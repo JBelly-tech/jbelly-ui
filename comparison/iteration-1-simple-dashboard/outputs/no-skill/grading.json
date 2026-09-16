@@ -1,0 +1,44 @@
+{
+  "expectations": [
+    {
+      "text": "tokens-not-raw-palette",
+      "passed": false,
+      "evidence": "238 raw palette classes in markup, e.g. ['bg-amber-100', 'bg-amber-400', 'bg-amber-50', 'bg-amber-500', 'bg-emerald-50']"
+    },
+    {
+      "text": "deliberate-personality",
+      "passed": true,
+      "evidence": "fonts=['(system/Inter default)'], blue-600 primary=no"
+    },
+    {
+      "text": "dark-mode-class",
+      "passed": true,
+      "evidence": "class toggle=yes, localStorage=yes"
+    },
+    {
+      "text": "rtl-logical-properties",
+      "passed": true,
+      "evidence": "logical=13, physical=0, rtl variants=yes"
+    },
+    {
+      "text": "table-states-and-actions",
+      "passed": false,
+      "evidence": "badge text=True, row actions=True, loading/empty state=False"
+    },
+    {
+      "text": "control-sizing-consistency",
+      "passed": false,
+      "evidence": "control heights used: ['h-8'] (2 occurrences)"
+    },
+    {
+      "text": "one-primary-per-view",
+      "passed": true,
+      "evidence": "2 solid primary button(s) found (KPI chips excluded heuristically)"
+    },
+    {
+      "text": "keyboard-and-focus",
+      "passed": false,
+      "evidence": "focus-visible=True, Esc handler=False, Ctrl/Cmd+K=False"
+    }
+  ]
+}

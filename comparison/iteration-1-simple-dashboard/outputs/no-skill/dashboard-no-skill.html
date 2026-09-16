@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="en" dir="ltr" class="h-full">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Nutrio — Dashboard</title>
+<script>
+  // Apply saved theme / direction before first paint to avoid a flash.
+  try {
+    var t = localStorage.getItem('nutrio-theme');
+    if (t === 'dark' || (!t && matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark');
+    if (localStorage.getItem('nutrio-dir') === 'rtl') { document.documentElement.dir = 'rtl'; document.documentElement.lang = 'ar'; }
+  } catch (e) {}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<style type="text/tailwindcss">
+  @custom-variant dark (&:where(.dark, .dark *));
+
+  @theme {
+    --font-sans: "Segoe UI", ui-sans-serif, system-ui, -apple-system, "Noto Sans Arabic", Tahoma, sans-serif;
+    --color-brand-50:  #effaf4;
+    --color-brand-100: #d7f3e3;
+    --color-brand-200: #b2e6ca;
+    --color-brand-300: #7fd3a9;
+    --color-brand-400: #4bb985;
+    --color-brand-500: #279e69;
+    --color-brand-600: #1a8055;
+    --color-brand-700: #176646;
+    --color-brand-800: #155139;
+    --color-brand-900: #124330;
+    --color-brand-950: #082518;
+  }
+
+  @layer base {
+    .dark { color-scheme: dark; }
+    #sidebar.open { transform: none; }
+  }
+
+  @layer components {
+    .card { @apply rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900; }
+    .btn { @apply inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/50; }
+    .btn-secondary { @apply border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800; }
+    .btn-primary { @apply border-brand-600 bg-brand-600 text-white hover:bg-brand-700 dark:border-brand-500 dark:bg-brand-500 dark:hover:bg-brand-400; }
+    .btn-icon { @apply inline-flex size-9 shrink-0 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/50 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white; }
+    .nav-link { @apply flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white; }
+    .nav-link.active { @apply bg-brand-50 text-brand-700 hover:bg-brand-50 dark:bg-brand-500/10 dark:text-brand-300 dark:hover:bg-brand-500/10; }
+    .nav-label { @apply px-3 pt-5 pb-1.5 text-[11px] font-semibold tracking-wider text-slate-400 uppercase; }
+    .badge { @apply inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs font-medium whitespace-nowrap; }
+    .badge-dot { @apply size-1.5 rounded-full; }
+    .seg { @apply rounded-md px-3 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white; }
+    .seg[aria-pressed="true"] { @apply bg-white text-slate-900 shadow-sm dark:bg-slate-700 dark:text-white; }
+    .th { @apply px-4 py-3 text-start text-xs font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-400; }
+    .td { @apply px-4 py-3 align-middle; }
+    .bar:hover rect { opacity: .75; }
+  }
+</style>
+<script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+</head>
+
+<body class="h-full bg-slate-50 font-sans text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100">
+<div class="min-h-full lg:flex">
+
+  <!-- Mobile overlay -->
+  <div id="overlay" class="fixed inset-0 z-30 hidden bg-slate-900/50 lg:hidden"></div>
+
+  <!-- ============ Sidebar ============ -->
+  <aside id="sidebar" class="fixed inset-y-0 start-0 z-40 flex w-72 -translate-x-full flex-col border-e border-slate-200 bg-white transition-transform duration-200 rtl:translate-x-full lg:static lg:translate-x-0 lg:shrink-0 lg:rtl:translate-x-0 dark:border-slate-800 dark:bg-slate-900">
+    <div class="flex h-16 items-center gap-3 border-b border-slate-200 px-4 dark:border-slate-800">
+      <div class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-brand-600 text-white">
+        <i data-lucide="leaf" class="size-5"></i>
+      </div>
+      <div class="min-w-0">
+        <p class="truncate text-sm font-semibold">Nutrio</p>
+        <p class="truncate text-xs text-slate-500 dark:text-slate-400">Abdoun · Amman</p>
+      </div>
+      <button class="btn-icon ms-auto" title="Switch branch"><i data-lucide="chevrons-up-down" class="size-4"></i></button>
+      <button id="closeSidebar" class="btn-icon lg:hidden" title="Close menu"><i data-lucide="x" class="size-4"></i></button>
+    </div>
+
+    <nav class="flex-1 overflow-y-auto px-3 py-2">
+      <p class="nav-label">Clinic</p>
+      <a href="#" class="nav-link active" aria-current="page"><i data-lucide="layout-dashboard" class="size-4.5"></i>Overview</a>
+      <a href="#" class="nav-link"><i data-lucide="users" class="size-4.5"></i>Patients
+        <span class="ms-auto rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600 dark:bg-slate-800 dark:text-slate-300">1,284</span></a>
+      <a href="#" class="nav-link"><i data-lucide="calendar-days" class="size-4.5"></i>Appointments
+        <span class="ms-auto rounded-full bg-brand-100 px-2 py-0.5 text-xs text-brand-700 dark:bg-brand-500/15 dark:text-brand-300">8</span></a>
+      <a href="#" class="nav-link"><i data-lucide="utensils-crossed" class="size-4.5"></i>Meal plans</a>
+      <a href="#" class="nav-link"><i data-lucide="stethoscope" class="size-4.5"></i>Nutritionists</a>
+      <a href="#" class="nav-link"><i data-lucide="flask-conical" class="size-4.5"></i>Lab &amp; InBody</a>
+
+      <p class="nav-label">Business</p>
+      <a href="#" class="nav-link"><i data-lucide="wallet" class="size-4.5"></i>Billing</a>
+      <a href="#" class="nav-link"><i data-lucide="chart-column" class="size-4.5"></i>Reports</a>
+      <a href="#" class="nav-link"><i data-lucide="message-square" class="size-4.5"></i>Messaging</a>
+
+      <p class="nav-label">System</p>
+      <a href="#" class="nav-link"><i data-lucide="settings" class="size-4.5"></i>Settings</a>
+      <a href="#" class="nav-link"><i data-lucide="life-buoy" class="size-4.5"></i>Help centre</a>
+    </nav>
+
+    <div class="border-t border-slate-200 p-3 dark:border-slate-800">
+      <div class="flex items-center gap-3 rounded-lg px-2 py-2">
+        <div class="flex size-9 shrink-0 items-center justify-center rounded-full bg-brand-100 text-sm font-semibold text-brand-700 dark:bg-brand-500/20 dark:text-brand-300">RS</div>
+        <div class="min-w-0">
+          <p class="truncate text-sm font-medium">Dr. Reem Al-Saleh</p>
+          <p class="truncate text-xs text-slate-500 dark:text-slate-400">Clinic director</p>
+        </div>
+        <button class="btn-icon ms-auto" title="Sign out"><i data-lucide="log-out" class="size-4"></i></button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ============ Main column ============ -->
+  <div class="flex min-w-0 flex-1 flex-col">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-slate-200 bg-white/80 px-4 backdrop-blur sm:px-6 lg:px-8 dark:border-slate-800 dark:bg-slate-900/80">
+      <button id="menuBtn" class="btn-icon lg:hidden" title="Open menu"><i data-lucide="menu" class="size-5"></i></button>
+
+      <label class="relative w-full max-w-md">
+        <i data-lucide="search" class="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-slate-400"></i>
+        <input type="search" placeholder="Search patients, appointments, plans…"
+               class="w-full rounded-lg border border-slate-200 bg-slate-50 py-2 ps-9 pe-16 text-sm placeholder:text-slate-400 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:border-slate-700 dark:bg-slate-800 dark:focus:bg-slate-900">
+        <kbd class="absolute end-2 top-1/2 hidden -translate-y-1/2 rounded border border-slate-200 bg-white px-1.5 py-0.5 font-sans text-[10px] text-slate-500 sm:block dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400">Ctrl K</kbd>
+      </label>
+
+      <div class="ms-auto flex items-center gap-1">
+        <button id="dirBtn" class="btn-icon w-auto gap-1.5 px-2.5" title="Toggle text direction">
+          <i data-lucide="languages" class="size-4"></i><span id="dirLabel" class="text-xs font-semibold">RTL</span>
+        </button>
+        <button id="themeBtn" class="btn-icon" title="Toggle dark mode">
+          <i data-lucide="moon" class="size-4 dark:hidden"></i>
+          <i data-lucide="sun" class="hidden size-4 dark:block"></i>
+        </button>
+        <button class="btn-icon relative" title="Notifications">
+          <i data-lucide="bell" class="size-4"></i>
+          <span class="absolute end-2 top-2 size-2 rounded-full bg-rose-500 ring-2 ring-white dark:ring-slate-900"></span>
+        </button>
+        <div class="mx-2 hidden h-6 w-px bg-slate-200 sm:block dark:bg-slate-800"></div>
+        <button class="hidden items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-slate-100 sm:flex dark:hover:bg-slate-800">
+          <span class="flex size-8 items-center justify-center rounded-full bg-brand-100 text-xs font-semibold text-brand-700 dark:bg-brand-500/20 dark:text-brand-300">RS</span>
+          <span class="text-start leading-tight">
+            <span class="block text-sm font-medium">Dr. Reem</span>
+            <span class="block text-[11px] text-slate-500 dark:text-slate-400">Director</span>
+          </span>
+          <i data-lucide="chevron-down" class="size-4 text-slate-400"></i>
+        </button>
+      </div>
+    </header>
+
+    <main class="space-y-6 p-4 sm:p-6 lg:p-8">
+
+      <!-- Page toolbar -->
+      <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <nav class="mb-1 flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400" aria-label="Breadcrumb">
+            <span>Nutrio</span><i data-lucide="chevron-right" class="size-3 rtl:rotate-180"></i>
+            <span>Abdoun branch</span><i data-lucide="chevron-right" class="size-3 rtl:rotate-180"></i>
+            <span class="text-slate-900 dark:text-slate-200">Overview</span>
+          </nav>
+          <h1 class="text-2xl font-semibold tracking-tight">Good morning, Dr. Reem</h1>
+          <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Wednesday, 9 September 2026 · 32 appointments across 3 nutritionists · 2 rooms free this afternoon</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <div class="flex rounded-lg border border-slate-200 bg-slate-100 p-0.5 dark:border-slate-700 dark:bg-slate-800" role="group" aria-label="Range">
+            <button class="seg" aria-pressed="true">Today</button>
+            <button class="seg" aria-pressed="false">Week</button>
+            <button class="seg" aria-pressed="false">Month</button>
+          </div>
+          <button class="btn btn-secondary"><i data-lucide="calendar" class="size-4"></i>1 – 9 Sep</button>
+          <button class="btn btn-secondary"><i data-lucide="download" class="size-4"></i>Export</button>
+          <button class="btn btn-primary"><i data-lucide="plus" class="size-4"></i>New appointment</button>
+        </div>
+      </div>
+
+      <!-- KPI cards -->
+      <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Key metrics">
+
+        <div class="card p-5">
+          <div class="flex items-start justify-between">
+            <div>
+              <p class="text-sm text-slate-500 dark:text-slate-400">Active patients</p>
+              <p class="mt-1 text-3xl font-semibold tracking-tight">1,284</p>
+            </div>
+            <span class="flex size-10 items-center justify-center rounded-lg bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-300"><i data-lucide="users" class="size-5"></i></span>
+          </div>
+          <div class="mt-4 flex items-end justify-between gap-3">
+            <p class="text-xs text-slate-500 dark:text-slate-400"><span class="inline-flex items-center gap-0.5 font-medium text-emerald-600 dark:text-emerald-400"><i data-lucide="trending-up" class="size-3.5"></i>6.2%</span> vs August</p>
+            <svg viewBox="0 0 100 32" class="h-8 w-24 text-brand-500" aria-hidden="true"><polyline fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" points="0,26 12,22 24,24 36,17 48,19 60,12 72,14 84,8 100,6"/></svg>
+          </div>
+        </div>
+
+        <div class="card p-5">
+          <div class="flex items-start justify-between">
+            <div>
+              <p class="text-sm text-slate-500 dark:text-slate-400">Appointments today</p>
+              <p class="mt-1 text-3xl font-semibold tracking-tight">32</p>
+            </div>
+            <span class="flex size-10 items-center justify-center rounded-lg bg-sky-50 text-sky-600 dark:bg-sky-500/10 dark:text-sky-300"><i data-lucide="calendar-days" class="size-5"></i></span>
+          </div>
+          <div class="mt-4">
+            <div class="flex justify-between text-xs text-slate-500 dark:text-slate-400"><span>24 completed</span><span>8 remaining</span></div>
+            <div class="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800"><div class="h-full w-3/4 rounded-full bg-sky-500"></div></div>
+          </div>
+        </div>
+
+        <div class="card p-5">
+          <div class="flex items-start justify-between">
+            <div>
+              <p class="text-sm text-slate-500 dark:text-slate-400">Avg. progress to goal</p>
+              <p class="mt-1 text-3xl font-semibold tracking-tight">68%</p>
+            </div>
+            <span class="flex size-10 items-center justify-center rounded-lg bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-300"><i data-lucide="target" class="size-5"></i></span>
+          </div>
+          <div class="mt-4">
+            <div class="flex h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+              <div class="h-full bg-emerald-500" style="width:61%" title="On track 61%"></div>
+              <div class="h-full bg-amber-400" style="width:27%" title="At risk 27%"></div>
+              <div class="h-full bg-rose-400" style="width:12%" title="Off track 12%"></div>
+            </div>
+            <div class="mt-1.5 flex gap-3 text-xs text-slate-500 dark:text-slate-400">
+              <span class="flex items-center gap-1"><span class="badge-dot bg-emerald-500"></span>On track 61%</span>
+              <span class="flex items-center gap-1"><span class="badge-dot bg-amber-400"></span>At risk 27%</span>
+              <span class="flex items-center gap-1"><span class="badge-dot bg-rose-400"></span>Off 12%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card p-5">
+          <div class="flex items-start justify-between">
+            <div>
+              <p class="text-sm text-slate-500 dark:text-slate-400">Revenue (month to date)</p>
+              <p class="mt-1 text-3xl font-semibold tracking-tight"><span class="text-lg font-medium text-slate-400">JOD</span> 18,450</p>
+            </div>
+            <span class="flex size-10 items-center justify-center rounded-lg bg-violet-50 text-violet-600 dark:bg-violet-500/10 dark:text-violet-300"><i data-lucide="wallet" class="size-5"></i></span>
+          </div>
+          <div class="mt-4 flex items-end justify-between gap-3">
+            <p class="text-xs text-slate-500 dark:text-slate-400"><span class="inline-flex items-center gap-0.5 font-medium text-emerald-600 dark:text-emerald-400"><i data-lucide="trending-up" class="size-3.5"></i>12.4%</span> vs same period Aug</p>
+            <svg viewBox="0 0 100 32" class="h-8 w-24 text-violet-500" aria-hidden="true"><polyline fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" points="0,28 12,25 24,26 36,20 48,22 60,15 72,17 84,10 100,9"/></svg>
+          </div>
+        </div>
+      </section>
+
+      <!-- Chart + program mix -->
+      <section class="grid gap-4 lg:grid-cols-3">
+        <div class="card lg:col-span-2">
+          <div class="flex flex-wrap items-start justify-between gap-3 border-b border-slate-200 px-5 py-4 dark:border-slate-800">
+            <div>
+              <h2 class="font-semibold">Appointments — last 14 days</h2>
+              <p class="mt-0.5 text-sm text-slate-500 dark:text-slate-400">Daily volume with 7-day rolling average · weekends (Fri–Sat) shaded</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <select class="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-sm dark:border-slate-700 dark:bg-slate-900" aria-label="Nutritionist filter">
+                <option>All nutritionists</option><option>Dr. Reem Al-Saleh</option><option>Dr. Ayman Khreisat</option><option>Dr. Farah Masri</option>
+              </select>
+              <button class="btn-icon" title="More"><i data-lucide="ellipsis" class="size-4"></i></button>
+            </div>
+          </div>
+          <div class="px-3 pt-4 pb-2 sm:px-5">
+            <svg id="chart" viewBox="0 0 640 240" class="h-auto w-full" style="direction:ltr" role="img" aria-label="Bar chart of daily appointments for the last 14 days"></svg>
+            <div class="mt-2 flex flex-wrap gap-4 px-2 text-xs text-slate-500 dark:text-slate-400">
+              <span class="flex items-center gap-1.5"><span class="size-2.5 rounded-sm bg-brand-500"></span>Appointments</span>
+              <span class="flex items-center gap-1.5"><span class="size-2.5 rounded-sm bg-slate-300 dark:bg-slate-700"></span>Weekend</span>
+              <span class="flex items-center gap-1.5"><span class="h-0.5 w-4 rounded bg-amber-500"></span>7-day average</span>
+              <span class="ms-auto">Peak: Mon 7 Sep · 36</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="border-b border-slate-200 px-5 py-4 dark:border-slate-800">
+            <h2 class="font-semibold">Patients by program</h2>
+            <p class="mt-0.5 text-sm text-slate-500 dark:text-slate-400">Active plans, all branches</p>
+          </div>
+          <div class="flex items-center gap-5 p-5">
+            <svg id="donut" viewBox="0 0 100 100" class="size-32 shrink-0" style="direction:ltr" role="img" aria-label="Donut chart of patients by program">
+              <circle cx="50" cy="50" r="42" fill="none" stroke-width="12" class="stroke-slate-100 dark:stroke-slate-800"/>
+              <g id="donutSegs" transform="rotate(-90 50 50)"></g>
+              <text x="50" y="47" text-anchor="middle" class="fill-slate-900 text-[15px] font-semibold dark:fill-white">1,284</text>
+              <text x="50" y="60" text-anchor="middle" class="fill-slate-500 text-[8px]">patients</text>
+            </svg>
+            <ul id="donutLegend" class="min-w-0 flex-1 space-y-2 text-sm"></ul>
+          </div>
+          <div class="border-t border-slate-200 px-5 py-3 text-xs text-slate-500 dark:border-slate-800 dark:text-slate-400">
+            Diabetes &amp; metabolic grew <span class="font-medium text-emerald-600 dark:text-emerald-400">+18%</span> this quarter.
+          </div>
+        </div>
+      </section>
+
+      <!-- Appointments table + activity -->
+      <section class="grid gap-4 lg:grid-cols-3">
+        <div class="card lg:col-span-2">
+          <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-5 py-4 dark:border-slate-800">
+            <div>
+              <h2 class="font-semibold">Upcoming appointments</h2>
+              <p class="mt-0.5 text-sm text-slate-500 dark:text-slate-400">Today from 11:30 · Abdoun branch</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button class="btn btn-secondary py-1.5"><i data-lucide="clock" class="size-4"></i>Next 2 hours</button>
+              <button class="btn btn-secondary py-1.5">All statuses<i data-lucide="chevron-down" class="size-4"></i></button>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full min-w-[720px] text-sm">
+              <thead class="border-b border-slate-200 bg-slate-50/60 dark:border-slate-800 dark:bg-slate-800/40">
+                <tr>
+                  <th class="th">Patient</th>
+                  <th class="th">Time</th>
+                  <th class="th">Nutritionist</th>
+                  <th class="th">Visit</th>
+                  <th class="th">Status</th>
+                  <th class="th text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="apptRows" class="divide-y divide-slate-100 dark:divide-slate-800"></tbody>
+            </table>
+          </div>
+
+          <div class="flex items-center justify-between border-t border-slate-200 px-5 py-3 text-sm dark:border-slate-800">
+            <p class="text-slate-500 dark:text-slate-400">Showing 8 of 14 remaining today</p>
+            <a href="#" class="inline-flex items-center gap-1 font-medium text-brand-600 hover:underline dark:text-brand-300">Open schedule<i data-lucide="arrow-right" class="size-4 rtl:rotate-180"></i></a>
+          </div>
+        </div>
+
+        <div class="card flex flex-col">
+          <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4 dark:border-slate-800">
+            <div>
+              <h2 class="font-semibold">Activity</h2>
+              <p class="mt-0.5 text-sm text-slate-500 dark:text-slate-400">This morning</p>
+            </div>
+            <button class="btn-icon" title="Refresh"><i data-lucide="refresh-cw" class="size-4"></i></button>
+          </div>
+          <ol id="activity" class="flex-1 space-y-0 px-5 py-2"></ol>
+          <div class="border-t border-slate-200 px-5 py-3 dark:border-slate-800">
+            <a href="#" class="inline-flex items-center gap-1 text-sm font-medium text-brand-600 hover:underline dark:text-brand-300">View full log<i data-lucide="arrow-right" class="size-4 rtl:rotate-180"></i></a>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<script>
+(function () {
+  const root = document.documentElement;
+
+  /* ---------- Theme + direction toggles ---------- */
+  const save = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+  document.getElementById('themeBtn').addEventListener('click', () => {
+    const on = !root.classList.contains('dark');
+    root.classList.toggle('dark', on);
+    save('nutrio-theme', on ? 'dark' : 'light');
+  });
+  const dirLabel = document.getElementById('dirLabel');
+  const syncDir = () => { dirLabel.textContent = root.dir === 'rtl' ? 'LTR' : 'RTL'; };
+  document.getElementById('dirBtn').addEventListener('click', () => {
+    const rtl = root.dir !== 'rtl';
+    root.dir = rtl ? 'rtl' : 'ltr';
+    root.lang = rtl ? 'ar' : 'en';
+    save('nutrio-dir', root.dir);
+    syncDir();
+  });
+  syncDir();
+
+  /* ---------- Mobile sidebar ---------- */
+  const sidebar = document.getElementById('sidebar'), overlay = document.getElementById('overlay');
+  const setMenu = (open) => { sidebar.classList.toggle('open', open); overlay.classList.toggle('hidden', !open); };
+  document.getElementById('menuBtn').addEventListener('click', () => setMenu(true));
+  document.getElementById('closeSidebar').addEventListener('click', () => setMenu(false));
+  overlay.addEventListener('click', () => setMenu(false));
+
+  /* ---------- Segmented control ---------- */
+  document.querySelectorAll('.seg').forEach(b => b.addEventListener('click', () => {
+    b.parentElement.querySelectorAll('.seg').forEach(x => x.setAttribute('aria-pressed', x === b));
+  }));
+
+  /* ---------- Bar chart: last 14 days ---------- */
+  const days = [
+    ['Thu','27 Aug',29],['Fri','28 Aug',6,1],['Sat','29 Aug',11,1],['Sun','30 Aug',27],['Mon','31 Aug',33],
+    ['Tue','1 Sep',31],['Wed','2 Sep',35],['Thu','3 Sep',28],['Fri','4 Sep',5,1],['Sat','5 Sep',12,1],
+    ['Sun','6 Sep',30],['Mon','7 Sep',36],['Tue','8 Sep',34],['Wed','9 Sep',32]
+  ];
+  (function drawChart() {
+    const W = 640, H = 240, pl = 36, pr = 12, pt = 16, pb = 28, max = 40;
+    const iw = W - pl - pr, ih = H - pt - pb;
+    const yOf = v => pt + ih - (v / max) * ih;
+    let s = '';
+    for (let y = 0; y <= max; y += 10) {
+      s += `<line x1="${pl}" x2="${W - pr}" y1="${yOf(y)}" y2="${yOf(y)}" class="stroke-slate-200 dark:stroke-slate-800"/>`;
+      s += `<text x="${pl - 8}" y="${yOf(y) + 4}" text-anchor="end" class="fill-slate-400 text-[11px]">${y}</text>`;
+    }
+    const slot = iw / days.length, bw = slot * 0.56, pts = [];
+    days.forEach((d, i) => {
+      const [w, date, v, we] = d, x = pl + slot * i + (slot - bw) / 2, y = yOf(v), today = i === days.length - 1;
+      s += `<g class="bar"><title>${w} ${date}: ${v} appointments</title><rect x="${x}" y="${y}" width="${bw}" height="${ih + pt - y}" rx="3" class="${we ? 'fill-slate-300 dark:fill-slate-700' : 'fill-brand-500'}"/></g>`;
+      s += `<text x="${x + bw / 2}" y="${H - 8}" text-anchor="middle" class="${today ? 'fill-brand-600 font-semibold dark:fill-brand-300' : 'fill-slate-400'} text-[11px]">${today ? 'Today' : w}</text>`;
+      const from = Math.max(0, i - 6), sub = days.slice(from, i + 1);
+      pts.push([x + bw / 2, yOf(sub.reduce((a, b) => a + b[2], 0) / sub.length)]);
+    });
+    s += `<polyline fill="none" points="${pts.map(p => p.join(',')).join(' ')}" class="stroke-amber-500" stroke-width="2" stroke-linejoin="round"/>`;
+    pts.forEach(p => { s += `<circle cx="${p[0]}" cy="${p[1]}" r="3" class="fill-white stroke-amber-500 dark:fill-slate-900" stroke-width="2"/>`; });
+    document.getElementById('chart').innerHTML = s;
+  })();
+
+  /* ---------- Donut: patients by program ---------- */
+  const programs = [
+    ['Weight management', 46, 'brand-500'], ['Diabetes & metabolic', 22, 'sky-500'],
+    ['Sports nutrition', 17, 'amber-500'], ['Pediatric', 9, 'violet-500'], ['Other', 6, 'slate-400']
+  ];
+  (function drawDonut() {
+    const C = 2 * Math.PI * 42; let off = 0, segs = '', legend = '';
+    programs.forEach(([name, pct, col]) => {
+      const len = C * pct / 100;
+      segs += `<circle cx="50" cy="50" r="42" fill="none" stroke-width="12" stroke-dasharray="${len - 1.5} ${C - len + 1.5}" stroke-dashoffset="${-off}" class="stroke-${col}"><title>${name}: ${pct}%</title></circle>`;
+      legend += `<li class="flex items-center gap-2"><span class="size-2.5 shrink-0 rounded-sm bg-${col}"></span><span class="min-w-0 flex-1 truncate text-slate-600 dark:text-slate-300">${name}</span><span class="font-medium tabular-nums">${pct}%</span></li>`;
+      off += len;
+    });
+    document.getElementById('donutSegs').innerHTML = segs;
+    document.getElementById('donutLegend').innerHTML = legend;
+  })();
+
+  /* ---------- Appointments table ---------- */
+  const status = {
+    progress:  ['In progress', 'border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-500/30 dark:bg-sky-500/10 dark:text-sky-300', 'bg-sky-500'],
+    confirmed: ['Confirmed',   'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300', 'bg-emerald-500'],
+    pending:   ['Pending',     'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300', 'bg-amber-500'],
+    cancelled: ['Cancelled',   'border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300', 'bg-rose-500'],
+    noshow:    ['No-show',     'border-slate-200 bg-slate-50 text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300', 'bg-slate-400']
+  };
+  const avatars = ['bg-brand-100 text-brand-700', 'bg-sky-100 text-sky-700', 'bg-amber-100 text-amber-700', 'bg-violet-100 text-violet-700', 'bg-rose-100 text-rose-700'];
+  const appts = [
+    ['Mohammad Al-Zoubi', 'محمد الزعبي', 'MZ', '11:30', 'Dr. Reem Al-Saleh', 'Follow-up · Weight mgmt', 'clinic', 'progress'],
+    ['Rania Al-Khatib', 'رانيا الخطيب', 'RK', '12:00', 'Dr. Reem Al-Saleh', 'Follow-up · Weight mgmt', 'clinic', 'confirmed'],
+    ['Omar Abu Zaid', 'عمر أبو زيد', 'OA', '12:30', 'Dr. Ayman Khreisat', 'Initial consultation', 'clinic', 'pending'],
+    ['Lina Haddad', 'لينا حداد', 'LH', '13:00', 'Dr. Farah Masri', 'Meal plan review', 'online', 'confirmed'],
+    ['Dana Nabulsi', 'دانا نابلسي', 'DN', '13:30', 'Dr. Farah Masri', 'InBody scan', 'clinic', 'cancelled'],
+    ['Yousef Al-Majali', 'يوسف المجالي', 'YM', '14:00', 'Dr. Ayman Khreisat', 'Diabetes follow-up', 'clinic', 'confirmed'],
+    ['Hala Shehadeh', 'هالة شحادة', 'HS', '15:00', 'Dr. Reem Al-Saleh', 'Initial consultation', 'online', 'pending'],
+    ['Khaled Al-Tarawneh', 'خالد الطراونة', 'KT', '16:30', 'Dr. Ayman Khreisat', 'Sports nutrition', 'clinic', 'confirmed']
+  ];
+  document.getElementById('apptRows').innerHTML = appts.map((a, i) => {
+    const [name, ar, ini, time, doc, visit, mode, st] = a, [label, cls, dot] = status[st];
+    const done = st === 'cancelled';
+    return `<tr class="${done ? 'opacity-60' : ''} hover:bg-slate-50 dark:hover:bg-slate-800/40">
+      <td class="td">
+        <div class="flex items-center gap-3">
+          <span class="flex size-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${avatars[i % avatars.length]}">${ini}</span>
+          <div class="min-w-0"><p class="truncate font-medium">${name}</p><p class="truncate text-xs text-slate-500 dark:text-slate-400">${ar}</p></div>
+        </div>
+      </td>
+      <td class="td whitespace-nowrap"><span class="font-medium tabular-nums">${time}</span><span class="ms-1 text-xs text-slate-400">30 min</span></td>
+      <td class="td whitespace-nowrap text-slate-600 dark:text-slate-300">${doc}</td>
+      <td class="td">
+        <div class="flex items-center gap-2"><span class="text-slate-600 dark:text-slate-300">${visit}</span>
+          <span class="inline-flex items-center gap-1 rounded border border-slate-200 px-1.5 py-0.5 text-[11px] text-slate-500 dark:border-slate-700 dark:text-slate-400"><i data-lucide="${mode === 'online' ? 'video' : 'building-2'}" class="size-3"></i>${mode === 'online' ? 'Online' : 'In clinic'}</span>
+        </div>
+      </td>
+      <td class="td"><span class="badge ${cls}"><span class="badge-dot ${dot}"></span>${label}</span></td>
+      <td class="td">
+        <div class="flex items-center justify-end gap-0.5">
+          <button class="btn-icon size-8" title="Check in" ${done ? 'disabled' : ''}><i data-lucide="user-check" class="size-4"></i></button>
+          <button class="btn-icon size-8" title="Reschedule"><i data-lucide="calendar-clock" class="size-4"></i></button>
+          <button class="btn-icon size-8" title="More"><i data-lucide="ellipsis" class="size-4"></i></button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  /* ---------- Activity list ---------- */
+  const activity = [
+    ['11:32', 'file-text', 'text-sky-600 bg-sky-50 dark:bg-sky-500/10 dark:text-sky-300', '<b>Dr. Farah Masri</b> uploaded InBody results for <b>Sara Odeh</b>'],
+    ['11:05', 'receipt', 'text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10 dark:text-emerald-300', 'Payment received: <b>JOD 45</b> from <b>Ahmad Bani Hani</b> (follow-up)'],
+    ['10:48', 'user-plus', 'text-brand-600 bg-brand-50 dark:bg-brand-500/10 dark:text-brand-300', 'New patient registered: <b>Noor Al-Momani</b> · referred by Dr. Khreisat'],
+    ['10:20', 'calendar-clock', 'text-amber-600 bg-amber-50 dark:bg-amber-500/10 dark:text-amber-300', '<b>Tariq Hijazi</b> rescheduled to Thu 10 Sep, 09:30'],
+    ['09:55', 'utensils-crossed', 'text-violet-600 bg-violet-50 dark:bg-violet-500/10 dark:text-violet-300', 'Meal plan v3 published for <b>Lina Haddad</b> by Dr. Reem'],
+    ['09:10', 'message-square', 'text-slate-600 bg-slate-100 dark:bg-slate-800 dark:text-slate-300', 'Reminder SMS sent to <b>27 patients</b> for tomorrow']
+  ];
+  document.getElementById('activity').innerHTML = activity.map(([t, icon, cls, text], i) => `
+    <li class="relative flex gap-3 py-3 ${i < activity.length - 1 ? 'border-b border-slate-100 dark:border-slate-800' : ''}">
+      <span class="flex size-8 shrink-0 items-center justify-center rounded-full ${cls}"><i data-lucide="${icon}" class="size-4"></i></span>
+      <div class="min-w-0 flex-1">
+        <p class="text-sm leading-snug text-slate-700 [&_b]:font-medium [&_b]:text-slate-900 dark:text-slate-300 dark:[&_b]:text-white">${text}</p>
+        <p class="mt-0.5 text-xs text-slate-400 tabular-nums">${t}</p>
+      </div>
+    </li>`).join('');
+
+  lucide.createIcons();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nutrio — Dashboard</title>
+<meta name="description" content="Nutrio clinic admin — daily overview of appointments, patients and revenue for a nutrition clinic in Amman.">
+<script>
+  /* Pre-paint: restore theme + language before first render to avoid a flash. */
+  (function () {
+    try {
+      var t = localStorage.getItem('nutrio-theme');
+      if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      }
+      if (localStorage.getItem('nutrio-lang') === 'ar') {
+        document.documentElement.lang = 'ar';
+        document.documentElement.dir = 'rtl';
+      }
+    } catch (e) {}
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;600;700&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<style type="text/tailwindcss">
+  @custom-variant dark (&:where(.dark, .dark *));
+  @theme {
+    --font-sans: "Atkinson Hyperlegible Next", "Noto Sans Arabic", ui-sans-serif, system-ui, sans-serif;
+  }
+  @theme inline {
+    --color-bg: var(--bg);
+    --color-surface: var(--surface);
+    --color-surface-2: var(--surface-2);
+    --color-surface-3: var(--surface-3);
+    --color-fg: var(--fg);
+    --color-fg-muted: var(--fg-muted);
+    --color-fg-subtle: var(--fg-subtle);
+    --color-line: var(--line);
+    --color-line-strong: var(--line-strong);
+    --color-brand: var(--brand);
+    --color-brand-strong: var(--brand-strong);
+    --color-brand-soft: var(--brand-soft);
+    --color-brand-fg: var(--brand-fg);
+    --color-accent: var(--accent);
+    --color-accent-soft: var(--accent-soft);
+    --color-accent-fg: var(--accent-fg);
+    --color-info-soft: var(--info-soft);
+    --color-info-fg: var(--info-fg);
+    --color-warn-soft: var(--warn-soft);
+    --color-warn-fg: var(--warn-fg);
+    --color-danger: var(--danger);
+    --color-danger-soft: var(--danger-soft);
+    --color-danger-fg: var(--danger-fg);
+    --color-neutral-soft: var(--neutral-soft);
+    --color-neutral-fg: var(--neutral-fg);
+  }
+</style>
+<style>
+  /* ---------- Semantic tokens (light) ---------- */
+  :root {
+    color-scheme: light;
+    --bg: #F3F8F5;
+    --surface: #FFFFFF;
+    --surface-2: #EEF5F0;
+    --surface-3: #E1EBE5;
+    --fg: #0F1A15;
+    --fg-muted: #4B5B52;
+    --fg-subtle: #5B6B62;
+    --line: #DCE6DF;
+    --line-strong: #C3D2C9;
+    --brand: #059669;
+    --brand-strong: #047857;
+    --brand-soft: #D7F5E6;
+    --brand-fg: #065F46;
+    --accent: #EA580C;
+    --accent-soft: #FFEAD5;
+    --accent-fg: #9A3412;
+    --info-soft: #CFFAFE;
+    --info-fg: #155E75;
+    --warn-soft: #FEF3C7;
+    --warn-fg: #92400E;
+    --danger: #DC2626;
+    --danger-soft: #FEE2E2;
+    --danger-fg: #991B1B;
+    --neutral-soft: #E5EBE7;
+    --neutral-fg: #3F4E46;
+    --btn-bg: #047857;
+    --btn-fg: #FFFFFF;
+    --shadow-card: 0 1px 2px rgba(15, 26, 21, .05), 0 0 0 1px rgba(15, 26, 21, .02);
+  }
+  /* ---------- Semantic tokens (dark) ---------- */
+  .dark {
+    color-scheme: dark;
+    --bg: #0C1210;
+    --surface: #141B18;
+    --surface-2: #1B2420;
+    --surface-3: #243029;
+    --fg: #E8EFEA;
+    --fg-muted: #A9B7AE;
+    --fg-subtle: #8F9E95;
+    --line: #26322C;
+    --line-strong: #354239;
+    --brand: #34D399;
+    --brand-strong: #10B981;
+    --brand-soft: #123527;
+    --brand-fg: #6EE7B7;
+    --accent: #FB923C;
+    --accent-soft: #3B2313;
+    --accent-fg: #FDBA74;
+    --info-soft: #0E2F36;
+    --info-fg: #67E8F9;
+    --warn-soft: #3A2A0A;
+    --warn-fg: #FCD34D;
+    --danger: #F87171;
+    --danger-soft: #3B1717;
+    --danger-fg: #FCA5A5;
+    --neutral-soft: #2A342F;
+    --neutral-fg: #C3CDC7;
+    --btn-bg: #34D399;
+    --btn-fg: #062A1E;
+    --shadow-card: none;
+  }
+
+  /* Component styles live in the `components` layer so Tailwind utilities (layer `utilities`) keep precedence. */
+  @layer components {
+  html { font-family: "Atkinson Hyperlegible Next", "Noto Sans Arabic", ui-sans-serif, system-ui, sans-serif; }
+  body { background: var(--bg); color: var(--fg); -webkit-font-smoothing: antialiased; }
+  [dir="rtl"] .tracking-tight { letter-spacing: 0; }
+  :focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+  ::selection { background: var(--brand-soft); color: var(--brand-fg); }
+
+  /* ---------- Components ---------- */
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: .875rem; box-shadow: var(--shadow-card); }
+
+  .nav-link { display: flex; align-items: center; gap: .625rem; padding: .5rem .625rem; border-radius: .5rem; font-size: .875rem; font-weight: 500; color: var(--fg-muted); cursor: pointer; transition: background-color .15s ease, color .15s ease; }
+  .nav-link:hover { background: var(--surface-2); color: var(--fg); }
+  .nav-link[aria-current="page"] { background: var(--brand-soft); color: var(--brand-fg); }
+  .nav-link svg { width: 1.125rem; height: 1.125rem; flex: none; }
+  .nav-heading { padding: 0 .625rem; margin: 1rem 0 .375rem; font-size: .6875rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--fg-subtle); }
+  [dir="rtl"] .nav-heading { letter-spacing: 0; }
+
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; height: 2.25rem; padding: 0 .875rem; border-radius: .5rem; font-size: .875rem; font-weight: 600; white-space: nowrap; cursor: pointer; transition: background-color .15s ease, color .15s ease, border-color .15s ease, filter .15s ease; }
+  .btn svg { width: 1rem; height: 1rem; flex: none; }
+  .btn-primary { background: var(--btn-bg); color: var(--btn-fg); }
+  .btn-primary:hover { filter: brightness(1.08); }
+  .btn-secondary { background: var(--surface); color: var(--fg); border: 1px solid var(--line-strong); }
+  .btn-secondary:hover { background: var(--surface-2); }
+  .btn-ghost { background: transparent; color: var(--fg-muted); }
+  .btn-ghost:hover { background: var(--surface-2); color: var(--fg); }
+  .btn-sm { height: 2rem; padding: 0 .625rem; font-size: .8125rem; }
+
+  .icon-btn { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 2.5rem; height: 2.5rem; border-radius: .5rem; color: var(--fg-muted); cursor: pointer; transition: background-color .15s ease, color .15s ease; }
+  .icon-btn:hover { background: var(--surface-2); color: var(--fg); }
+  .icon-btn svg { width: 1.125rem; height: 1.125rem; }
+  .icon-btn-sm { width: 2.25rem; height: 2.25rem; }
+  .icon-btn-sm svg { width: 1rem; height: 1rem; }
+  .icon-btn-brand:hover { background: var(--brand-soft); color: var(--brand-fg); }
+
+  .avatar { display: inline-flex; align-items: center; justify-content: center; width: 2.125rem; height: 2.125rem; border-radius: 9999px; background: var(--surface-3); color: var(--fg-muted); font-size: .6875rem; font-weight: 700; letter-spacing: .02em; flex: none; }
+
+  .seg { display: inline-flex; padding: 2px; background: var(--surface-2); border: 1px solid var(--line); border-radius: .5rem; }
+  .seg button { height: 1.875rem; padding: 0 .75rem; border-radius: .375rem; font-size: .8125rem; font-weight: 500; color: var(--fg-muted); cursor: pointer; transition: background-color .15s ease, color .15s ease; }
+  .seg button:hover { color: var(--fg); }
+  .seg button[aria-pressed="true"] { background: var(--surface); color: var(--fg); box-shadow: 0 1px 2px rgba(0, 0, 0, .08); }
+
+  .chip { display: inline-flex; align-items: center; gap: .375rem; height: 1.875rem; padding: 0 .75rem; border-radius: 9999px; border: 1px solid var(--line); background: var(--surface); font-size: .8125rem; font-weight: 500; color: var(--fg-muted); cursor: pointer; transition: background-color .15s ease, color .15s ease, border-color .15s ease; }
+  .chip:hover { background: var(--surface-2); color: var(--fg); }
+  .chip[aria-pressed="true"] { background: var(--fg); color: var(--surface); border-color: var(--fg); }
+  .chip .count { font-size: .6875rem; font-weight: 600; padding: 0 .375rem; border-radius: 9999px; background: var(--surface-2); color: var(--fg-muted); }
+  .chip[aria-pressed="true"] .count { background: rgba(255, 255, 255, .18); color: inherit; }
+  .dark .chip[aria-pressed="true"] .count { background: rgba(0, 0, 0, .18); }
+
+  .badge { display: inline-flex; align-items: center; gap: .375rem; padding: .125rem .625rem; border-radius: 9999px; font-size: .75rem; font-weight: 600; line-height: 1.25rem; white-space: nowrap; }
+  .badge .dot { width: .375rem; height: .375rem; border-radius: 9999px; background: currentColor; }
+  .badge-confirmed { background: var(--brand-soft); color: var(--brand-fg); }
+  .badge-pending { background: var(--warn-soft); color: var(--warn-fg); }
+  .badge-checkedin { background: var(--info-soft); color: var(--info-fg); }
+  .badge-cancelled { background: var(--danger-soft); color: var(--danger-fg); }
+  .badge-noshow { background: var(--neutral-soft); color: var(--neutral-fg); }
+
+  .delta { display: inline-flex; align-items: center; gap: .25rem; padding: .125rem .5rem; border-radius: 9999px; font-size: .75rem; font-weight: 600; white-space: nowrap; }
+  .delta svg { width: .875rem; height: .875rem; }
+  .delta-good { background: var(--brand-soft); color: var(--brand-fg); }
+  .delta-bad { background: var(--danger-soft); color: var(--danger-fg); }
+
+  .kpi-icon { display: inline-flex; align-items: center; justify-content: center; width: 2.5rem; height: 2.5rem; border-radius: .625rem; flex: none; }
+  .kpi-icon svg { width: 1.25rem; height: 1.25rem; }
+
+  .act-icon { display: inline-flex; align-items: center; justify-content: center; width: 2rem; height: 2rem; border-radius: 9999px; flex: none; position: relative; z-index: 1; }
+  .act-icon svg { width: .9375rem; height: .9375rem; }
+
+  table th { font-size: .6875rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--fg-subtle); }
+  [dir="rtl"] table th { letter-spacing: 0; }
+
+  input[type="checkbox"] { width: 1rem; height: 1rem; border-radius: .25rem; accent-color: var(--brand-strong); cursor: pointer; }
+  .dark input[type="checkbox"] { accent-color: var(--brand); }
+
+  /* ---------- Chart ---------- */
+  .ch-grid { stroke: var(--line); stroke-width: 1; }
+  .ch-axis { fill: var(--fg-subtle); font-size: 11px; font-family: inherit; }
+  .ch-axis-today { fill: var(--fg); font-weight: 700; }
+  .ch-weekend { fill: var(--fg); fill-opacity: .045; }
+  .ch-area { fill: var(--brand); fill-opacity: .14; }
+  .ch-line-booked { fill: none; stroke: var(--brand); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+  .ch-line-done { fill: none; stroke: var(--accent); stroke-width: 2; stroke-dasharray: 5 4; stroke-linejoin: round; stroke-linecap: round; }
+  .ch-dot-booked { fill: var(--brand); stroke: var(--surface); stroke-width: 2; }
+  .ch-dot-done { fill: var(--accent); stroke: var(--surface); stroke-width: 2; }
+  .ch-hit { fill: transparent; cursor: crosshair; outline: none; }
+  .ch-hit:hover, .ch-hit:focus-visible { fill: var(--fg); fill-opacity: .05; }
+  .ch-cross { stroke: var(--fg-subtle); stroke-dasharray: 3 3; visibility: hidden; pointer-events: none; }
+  .ch-cross.on { visibility: visible; }
+  .legend-swatch { display: inline-block; width: 1.25rem; height: 0; border-top: 2px solid; }
+  .legend-swatch.dashed { border-top-style: dashed; }
+  .legend-box { display: inline-block; width: .75rem; height: .75rem; border-radius: .125rem; background: var(--fg); opacity: .12; }
+
+  /* ---------- Off-canvas sidebar (below lg) ---------- */
+  @media (max-width: 1023.98px) {
+    #sidebar { transform: translateX(-100%); transition: transform .2s ease; }
+    [dir="rtl"] #sidebar { transform: translateX(100%); }
+    #sidebar.open { transform: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+  }
+  } /* end @layer components */
+</style>
+</head>
+<body class="min-h-screen text-sm">
+
+<div class="flex min-h-screen">
+
+  <!-- ================= SIDEBAR ================= -->
+  <aside id="sidebar" class="fixed inset-y-0 start-0 z-40 flex h-screen w-60 shrink-0 flex-col border-e border-line bg-surface lg:sticky lg:top-0" aria-label="Primary navigation">
+    <div class="flex h-14 items-center gap-2.5 border-b border-line px-4">
+      <span class="inline-flex size-8 items-center justify-center rounded-lg bg-brand-strong text-white" aria-hidden="true">
+        <i data-lucide="leaf" class="size-4"></i>
+      </span>
+      <div class="min-w-0 flex-1 leading-tight">
+        <div class="text-[15px] font-bold tracking-tight text-fg">Nutrio</div>
+        <div class="text-[11px] text-fg-subtle" data-ar="إدارة العيادة">Clinic admin</div>
+      </div>
+      <button id="closeSidebar" type="button" class="icon-btn icon-btn-sm lg:hidden" aria-label="Close navigation" data-ar-label="إغلاق القائمة">
+        <i data-lucide="x"></i>
+      </button>
+    </div>
+
+    <nav class="flex-1 overflow-y-auto px-3 py-2">
+      <div class="nav-heading" data-ar="نظرة عامة">Overview</div>
+      <a href="#" class="nav-link" aria-current="page"><i data-lucide="layout-dashboard"></i><span data-ar="لوحة التحكم">Dashboard</span></a>
+      <a href="#" class="nav-link"><i data-lucide="calendar-days"></i><span class="flex-1" data-ar="المواعيد">Appointments</span><span class="rounded-full bg-brand-soft px-1.5 text-[11px] font-semibold tabular-nums text-brand-fg">24</span></a>
+      <a href="#" class="nav-link"><i data-lucide="users"></i><span data-ar="المرضى">Patients</span></a>
+
+      <div class="nav-heading" data-ar="العيادة">Clinic</div>
+      <a href="#" class="nav-link"><i data-lucide="utensils-crossed"></i><span data-ar="الخطط الغذائية">Meal plans</span></a>
+      <a href="#" class="nav-link"><i data-lucide="stethoscope"></i><span data-ar="أخصائيو التغذية">Nutritionists</span></a>
+      <a href="#" class="nav-link"><i data-lucide="flask-conical"></i><span data-ar="نتائج المختبر">Lab results</span></a>
+
+      <div class="nav-heading" data-ar="الأعمال">Business</div>
+      <a href="#" class="nav-link"><i data-lucide="receipt"></i><span data-ar="الفواتير">Billing</span></a>
+      <a href="#" class="nav-link"><i data-lucide="chart-column"></i><span data-ar="التقارير">Reports</span></a>
+    </nav>
+
+    <div class="border-t border-line p-3">
+      <a href="#" class="nav-link"><i data-lucide="settings"></i><span data-ar="الإعدادات">Settings</span></a>
+      <a href="#" class="nav-link"><i data-lucide="circle-help"></i><span data-ar="المساعدة">Help</span></a>
+      <button type="button" class="mt-2 flex w-full cursor-pointer items-center gap-2.5 rounded-lg border border-line bg-surface-2 px-2.5 py-2 text-start transition-colors hover:bg-surface-3">
+        <span class="inline-flex size-8 items-center justify-center rounded-md bg-surface text-fg-muted"><i data-lucide="map-pin" class="size-4"></i></span>
+        <span class="min-w-0 flex-1 leading-tight">
+          <span class="block truncate text-[13px] font-semibold text-fg" data-ar="فرع عبدون">Abdoun branch</span>
+          <span class="block truncate text-[11px] text-fg-subtle" data-ar="عمّان، الأردن">Amman, Jordan</span>
+        </span>
+        <i data-lucide="chevrons-up-down" class="size-4 text-fg-subtle"></i>
+      </button>
+    </div>
+  </aside>
+  <div id="overlay" class="fixed inset-0 z-30 bg-black/40 lg:hidden" hidden></div>
+
+  <!-- ================= MAIN ================= -->
+  <div class="flex min-w-0 flex-1 flex-col">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-20 flex h-14 items-center gap-2 border-b border-line bg-surface/85 px-3 backdrop-blur sm:gap-3 sm:px-5">
+      <button id="menuBtn" type="button" class="icon-btn lg:hidden" aria-label="Open navigation" data-ar-label="فتح القائمة" aria-controls="sidebar" aria-expanded="false">
+        <i data-lucide="menu"></i>
+      </button>
+
+      <label class="relative hidden max-w-md flex-1 sm:block">
+        <span class="sr-only" data-ar="بحث">Search</span>
+        <i data-lucide="search" class="pointer-events-none absolute inset-y-0 start-3 my-auto size-4 text-fg-subtle"></i>
+        <input type="search" class="h-9 w-full rounded-lg border border-line bg-surface-2 pe-12 ps-9 text-sm text-fg placeholder:text-fg-subtle focus:border-brand focus:bg-surface" placeholder="Search patients, appointments, invoices…" data-ar-placeholder="ابحث في المرضى والمواعيد والفواتير…">
+        <kbd class="pointer-events-none absolute inset-y-0 end-2 my-auto hidden h-5 items-center rounded border border-line bg-surface px-1.5 font-sans text-[11px] text-fg-subtle md:inline-flex">/</kbd>
+      </label>
+
+      <div class="ms-auto flex items-center gap-1 sm:gap-2">
+        <button type="button" class="btn btn-primary hidden md:inline-flex">
+          <i data-lucide="plus"></i><span data-ar="موعد جديد">New appointment</span>
+        </button>
+        <button type="button" class="icon-btn" aria-label="Notifications, 3 unread" data-ar-label="الإشعارات، 3 غير مقروءة">
+          <i data-lucide="bell"></i>
+          <span class="absolute end-2 top-2 size-2 rounded-full bg-accent ring-2 ring-surface" aria-hidden="true"></span>
+        </button>
+        <button id="langBtn" type="button" class="btn btn-ghost h-10 px-2.5" aria-label="Switch to Arabic">
+          <i data-lucide="languages"></i><span id="langLabel" lang="ar">العربية</span>
+        </button>
+        <button id="themeBtn" type="button" class="icon-btn" aria-label="Switch to dark mode" aria-pressed="false">
+          <i data-lucide="sun" class="dark:hidden"></i>
+          <i data-lucide="moon" class="hidden dark:block"></i>
+        </button>
+        <div class="mx-1 hidden h-6 w-px bg-line sm:block" aria-hidden="true"></div>
+        <button type="button" class="hidden cursor-pointer items-center gap-2.5 rounded-lg py-1 pe-2 ps-1 transition-colors hover:bg-surface-2 sm:flex">
+          <span class="avatar bg-brand-soft text-brand-fg">LH</span>
+          <span class="hidden text-start leading-tight lg:block">
+            <span class="block text-[13px] font-semibold text-fg" data-ar="د. لينا حداد">Dr. Lina Haddad</span>
+            <span class="block text-[11px] text-fg-subtle" data-ar="مديرة العيادة">Clinic manager</span>
+          </span>
+          <i data-lucide="chevron-down" class="size-4 text-fg-subtle"></i>
+        </button>
+      </div>
+    </header>
+
+    <main class="flex-1 px-3 py-4 sm:px-5 sm:py-5">
+
+      <!-- Page toolbar -->
+      <div class="mb-4 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 class="text-xl font-bold tracking-tight text-fg sm:text-2xl" data-ar="لوحة التحكم">Dashboard</h1>
+          <p class="mt-0.5 text-sm text-fg-muted">
+            <span data-ar="الأربعاء، 9 أيلول 2026">Wednesday, 9 September 2026</span>
+            <span class="mx-1.5 text-fg-subtle" aria-hidden="true">·</span>
+            <span data-ar="فرع عبدون">Abdoun branch</span>
+          </p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <div class="seg" role="group" aria-label="Date range" data-ar-label="النطاق الزمني">
+            <button type="button" aria-pressed="true" data-ar="اليوم">Today</button>
+            <button type="button" aria-pressed="false" data-ar="الأسبوع">Week</button>
+            <button type="button" aria-pressed="false" data-ar="الشهر">Month</button>
+          </div>
+          <button type="button" class="btn btn-secondary"><i data-lucide="sliders-horizontal"></i><span data-ar="تصفية">Filter</span></button>
+          <button type="button" class="btn btn-secondary"><i data-lucide="download"></i><span data-ar="تصدير">Export</span></button>
+          <button type="button" class="btn btn-primary md:hidden" aria-label="New appointment" data-ar-label="موعد جديد"><i data-lucide="plus"></i></button>
+        </div>
+      </div>
+
+      <!-- KPI cards -->
+      <section aria-label="Key metrics" class="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <article class="card p-4">
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <p class="text-[13px] font-medium text-fg-muted" data-ar="مواعيد اليوم">Today's appointments</p>
+              <p class="mt-1 text-2xl font-bold tabular-nums tracking-tight text-fg">24</p>
+            </div>
+            <span class="kpi-icon bg-brand-soft text-brand-fg"><i data-lucide="calendar-check"></i></span>
+          </div>
+          <div class="mt-3 flex items-center justify-between gap-2">
+            <span class="delta delta-good"><i data-lucide="arrow-up-right"></i><span data-ar="+3 عن الأربعاء الماضي">+3 vs last Wed</span></span>
+            <svg class="spark h-8 w-20 text-brand" viewBox="0 0 80 32" preserveAspectRatio="none" aria-hidden="true" data-values="19,22,21,18,24,23,26,21,25,24"></svg>
+          </div>
+        </article>
+
+        <article class="card p-4">
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <p class="text-[13px] font-medium text-fg-muted" data-ar="المرضى النشطون">Active patients</p>
+              <p class="mt-1 text-2xl font-bold tabular-nums tracking-tight text-fg">312</p>
+            </div>
+            <span class="kpi-icon bg-info-soft text-info-fg"><i data-lucide="users"></i></span>
+          </div>
+          <div class="mt-3 flex items-center justify-between gap-2">
+            <span class="delta delta-good"><i data-lucide="arrow-up-right"></i><span data-ar="+4.2% هذا الشهر">+4.2% this month</span></span>
+            <svg class="spark h-8 w-20 text-brand" viewBox="0 0 80 32" preserveAspectRatio="none" aria-hidden="true" data-values="268,274,281,279,288,294,299,303,306,312"></svg>
+          </div>
+        </article>
+
+        <article class="card p-4">
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <p class="text-[13px] font-medium text-fg-muted" data-ar="نسبة عدم الحضور">No-show rate</p>
+              <p class="mt-1 text-2xl font-bold tabular-nums tracking-tight text-fg">6.1%</p>
+            </div>
+            <span class="kpi-icon bg-warn-soft text-warn-fg"><i data-lucide="user-x"></i></span>
+          </div>
+          <div class="mt-3 flex items-center justify-between gap-2">
+            <span class="delta delta-good"><i data-lucide="arrow-down-right"></i><span data-ar="−1.4 نقطة عن آب">−1.4 pts vs Aug</span></span>
+            <svg class="spark h-8 w-20 text-accent" viewBox="0 0 80 32" preserveAspectRatio="none" aria-hidden="true" data-values="9.2,8.8,8.1,8.4,7.5,7.9,7.1,6.8,6.4,6.1"></svg>
+          </div>
+        </article>
+
+        <article class="card p-4">
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <p class="text-[13px] font-medium text-fg-muted" data-ar="الإيرادات (هذا الشهر)">Revenue (month to date)</p>
+              <p class="mt-1 text-2xl font-bold tabular-nums tracking-tight text-fg"><span class="text-base font-semibold text-fg-muted" data-ar="د.أ">JOD</span> 8,420</p>
+            </div>
+            <span class="kpi-icon bg-accent-soft text-accent-fg"><i data-lucide="banknote"></i></span>
+          </div>
+          <div class="mt-3 flex items-center justify-between gap-2">
+            <span class="delta delta-good"><i data-lucide="arrow-up-right"></i><span data-ar="+12% عن آب">+12% vs Aug</span></span>
+            <svg class="spark h-8 w-20 text-brand" viewBox="0 0 80 32" preserveAspectRatio="none" aria-hidden="true" data-values="1200,2100,2650,3400,4300,5100,5700,6600,7500,8420"></svg>
+          </div>
+        </article>
+      </section>
+
+      <!-- Chart + Activity -->
+      <section class="mb-4 grid grid-cols-1 gap-3 xl:grid-cols-3">
+        <article class="card flex flex-col xl:col-span-2">
+          <div class="flex flex-wrap items-center justify-between gap-3 border-b border-line px-4 py-3">
+            <div>
+              <h2 class="text-[15px] font-semibold text-fg" data-ar="المواعيد — آخر 14 يوماً">Appointments — last 14 days</h2>
+              <p class="text-xs text-fg-subtle" data-ar="الحجوزات مقابل المكتملة، جميع الأخصائيين">Booked vs completed, all nutritionists</p>
+            </div>
+            <div class="flex items-center gap-3">
+              <ul class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-muted" aria-label="Legend">
+                <li class="flex items-center gap-1.5"><span class="legend-swatch text-brand" aria-hidden="true"></span><span data-ar="محجوز">Booked</span></li>
+                <li class="flex items-center gap-1.5"><span class="legend-swatch dashed text-accent" aria-hidden="true"></span><span data-ar="مكتمل">Completed</span></li>
+                <li class="flex items-center gap-1.5"><span class="legend-box" aria-hidden="true"></span><span data-ar="عطلة (الجمعة–السبت)">Weekend (Fri–Sat)</span></li>
+              </ul>
+              <select class="h-8 cursor-pointer rounded-md border border-line bg-surface px-2 text-xs text-fg" aria-label="Chart range" data-ar-label="نطاق الرسم">
+                <option data-ar="آخر 14 يوماً">Last 14 days</option>
+                <option data-ar="آخر 30 يوماً">Last 30 days</option>
+                <option data-ar="هذا الربع">This quarter</option>
+              </select>
+            </div>
+          </div>
+          <div class="flex flex-1 flex-col p-3 sm:p-4">
+            <div id="chartWrap" class="relative min-h-60 flex-1" dir="ltr">
+              <svg id="apptChart" class="absolute inset-0 block h-full w-full" role="img" aria-labelledby="chartTitle chartDesc">
+                <title id="chartTitle">Booked and completed appointments per day, 27 August to 9 September 2026</title>
+                <desc id="chartDesc">Weekday volume is 20 to 27 booked appointments; Fridays and Saturdays drop to 6 to 10. Today has 24 booked and 11 completed so far.</desc>
+              </svg>
+              <div id="chartTip" class="pointer-events-none absolute z-10 min-w-36 rounded-lg border border-line bg-surface px-3 py-2 text-xs text-fg shadow-lg" role="tooltip" hidden></div>
+            </div>
+            <table class="sr-only">
+              <caption>Daily appointments, booked and completed</caption>
+              <thead><tr><th scope="col">Date</th><th scope="col">Booked</th><th scope="col">Completed</th></tr></thead>
+              <tbody id="chartTable"></tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="card flex flex-col">
+          <div class="flex items-center justify-between border-b border-line px-4 py-3">
+            <h2 class="text-[15px] font-semibold text-fg" data-ar="النشاط الأخير">Recent activity</h2>
+            <a href="#" class="inline-flex items-center gap-1 text-[13px] font-medium text-brand-fg hover:underline">
+              <span data-ar="عرض الكل">View all</span><i data-lucide="chevron-right" class="size-4 rtl:rotate-180"></i>
+            </a>
+          </div>
+          <ul class="relative flex-1 space-y-4 px-4 py-4 before:absolute before:inset-y-5 before:start-8 before:w-px before:bg-line">
+            <li class="flex gap-3">
+              <span class="act-icon bg-info-soft text-info-fg"><i data-lucide="log-in"></i></span>
+              <div class="min-w-0 flex-1">
+                <p class="text-[13px] leading-snug text-fg"><span class="font-semibold" data-ar="رانيا الخطيب">Rania Al-Khatib</span> <span data-ar="سجّلت وصولها في الاستقبال">checked in at reception</span></p>
+                <p class="mt-0.5 text-xs text-fg-subtle" data-ar="قبل 5 دقائق">5 min ago</p>
+              </div>
+            </li>
+            <li class="flex gap-3">
+              <span class="act-icon bg-brand-soft text-brand-fg"><i data-lucide="banknote"></i></span>
+              <div class="min-w-0 flex-1">
+                <p class="text-[13px] leading-snug text-fg"><span class="font-semibold" data-ar="دفعة مستلمة">Payment received</span> <span data-ar="— INV-2041 · 45.00 د.أ من">— INV-2041 · JOD 45.00 from</span> <span data-ar="عمر أبو زيد">Omar Abu Zaid</span></p>
+                <p class="mt-0.5 text-xs text-fg-subtle" data-ar="قبل 21 دقيقة">21 min ago</p>
+              </div>
+            </li>
+            <li class="flex gap-3">
+              <span class="act-icon bg-accent-soft text-accent-fg"><i data-lucide="utensils"></i></span>
+              <div class="min-w-0 flex-1">
+                <p class="text-[13px] leading-snug text-fg"><span class="font-semibold" data-ar="روان عودة">Rawan Odeh</span> <span data-ar="حدّثت الخطة الغذائية لـ">updated the meal plan for</span> <span class="font-semibold" data-ar="يزن شقير">Yazan Shqair</span></p>
+                <p class="mt-0.5 text-xs text-fg-subtle" data-ar="قبل 37 دقيقة">37 min ago</p>
+              </div>
+            </li>
+            <li class="flex gap-3">
+              <span class="act-icon bg-brand-soft text-brand-fg"><i data-lucide="user-plus"></i></span>
+              <div class="min-w-0 flex-1">
+                <p class="text-[13px] leading-snug text-fg"><span data-ar="مريض جديد مسجّل:">New patient registered:</span> <span class="font-semibold" data-ar="نور أبو غزالة">Nour Abu Ghazaleh</span></p>
+                <p class="mt-0.5 text-xs text-fg-subtle" data-ar="قبل 54 دقيقة">54 min ago</p>
+              </div>
+            </li>
+            <li class="flex gap-3">
+              <span class="act-icon bg-neutral-soft text-neutral-fg"><i data-lucide="message-square"></i></span>
+              <div class="min-w-0 flex-1">
+                <p class="text-[13px] leading-snug text-fg"><span data-ar="أُرسلت رسائل تذكير إلى 18 مريضاً لمواعيد اليوم">Reminder SMS sent to 18 patients for today's appointments</span></p>
+                <p class="mt-0.5 text-xs text-fg-subtle" data-ar="أمس، 17:40">Yesterday, 17:40</p>
+              </div>
+            </li>
+            <li class="flex gap-3">
+              <span class="act-icon bg-danger-soft text-danger-fg"><i data-lucide="user-x"></i></span>
+              <div class="min-w-0 flex-1">
+                <p class="text-[13px] leading-snug text-fg"><span class="font-semibold" data-ar="د. طارق القضاة">Dr. Tariq Al-Qudah</span> <span data-ar="سجّل">marked</span> <span class="font-semibold" data-ar="فارس الزعبي">Faris Al-Zoubi</span> <span data-ar="كغائب">as no-show</span></p>
+                <p class="mt-0.5 text-xs text-fg-subtle" data-ar="أمس، 16:05">Yesterday, 16:05</p>
+              </div>
+            </li>
+          </ul>
+        </article>
+      </section>
+
+      <!-- Upcoming appointments table -->
+      <section class="card">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-line px-4 py-3">
+          <div>
+            <h2 class="text-[15px] font-semibold text-fg" data-ar="المواعيد القادمة">Upcoming appointments</h2>
+            <p class="text-xs text-fg-subtle"><span data-ar="اليوم · 24 موعداً مجدولاً">Today · 24 scheduled</span></p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2" role="group" aria-label="Filter by status" data-ar-label="تصفية حسب الحالة">
+            <button type="button" class="chip" aria-pressed="true" data-filter="all"><span data-ar="الكل">All</span><span class="count">10</span></button>
+            <button type="button" class="chip" aria-pressed="false" data-filter="confirmed"><span data-ar="مؤكد">Confirmed</span><span class="count">5</span></button>
+            <button type="button" class="chip" aria-pressed="false" data-filter="pending"><span data-ar="قيد الانتظار">Pending</span><span class="count">3</span></button>
+            <button type="button" class="chip" aria-pressed="false" data-filter="checkedin"><span data-ar="تم الوصول">Checked-in</span><span class="count">1</span></button>
+            <button type="button" class="chip" aria-pressed="false" data-filter="cancelled"><span data-ar="ملغي">Cancelled</span><span class="count">1</span></button>
+          </div>
+        </div>
+
+        <div id="bulkBar" class="flex flex-wrap items-center gap-2 border-b border-line bg-brand-soft/60 px-4 py-2 text-[13px] text-brand-fg" hidden>
+          <span class="font-semibold"><span data-ar="محدد:">Selected:</span> <span id="selCount" class="tabular-nums">0</span></span>
+          <span class="mx-1 h-4 w-px bg-brand-fg/30" aria-hidden="true"></span>
+          <button type="button" class="btn btn-secondary btn-sm"><i data-lucide="send"></i><span data-ar="إرسال تذكير">Send reminder</span></button>
+          <button type="button" class="btn btn-secondary btn-sm"><i data-lucide="calendar-clock"></i><span data-ar="إعادة جدولة">Reschedule</span></button>
+          <button type="button" class="btn btn-ghost btn-sm text-danger-fg"><i data-lucide="ban"></i><span data-ar="إلغاء">Cancel</span></button>
+          <button id="clearSel" type="button" class="btn btn-ghost btn-sm ms-auto"><span data-ar="مسح التحديد">Clear</span></button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full min-w-[860px] border-collapse">
+            <thead class="bg-surface-2">
+              <tr>
+                <th scope="col" class="w-10 py-2.5 pe-2 ps-4"><input id="checkAll" type="checkbox" aria-label="Select all appointments" data-ar-label="تحديد كل المواعيد"></th>
+                <th scope="col" class="px-3 py-2.5 text-start" data-ar="الوقت">Time</th>
+                <th scope="col" class="px-3 py-2.5 text-start" data-ar="المريض">Patient</th>
+                <th scope="col" class="px-3 py-2.5 text-start" data-ar="الأخصائي">Nutritionist</th>
+                <th scope="col" class="px-3 py-2.5 text-start" data-ar="النوع">Type</th>
+                <th scope="col" class="px-3 py-2.5 text-start" data-ar="الحالة">Status</th>
+                <th scope="col" class="px-4 py-2.5 text-end" data-ar="الإجراءات">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="apptRows" class="divide-y divide-line">
+
+              <tr data-status="checkedin" class="transition-colors hover:bg-surface-2">
+                <td class="py-2.5 pe-2 ps-4"><input type="checkbox" class="row-check" aria-label="Select Rania Al-Khatib" data-ar-label="تحديد رانيا الخطيب"></td>
+                <td class="whitespace-nowrap px-3 py-2.5 tabular-nums"><div class="font-semibold text-fg">09:00</div><div class="text-xs text-fg-subtle" data-ar="30 دقيقة">30 min</div></td>
+                <td class="px-3 py-2.5"><div class="flex items-center gap-3"><span class="avatar">RK</span><div class="min-w-0"><div class="truncate font-medium text-fg" data-ar="رانيا الخطيب">Rania Al-Khatib</div><div class="text-xs tabular-nums text-fg-subtle" dir="ltr">+962 79 512 3456</div></div></div></td>
+                <td class="whitespace-nowrap px-3 py-2.5 text-fg" data-ar="د. لينا حداد">Dr. Lina Haddad</td>
+                <td class="whitespace-nowrap px-3 py-2.5 text-fg-muted" data-ar="متابعة">Follow-up</td>
+                <td class="px-3 py-2.5"><span class="badge badge-checkedin"><span class="dot" aria-hidden="true"></span><span data-ar="تم الوصول">Checked-in</span></span></td>
+                <td class="px-4 py-2.5"><div class="flex justify-end gap-0.5">
+                  <button type="button" class="icon-btn icon-btn-sm icon-btn-brand" aria-label="Open chart for Rania Al-Khatib" data-ar-label="فتح ملف رانيا الخطيب" title="Open chart" data-ar-title="فتح الملف"><i data-lucide="clipboard-list"></i></button>
+                  <button type="button" class="icon-btn icon-btn-sm" aria-label="Reschedule Rania Al-Khatib" data-ar-label="إعادة جدولة رانيا الخطيب" title="Reschedule" data-ar-title="إعادة جدولة"><i data-lucide="calendar-clock"></i></button>
+                  <button type="button" class="icon-btn icon-btn-sm" aria-label="More actions for Rania Al-Khatib" data-ar-label="المزيد لرانيا الخطيب" title="More" data-ar-title="المزيد"><i data-lucide="ellipsis-vertical"></i></button>
+                </div></td>
+              </tr>
+
+              <tr data-status="confirmed" class="transition-colors hover:bg-surface-2">
+                <td class="py-2.5 pe-2 ps-4"><input type="checkbox" class="row-check" aria-label="Select Omar Abu Zaid" data-ar-label="تحديد عمر أبو زيد"></td>
+                <td class="whitespace-nowrap px-3 py-2.5 tabular-nums"><div class="font-semibold text-fg">09:30</div><div class="text-xs text-fg-subtle" data-ar="45 دقيقة">45 min</div></td>
+                <td class="px-3 py-2.5"><div class="flex items-center gap-3"><span class="avatar">OA</span><div class="min-w-0"><div class="truncate font-medium text-fg" data-ar="عمر أبو زيد">Omar Abu Zaid</div><div class="text-xs tabular-nums text-fg-subtle" dir="ltr">+962 77 640 1187</div></div></div></td>
+                <td class="whitespace-nowrap px-3 py-2.5 text-fg" data-ar="د. طارق القضاة">Dr. Tariq Al-Qudah</td>
+                <td class="whitespace-nowrap px-3 py-2.5 text-fg-muted" data-ar="استشارة أولى">Initial consultation</td>
+                <td class="px-3 py-2.5"><span class="badge badge-confirmed"><span class="dot" aria-hidden="true"></span><span data-ar="مؤكد">Confirmed</span></span></td>
+                <td class="px-4 py-2.5"><div class="flex justify-end gap-0.5">
+                  <button type="button" class="icon-btn icon-btn-sm icon-btn-brand" aria-label="Check in Omar Abu Zaid" data-ar-label="تسجيل وصول عمر أبو زيد" title="Check in" data-ar-title="تسجيل الوصول"><i data-lucide="log-in"></i></button>
+                  <button type="button" class="icon-btn icon-btn-sm" aria-label="Reschedule Omar Abu Zaid" data-ar-label="إعادة جدولة عمر أبو زيد" title="Reschedule" data-ar-title="إعادة جدولة"><i data-lucide="calendar-clock"></i></button>
+                  <button type="button" class="icon-btn icon-btn-sm" aria-label="More actions for Omar Abu Zaid" data-ar-label="المزيد لعمر أبو زيد" title="More" data-ar-title="المزيد"><i data-lucide="ellipsis-vertical"></i></button>
+                </div></td>
+              </tr>
+
+              <tr data-status="confirmed" class="transition-colors hover:bg-surface-2">
+                <td class="py-2.5 pe-2 ps-4"><input type="checkbox" class="row-check" aria-label="Select Hala Al-Momani" data-ar-label="تحديد هالة المومني"></td>
+                <td class="whitespace-nowrap px-3 py-2.5 tabular-nums"><div class="font-semibold text-fg">10:00</div><div class="text-xs text-fg-subtle" data-ar="20 دقيقة">20 min</div></td>
+                <td class="px-3 py-2.5"><div class="flex items-center gap-3"><span class="avatar">HM</span><div class="min-w-0"><div class="truncate font-medium text-fg" data-ar="هالة المومني">Hala Al-Momani</div><div class="text-xs tabular-nums text-fg-subtle" dir="ltr">+962 78 233 9012</div></div></div></td>
+                <td class="whitespace-nowrap px-3 py-2.5 text-fg" data-ar="روان عودة">Rawan Odeh</td>
+                <td class="whitespace-nowrap px-3 py-2.5 text-fg-muted" data-ar="تحليل تركيب الجسم">Body composition</td>
+                <td class="px-3 py-2.5"><span class="badge badge-confirmed"><span class="dot" aria-hidden="true"></span><span data-ar="مؤكد">Confirmed</span></span></td>
+                <td class="px-4 py-2.5"><div class="flex justify-end gap-0.5">
+                  <button type="button" class="icon-btn icon-btn-sm icon-btn-brand" aria-label="Check in Hala Al-Momani" data-ar-label="تسجيل وصول هالة المومني" title="Check in" data-ar-title="تسجيل الوصول"><i data-lucide="log-in"></i></button>
+                  <button type="button" class="icon-btn icon-btn-sm" aria-label="Reschedule Hala Al-Momani" data-ar-label="إعادة جدولة هالة المومني" title="Reschedule" data-ar-title="إعادة جدولة"><i data-lucide="calendar-clock"></i></button>
+                  <button type="button" class="icon-btn icon-btn-sm" aria-label="More actions for Hala Al-Momani" data-ar-label="المزيد لهالة المومني" title="More" data-ar-title="المزيد"><i data-lucide="ellipsis-vertical"></i></button>
+                </div></td>
+              </tr>
+
+              <tr data-status="pending" class="transition-colors hover:bg-surface-2">
+                <td class="py-2.5 pe-2 ps-4"><input type="checkbox" class="row-check" aria-label="Select Yazan Shqair" data-ar-label="تحديد يزن شقير"></td>
+                <td class="whitespace-nowrap px-3 py-2.5 tabular-nums"><div class="font-semibold text-fg">10:30</div><div class="text-xs text-fg-subtle" data-ar="30 دقيقة">30 min</div></td>
+                <td class="px-3 py-2.5"><div class="flex items-center gap-3"><span class="avatar">YS</span><div class="min-w-0"><div class="truncate font-medium text-fg" data-ar="يزن شقير">Yazan Shqair</div><div class="text-xs tabular-nums text-fg-subtle" dir="ltr">+962 79 880 4471</div></div></div></td>
+                <td class="whitespace-nowrap px-3 py-2.5 text-fg" data-ar="د. لينا حداد">Dr. Lina Haddad</td>
+                <td class="whitespace-nowrap px-3 py-2.5 text-fg-muted" data-ar="مراجعة الخطة الغذائية">Meal plan review</td>
+                <td class="px-3 py-2.5"><span class="badge badge-pending"><span class="dot" aria-hidden="true"></span><span data-ar="قيد الانتظار">Pending</span></span></td>
+                <td class="px-4 py-2.5"><div class="flex justify-end gap-0.5">
+                  <button type="button" class="icon-btn icon-btn-sm icon-btn-brand" aria-label="Confirm appointment for Yazan Shqair" data-ar-label="تأكيد موعد يزن شقير" title="Confirm" data-ar-title="تأكيد"><i data-lucide="check"></i></button>
+                  <button type="button" class="icon-btn icon-btn-sm" aria-label="Reschedule Yazan Shqair" data-ar-label="إعادة جدولة يزن شقير" title="Reschedule" data-ar-title="إعادة جدولة"><i data-lucide="calendar-clock"></i></button>
+                  <button type="button" class="icon-btn icon-btn-sm" aria-label="More actions for Yazan Shqair" data-ar-label="المزيد ليزن شقير" title="More" data-ar-title="المزيد"><i data-lucide="ellipsis-vertical"></i></button>
+                </div></td>
+              </tr>
+
+              <tr data-status="confirmed" class="transition-colors hover:bg-surface-2">
+                <td class="py-2.5 pe-2 ps-4"><input type="checkbox" class="row-check" aria-label="Select Layla Nsour" data-ar-label="تحديد ليلى النسور"></td>
+                <td class="whitespace-nowrap px-3 py-2.5 tabular-nums"><div class="font-semibold text-fg">11:00</div><div class="text-xs text-fg-subtle" data-ar="30 دقيقة">30 min</div></td>
+                <td class="px-3 py-2.5"><div class="flex items-center gap-3"><span class="avatar">LN</span><div class="min-w-0"><div class="truncate font-medium text-fg" data-ar="ليلى النسور">Layla Nsour</div><div class="text-xs tabular-nums text-fg-subtle" dir="ltr">+962 77 915 6620</div></div></div></td>
+                <td class="whitespace-nowrap px-3 py-2.5 text-fg" data-ar="أحمد العدوان">Ahmad Al-Adwan</td>
+                <td class="whitespace-nowrap px-3 py-2.5 text-fg-muted" data-ar="متابعة">Follow-up</td>
+                <td class="px-3 py-2.5"><span class="badge badge-confirmed"><span class="dot" aria-hidden="true"></span><span data-ar="مؤكد">Confirmed</span></span></td>
+                <td class="px-4 py-2.5"><div class="flex justify-end gap-0.5">
+                  <button type="button" class="icon-btn icon-btn-sm icon-btn-brand" aria-label="Check in Layla Nsour" data-ar-label="تسجيل وصول ليلى النسور" title="Check in" data-ar-title="تسجيل الوصول"><i data-lucide="log-in"></i></button>
+                  <button type="button" class="icon-btn icon-btn-sm" aria-label="Reschedule Layla Nsour" data-ar-label="إعادة جدولة ليلى النسور" title="Reschedule" data-ar-title="إعادة جدولة"><i data-lucide="calendar-clock"></i></button>
+                  <button type="button" class="icon-btn icon-btn-sm" aria-label="More actions for Layla Nsour" data-ar-label="المزيد لليلى النسور" title="More" data-ar-title="المزيد"><i data-lucide="ellipsis-vertical"></i></button>
+                </div></td>
+              </tr>
+
+              <tr data-status="cancelled" class="transition-colors hover:bg-surface-2">
+                <td class="py-2.5 pe-2 ps-4"><input type="checkbox" class="row-check" aria-label="Select Mohammad Al-Tarawneh" data-ar-label="تحديد محمد الطراونة"></td>
+                <td class="whitespace-nowrap px-3 py-2.5 tabular-nums"><div class="font-semibold text-fg-muted line-through decoration-fg-subtle">11:30</div><div class="text-xs text-fg-subtle" data-ar="45 دقيقة">45 min</div></td>
+                <td class="px-3 py-2.5"><div class="flex items-center gap-3"><span class="avatar">MT</span><div class="min-w-0"><div class="truncate font-medium text-fg" data-ar="محمد الطراونة">Mohammad Al-Tarawneh</div><div class="text-xs tabular-nums text-fg-subtle" dir="ltr">+962 79 301 2284</div></div></div></td>
+                <td class="whitespace-nowrap px-3 py-2.5 text-fg" data-ar="د. طارق القضاة">Dr. Tariq Al-Qudah</td>
+                <td class="whitespace-nowrap px-3 py-2.5 text-fg-muted" data-ar="استشارة أولى">Initial consultation</td>
+                <td class="px-3 py-2.5"><span class="badge badge-cancelled"><span class="dot" aria-hidden="true"></span><span data-ar="ملغي">Cancelled</span></span></td>
+                <td class="px-4 py-2.5"><div class="flex justify-end gap-0.5">
+                  <button type="button" class="icon-btn icon-btn-sm icon-btn-brand" aria-label="Rebook Mohammad Al-Tarawneh" data-ar-label="إعادة حجز محمد الطراونة" title="Rebook" data-ar-title="إعادة الحجز"><i data-lucide="rotate-ccw"></i></button>
+                  <button type="button" class="icon-btn icon-btn-sm" aria-label="Call Mohammad Al-Tarawneh" data-ar-label="الاتصال بمحمد الطراونة" title="Call" data-ar-title="اتصال"><i data-lucide="phone"></i></button>
+                  <button type="button" class="icon-btn icon-btn-sm" aria-label="More actions for Mohammad Al-Tarawneh" data-ar-label="المزيد لمحمد الطراونة" title="More" data-ar-title="المزيد"><i data-lucide="ellipsis-vertical"></i></button>
+                </div></td>
+              </tr>
+
+              <tr data-status="pending" class="transition-colors hover:bg-surface-2">
+                <td class="py-2.5 pe-2 ps-4"><input type="checkbox" class="row-check" aria-label="Select Dana Haddadin" data-ar-label="تحديد دانا حدادين"></td>
+                <td class="whitespace-nowrap px-3 py-2.5 tabular-nums"><div class="font-semibold text-fg">12:00</div><div class="text-xs text-fg-subtle" data-ar="30 دقيقة">30 min</div></td>
+                <td class="px-3 py-2.5"><div class="flex items-center gap-3"><span class="avatar">DH</span><div class="min-w-0"><div class="truncate font-medium text-fg" data-ar="دانا حدادين">Dana Haddadin</div><div class="text-xs tabular-nums text-fg-subtle" dir="ltr">+962 78 456 7730</div></div></div></td>
+                <td class="whitespace-nowrap px-3 py-2.5 text-fg" data-ar="روان عودة">Rawan Odeh</td>
+                <td class="whitespace-nowrap px-3 py-2.5 text-fg-muted" data-ar="خطة غذائية للسكري">Diabetes diet plan</td>
+                <td class="px-3 py-2.5"><span class="badge badge-pending"><span class="dot" aria-hidden="true"></span><span data-ar="قيد الانتظار">Pending</span></span></td>
+                <td class="px-4 py-2.5"><div class="flex justify-end gap-0.5">
+                  <button type="button" class="icon-btn icon-btn-sm icon-btn-brand" aria-label="Confirm appointment for Dana Haddadin" data-ar-label="تأكيد موعد دانا حدادين" title="Confirm" data-ar-title="تأكيد"><i data-lucide="check"></i></button>
+                  <button type="button" class="icon-btn icon-btn-sm" aria-label="Reschedule Dana Haddadin" data-ar-label="إعادة جدولة دانا حدادين" title="Reschedule" data-ar-title="إعادة جدولة"><i data-lucide="calendar-clock"></i></button>
+                  <button type="button" class="icon-btn icon-btn-sm" aria-label="More actions for Dana Haddadin" data-ar-label="المزيد لدانا حدادين" title="More" data-ar-title="المزيد"><i data-lucide="ellipsis-vertical"></i></button>
+                </div></td>
+              </tr>
+
+              <tr data-status="confirmed" class="transition-colors hover:bg-surface-2">
+                <td class="py-2.5 pe-2 ps-4"><input type="checkbox" class="row-check" aria-label="Select Khaled Al-Majali" data-ar-label="تحديد خالد المجالي"></td>
+                <td class="whitespace-nowrap px-3 py-2.5 tabular-nums"><div class="font-semibold text-fg">12:30</div><div class="text-xs text-fg-subtle" data-ar="30 دقيقة">30 min</div></td>
+                <td class="px-3 py-2.5"><div class="flex items-center gap-3"><span class="avatar">KM</span><div class="min-w-0"><div class="truncate font-medium text-fg" data-ar="خالد المجالي">Khaled Al-Majali</div><div class="text-xs tabular-nums text-fg-subtle" dir="ltr">+962 79 774 0195</div></div></div></td>
+                <td class="whitespace-nowrap px-3 py-2.5 text-fg" data-ar="د. لينا حداد">Dr. Lina Haddad</td>
+                <td class="whitespace-nowrap px-3 py-2.5 text-fg-muted" data-ar="متابعة">Follow-up</td>
+                <td class="px-3 py-2.5"><span class="badge badge-confirmed"><span class="dot" aria-hidden="true"></span><span data-ar="مؤكد">Confirmed</span></span></td>
+                <td class="px-4 py-2.5"><div class="flex justify-end gap-0.5">
+                  <button type="button" class="icon-btn icon-btn-sm icon-btn-brand" aria-label="Check in Khaled Al-Majali" data-ar-label="تسجيل وصول خالد المجالي" title="Check in" data-ar-title="تسجيل الوصول"><i data-lucide="log-in"></i></button>
+                  <button type="button" class="icon-btn icon-btn-sm" aria-label="Reschedule Khaled Al-Majali" data-ar-label="إعادة جدولة خالد المجالي" title="Reschedule" data-ar-title="إعادة جدولة"><i data-lucide="calendar-clock"></i></button>
+                  <button type="button" class="icon-btn icon-btn-sm" aria-label="More actions for Khaled Al-Majali" data-ar-label="المزيد لخالد المجالي" title="More" data-ar-title="المزيد"><i data-lucide="ellipsis-vertical"></i></button>
+                </div></td>
+              </tr>
+
+              <tr data-status="confirmed" class="transition-colors hover:bg-surface-2">
+                <td class="py-2.5 pe-2 ps-4"><input type="checkbox" class="row-check" aria-label="Select Sara Bataineh" data-ar-label="تحديد سارة بطاينة"></td>
+                <td class="whitespace-nowrap px-3 py-2.5 tabular-nums"><div class="font-semibold text-fg">13:30</div><div class="text-xs text-fg-subtle" data-ar="45 دقيقة">45 min</div></td>
+                <td class="px-3 py-2.5"><div class="flex items-center gap-3"><span class="avatar">SB</span><div class="min-w-0"><div class="truncate font-medium text-fg" data-ar="سارة بطاينة">Sara Bataineh</div><div class="text-xs tabular-nums text-fg-subtle" dir="ltr">+962 77 128 8843</div></div></div></td>
+                <td class="whitespace-nowrap px-3 py-2.5 text-fg" data-ar="أحمد العدوان">Ahmad Al-Adwan</td>
+                <td class="whitespace-nowrap px-3 py-2.5 text-fg-muted" data-ar="تغذية رياضية">Sports nutrition</td>
+                <td class="px-3 py-2.5"><span class="badge badge-confirmed"><span class="dot" aria-hidden="true"></span><span data-ar="مؤكد">Confirmed</span></span></td>
+                <td class="px-4 py-2.5"><div class="flex justify-end gap-0.5">
+                  <button type="button" class="icon-btn icon-btn-sm icon-btn-brand" aria-label="Check in Sara Bataineh" data-ar-label="تسجيل وصول سارة بطاينة" title="Check in" data-ar-title="تسجيل الوصول"><i data-lucide="log-in"></i></button>
+                  <button type="button" class="icon-btn icon-btn-sm" aria-label="Reschedule Sara Bataineh" data-ar-label="إعادة جدولة سارة بطاينة" title="Reschedule" data-ar-title="إعادة جدولة"><i data-lucide="calendar-clock"></i></button>
+                  <button type="button" class="icon-btn icon-btn-sm" aria-label="More actions for Sara Bataineh" data-ar-label="المزيد لسارة بطاينة" title="More" data-ar-title="المزيد"><i data-lucide="ellipsis-vertical"></i></button>
+                </div></td>
+              </tr>
+
+              <tr data-status="pending" class="transition-colors hover:bg-surface-2">
+                <td class="py-2.5 pe-2 ps-4"><input type="checkbox" class="row-check" aria-label="Select Faris Al-Zoubi" data-ar-label="تحديد فارس الزعبي"></td>
+                <td class="whitespace-nowrap px-3 py-2.5 tabular-nums"><div class="font-semibold text-fg">14:00</div><div class="text-xs text-fg-subtle" data-ar="30 دقيقة">30 min</div></td>
+                <td class="px-3 py-2.5"><div class="flex items-center gap-3"><span class="avatar">FZ</span><div class="min-w-0"><div class="truncate font-medium text-fg" data-ar="فارس الزعبي">Faris Al-Zoubi</div><div class="text-xs tabular-nums text-fg-subtle" dir="ltr">+962 79 655 2019</div></div></div></td>
+                <td class="whitespace-nowrap px-3 py-2.5 text-fg" data-ar="د. طارق القضاة">Dr. Tariq Al-Qudah</td>
+                <td class="whitespace-nowrap px-3 py-2.5 text-fg-muted" data-ar="متابعة">Follow-up</td>
+                <td class="px-3 py-2.5"><span class="badge badge-pending"><span class="dot" aria-hidden="true"></span><span data-ar="قيد الانتظار">Pending</span></span></td>
+                <td class="px-4 py-2.5"><div class="flex justify-end gap-0.5">
+                  <button type="button" class="icon-btn icon-btn-sm icon-btn-brand" aria-label="Confirm appointment for Faris Al-Zoubi" data-ar-label="تأكيد موعد فارس الزعبي" title="Confirm" data-ar-title="تأكيد"><i data-lucide="check"></i></button>
+                  <button type="button" class="icon-btn icon-btn-sm" aria-label="Reschedule Faris Al-Zoubi" data-ar-label="إعادة جدولة فارس الزعبي" title="Reschedule" data-ar-title="إعادة جدولة"><i data-lucide="calendar-clock"></i></button>
+                  <button type="button" class="icon-btn icon-btn-sm" aria-label="More actions for Faris Al-Zoubi" data-ar-label="المزيد لفارس الزعبي" title="More" data-ar-title="المزيد"><i data-lucide="ellipsis-vertical"></i></button>
+                </div></td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+
+        <p id="emptyState" class="px-4 py-8 text-center text-sm text-fg-subtle" hidden data-ar="لا توجد مواعيد تطابق هذه التصفية.">No appointments match this filter.</p>
+
+        <div class="flex flex-wrap items-center justify-between gap-3 border-t border-line px-4 py-3 text-[13px] text-fg-muted">
+          <p><span data-ar="عرض">Showing</span> <span class="font-semibold tabular-nums text-fg">1–10</span> <span data-ar="من">of</span> <span class="font-semibold tabular-nums text-fg">24</span></p>
+          <div class="flex items-center gap-1">
+            <button type="button" class="btn btn-secondary btn-sm" disabled aria-label="Previous page" data-ar-label="الصفحة السابقة"><i data-lucide="chevron-left" class="rtl:rotate-180"></i></button>
+            <button type="button" class="btn btn-secondary btn-sm" aria-current="page">1</button>
+            <button type="button" class="btn btn-ghost btn-sm">2</button>
+            <button type="button" class="btn btn-ghost btn-sm">3</button>
+            <button type="button" class="btn btn-secondary btn-sm" aria-label="Next page" data-ar-label="الصفحة التالية"><i data-lucide="chevron-right" class="rtl:rotate-180"></i></button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+<script>
+(function () {
+  'use strict';
+  var root = document.documentElement;
+  var store = {
+    get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  };
+  var isAr = function () { return root.lang === 'ar'; };
+
+  /* ---------- Icons ---------- */
+  if (window.lucide) { lucide.createIcons({ attrs: { 'stroke-width': 1.75 } }); }
+
+  /* ---------- Off-canvas sidebar ---------- */
+  var sidebar = document.getElementById('sidebar');
+  var overlay = document.getElementById('overlay');
+  var menuBtn = document.getElementById('menuBtn');
+  var closeBtn = document.getElementById('closeSidebar');
+  function openNav(open) {
+    sidebar.classList.toggle('open', open);
+    overlay.hidden = !open;
+    menuBtn.setAttribute('aria-expanded', String(open));
+    (open ? closeBtn : menuBtn).focus();
+  }
+  menuBtn.addEventListener('click', function () { openNav(true); });
+  closeBtn.addEventListener('click', function () { openNav(false); });
+  overlay.addEventListener('click', function () { openNav(false); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && sidebar.classList.contains('open')) openNav(false);
+  });
+
+  /* ---------- Theme ---------- */
+  var themeBtn = document.getElementById('themeBtn');
+  function syncTheme() {
+    var dark = root.classList.contains('dark');
+    var label = isAr()
+      ? (dark ? 'التبديل إلى الوضع الفاتح' : 'التبديل إلى الوضع الداكن')
+      : (dark ? 'Switch to light mode' : 'Switch to dark mode');
+    themeBtn.setAttribute('aria-pressed', String(dark));
+    themeBtn.setAttribute('aria-label', label);
+    themeBtn.title = label;
+  }
+  themeBtn.addEventListener('click', function () {
+    root.classList.toggle('dark');
+    store.set('nutrio-theme', root.classList.contains('dark') ? 'dark' : 'light');
+    syncTheme();
+  });
+
+  /* ---------- Language / direction ---------- */
+  var langBtn = document.getElementById('langBtn');
+  var langLabel = document.getElementById('langLabel');
+  var attrMap = [['data-ar-label', 'aria-label', 'enLabel'], ['data-ar-placeholder', 'placeholder', 'enPlaceholder'], ['data-ar-title', 'title', 'enTitle']];
+  function applyLang(lang) {
+    var ar = lang === 'ar';
+    root.lang = lang;
+    root.dir = ar ? 'rtl' : 'ltr';
+    document.querySelectorAll('[data-ar]').forEach(function (el) {
+      if (el.dataset.en === undefined) el.dataset.en = el.textContent.trim();
+      el.textContent = ar ? el.dataset.ar : el.dataset.en;
+    });
+    attrMap.forEach(function (m) {
+      document.querySelectorAll('[' + m[0] + ']').forEach(function (el) {
+        if (el.dataset[m[2]] === undefined) el.dataset[m[2]] = el.getAttribute(m[1]) || '';
+        el.setAttribute(m[1], ar ? el.getAttribute(m[0]) : el.dataset[m[2]]);
+      });
+    });
+    langLabel.textContent = ar ? 'English' : 'العربية';
+    langLabel.lang = ar ? 'en' : 'ar';
+    langBtn.setAttribute('aria-label', ar ? 'Switch to English' : 'التبديل إلى العربية');
+    langBtn.title = langBtn.getAttribute('aria-label');
+    document.title = ar ? 'Nutrio — لوحة التحكم' : 'Nutrio — Dashboard';
+    syncTheme();
+    renderChart();
+  }
+  langBtn.addEventListener('click', function () {
+    var next = isAr() ? 'en' : 'ar';
+    store.set('nutrio-lang', next);
+    applyLang(next);
+  });
+
+  /* ---------- Segmented control ---------- */
+  document.querySelectorAll('.seg').forEach(function (seg) {
+    seg.addEventListener('click', function (e) {
+      var b = e.target.closest('button');
+      if (!b) return;
+      seg.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+    });
+  });
+
+  /* ---------- Sparklines ---------- */
+  document.querySelectorAll('svg.spark').forEach(function (svg) {
+    var v = svg.dataset.values.split(',').map(Number);
+    var max = Math.max.apply(null, v), min = Math.min.apply(null, v);
+    var W = 80, H = 32, p = 3;
+    var pts = v.map(function (n, i) {
+      return ((i / (v.length - 1)) * W).toFixed(1) + ',' + (H - p - ((n - min) / (max - min || 1)) * (H - 2 * p)).toFixed(1);
+    });
+    svg.innerHTML = '<polyline points="' + pts.join(' ') + '" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>';
+  });
+
+  /* ---------- Appointments chart (inline SVG, responsive) ---------- */
+  var chart = {
+    booked: [22, 9, 6, 20, 24, 23, 26, 21, 10, 7, 25, 27, 24, 24],
+    done:   [20, 8, 5, 18, 22, 21, 24, 19, 9, 6, 23, 25, 22, 11],
+    weekend: [1, 2, 8, 9],
+    en: { axis: ['27 Aug', '28', '29', '30', '31', '1 Sep', '2', '3', '4', '5', '6', '7', '8', '9'],
+          full: ['Thu 27 Aug', 'Fri 28 Aug', 'Sat 29 Aug', 'Sun 30 Aug', 'Mon 31 Aug', 'Tue 1 Sep', 'Wed 2 Sep', 'Thu 3 Sep', 'Fri 4 Sep', 'Sat 5 Sep', 'Sun 6 Sep', 'Mon 7 Sep', 'Tue 8 Sep', 'Wed 9 Sep (today)'],
+          booked: 'Booked', done: 'Completed' },
+    ar: { axis: ['27 آب', '28', '29', '30', '31', '1 أيلول', '2', '3', '4', '5', '6', '7', '8', '9'],
+          full: ['الخميس 27 آب', 'الجمعة 28 آب', 'السبت 29 آب', 'الأحد 30 آب', 'الاثنين 31 آب', 'الثلاثاء 1 أيلول', 'الأربعاء 2 أيلول', 'الخميس 3 أيلول', 'الجمعة 4 أيلول', 'السبت 5 أيلول', 'الأحد 6 أيلول', 'الاثنين 7 أيلول', 'الثلاثاء 8 أيلول', 'الأربعاء 9 أيلول (اليوم)'],
+          booked: 'محجوز', done: 'مكتمل' }
+  };
+  var svg = document.getElementById('apptChart');
+  var wrap = document.getElementById('chartWrap');
+  var tip = document.getElementById('chartTip');
+  var geo = null;
+
+  function renderChart() {
+    var W = svg.clientWidth, H = svg.clientHeight;
+    if (!W || !H) return;
+    var t = chart[isAr() ? 'ar' : 'en'];
+    var n = chart.booked.length, max = 30;
+    var L = 30, R = 12, T = 12, B = 26;
+    var pw = W - L - R, ph = H - T - B, step = pw / (n - 1);
+    var X = function (i) { return L + i * step; };
+    var Y = function (v) { return T + ph - (v / max) * ph; };
+    geo = { X: X, Y: Y, W: W, H: H, n: n, t: t };
+    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+
+    var out = '<title id="chartTitle">' + svg.querySelector('title').textContent + '</title><desc id="chartDesc">' + svg.querySelector('desc').textContent + '</desc>';
+    chart.weekend.forEach(function (i) {
+      out += '<rect class="ch-weekend" x="' + (X(i) - step / 2).toFixed(1) + '" y="' + T + '" width="' + step.toFixed(1) + '" height="' + ph.toFixed(1) + '"/>';
+    });
+    [0, 10, 20, 30].forEach(function (v) {
+      out += '<line class="ch-grid" x1="' + L + '" x2="' + (W - R) + '" y1="' + Y(v).toFixed(1) + '" y2="' + Y(v).toFixed(1) + '"/>';
+      out += '<text class="ch-axis" x="' + (L - 8) + '" y="' + (Y(v) + 4).toFixed(1) + '" text-anchor="end">' + v + '</text>';
+    });
+    var path = function (a) {
+      return a.map(function (v, i) { return (i ? 'L' : 'M') + X(i).toFixed(1) + ',' + Y(v).toFixed(1); }).join(' ');
+    };
+    out += '<path class="ch-area" d="' + path(chart.booked) + ' L' + X(n - 1).toFixed(1) + ',' + Y(0).toFixed(1) + ' L' + X(0).toFixed(1) + ',' + Y(0).toFixed(1) + ' Z"/>';
+    out += '<path class="ch-line-booked" d="' + path(chart.booked) + '"/>';
+    out += '<path class="ch-line-done" d="' + path(chart.done) + '"/>';
+    var every = W < 520 ? 3 : 2;
+    t.axis.forEach(function (lbl, i) {
+      if (i % every === 0 || i === n - 1) {
+        var cls = 'ch-axis' + (i === n - 1 ? ' ch-axis-today' : '');
+        var anchor = i === n - 1 ? 'end' : (i === 0 ? 'start' : 'middle');
+        out += '<text class="' + cls + '" x="' + X(i).toFixed(1) + '" y="' + (H - 8) + '" text-anchor="' + anchor + '">' + lbl + '</text>';
+      }
+    });
+    out += '<circle class="ch-dot-booked" cx="' + X(n - 1).toFixed(1) + '" cy="' + Y(chart.booked[n - 1]).toFixed(1) + '" r="4"/>';
+    out += '<circle class="ch-dot-done" cx="' + X(n - 1).toFixed(1) + '" cy="' + Y(chart.done[n - 1]).toFixed(1) + '" r="4"/>';
+    out += '<line id="chCross" class="ch-cross" x1="0" x2="0" y1="' + T + '" y2="' + (T + ph).toFixed(1) + '"/>';
+    out += '<circle id="chPtB" class="ch-dot-booked" r="4" style="visibility:hidden"/><circle id="chPtD" class="ch-dot-done" r="4" style="visibility:hidden"/>';
+    for (var i = 0; i < n; i++) {
+      out += '<rect class="ch-hit" data-i="' + i + '" tabindex="0" role="img" aria-label="' + t.full[i] + ': ' + chart.booked[i] + ' ' + t.booked.toLowerCase() + ', ' + chart.done[i] + ' ' + t.done.toLowerCase() + '" x="' + (X(i) - step / 2).toFixed(1) + '" y="' + T + '" width="' + step.toFixed(1) + '" height="' + ph.toFixed(1) + '"/>';
+    }
+    svg.innerHTML = out;
+
+    var tbody = document.getElementById('chartTable');
+    tbody.innerHTML = t.full.map(function (d, i) {
+      return '<tr><td>' + d + '</td><td>' + chart.booked[i] + '</td><td>' + chart.done[i] + '</td></tr>';
+    }).join('');
+  }
+
+  function showTip(i) {
+    if (!geo) return;
+    var t = geo.t, x = geo.X(i), y = Math.min(geo.Y(chart.booked[i]), geo.Y(chart.done[i]));
+    tip.innerHTML = '<div class="mb-1 font-semibold">' + t.full[i] + '</div>' +
+      '<div class="flex items-center justify-between gap-4"><span class="flex items-center gap-1.5"><span class="legend-swatch text-brand"></span>' + t.booked + '</span><span class="font-semibold tabular-nums">' + chart.booked[i] + '</span></div>' +
+      '<div class="flex items-center justify-between gap-4"><span class="flex items-center gap-1.5"><span class="legend-swatch dashed text-accent"></span>' + t.done + '</span><span class="font-semibold tabular-nums">' + chart.done[i] + '</span></div>';
+    tip.hidden = false;
+    var tw = tip.offsetWidth;
+    var left = x - tw / 2;
+    left = Math.max(0, Math.min(left, geo.W - tw));
+    tip.style.left = left + 'px';
+    tip.style.top = Math.max(0, y - tip.offsetHeight - 12) + 'px';
+    var cross = document.getElementById('chCross');
+    cross.setAttribute('x1', x); cross.setAttribute('x2', x); cross.classList.add('on');
+    var pb = document.getElementById('chPtB'), pd = document.getElementById('chPtD');
+    pb.setAttribute('cx', x); pb.setAttribute('cy', geo.Y(chart.booked[i])); pb.style.visibility = 'visible';
+    pd.setAttribute('cx', x); pd.setAttribute('cy', geo.Y(chart.done[i])); pd.style.visibility = 'visible';
+  }
+  function hideTip() {
+    tip.hidden = true;
+    var cross = document.getElementById('chCross');
+    if (cross) cross.classList.remove('on');
+    ['chPtB', 'chPtD'].forEach(function (id) { var el = document.getElementById(id); if (el) el.style.visibility = 'hidden'; });
+  }
+  svg.addEventListener('mouseover', function (e) { var h = e.target.closest('.ch-hit'); if (h) showTip(+h.dataset.i); });
+  svg.addEventListener('mouseleave', hideTip);
+  svg.addEventListener('focusin', function (e) { var h = e.target.closest('.ch-hit'); if (h) showTip(+h.dataset.i); });
+  svg.addEventListener('focusout', hideTip);
+
+  if ('ResizeObserver' in window) {
+    var raf = null;
+    new ResizeObserver(function () {
+      if (raf) cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(function () { hideTip(); renderChart(); });
+    }).observe(wrap);
+  } else {
+    window.addEventListener('resize', function () { hideTip(); renderChart(); });
+  }
+
+  /* ---------- Table: status filter + bulk selection ---------- */
+  var rows = Array.prototype.slice.call(document.querySelectorAll('#apptRows tr'));
+  var checks = rows.map(function (r) { return r.querySelector('.row-check'); });
+  var checkAll = document.getElementById('checkAll');
+  var bulkBar = document.getElementById('bulkBar');
+  var selCount = document.getElementById('selCount');
+  var emptyState = document.getElementById('emptyState');
+
+  function visibleRows() { return rows.filter(function (r) { return !r.hidden; }); }
+  function syncBulk() {
+    var vis = visibleRows();
+    var sel = vis.filter(function (r) { return r.querySelector('.row-check').checked; }).length;
+    selCount.textContent = sel;
+    bulkBar.hidden = sel === 0;
+    checkAll.checked = vis.length > 0 && sel === vis.length;
+    checkAll.indeterminate = sel > 0 && sel < vis.length;
+  }
+  checks.forEach(function (c) { c.addEventListener('change', syncBulk); });
+  checkAll.addEventListener('change', function () {
+    visibleRows().forEach(function (r) { r.querySelector('.row-check').checked = checkAll.checked; });
+    syncBulk();
+  });
+  document.getElementById('clearSel').addEventListener('click', function () {
+    checks.forEach(function (c) { c.checked = false; });
+    syncBulk();
+    checkAll.focus();
+  });
+  document.querySelectorAll('.chip[data-filter]').forEach(function (chip) {
+    chip.addEventListener('click', function () {
+      document.querySelectorAll('.chip[data-filter]').forEach(function (c) { c.setAttribute('aria-pressed', String(c === chip)); });
+      var f = chip.dataset.filter;
+      rows.forEach(function (r) {
+        r.hidden = f !== 'all' && r.dataset.status !== f;
+        if (r.hidden) r.querySelector('.row-check').checked = false;
+      });
+      emptyState.hidden = visibleRows().length > 0;
+      syncBulk();
+    });
+  });
+
+  /* ---------- Init ---------- */
+  applyLang(isAr() ? 'ar' : 'en');
+})();
+</script>
+</body>
+</html>

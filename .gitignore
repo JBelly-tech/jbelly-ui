@@ -1,0 +1,17 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# eval workspaces and scratch output
+evals/workspace/
+*-workspace/
+
+# node / python leftovers
+node_modules/
+__pycache__/
+*.pyc
+
+# vendor template reference material (local yardstick only)
+comparison/reference-template/

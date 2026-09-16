@@ -1,0 +1,30 @@
+[
+  {
+    "name": "uiux:uiux-light-1440.png",
+    "file": "uiux-light-1440.png",
+    "size": [
+      720,
+      500
+    ],
+    "distinct_hues": 13,
+    "chromatic_ratio": 0.0918,
+    "ink_ratio": 0.133,
+    "mean_luminance": 0.93,
+    "accent_share": 0.745,
+    "hairline_rows": 71
+  },
+  {
+    "name": "uiux:uiux-dark-1440.png",
+    "file": "uiux-dark-1440.png",
+    "size": [
+      720,
+      500
+    ],
+    "distinct_hues": 18,
+    "chromatic_ratio": 0.1316,
+    "ink_ratio": 0.1346,
+    "mean_luminance": 0.166,
+    "accent_share": 0.566,
+    "hairline_rows": 66
+  }
+]

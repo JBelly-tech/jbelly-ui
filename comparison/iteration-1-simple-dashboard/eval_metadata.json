@@ -1,0 +1,15 @@
+{
+  "eval_id": 0,
+  "eval_name": "nutrition-dashboard",
+  "prompt": "Build a single self-contained HTML file (Tailwind v4 browser CDN + Lucide) for the main dashboard screen of \"Nutrio\", a SaaS admin for a nutrition clinic in Amman: sidebar with navigation, header, page toolbar, 4 KPI cards, one chart, appointments table with status badges and row actions, activity list; dark mode and RTL toggles as a plus; realistic Arabic-Jordanian names; no commercial template code.",
+  "assertions": [
+    {"name": "tokens-not-raw-palette", "text": "Colours come from semantic CSS variables/roles; the lint finds no raw Tailwind palette classes (bg-blue-500, text-gray-600 …) in component markup."},
+    {"name": "deliberate-personality", "text": "The page does not use the default-AI look: not Inter-only typography with a blue-600 primary on zinc greys; a display/text pairing or a non-default primary hue is chosen on purpose and stated in notes."},
+    {"name": "dark-mode-class", "text": "Dark mode is implemented as a class on <html> (not only a media query) with a working toggle and persisted preference."},
+    {"name": "rtl-logical-properties", "text": "Layout uses logical utilities (ps-/pe-/ms-/me-/start-/end-) so dir=rtl mirrors the shell; directional icons are mirrored."},
+    {"name": "table-states-and-actions", "text": "The appointments table has status badges with text (not colour alone) and row actions; at least a loading/skeleton or empty state exists for the table."},
+    {"name": "control-sizing-consistency", "text": "Buttons, inputs and selects share consistent heights (e.g. 28/34/40px scale) so mixed toolbar rows align."},
+    {"name": "one-primary-per-view", "text": "Exactly one solid primary action button is visible in the toolbar/header; other actions are outline/ghost."},
+    {"name": "keyboard-and-focus", "text": "Interactive elements are real buttons/links with visible focus styles; Esc closes any overlay; a search shortcut (Ctrl/⌘+K) is wired if a search exists."}
+  ]
+}

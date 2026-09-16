@@ -1,0 +1,101 @@
+{
+ "skill_name": "jbelly-ui",
+ "evals": [
+  {
+   "query": "add a dashboard page to our React admin with KPIs and a table of recent orders",
+   "should_trigger": true
+  },
+  {
+   "query": "make the settings screen look more professional, it looks like a default template",
+   "should_trigger": true
+  },
+  {
+   "query": "build me a landing page for our scheduling SaaS with pricing",
+   "should_trigger": true
+  },
+  {
+   "query": "the sign up form on mobile is ugly, redesign it",
+   "should_trigger": true
+  },
+  {
+   "query": "review this UI and tell me what is wrong: [pastes HTML]",
+   "should_trigger": true
+  },
+  {
+   "query": "create a data table with filters, bulk actions and pagination for customers",
+   "should_trigger": true
+  },
+  {
+   "query": "we need dark mode and RTL Arabic support for the app shell",
+   "should_trigger": true
+  },
+  {
+   "query": "make a page",
+   "should_trigger": true
+  },
+  {
+   "query": "design tokens for our new product, we want something that does not look AI-generated",
+   "should_trigger": true
+  },
+  {
+   "query": "turn this description into a Tailwind page: sidebar, header, cards",
+   "should_trigger": true
+  },
+  {
+   "query": "restyle our Blazor admin pages, they use 4 different fonts",
+   "should_trigger": true
+  },
+  {
+   "query": "add an empty state and loading skeleton to the projects list",
+   "should_trigger": true
+  },
+  {
+   "query": "fix this SQL query, it returns duplicates",
+   "should_trigger": false
+  },
+  {
+   "query": "write a Dockerfile for the API",
+   "should_trigger": false
+  },
+  {
+   "query": "why does my React useEffect run twice",
+   "should_trigger": false
+  },
+  {
+   "query": "design the database schema for orders and invoices",
+   "should_trigger": false
+  },
+  {
+   "query": "write unit tests for the pricing calculator",
+   "should_trigger": false
+  },
+  {
+   "query": "set up GitHub Actions to deploy on tag",
+   "should_trigger": false
+  },
+  {
+   "query": "the API returns 500 on POST /users, debug it",
+   "should_trigger": false
+  },
+  {
+   "query": "design a REST API for a booking system",
+   "should_trigger": false
+  },
+  {
+   "query": "improve the performance of this Python data pipeline",
+   "should_trigger": false
+  },
+  {
+   "query": "write the copy for our About page",
+   "should_trigger": false
+  },
+  {
+   "query": "generate a logo for the brand",
+   "should_trigger": false
+  },
+  {
+   "query": "explain CSS grid vs flexbox",
+   "should_trigger": false
+  }
+ ]
+}

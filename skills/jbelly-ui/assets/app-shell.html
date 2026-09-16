@@ -1,0 +1,590 @@
+<!doctype html>
+<html lang="en" dir="ltr" class="h-full">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>jbelly-ui — app shell</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Source+Sans+3:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=DM+Sans:wght@400;500;600&family=Public+Sans:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts@4.7.0/dist/apexcharts.min.js"></script>
+<style type="text/tailwindcss">
+/* ===== tokens.css (inlined for the single-file demo) ===== */
+:root {
+  color-scheme: light;
+  --radius: 0.5rem;
+  --font-display: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Arabic", sans-serif;
+  --font-mono: ui-monospace, "JetBrains Mono", Consolas, monospace;
+  --background: oklch(100% 0 0); --foreground: oklch(14.5% 0.005 285);
+  --card: oklch(100% 0 0); --card-foreground: oklch(14.5% 0.005 285);
+  --popover: oklch(100% 0 0); --popover-foreground: oklch(14.5% 0.005 285);
+  --primary: oklch(54% 0.2 258); --primary-foreground: oklch(100% 0 0);
+  --secondary: oklch(96.5% 0.002 285); --secondary-foreground: oklch(21% 0.006 285);
+  --muted: oklch(96.5% 0.002 285); --muted-foreground: oklch(55% 0.014 285);
+  --accent: oklch(96.5% 0.002 285); --accent-foreground: oklch(21% 0.006 285);
+  --mono: oklch(14.5% 0.005 285); --mono-foreground: oklch(100% 0 0);
+  --destructive: oklch(57.5% 0.22 27); --destructive-foreground: oklch(100% 0 0);
+  --success: oklch(72% 0.19 150); --success-foreground: oklch(100% 0 0);
+  --warning: oklch(85% 0.17 90); --warning-foreground: oklch(30% 0.05 90);
+  --info: oklch(60% 0.22 293); --info-foreground: oklch(100% 0 0);
+  --border: oklch(94% 0.004 286); --input: oklch(92% 0.004 286); --ring: oklch(71% 0.01 286);
+  --sidebar: var(--card); --sidebar-foreground: var(--foreground); --sidebar-muted: var(--muted-foreground);
+  --sidebar-accent: var(--accent); --sidebar-accent-foreground: var(--accent-foreground);
+  --sidebar-primary: var(--primary); --sidebar-border: var(--border);
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.06);
+  --sidebar-width: 280px; --sidebar-width-collapsed: 80px; --header-height: 70px;
+  --ctl-h: 34px; --ctl-h-sm: 28px; --row-h: 46px; --card-p: 1.25rem; --page-gap: 1.25rem;
+  --chart-2: var(--info); --chart-3: var(--success); --chart-4: var(--warning);
+}
+@media (max-width: 63.99rem) { :root { --header-height: 60px; } }
+.dark {
+  color-scheme: dark;
+  --background: oklch(14.5% 0.005 285); --foreground: oklch(98.5% 0 0);
+  --card: oklch(14.5% 0.005 285); --card-foreground: oklch(98.5% 0 0);
+  --popover: oklch(14.5% 0.005 285); --popover-foreground: oklch(98.5% 0 0);
+  --primary: oklch(55% 0.21 258);
+  --secondary: oklch(27.5% 0.006 286); --secondary-foreground: oklch(98.5% 0 0);
+  --muted: oklch(21% 0.006 285); --muted-foreground: oklch(64% 0.014 285);
+  --accent: oklch(21% 0.006 285); --accent-foreground: oklch(98.5% 0 0);
+  --mono: oklch(87% 0.006 286); --mono-foreground: oklch(0% 0 0);
+  --warning-foreground: oklch(92% 0.12 90);
+  --border: oklch(27.5% 0.006 286); --input: oklch(27.5% 0.006 286); --ring: oklch(44% 0.01 286);
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.4);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.4);
+}
+/* ===== optional dark sidebar on a light page (the popular semi-dark layout) ===== */
+.sidebar-dark { --sidebar: oklch(16% 0.02 262); --sidebar-foreground: oklch(90% 0.01 250); --sidebar-muted: oklch(62% 0.02 250); --sidebar-accent: oklch(22% 0.025 262); --sidebar-accent-foreground: oklch(100% 0 0); --sidebar-primary: oklch(78% 0.13 195); --sidebar-border: oklch(25% 0.025 262); }
+.sidebar-dark.dark { --sidebar: oklch(11% 0.015 262); --sidebar-border: oklch(20% 0.02 262); }
+/* ===== density ===== */
+.density-compact { --ctl-h: 30px; --ctl-h-sm: 24px; --row-h: 38px; --card-p: 1rem; --page-gap: 1rem; }
+.density-airy    { --ctl-h: 40px; --ctl-h-sm: 32px; --row-h: 56px; --card-p: 1.75rem; --page-gap: 1.75rem; }
+/* ===== personalities (from references/personalities.md) ===== */
+.theme-clinic { --font-display: "Manrope", sans-serif; --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --primary: oklch(50% 0.12 195); --background: oklch(98.5% 0.006 190); --card: oklch(100% 0 0);
+  --border: oklch(92% 0.012 190); --input: oklch(90% 0.014 190); --muted: oklch(96% 0.01 190); --accent: oklch(95% 0.012 190); --radius: 0.75rem; }
+.theme-clinic.dark { --background: oklch(15% 0.012 195); --card: oklch(18% 0.012 195); --popover: oklch(18% 0.012 195); --border: oklch(28% 0.015 195); --input: oklch(28% 0.015 195); --muted: oklch(22% 0.012 195); --accent: oklch(24% 0.014 195); --primary: oklch(70% 0.13 195); --primary-foreground: oklch(12% 0.02 195); }
+.theme-graphite { --font-display: "IBM Plex Sans", sans-serif; --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif; --font-mono: "IBM Plex Mono", monospace;
+  --primary: oklch(65% 0.17 150); --primary-foreground: oklch(14% 0 0); --background: oklch(97% 0.002 260); --card: oklch(100% 0 0); --border: oklch(88% 0.004 260); --input: oklch(86% 0.004 260); --radius: 0.25rem; }
+.theme-graphite.dark { --background: oklch(12% 0.004 260); --card: oklch(15% 0.004 260); --popover: oklch(15% 0.004 260); --border: oklch(24% 0.005 260); --input: oklch(26% 0.005 260); }
+.theme-editorial { --font-display: "Fraunces", Georgia, serif; --font-sans: "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
+  --primary: oklch(48% 0.16 30); --primary-foreground: oklch(98% 0.01 60); --background: oklch(97.5% 0.012 75); --card: oklch(99% 0.008 75);
+  --foreground: oklch(22% 0.02 50); --mono: oklch(22% 0.02 50); --border: oklch(90% 0.02 70); --input: oklch(88% 0.02 70); --muted: oklch(94% 0.015 75); --accent: oklch(93% 0.018 75); --muted-foreground: oklch(50% 0.03 50);
+  --radius: 0.5rem; --shadow-xs: 0 1px 3px rgb(60 30 10 / 0.08); --shadow-md: 0 6px 16px -6px rgb(60 30 10 / 0.18); }
+.theme-editorial.dark { --background: oklch(16% 0.012 60); --card: oklch(19% 0.012 60); --popover: oklch(19% 0.012 60); --foreground: oklch(95% 0.01 75); --mono: oklch(95% 0.01 75); --border: oklch(28% 0.015 60); --input: oklch(28% 0.015 60); --muted: oklch(23% 0.012 60); --accent: oklch(25% 0.014 60); --muted-foreground: oklch(65% 0.02 60); --primary: oklch(70% 0.15 35); --primary-foreground: oklch(14% 0.02 40); }
+.theme-neo { --font-display: "Space Grotesk", sans-serif; --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --primary: oklch(55% 0.25 290); --background: oklch(99% 0 0); --card: oklch(100% 0 0); --foreground: oklch(10% 0 0); --mono: oklch(10% 0 0);
+  --border: oklch(10% 0 0); --input: oklch(10% 0 0); --radius: 0.25rem; --shadow-xs: 3px 3px 0 0 var(--foreground); --shadow-md: 5px 5px 0 0 var(--foreground); }
+.theme-neo.dark { --background: oklch(12% 0 0); --card: oklch(15% 0 0); --popover: oklch(15% 0 0); --foreground: oklch(98% 0 0); --mono: oklch(98% 0 0); --border: oklch(98% 0 0); --input: oklch(98% 0 0); --primary: oklch(75% 0.2 290); --primary-foreground: oklch(10% 0 0); }
+.theme-slate { --font-display: "Inter", sans-serif; --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --primary: oklch(42% 0.12 260); --background: oklch(96.5% 0.004 250); --card: oklch(100% 0 0); --foreground: oklch(18% 0.02 260); --border: oklch(88% 0.008 250); --input: oklch(86% 0.008 250); --radius: 0.375rem;
+  --sidebar: oklch(18% 0.03 260); --sidebar-foreground: oklch(92% 0.01 250); --sidebar-muted: oklch(65% 0.02 250); --sidebar-accent: oklch(24% 0.03 260); --sidebar-accent-foreground: oklch(100% 0 0); --sidebar-primary: oklch(78% 0.12 80); --sidebar-border: oklch(26% 0.03 260); }
+.theme-slate.dark { --background: oklch(13% 0.02 260); --card: oklch(17% 0.02 260); --popover: oklch(17% 0.02 260); --foreground: oklch(95% 0.01 250); --border: oklch(26% 0.02 260); --input: oklch(26% 0.02 260); --primary: oklch(72% 0.12 80); --primary-foreground: oklch(15% 0.03 80); --sidebar: oklch(11% 0.02 260); }
+.theme-mint { --font-display: "Plus Jakarta Sans", sans-serif; --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --primary: oklch(60% 0.15 165); --primary-foreground: oklch(14% 0 0); --background: oklch(98% 0.01 160); --card: oklch(100% 0 0); --border: oklch(93% 0.02 160); --input: oklch(90% 0.02 160); --muted: oklch(96% 0.012 160); --accent: oklch(95% 0.015 160); --radius: 1rem;
+  --shadow-xs: 0 1px 2px rgb(20 60 40 / 0.06); --shadow-md: 0 8px 24px -8px rgb(20 60 40 / 0.18); }
+.theme-mint.dark { --background: oklch(14% 0.01 160); --card: oklch(18% 0.012 160); --popover: oklch(18% 0.012 160); --border: oklch(27% 0.015 160); --input: oklch(27% 0.015 160); --muted: oklch(22% 0.012 160); --accent: oklch(24% 0.014 160); --primary: oklch(72% 0.15 165); }
+
+@custom-variant dark (&:where(.dark, .dark *));
+@theme inline {
+  --font-sans: var(--font-sans); --font-mono: var(--font-mono); --font-display: var(--font-display);
+  --color-background: var(--background); --color-foreground: var(--foreground);
+  --color-card: var(--card); --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover); --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary); --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary); --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted); --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent); --color-accent-foreground: var(--accent-foreground);
+  --color-mono: var(--mono); --color-mono-foreground: var(--mono-foreground);
+  --color-destructive: var(--destructive); --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success); --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning); --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info); --color-info-foreground: var(--info-foreground);
+  --color-border: var(--border); --color-input: var(--input); --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar); --color-sidebar-foreground: var(--sidebar-foreground); --color-sidebar-muted: var(--sidebar-muted);
+  --color-sidebar-accent: var(--sidebar-accent); --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-primary: var(--sidebar-primary); --color-sidebar-border: var(--sidebar-border);
+  --radius-xl: calc(var(--radius) + 4px); --radius-lg: var(--radius); --radius-md: calc(var(--radius) - 2px); --radius-sm: calc(var(--radius) - 4px);
+  --shadow-xs: var(--shadow-xs); --shadow-md: var(--shadow-md);
+}
+@theme { --text-2sm: 0.8125rem; --text-2sm--line-height: 1.3; --text-2xs: 0.6875rem; --text-2xs--line-height: 1.2; }
+@layer base {
+  * { border-color: var(--border); }
+  html { font-family: var(--font-sans); }
+  body { background: var(--background); color: var(--foreground); -webkit-font-smoothing: antialiased; }
+  :focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+  .scroll-thin { scrollbar-width: thin; scrollbar-color: var(--accent) transparent; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+}
+@layer components {
+  .container-fixed { @apply w-full grow px-6 xl:mx-auto xl:px-7.5 xl:max-w-(--breakpoint-xl); }
+  /* buttons */
+  .btn { @apply inline-flex items-center justify-center gap-1.5 shrink-0 whitespace-nowrap font-medium rounded-md shadow-xs transition-colors cursor-pointer h-(--ctl-h) px-3 text-2sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background disabled:opacity-50 disabled:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0; }
+  .btn-sm { @apply h-(--ctl-h-sm) px-2.5 text-xs gap-1.25; }
+  .btn-icon { @apply p-0 w-(--ctl-h); }
+  .btn-icon.btn-sm { @apply w-(--ctl-h-sm); }
+  .btn-primary { @apply bg-primary text-primary-foreground hover:bg-primary/90; }
+  .btn-outline { @apply border border-input bg-background text-secondary-foreground hover:bg-accent hover:text-accent-foreground; }
+  .btn-ghost { @apply shadow-none bg-transparent text-accent-foreground hover:bg-accent; }
+  .btn-destructive { @apply bg-destructive text-destructive-foreground hover:bg-destructive/90; }
+  /* inputs */
+  .input { @apply flex w-full rounded-md border border-input bg-background text-foreground shadow-xs placeholder:text-muted-foreground transition-colors h-(--ctl-h) px-3 text-2sm focus-visible:outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40; }
+  .input-sm { @apply h-(--ctl-h-sm) px-2.5 text-xs; }
+  .select { @apply appearance-none cursor-pointer pe-8 bg-no-repeat bg-[length:14px_11px] bg-[position:right_0.6rem_center] rtl:bg-[position:left_0.6rem_center]; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%239f9fa9' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3E%3C/svg%3E"); }
+  .checkbox { @apply appearance-none shrink-0 size-4 rounded-sm border border-input bg-background shadow-xs cursor-pointer checked:bg-primary checked:border-primary bg-center bg-no-repeat focus-visible:ring-2 focus-visible:ring-ring/40; }
+  .checkbox:checked { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='white' stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='m3.5 8.5 3 3 6-7'/%3E%3C/svg%3E"); }
+  /* badges */
+  .badge { @apply inline-flex items-center justify-center gap-1.5 whitespace-nowrap font-medium rounded-md h-6 min-w-6 px-[0.45rem] text-xs bg-secondary text-accent-foreground; }
+  .badge-sm { @apply h-5 min-w-5 px-[0.325rem] text-2xs rounded-sm gap-1; }
+  .badge-light-primary { @apply bg-primary/10 text-primary; }
+  .badge-light-success { @apply bg-success/15 text-success; }
+  .badge-light-warning { @apply bg-warning/20 text-warning-foreground; }
+  .badge-light-destructive { @apply bg-destructive/10 text-destructive; }
+  .badge-outline { @apply border border-border bg-muted text-secondary-foreground; }
+  .dot { @apply size-1.5 rounded-full bg-current opacity-75; }
+  /* card */
+  .card { @apply flex flex-col rounded-xl border border-border bg-card text-card-foreground shadow-xs; }
+  .card-header { @apply flex min-h-14 flex-wrap items-center justify-between gap-2.5 border-b border-border px-5; }
+  .card-title { @apply text-base font-semibold tracking-tight leading-none text-mono; }
+  .card-content { @apply grow p-(--card-p); }
+  .card-footer { @apply flex items-center border-t border-border px-5 py-4; }
+  /* table */
+  .table { @apply w-full border-collapse text-sm text-foreground; }
+  .table th { @apply h-11 px-4 text-start align-middle text-xs font-normal text-secondary-foreground border-b border-border whitespace-nowrap; }
+  .table td { @apply px-4 align-middle border-b border-border h-(--row-h); }
+  .table tbody tr:last-child td { @apply border-b-0; }
+  .table tbody tr { @apply hover:bg-muted/40 transition-colors; }
+  .table tbody tr.selected { @apply bg-accent; }
+  /* nav */
+  .nav-heading { @apply px-2.5 pt-4 pb-1 text-xs font-medium uppercase text-sidebar-muted; }
+  .nav-link { @apply flex items-center gap-3.5 rounded-lg px-2.5 py-2 text-sm text-sidebar-foreground hover:bg-sidebar-accent cursor-pointer; }
+  .nav-link.active { @apply bg-sidebar-accent text-sidebar-primary font-medium relative before:absolute before:-start-2 before:top-2 before:bottom-2 before:w-[3px] before:rounded-full before:bg-sidebar-primary; }
+  .nav-link svg { @apply size-5 shrink-0 text-sidebar-muted; }
+  .nav-link.active svg, .nav-link:hover svg { @apply text-sidebar-primary; }
+  .nav-children { @apply hidden flex-col gap-1 ms-[22px] ps-2.5 border-s border-sidebar-border; }
+  .nav-group.open > .nav-children { @apply flex; }
+  .nav-group.open > .nav-link .nav-arrow { @apply rotate-90 rtl:-rotate-90; }
+  .nav-child { @apply relative flex items-center gap-3.5 rounded-lg px-2.5 py-1.5 text-2sm text-sidebar-foreground hover:bg-sidebar-accent before:absolute before:-start-[15px] before:top-1/2 before:size-1.5 before:-translate-y-1/2 before:rounded-full; }
+  .nav-child.active { @apply text-sidebar-primary before:bg-sidebar-primary; }
+  /* menu */
+  .menu { @apply min-w-44 rounded-md border border-border bg-popover text-popover-foreground shadow-md p-2 flex flex-col gap-0.5 z-50; }
+  .menu-item { @apply flex items-center gap-2.5 rounded-md px-2 py-2 text-2sm text-foreground cursor-pointer hover:bg-accent [&_svg]:size-4 [&_svg]:text-muted-foreground; }
+  .kbd { @apply inline-flex h-5 items-center rounded-sm border border-border bg-muted px-1.5 font-mono text-2xs text-secondary-foreground; }
+  .skeleton { @apply animate-pulse rounded-md bg-accent; }
+  /* collapsed sidebar (desktop) */
+  @media (width >= 64rem) {
+    .sidebar-collapsed { --sidebar-width: var(--sidebar-width-collapsed); }
+    .sidebar-collapsed #sidebar:hover { width: 280px; }
+    .sidebar-collapsed #sidebar:not(:hover) :is(.nav-title, .nav-badge, .nav-arrow, .nav-children, .logo-full) { display: none; }
+    .sidebar-collapsed #sidebar:not(:hover) .nav-heading { visibility: hidden; height: 1.75rem; }
+    .sidebar-collapsed #sidebar:not(:hover) .logo-mark { display: flex; }
+  }
+  .logo-mark { display: none; }
+}
+</style>
+</head>
+<body class="h-full flex text-2sm">
+<a href="#content" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:start-2 focus:z-50 btn btn-primary btn-sm">Skip to content</a>
+
+<!-- ===== Sidebar ===== -->
+<div id="overlay" class="fixed inset-0 z-30 bg-black/30 hidden lg:hidden"></div>
+<aside id="sidebar" class="fixed inset-y-0 start-0 z-40 hidden lg:flex flex-col w-(--sidebar-width) bg-sidebar text-sidebar-foreground border-e border-sidebar-border transition-[width] duration-300 ease-in-out">
+  <div class="flex items-center justify-between h-(--header-height) px-6 shrink-0 relative">
+    <a href="#" class="logo-full flex items-center gap-2.5 font-semibold text-mono text-sidebar-foreground">
+      <span class="inline-flex size-7 items-center justify-center rounded-md bg-primary text-primary-foreground font-bold text-xs">N</span>
+      <span class="font-display">Acme Ops</span>
+    </a>
+    <a href="#" class="logo-mark items-center justify-center mx-auto"><span class="inline-flex size-7 items-center justify-center rounded-md bg-primary text-primary-foreground font-bold text-xs">N</span></a>
+    <button id="sidebar-toggle" class="btn btn-outline btn-icon btn-sm rounded-full absolute start-full top-1/2 -translate-x-1/2 rtl:translate-x-1/2 -translate-y-1/2 hidden lg:inline-flex" aria-label="Collapse sidebar"><i data-lucide="chevrons-left" class="rtl:rotate-180"></i></button>
+  </div>
+  <!-- @region nav -->
+<nav class="grow overflow-y-auto scroll-thin py-3 ps-5 pe-3 flex flex-col gap-1">
+    <a class="nav-link active" href="#" aria-current="page"><i data-lucide="layout-dashboard"></i><span class="nav-title grow truncate" data-i18n="Dashboard">Dashboard</span></a>
+    <a class="nav-link" href="#"><i data-lucide="users"></i><span class="nav-title grow truncate" data-i18n="Customers">Customers</span><span class="nav-badge badge badge-sm badge-outline">128</span></a>
+    <a class="nav-link" href="#"><i data-lucide="shopping-cart"></i><span class="nav-title grow truncate" data-i18n="Orders">Orders</span></a>
+    <div class="nav-group open">
+      <a class="nav-link" href="#" data-toggle-group><i data-lucide="package"></i><span class="nav-title grow truncate" data-i18n="Products">Products</span><i data-lucide="chevron-right" class="nav-arrow size-4! transition-transform rtl:rotate-180"></i></a>
+      <div class="nav-children">
+        <a class="nav-child" href="#" data-i18n="Catalogue">Catalogue</a>
+        <a class="nav-child" href="#" data-i18n="Collections">Collections</a>
+        <a class="nav-child" href="#" data-i18n="Inventory">Inventory</a>
+      </div>
+    </div>
+    <div class="nav-heading" data-i18n="Business">Business</div>
+    <a class="nav-link" href="#"><i data-lucide="credit-card"></i><span class="nav-title grow truncate" data-i18n="Billing">Billing</span></a>
+    <a class="nav-link" href="#"><i data-lucide="bar-chart-3"></i><span class="nav-title grow truncate" data-i18n="Reports">Reports</span></a>
+    <a class="nav-link opacity-70" href="#" aria-disabled="true"><i data-lucide="sparkle"></i><span class="nav-title grow truncate">Insights</span><span class="nav-badge badge badge-sm badge-outline">Soon</span></a>
+    <a class="nav-link" href="#"><i data-lucide="settings"></i><span class="nav-title grow truncate" data-i18n="Settings">Settings</span></a>
+  </nav>
+<!-- @endregion nav -->
+<div class="p-3 border-t border-sidebar-border">
+    <button class="w-full flex items-center gap-2.5 rounded-lg px-2 py-2 hover:bg-sidebar-accent text-start" aria-haspopup="menu">
+      <span class="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold text-2xs">LA</span>
+      <span class="nav-title flex flex-col min-w-0 grow"><span class="text-sm font-medium text-sidebar-foreground truncate">Lina Ahmad</span><span class="text-xs text-sidebar-muted truncate">Operations · Admin</span></span>
+      <i data-lucide="chevrons-up-down" class="nav-arrow size-4 text-sidebar-muted"></i>
+    </button>
+  </div>
+</aside>
+
+<!-- ===== Wrapper ===== -->
+<div class="flex flex-col grow min-w-0 lg:ps-(--sidebar-width) pt-(--header-height) transition-[padding] duration-300">
+  <header class="fixed top-0 end-0 start-0 lg:start-(--sidebar-width) z-30 h-(--header-height) flex items-stretch bg-background border-b border-border transition-[inset] duration-300">
+    <div class="container-fixed flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <button id="hamburger" class="btn btn-ghost btn-icon lg:hidden" aria-label="Open menu"><i data-lucide="menu"></i></button>
+        <nav class="hidden md:flex items-center gap-1.5 text-xs text-secondary-foreground" aria-label="Breadcrumb">
+          <a href="#" class="hover:text-primary" data-i18n="Business">Business</a><i data-lucide="chevron-right" class="size-3.5 text-muted-foreground rtl:rotate-180"></i><span class="text-mono" data-i18n="Dashboard">Dashboard</span>
+        </nav>
+      </div>
+      <div class="flex items-center gap-1.5">
+        <button id="open-search" class="btn btn-outline btn-sm hidden md:inline-flex gap-2 text-muted-foreground w-52 justify-start"><i data-lucide="search"></i><span class="grow text-start">Search…</span><span class="kbd">⌘K</span></button>
+        <button class="btn btn-ghost btn-icon relative" aria-label="Notifications"><i data-lucide="bell"></i><span class="absolute top-2 end-2 size-2 rounded-full bg-destructive ring-2 ring-background"></span></button>
+        <button id="theme-toggle" class="btn btn-ghost btn-icon" aria-label="Toggle dark mode"><i data-lucide="moon" class="dark:hidden"></i><i data-lucide="sun" class="hidden dark:block"></i></button>
+        <div class="relative">
+          <button id="user-btn" class="flex items-center gap-2 rounded-full ms-1" aria-haspopup="menu" aria-expanded="false">
+            <span class="inline-flex size-9 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold text-2xs uppercase ring-1 ring-border">LA</span>
+          </button>
+          <div id="user-menu" class="menu absolute end-0 top-full mt-2 w-60 hidden" role="menu">
+            <div class="px-2 py-2 flex flex-col"><span class="text-sm font-medium text-mono">Lina Ahmad</span><span class="text-xs text-muted-foreground">lina@acme.app</span></div>
+            <div class="my-1 h-px bg-border"></div>
+            <a class="menu-item" href="#"><i data-lucide="user"></i>Profile</a>
+            <a class="menu-item" href="#"><i data-lucide="settings"></i>Settings<span class="ms-auto kbd">,</span></a>
+            <div class="my-1 h-px bg-border"></div>
+            <a class="menu-item text-destructive hover:bg-destructive/10" href="#"><i data-lucide="log-out" class="text-destructive!"></i>Log out</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="content" class="grow pt-5 pb-10">
+    <div class="container-fixed">
+      <!-- @region toolbar -->
+<!-- toolbar -->
+      <div class="flex flex-wrap items-center justify-between gap-5 pb-7.5">
+        <div class="flex flex-col gap-1">
+          <h1 class="text-xl font-medium text-mono font-display" data-i18n="Dashboard">Dashboard</h1>
+          <p class="text-2sm text-secondary-foreground">Business overview · <span id="period-label" data-i18n="Last 30 days">Last 30 days</span> vs previous period</p>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <select id="period" class="input select w-40"><option data-i18n="Last 7 days">Last 7 days</option><option selected data-i18n="Last 30 days">Last 30 days</option><option data-i18n="This quarter">This quarter</option></select>
+          <button class="btn btn-outline"><i data-lucide="download"></i>Export</button>
+          <button class="btn btn-primary" data-toast="Order created" data-toast-undo><i data-lucide="plus"></i>New order</button>
+        </div>
+      </div>
+
+      <!-- @endregion toolbar -->
+<div class="grid gap-(--page-gap)">
+        <!-- @region kpis -->
+<!-- KPIs -->
+        <div class="grid sm:grid-cols-2 xl:grid-cols-4 gap-(--page-gap)" id="kpis">
+          <div class="card p-(--card-p) gap-6 justify-between relative overflow-hidden">
+            <div class="flex items-center justify-between"><span class="inline-flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary"><i data-lucide="users" class="size-5"></i></span><span class="badge badge-sm badge-light-success"><i data-lucide="trending-up" class="size-3"></i>12%</span></div>
+            <div class="flex flex-col gap-1"><span class="text-3xl font-semibold text-mono tabular-nums font-display" data-count="1284">0</span><span class="text-sm text-secondary-foreground" data-i18n="Active customers">Active customers</span></div><div class="h-10 -mx-1 -mb-2 apex-spark" data-spark="62,64,61,66,70,69,74,78,77,82,85,89"></div>
+          </div>
+          <div class="card p-(--card-p) gap-6 justify-between overflow-hidden">
+            <div class="flex items-center justify-between"><span class="inline-flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary"><i data-lucide="shopping-bag" class="size-5"></i></span><span class="badge badge-sm badge-light-success"><i data-lucide="trending-up" class="size-3"></i>4%</span></div>
+            <div class="flex flex-col gap-1"><span class="text-3xl font-semibold text-mono tabular-nums font-display" data-count="312">0</span><span class="text-sm text-secondary-foreground" data-i18n="Orders">Orders</span></div><div class="h-10 -mx-1 -mb-2 apex-spark" data-spark="18,22,19,24,26,25,29,31,30,33,35,38"></div>
+          </div>
+          <div class="card p-(--card-p) gap-6 justify-between overflow-hidden">
+            <div class="flex items-center justify-between"><span class="inline-flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary"><i data-lucide="truck" class="size-5"></i></span><span class="badge badge-sm badge-light-destructive"><i data-lucide="trending-down" class="size-3"></i>2%</span></div>
+            <div class="flex flex-col gap-1"><span class="text-3xl font-semibold text-mono tabular-nums font-display"><span data-count="78">0</span>%</span><span class="text-sm text-secondary-foreground" data-i18n="Fulfilment rate">Fulfilment rate</span></div><div class="h-10 -mx-1 -mb-2 apex-spark" data-spark="80,79,81,80,78,77,79,78,76,77,78,78"></div>
+          </div>
+          <div class="card p-(--card-p) gap-6 justify-between overflow-hidden">
+            <div class="flex items-center justify-between"><span class="inline-flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary"><i data-lucide="wallet" class="size-5"></i></span><span class="badge badge-sm badge-light-success"><i data-lucide="trending-up" class="size-3"></i>9%</span></div>
+            <div class="flex flex-col gap-1"><span class="text-3xl font-semibold text-mono tabular-nums font-display">$<span data-count="18400">0</span></span><span class="text-sm text-secondary-foreground" data-i18n="Revenue">Revenue</span></div><div class="h-10 -mx-1 -mb-2 apex-spark" data-spark="9,10,10,11,12,12,13,13,14,15,15,16"></div>
+          </div>
+        </div>
+
+        <!-- @endregion kpis -->
+<!-- @region row2 -->
+<!-- chart + highlights -->
+        <div class="grid lg:grid-cols-3 gap-(--page-gap) items-stretch">
+          <div class="card h-full lg:col-span-2">
+            <div class="card-header"><h3 class="card-title" data-i18n="Orders per week">Orders per week</h3>
+              <div class="flex items-center gap-2.5"><span class="flex items-center gap-1.5 text-2sm text-secondary-foreground"><span class="size-2 rounded-full bg-primary"></span>Completed</span><span class="flex items-center gap-1.5 text-2sm text-secondary-foreground"><span class="size-2 rounded-full bg-muted-foreground/40"></span>Refunded</span><button class="btn btn-ghost btn-icon btn-sm" aria-label="More"><i data-lucide="ellipsis-vertical"></i></button></div>
+            </div>
+            <div class="card-content px-3 py-1 flex flex-col overflow-hidden min-h-60">
+              <div id="chart-visits" class="h-full min-h-60" role="img" aria-label="Completed orders grew from 52 to 84 per week over 12 weeks; no-shows stayed under 10"></div>
+              <table class="sr-only"><caption>Orders per week</caption><thead><tr><th>Week</th><th>Completed</th><th>Refunded</th></tr></thead><tbody><tr><td>W1</td><td>52</td><td>8</td></tr><tr><td>W6</td><td>70</td><td>6</td></tr><tr><td>W12</td><td>84</td><td>4</td></tr></tbody></table>
+            </div>
+          </div>
+          <div class="card h-full">
+            <div class="card-header"><h3 class="card-title" data-i18n="Highlights">Highlights</h3><select class="input select input-sm w-28"><option data-i18n="Month">Month</option><option data-i18n="Quarter">Quarter</option></select></div>
+            <div class="card-content flex flex-col gap-4">
+              <div class="flex flex-col gap-1"><span class="text-2sm text-secondary-foreground" data-i18n="Orders completed">Orders completed</span><div class="flex items-end gap-2"><span class="text-2xl font-semibold text-mono tabular-nums font-display">214</span><span class="badge badge-sm badge-light-success mb-1"><i data-lucide="trending-up" class="size-3"></i>18%</span></div></div>
+              <div id="chart-programmes" class="h-44 -my-1 overflow-hidden"></div>
+              <div class="flex flex-col gap-2.5 text-2sm">
+                <div class="flex justify-between"><span class="flex items-center gap-2"><span class="size-2 rounded-full bg-primary"></span>Online store</span><span class="text-mono font-medium tabular-nums">98</span></div>
+                <div class="flex justify-between"><span class="flex items-center gap-2"><span class="size-2 rounded-full bg-info"></span>Marketplace</span><span class="text-mono font-medium tabular-nums">58</span></div>
+                <div class="flex justify-between"><span class="flex items-center gap-2"><span class="size-2 rounded-full bg-success"></span>Wholesale</span><span class="text-mono font-medium tabular-nums">36</span></div>
+                <div class="flex justify-between"><span class="flex items-center gap-2"><span class="size-2 rounded-full bg-warning"></span>In-store</span><span class="text-mono font-medium tabular-nums">22</span></div>
+              </div>
+            </div>
+            <div class="card-footer justify-center"><a href="#" class="text-primary hover:underline underline-offset-4 text-2sm font-medium" data-i18n="View report">View report</a></div>
+          </div>
+        </div>
+
+        <!-- @endregion row2 -->
+<!-- @region row3 -->
+<!-- table + activity -->
+        <div class="grid lg:grid-cols-3 gap-(--page-gap) items-stretch">
+          <div class="card h-full lg:col-span-2 min-w-0">
+            <div class="card-header" id="table-toolbar">
+              <div class="flex items-center gap-2.5"><h3 class="card-title" data-i18n="Recent orders">Recent orders</h3><span class="badge badge-sm badge-outline">24</span></div>
+              <div class="flex items-center gap-2.5 flex-wrap">
+                <div class="relative"><i data-lucide="search" class="absolute start-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground"></i><input class="input input-sm ps-8 w-48" placeholder="Search customers" data-i18n-placeholder="Search customers"></div>
+                <select class="input select input-sm w-32"><option data-i18n="All status">All status</option><option data-i18n="Confirmed">Confirmed</option><option data-i18n="Pending">Pending</option></select>
+                <div class="inline-flex items-center gap-1 rounded-lg bg-muted p-1" role="tablist" aria-label="Demo data state">
+                  <button class="h-6 px-2.5 rounded-md text-xs bg-background text-mono shadow-xs font-medium" data-state="data" role="tab" data-i18n="Data">Data</button>
+                  <button class="h-6 px-2.5 rounded-md text-xs text-secondary-foreground hover:text-foreground" data-state="loading" role="tab" data-i18n="Loading">Loading</button>
+                  <button class="h-6 px-2.5 rounded-md text-xs text-secondary-foreground hover:text-foreground" data-state="empty" role="tab" data-i18n="Empty">Empty</button>
+                </div>
+              </div>
+            </div>
+            <div class="card-header hidden bg-accent/60" id="bulk-bar">
+              <span class="text-2sm font-medium text-mono"><span id="sel-count">0</span> selected</span>
+              <div class="flex items-center gap-2.5"><button class="btn btn-ghost btn-sm"><i data-lucide="mail"></i>Send reminder</button><button class="btn btn-ghost btn-sm"><i data-lucide="clock"></i>Reschedule</button><button class="btn btn-outline btn-sm text-destructive border-destructive/40 hover:bg-destructive/10"><i data-lucide="trash-2"></i>Cancel</button></div>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="table" id="appt-table">
+                <thead><tr><th class="w-[52px] text-center"><input type="checkbox" class="checkbox" id="check-all" aria-label="Select all"></th><th class="min-w-56" aria-sort="none"><button type="button" class="inline-flex items-center gap-1 cursor-pointer select-none" data-sort="name" data-i18n="Customer">Customer <i data-lucide="chevrons-up-down" class="size-3.5 text-muted-foreground"></i></button></th><th data-i18n="Item">Item</th><th data-i18n="Status">Status</th><th class="hidden lg:table-cell" data-i18n="Time">Time</th><th class="w-[60px]"></th></tr></thead>
+                <tbody id="tbody"></tbody>
+              </table>
+            </div>
+            <div class="card-footer flex-wrap justify-between gap-2.5 text-2sm text-secondary-foreground">
+              <div class="flex items-center gap-2">Show <select class="input select input-sm w-18"><option>5</option><option>10</option><option>25</option></select> per page</div>
+              <div class="flex items-center gap-3"><span>1–5 of 24</span>
+                <nav class="flex items-center gap-1" aria-label="Pagination">
+                  <button class="inline-flex size-7 items-center justify-center rounded-md text-xs text-secondary-foreground hover:bg-accent opacity-50 pointer-events-none" aria-label="Previous"><i data-lucide="chevron-left" class="size-4 rtl:rotate-180"></i></button>
+                  <button class="inline-flex size-7 items-center justify-center rounded-md text-xs bg-accent text-mono font-medium">1</button>
+                  <button class="inline-flex size-7 items-center justify-center rounded-md text-xs text-secondary-foreground hover:bg-accent">2</button>
+                  <button class="inline-flex size-7 items-center justify-center rounded-md text-xs text-secondary-foreground hover:bg-accent">3</button>
+                  <button class="inline-flex size-7 items-center justify-center rounded-md text-xs text-secondary-foreground hover:bg-accent" aria-label="Next"><i data-lucide="chevron-right" class="size-4 rtl:rotate-180"></i></button>
+                </nav>
+              </div>
+            </div>
+          </div>
+          <div class="card h-full">
+            <div class="card-header"><h3 class="card-title" data-i18n="Activity">Activity</h3><a href="#" class="text-primary hover:underline underline-offset-4 text-2sm font-medium" data-i18n="View all">View all</a></div>
+            <div class="card-content flex flex-col">
+              <div class="relative flex gap-3 pb-6 ps-6 before:absolute before:start-2 before:top-6 before:bottom-0 before:w-px before:bg-border"><span class="absolute start-0 top-1 size-4 rounded-full border-2 border-background bg-primary"></span><div class="flex flex-col gap-1"><p class="text-2sm"><span class="font-medium text-mono">Sara K.</span> placed order #1042</p><span class="text-xs text-muted-foreground">12 min ago</span></div></div>
+              <div class="relative flex gap-3 pb-6 ps-6 before:absolute before:start-2 before:top-6 before:bottom-0 before:w-px before:bg-border"><span class="absolute start-0 top-1 size-4 rounded-full border-2 border-background bg-muted-foreground"></span><div class="flex flex-col gap-1"><p class="text-2sm"><span class="font-medium text-mono">Omar H.</span> confirmed delivery for Thursday</p><span class="text-xs text-muted-foreground">1 h ago</span></div></div>
+              <div class="relative flex gap-3 pb-6 ps-6 before:absolute before:start-2 before:top-6 before:bottom-0 before:w-px before:bg-border"><span class="absolute start-0 top-1 size-4 rounded-full border-2 border-background bg-muted-foreground"></span><div class="flex flex-col gap-1"><p class="text-2sm">Invoice <span class="font-medium text-mono">#1042</span> paid · $120</p><span class="text-xs text-muted-foreground">3 h ago</span></div></div>
+              <div class="relative flex gap-3 ps-6"><span class="absolute start-0 top-1 size-4 rounded-full border-2 border-background bg-muted-foreground"></span><div class="flex flex-col gap-1"><p class="text-2sm"><span class="font-medium text-mono">Lina A.</span> published plan “Ramadan 14-day”</p><span class="text-xs text-muted-foreground">Yesterday</span></div></div>
+            </div>
+          </div>
+        </div>
+      <!-- @endregion row3 -->
+</div>
+    </div>
+  </main>
+
+  <footer class="container-fixed flex flex-wrap items-center justify-between gap-2.5 py-5 text-2sm text-muted-foreground">
+    <span>© 2026 Acme Ops</span><nav class="flex gap-4"><a href="#" class="hover:text-primary" data-i18n="Docs">Docs</a><a href="#" class="hover:text-primary" data-i18n="Support">Support</a><a href="#" class="hover:text-primary" data-i18n="Privacy">Privacy</a></nav>
+  </footer>
+</div>
+
+<!-- ===== Drawer ===== -->
+<div id="drawer-overlay" class="fixed inset-0 z-50 bg-black/30 backdrop-blur-[2px] hidden"></div>
+<aside id="drawer" class="fixed z-50 top-5 bottom-5 end-5 w-[450px] max-w-[90%] rounded-xl border border-border bg-card shadow-md flex flex-col hidden" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
+  <div class="flex items-center justify-between px-5 py-2.5 border-b border-border"><span id="drawer-title" class="text-sm font-semibold text-mono">Order</span><button class="btn btn-ghost btn-icon btn-sm" data-close-drawer aria-label="Close"><i data-lucide="x"></i></button></div>
+  <div class="grow overflow-y-auto scroll-thin p-5 flex flex-col gap-5">
+    <div class="flex items-center gap-3"><span class="inline-flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold text-sm" id="drawer-initials">SK</span><div class="flex flex-col"><span class="text-base font-semibold text-mono" id="drawer-name">Sara Khalil</span><span class="text-2sm text-secondary-foreground" id="drawer-plan">Online store · week 6</span></div></div>
+    <div class="grid grid-cols-2 gap-2.5 text-2sm">
+      <div class="rounded-lg bg-muted p-3 flex flex-col gap-1"><span class="text-xs text-muted-foreground" data-i18n="Time">Time</span><span class="font-medium text-mono" id="drawer-time">Today 14:30</span></div>
+      <div class="rounded-lg bg-muted p-3 flex flex-col gap-1"><span class="text-xs text-muted-foreground" data-i18n="Status">Status</span><span id="drawer-status"></span></div>
+    </div>
+    <div class="flex flex-col gap-1.5"><label class="text-2sm font-medium text-mono" for="note">Order note</label><textarea id="note" class="input h-auto min-h-24 p-3 leading-normal resize-y" placeholder="Notes, special instructions…"></textarea><span class="text-xs text-muted-foreground">Visible to your team only.</span></div>
+  </div>
+  <div class="grid grid-cols-2 gap-2.5 p-5 border-t border-border"><button class="btn btn-outline" data-close-drawer>Cancel</button><button class="btn btn-primary" data-toast="Note saved" data-close-drawer>Save note</button></div>
+</aside>
+
+<!-- ===== Command palette ===== -->
+<div id="palette-overlay" class="fixed inset-0 z-50 bg-black/30 backdrop-blur-[2px] hidden"></div>
+<div id="palette" class="fixed z-50 top-[15%] start-1/2 -translate-x-1/2 rtl:translate-x-1/2 w-[calc(100%-2rem)] max-w-[600px] rounded-lg border border-border bg-popover text-popover-foreground shadow-md hidden flex-col" role="dialog" aria-modal="true" aria-label="Search">
+  <div class="flex items-center gap-2 px-4 border-b border-border"><i data-lucide="search" class="size-4 text-muted-foreground"></i><input id="palette-input" class="input h-12 border-0 shadow-none focus-visible:ring-0 px-1 text-sm" placeholder="Search customers, orders, actions…"><span class="kbd">Esc</span></div>
+  <div class="p-2 max-h-80 overflow-y-auto scroll-thin" id="palette-list">
+    <div class="px-2 py-1.5 text-xs font-medium uppercase text-muted-foreground">Actions</div>
+    <a class="menu-item" href="#"><i data-lucide="plus-circle"></i>New order<span class="ms-auto kbd">N</span></a>
+    <a class="menu-item" href="#"><i data-lucide="user-plus"></i>Add customer<span class="ms-auto kbd">P</span></a>
+    <div class="px-2 py-1.5 text-xs font-medium uppercase text-muted-foreground" data-i18n="Customers">Customers</div>
+    <a class="menu-item" href="#"><i data-lucide="user"></i>Sara Khalil<span class="ms-auto text-xs text-muted-foreground" data-i18n="Online store">Online store</span></a>
+    <a class="menu-item" href="#"><i data-lucide="user"></i>Omar Haddad<span class="ms-auto text-xs text-muted-foreground" data-i18n="Marketplace">Marketplace</span></a>
+    <div class="px-2 py-1.5 text-xs font-medium uppercase text-muted-foreground">Pages</div>
+    <a class="menu-item" href="#"><i data-lucide="settings"></i>Settings → Appearance</a>
+  </div>
+  <div class="flex gap-4 px-4 py-2.5 border-t border-border text-xs text-muted-foreground"><span><span class="kbd">↑↓</span> navigate</span><span><span class="kbd">↵</span> open</span></div>
+</div>
+
+<!-- ===== Toasts ===== -->
+<div id="toasts" aria-live="polite" aria-relevant="additions" class="fixed bottom-5 end-5 z-50 flex flex-col gap-2.5 w-[360px] max-w-[calc(100%-2.5rem)]"></div>
+
+<!-- ===== Demo controls (not part of the shell) ===== -->
+<details class="fixed bottom-5 start-5 z-40 rounded-lg border border-border bg-popover shadow-md text-2sm w-64 open:pb-3" open>
+  <summary class="cursor-pointer select-none px-3 py-2 font-medium text-mono flex items-center gap-2"><i data-lucide="sliders-horizontal" class="size-4 text-muted-foreground"></i>Demo controls</summary>
+  <div class="px-3 flex flex-col gap-2.5">
+    <label class="flex flex-col gap-1"><span class="text-xs text-muted-foreground">Personality</span>
+      <select id="ctl-theme" class="input select input-sm"><option value="">Default (demo only — never ship)</option><option value="theme-clinic">Calm — teal, Manrope display</option><option value="theme-graphite">Graphite — dense, Plex</option><option value="theme-editorial">Editorial — warm serif</option><option value="theme-neo">Neo — bold, offset shadows</option><option value="theme-slate">Slate — navy sidebar, gold</option><option value="theme-mint">Mint — pills, Jakarta</option></select></label>
+    <label class="flex flex-col gap-1"><span class="text-xs text-muted-foreground">Density</span>
+      <select id="ctl-density" class="input select input-sm"><option value="">Standard</option><option value="density-compact">Compact</option><option value="density-airy">Airy</option></select></label>
+    <div class="flex items-center gap-2"><button id="ctl-rtl" class="btn btn-outline btn-sm grow" aria-label="Toggle language and direction">AR / EN</button><button id="ctl-dark" class="btn btn-outline btn-sm grow">Dark</button><button id="ctl-sidebar" class="btn btn-outline btn-sm grow" title="Dark sidebar on a light page">Side</button></div>
+  </div>
+</details>
+
+<script>
+const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const html = document.documentElement;
+const rows = [
+  { n: 'Sara Khalil', i: 'SK', p: 'Online store · 3 items', s: 'Confirmed', t: 'Today 14:30' },
+  { n: 'Omar Haddad', i: 'OH', p: 'Marketplace', s: 'Pending', t: 'Today 15:15' },
+  { n: 'Rana Saleh', i: 'RS', p: 'Wholesale', s: 'Confirmed', t: 'Tomorrow 09:00' },
+  { n: 'Yousef Amin', i: 'YA', p: 'In-store', s: 'At risk', t: 'Tomorrow 11:30' },
+  { n: 'Dana Qasem', i: 'DQ', p: 'Online store · 1 item', s: 'Confirmed', t: 'Thu 10:30' },
+];
+const badge = s => ({ 'Confirmed': 'badge-light-success', 'Pending': 'badge-light-warning', 'At risk': 'badge-light-destructive' }[s] || 'badge-outline');
+function renderRows() {
+  $('#tbody').innerHTML = rows.map((r, k) => `<tr class="group" data-i="${k}">
+    <td class="text-center"><input type="checkbox" class="checkbox row-check" aria-label="Select ${r.n}"></td>
+    <td><div class="flex items-center gap-2.5"><span class="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold text-2xs">${r.i}</span><div class="flex flex-col min-w-0"><a href="#" class="text-sm font-medium text-mono hover:text-primary truncate" data-open-drawer="${k}">${r.n}</a><span class="text-2sm text-secondary-foreground truncate">${r.p}</span></div></div></td>
+    <td class="text-secondary-foreground whitespace-nowrap">${r.p.split(' ·')[0]}</td>
+    <td><span class="badge badge-sm ${badge(r.s)}"><span class="dot"></span>${r.s}</span></td>
+    <td class="hidden lg:table-cell text-secondary-foreground whitespace-nowrap">${r.t}</td>
+    <td class="text-end"><div class="flex justify-end gap-0.5 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity"><button class="btn btn-ghost btn-icon btn-sm" aria-label="Open" data-open-drawer="${k}"><i data-lucide="panel-right-open"></i></button><button class="btn btn-ghost btn-icon btn-sm" aria-label="More"><i data-lucide="ellipsis"></i></button></div></td></tr>`).join('');
+  lucide.createIcons();
+}
+function renderState(state) {
+  const tb = $('#tbody');
+  if (state === 'loading') tb.innerHTML = Array.from({ length: 5 }, () => `<tr><td class="text-center"><span class="skeleton inline-block size-4"></span></td><td><div class="flex items-center gap-2.5"><span class="skeleton size-9 rounded-full"></span><div class="flex flex-col gap-1.5"><span class="skeleton h-3 w-32"></span><span class="skeleton h-2.5 w-20"></span></div></div></td><td><span class="skeleton h-3 w-20 inline-block"></span></td><td><span class="skeleton h-5 w-16 inline-block"></span></td><td class="hidden lg:table-cell"><span class="skeleton h-3 w-16 inline-block"></span></td><td></td></tr>`).join('');
+  else if (state === 'empty') tb.innerHTML = `<tr><td colspan="6"><div class="flex flex-col items-center justify-center text-center gap-3 py-12"><span class="inline-flex size-12 items-center justify-center rounded-full bg-muted text-muted-foreground"><i data-lucide="package-x" class="size-5"></i></span><span class="text-sm font-semibold text-mono">No orders match</span><span class="text-2sm text-secondary-foreground max-w-xs">Try another status or clear the search.</span><button class="btn btn-outline btn-sm" data-state="data">Clear filters</button></div></td></tr>`;
+  else renderRows();
+  lucide.createIcons();
+  $$('[role=tab][data-state]').forEach(b => { const on = b.dataset.state === state; b.className = on ? 'h-6 px-2.5 rounded-md text-xs bg-background text-mono shadow-xs font-medium' : 'h-6 px-2.5 rounded-md text-xs text-secondary-foreground hover:text-foreground'; });
+}
+document.addEventListener('click', e => { const b = e.target.closest('[data-state]'); if (b) renderState(b.dataset.state); });
+// selection + bulk bar
+document.addEventListener('change', e => {
+  if (e.target.id === 'check-all') $$('.row-check').forEach(c => { c.checked = e.target.checked; c.closest('tr').classList.toggle('selected', c.checked); });
+  if (e.target.classList.contains('row-check')) e.target.closest('tr').classList.toggle('selected', e.target.checked);
+  if (e.target.matches('.row-check, #check-all')) { const n = $$('.row-check:checked').length; $('#sel-count').textContent = n; $('#bulk-bar').classList.toggle('hidden', n === 0); $('#table-toolbar').classList.toggle('hidden', n > 0); }
+});
+// KPI count-up (signature moment; skipped under reduced motion)
+(function countUp() {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  $$('[data-count]').forEach(el => { const end = +el.dataset.count; if (reduce) { el.textContent = end.toLocaleString(); return; }
+    const t0 = performance.now(); (function tick(t) { const p = Math.min(1, (t - t0) / 600), e = 1 - Math.pow(1 - p, 3); el.textContent = Math.round(end * e).toLocaleString(); if (p < 1) requestAnimationFrame(tick); })(t0); });
+})();
+// sidebar
+$('#sidebar-toggle').onclick = () => { html.classList.toggle('sidebar-collapsed'); try { localStorage.setItem('ui.sidebar', html.classList.contains('sidebar-collapsed') ? 'collapsed' : 'open'); } catch {} };
+try { if (localStorage.getItem('ui.sidebar') === 'collapsed') html.classList.add('sidebar-collapsed'); } catch {}
+$('#hamburger').onclick = () => { $('#sidebar').classList.remove('hidden'); $('#overlay').classList.remove('hidden'); };
+$('#overlay').onclick = () => { $('#sidebar').classList.add('hidden'); $('#overlay').classList.add('hidden'); };
+$$('[data-toggle-group]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); a.closest('.nav-group').classList.toggle('open'); }));
+// theme
+function setDark(on) { html.classList.toggle('dark', on); try { localStorage.setItem('ui.theme', on ? 'dark' : 'light'); } catch {} }
+$('#theme-toggle').onclick = () => setDark(!html.classList.contains('dark'));
+if ($('#ctl-dark')) $('#ctl-dark').onclick = () => setDark(!html.classList.contains('dark'));
+try { if (localStorage.getItem('ui.theme') === 'dark') html.classList.add('dark'); } catch {}
+// user menu
+const ub = $('#user-btn'), um = $('#user-menu');
+ub.onclick = e => { e.stopPropagation(); um.classList.toggle('hidden'); ub.setAttribute('aria-expanded', !um.classList.contains('hidden')); };
+document.addEventListener('click', () => { um.classList.add('hidden'); ub.setAttribute('aria-expanded', 'false'); });
+// drawer
+let lastFocus = null;
+function openDrawer(k) { const r = rows[k]; if (!r) return; lastFocus = document.activeElement;
+  $('#drawer-name').textContent = r.n; $('#drawer-initials').textContent = r.i; $('#drawer-plan').textContent = r.p; $('#drawer-time').textContent = r.t;
+  $('#drawer-status').innerHTML = `<span class="badge badge-sm ${badge(r.s)}"><span class="dot"></span>${r.s}</span>`;
+  $('#drawer').classList.remove('hidden'); $('#drawer-overlay').classList.remove('hidden'); document.body.style.overflow = 'hidden'; $('#note').focus(); }
+function closeDrawer() { $('#drawer').classList.add('hidden'); $('#drawer-overlay').classList.add('hidden'); document.body.style.overflow = ''; lastFocus?.focus(); }
+document.addEventListener('click', e => { const o = e.target.closest('[data-open-drawer]'); if (o) { e.preventDefault(); openDrawer(+o.dataset.openDrawer); } if (e.target.closest('[data-close-drawer]')) closeDrawer(); });
+$('#drawer-overlay').onclick = closeDrawer;
+// palette
+function openPalette() { lastFocus = document.activeElement; $('#palette').classList.remove('hidden'); $('#palette').classList.add('flex'); $('#palette-overlay').classList.remove('hidden'); $('#palette-input').value = ''; $('#palette-input').focus(); }
+function closePalette() { $('#palette').classList.add('hidden'); $('#palette').classList.remove('flex'); $('#palette-overlay').classList.add('hidden'); lastFocus?.focus(); }
+$('#open-search').onclick = openPalette; $('#palette-overlay').onclick = closePalette;
+$('#palette-input').addEventListener('input', e => { const q = e.target.value.toLowerCase(); $$('#palette-list .menu-item').forEach(i => i.classList.toggle('hidden', q && !i.textContent.toLowerCase().includes(q))); });
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); openPalette(); }
+  if (e.key === 'Escape') { if (!$('#palette').classList.contains('hidden')) closePalette(); else if (!$('#drawer').classList.contains('hidden')) closeDrawer(); else um.classList.add('hidden'); }
+});
+// toasts
+function toast(msg, undo) { const el = document.createElement('div');
+  el.className = 'flex items-start gap-2.5 rounded-lg border border-border bg-popover text-popover-foreground shadow-md p-3.5 text-sm';
+  el.innerHTML = `<i data-lucide="check-circle-2" class="size-4 mt-0.5 text-success shrink-0"></i><div class="grow"><div class="font-medium text-mono">${msg}</div><div class="text-2sm text-secondary-foreground">${undo ? 'You can undo this for 5 seconds.' : 'Done.'}</div></div>${undo ? '<button class="btn btn-ghost btn-sm">Undo</button>' : ''}<button class="btn btn-ghost btn-icon btn-sm" aria-label="Dismiss"><i data-lucide="x"></i></button>`;
+  $('#toasts').appendChild(el); lucide.createIcons(); let t = setTimeout(() => el.remove(), 4000);
+  el.addEventListener('mouseenter', () => clearTimeout(t)); el.addEventListener('mouseleave', () => t = setTimeout(() => el.remove(), 2000));
+  $$('button', el).forEach(b => b.onclick = () => el.remove()); while ($('#toasts').children.length > 3) $('#toasts').firstChild.remove(); }
+document.addEventListener('click', e => { const b = e.target.closest('[data-toast]'); if (b) toast(b.dataset.toast, b.hasAttribute('data-toast-undo')); });
+// period
+$('#period').onchange = e => $('#period-label').textContent = e.target.value;
+// demo controls
+const THEMES = ['theme-clinic', 'theme-graphite', 'theme-editorial', 'theme-neo', 'theme-slate', 'theme-mint'], DENS = ['density-compact', 'density-airy'];
+if ($('#ctl-theme')) $('#ctl-theme').onchange = e => { html.classList.remove(...THEMES); if (e.target.value) html.classList.add(e.target.value); };
+if ($('#ctl-density')) $('#ctl-density').onchange = e => { html.classList.remove(...DENS); if (e.target.value) html.classList.add(e.target.value); };
+const I18N = {"Dashboard": "لوحة التحكم", "Customers": "العملاء", "Orders": "الطلبات", "Products": "المنتجات", "Catalogue": "الكتالوج", "Collections": "المجموعات", "Inventory": "المخزون", "Business": "الأعمال", "Billing": "الفوترة", "Reports": "التقارير", "Settings": "الإعدادات", "Storage": "التخزين", "Export": "تصدير", "New order": "طلب جديد", "Active customers": "العملاء النشطون", "Fulfilment rate": "نسبة التنفيذ", "Revenue": "الإيرادات", "Orders per week": "الطلبات أسبوعياً", "Completed": "مكتملة", "Refunded": "مستردّ", "Highlights": "أبرز النتائج", "Orders completed": "طلبات مكتملة", "Online store": "المتجر الإلكتروني", "Marketplace": "السوق", "Wholesale": "الجملة", "In-store": "في المتجر", "View report": "عرض التقرير", "Recent orders": "أحدث الطلبات", "Customer": "العميل", "Item": "الصنف", "Status": "الحالة", "Time": "الوقت", "Activity": "النشاط", "View all": "عرض الكل", "Search customers": "ابحث عن عميل", "All status": "كل الحالات", "Confirmed": "مؤكد", "Pending": "قيد التأكيد", "Data": "بيانات", "Loading": "تحميل", "Empty": "فارغ", "Profile": "الملف الشخصي", "Log out": "تسجيل الخروج", "Business overview": "نظرة عامة على الأعمال", "Last 30 days": "آخر 30 يوماً", "Last 7 days": "آخر 7 أيام", "This quarter": "هذا الربع", "Docs": "التوثيق", "Support": "الدعم", "Privacy": "الخصوصية", "Month": "شهر", "Quarter": "ربع"};
+function setLang(lang) {
+  const ar = lang === 'ar';
+  html.setAttribute('dir', ar ? 'rtl' : 'ltr'); html.setAttribute('lang', ar ? 'ar' : 'en');
+  document.querySelectorAll('[data-i18n]').forEach(el => { const k = el.dataset.i18n; if (I18N[k]) { const t = ar ? I18N[k] : k; if (el.childNodes.length && el.lastChild.nodeType === 3) el.lastChild.nodeValue = ' ' + t + ' '; else el.textContent = t; } });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => { const k = el.dataset.i18nPlaceholder; el.placeholder = ar && I18N[k] ? I18N[k] : k; });
+  try { localStorage.setItem('ui.lang', lang); } catch {}
+}
+if ($('#ctl-sidebar')) $('#ctl-sidebar').onclick = () => html.classList.toggle('sidebar-dark');
+if ($('#ctl-rtl')) $('#ctl-rtl').onclick = () => setLang(html.getAttribute('dir') === 'rtl' ? 'en' : 'ar');
+try { if (localStorage.getItem('ui.lang') === 'ar') setLang('ar'); } catch {}
+// URL presets for sharing/screenshots: #theme=theme-clinic&density=density-compact&dark=1&dir=rtl&state=empty  (also works with ?)
+(function fromUrl() { const q = new URLSearchParams(location.search || location.hash.slice(1));
+  if (THEMES.includes(q.get('theme'))) { html.classList.add(q.get('theme')); $('#ctl-theme').value = q.get('theme'); }
+  if (DENS.includes(q.get('density'))) { html.classList.add(q.get('density')); $('#ctl-density').value = q.get('density'); }
+  if (q.get('dark') === '1') html.classList.add('dark');
+  if (q.get('sidebar') === 'dark') html.classList.add('sidebar-dark');
+  if (q.get('dir') === 'rtl' || q.get('lang') === 'ar') setLang('ar');
+  if (q.get('state')) setTimeout(() => renderState(q.get('state')), 0); })();
+
+// ===== charts: ApexCharts with a token-driven theme (re-renders when theme/dark changes) =====
+const cssVar = n => getComputedStyle(html).getPropertyValue(n).trim();
+function apexBase() { return {
+  chart: { fontFamily: cssVar('--font-sans') || 'Inter, sans-serif', foreColor: cssVar('--muted-foreground'), toolbar: { show: false }, zoom: { enabled: false }, animations: { enabled: !matchMedia('(prefers-reduced-motion: reduce)').matches, speed: 600 }, background: 'transparent', parentHeightOffset: 0 },
+  colors: [cssVar('--primary'), cssVar('--chart-2') || cssVar('--info'), cssVar('--chart-3') || cssVar('--success'), cssVar('--chart-4') || cssVar('--warning'), cssVar('--muted-foreground')],
+  grid: { borderColor: cssVar('--border'), strokeDashArray: 3, padding: { left: 8, right: 8, top: -10 }, xaxis: { lines: { show: false } } },
+  stroke: { curve: 'smooth', width: 2.5, lineCap: 'round' },
+  dataLabels: { enabled: false },
+  legend: { show: false },
+  tooltip: { theme: html.classList.contains('dark') ? 'dark' : 'light', style: { fontSize: '12px' } },
+  xaxis: { axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { fontSize: '11px' } }, tooltip: { enabled: false } },
+  yaxis: { labels: { style: { fontSize: '11px' } } },
+  states: { hover: { filter: { type: 'none' } }, active: { filter: { type: 'none' } } },
+}; }
+const charts = [];
+function mountCharts() {
+  charts.splice(0).forEach(c => c.destroy());
+  const base = apexBase();
+  if ($('#chart-visits')) charts.push(new ApexCharts($('#chart-visits'), Object.assign({}, base, {
+    chart: Object.assign({}, base.chart, { type: 'area', height: '100%' }),
+    series: [{ name: 'Completed', data: [52,58,55,61,66,70,68,74,79,77,82,84] }, { name: 'Refunded', data: [8,6,9,5,7,6,8,5,4,6,5,4] }],
+    fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.28, opacityTo: 0.02, stops: [0, 90, 100] } },
+    xaxis: Object.assign({}, base.xaxis, { categories: ['W1','W2','W3','W4','W5','W6','W7','W8','W9','W10','W11','W12'] }),
+    yaxis: Object.assign({}, base.yaxis, { min: 0, max: 100, tickAmount: 4 }),
+    markers: { size: 0, hover: { size: 5 } },
+  })));
+  if ($('#chart-programmes')) charts.push(new ApexCharts($('#chart-programmes'), Object.assign({}, base, {
+    chart: Object.assign({}, base.chart, { type: 'donut', height: 176 }),
+    series: [98, 58, 36, 22], labels: ['Online store', 'Marketplace', 'Wholesale', 'In-store'],
+    stroke: { width: 3, colors: [cssVar('--card')] },
+    plotOptions: { pie: { donut: { size: '74%', labels: { show: true, name: { show: true, fontSize: '12px', color: cssVar('--muted-foreground'), offsetY: 18 }, value: { show: true, fontSize: '24px', fontWeight: 600, color: cssVar('--mono'), offsetY: -12, formatter: v => v }, total: { show: true, label: 'Orders', fontSize: '12px', color: cssVar('--muted-foreground'), formatter: w => w.globals.seriesTotals.reduce((a, b) => a + b, 0) } } } } },
+  })));
+  $$('.apex-spark').forEach(el => charts.push(new ApexCharts(el, Object.assign({}, base, {
+    chart: Object.assign({}, base.chart, { type: 'area', height: 40, sparkline: { enabled: true } }),
+    series: [{ name: 'trend', data: el.dataset.spark.split(',').map(Number) }],
+    stroke: { curve: 'smooth', width: 2 }, fill: { type: 'gradient', gradient: { opacityFrom: 0.3, opacityTo: 0.02 } },
+    tooltip: { enabled: false },
+  }))));
+  charts.forEach(c => c.render());
+}
+new MutationObserver(() => { clearTimeout(window.__rechart); window.__rechart = setTimeout(mountCharts, 120); }).observe(html, { attributes: true, attributeFilter: ['class', 'dir'] });
+renderRows(); lucide.createIcons(); mountCharts();
+</script>
+</body>
+</html>

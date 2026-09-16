@@ -1,0 +1,228 @@
+/* ==========================================================================
+   jbelly-ui tokens — the ONLY file that may contain raw colours.
+
+   Tailwind v4:   @import "tailwindcss";  @import "./tokens.css";
+   Plain CSS:     <link rel="stylesheet" href="tokens.css">  (first)
+   Tailwind v3:   copy the :root/.dark blocks, map them in tailwind.config
+                  under theme.extend.colors as `background: "var(--background)"` …
+
+   Re-brand a product by changing --primary (and optionally --radius).
+   Everything else derives from these roles.
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+
+  /* shape + type */
+  --radius: 0.5rem;
+  /* Type: Inter for display AND text (the professional-template look): 13px UI, 600 headings,
+     tracking-tight on card titles only. Change --font-display only for a brand reason. */
+  --font-display: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, "Noto Sans Arabic", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "JetBrains Mono", "Cascadia Mono", Consolas,
+    "Liberation Mono", monospace;
+
+  /* surfaces */
+  --background: oklch(100% 0 0);
+  --foreground: oklch(14.5% 0.005 285);
+  --card: oklch(100% 0 0);
+  --card-foreground: oklch(14.5% 0.005 285);
+  --popover: oklch(100% 0 0);
+  --popover-foreground: oklch(14.5% 0.005 285);
+
+  /* brand — the one colour that carries identity */
+  --primary: oklch(54% 0.2 258);
+  --primary-foreground: oklch(100% 0 0);
+
+  /* neutrals */
+  --secondary: oklch(96.5% 0.002 285);
+  --secondary-foreground: oklch(21% 0.006 285);
+  --muted: oklch(96.5% 0.002 285);
+  --muted-foreground: oklch(55% 0.014 285);
+  --accent: oklch(96.5% 0.002 285);
+  --accent-foreground: oklch(21% 0.006 285);
+  --mono: oklch(14.5% 0.005 285);
+  --mono-foreground: oklch(100% 0 0);
+
+  /* state */
+  --destructive: oklch(57.5% 0.22 27);
+  --destructive-foreground: oklch(100% 0 0);
+  --success: oklch(72% 0.19 150);
+  --success-foreground: oklch(100% 0 0);
+  --warning: oklch(85% 0.17 90);
+  --warning-foreground: oklch(30% 0.05 90);   /* dark text: white on amber fails contrast */
+  --info: oklch(60% 0.22 293);
+  --info-foreground: oklch(100% 0 0);
+
+  /* lines + focus */
+  --border: oklch(94% 0.004 286);
+  --input: oklch(92% 0.004 286);
+  --ring: oklch(71% 0.01 286);
+
+  /* sidebar roles — override in .sidebar-dark for the dark-sidebar layout */
+  --sidebar: var(--card);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-muted: var(--muted-foreground);
+  --sidebar-accent: var(--accent);
+  --sidebar-accent-foreground: var(--accent-foreground);
+  --sidebar-primary: var(--primary);
+  --sidebar-border: var(--border);
+
+  /* elevation — nearly flat by design */
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.06);
+
+  /* app shell */
+  --sidebar-width: 280px;
+  --sidebar-width-collapsed: 80px;
+  --header-height: 70px;
+}
+
+@media (max-width: 63.99rem) {
+  :root { --header-height: 60px; }
+}
+
+.dark {
+  color-scheme: dark;
+
+  --background: oklch(14.5% 0.005 285);
+  --foreground: oklch(98.5% 0 0);
+  --card: oklch(14.5% 0.005 285);
+  --card-foreground: oklch(98.5% 0 0);
+  --popover: oklch(14.5% 0.005 285);
+  --popover-foreground: oklch(98.5% 0 0);
+
+  --primary: oklch(55% 0.21 258);
+  --primary-foreground: oklch(100% 0 0);
+
+  --secondary: oklch(27.5% 0.006 286);
+  --secondary-foreground: oklch(98.5% 0 0);
+  --muted: oklch(21% 0.006 285);
+  --muted-foreground: oklch(64% 0.014 285);
+  --accent: oklch(21% 0.006 285);
+  --accent-foreground: oklch(98.5% 0 0);
+  --mono: oklch(87% 0.006 286);
+  --mono-foreground: oklch(0% 0 0);
+
+  --destructive: oklch(57.5% 0.22 27);
+  --destructive-foreground: oklch(100% 0 0);
+  --warning-foreground: oklch(92% 0.12 90);   /* light amber text on tinted warning fills in dark mode */
+
+  --border: oklch(27.5% 0.006 286);
+  --input: oklch(27.5% 0.006 286);
+  --ring: oklch(44% 0.01 286);
+
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.4);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.4);
+}
+
+/* Dark sidebar on a light page: add .sidebar-dark to <html> or the sidebar. */
+.sidebar-dark {
+  --sidebar: oklch(14.5% 0.005 285);
+  --sidebar-foreground: oklch(87% 0.006 286);
+  --sidebar-muted: oklch(55% 0.014 285);
+  --sidebar-accent: oklch(21% 0.006 285);
+  --sidebar-accent-foreground: oklch(98.5% 0 0);
+  --sidebar-primary: oklch(70% 0.16 255);
+  --sidebar-border: oklch(27.5% 0.006 286);
+}
+
+/* ---------- Tailwind v4 mapping (ignored by browsers, used by Tailwind) ---- */
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme inline {
+  --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
+  --font-mono: var(--font-mono);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-mono: var(--mono);
+  --color-mono-foreground: var(--mono-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-muted: var(--sidebar-muted);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-border: var(--sidebar-border);
+
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  --shadow-xs: var(--shadow-xs);
+  --shadow-md: var(--shadow-md);
+}
+
+@theme {
+  /* the two extra UI sizes the system relies on */
+  --text-2sm: 0.8125rem;
+  --text-2sm--line-height: 1.3;
+  --text-2xs: 0.6875rem;
+  --text-2xs--line-height: 1.2;
+}
+
+/* ---------- Base --------------------------------------------------------- */
+
+@layer base {
+  * { border-color: var(--border); }
+
+  html { font-family: var(--font-sans); font-feature-settings: "cv11", "ss01"; }
+  h1, h2, h3, .font-display { font-family: var(--font-display); }
+
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--primary) 20%, transparent);
+  }
+
+  /* thin, token-coloured scrollbars for sidebars and drawers */
+  .scroll-thin { scrollbar-width: thin; scrollbar-color: var(--accent) transparent; }
+  .scroll-thin::-webkit-scrollbar { width: 5px; height: 5px; }
+  .scroll-thin::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 9999px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}

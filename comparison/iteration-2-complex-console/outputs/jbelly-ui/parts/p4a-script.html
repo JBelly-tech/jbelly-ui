@@ -1,0 +1,245 @@
+
+<script>
+'use strict';
+/* ===================== utilities ===================== */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const html = document.documentElement;
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const fmtN = (n, d = 0) => new Intl.NumberFormat('en', { minimumFractionDigits: d, maximumFractionDigits: d }).format(n);
+const fmtJOD = n => 'JOD ' + fmtN(n);
+const ico = (name, cls = '') => `<i data-lucide="${name}"${cls ? ` class="${cls}"` : ''}></i>`;
+const icons = () => { if (window.lucide) lucide.createIcons(); };
+const store = { get(k) { try { return localStorage.getItem('nutrio.' + k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem('nutrio.' + k, v); } catch (e) { /* private mode */ } } };
+const live = msg => { const l = $('#live'); l.textContent = ''; setTimeout(() => { l.textContent = msg; }, 40); };
+const initials = n => n.replace(/^Dr\.\s*/, '').split(/\s+/).map(w => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase();
+const isRtl = () => html.getAttribute('dir') === 'rtl';
+const TODAY = '2026-09-09';
+
+/* ===================== state + reference data ===================== */
+const state = { branch: 'all', range: '7d', compare: true, lang: html.getAttribute('lang') === 'ar' ? 'ar' : 'en' };
+const BRANCHES = {
+  all: { name: 'All branches', share: 1 },
+  abdoun: { name: 'Abdoun', share: 0.42 },
+  sweifieh: { name: 'Sweifieh', share: 0.33 },
+  khalda: { name: 'Khalda', share: 0.25 },
+};
+const RANGES = {
+  today: { label: 'Today', prev: 'yesterday', f: 0.14 },
+  '7d': { label: 'Last 7 days', prev: 'previous 7 days', f: 1 },
+  '30d': { label: 'Last 30 days', prev: 'previous 30 days', f: 4.2 },
+  quarter: { label: 'This quarter', prev: 'previous quarter', f: 12.5 },
+  custom: { label: 'Custom range', prev: 'previous period', f: 2.3 },
+};
+const DIETITIANS = [
+  { name: 'Dr. Lina Al-Khatib', branch: 'abdoun', pct: 94 },
+  { name: 'Rania Abu-Zaid', branch: 'sweifieh', pct: 88 },
+  { name: 'Mohammad Al-Omari', branch: 'khalda', pct: 81 },
+  { name: 'Hala Nsour', branch: 'abdoun', pct: 76 },
+  { name: 'Tariq Haddadin', branch: 'sweifieh', pct: 69 },
+  { name: 'Dana Al-Majali', branch: 'khalda', pct: 58 },
+];
+const PROGRAMMES = [
+  { key: 'weight', name: 'Weight management', n: 412, color: 'var(--chart-1)', adherence: 82, adDelta: 3 },
+  { key: 'diabetes', name: 'Diabetes care', n: 268, color: 'var(--chart-2)', adherence: 74, adDelta: -2 },
+  { key: 'sports', name: 'Sports nutrition', n: 154, color: 'var(--chart-3)', adherence: 91, adDelta: 1 },
+  { key: 'pregnancy', name: 'Pregnancy nutrition', n: 97, color: 'var(--chart-4)', adherence: 68, adDelta: -4 },
+  { key: 'paediatric', name: 'Paediatric', n: 71, color: 'var(--chart-5)', adherence: 77, adDelta: 2 },
+];
+const progName = k => (PROGRAMMES.find(p => p.key === k) || { name: k }).name;
+
+/* ===================== i18n (chrome strings only; data stays as recorded) ===================== */
+const I18N = { ar: {
+  'nav.operations': 'العمليات', 'nav.dashboard': 'لوحة التحكم', 'nav.appointments': 'المواعيد', 'nav.queue': 'طابور اليوم', 'nav.patients': 'المرضى',
+  'nav.clinical': 'السريري', 'nav.programmes': 'البرامج', 'nav.weight': 'إدارة الوزن', 'nav.diabetes': 'رعاية السكري', 'nav.sports': 'تغذية رياضية',
+  'nav.dietitians': 'أخصائيو التغذية', 'nav.meal': 'خطط الوجبات', 'nav.business': 'الأعمال', 'nav.billing': 'الفواتير', 'nav.reports': 'التقارير', 'nav.settings': 'الإعدادات',
+  'bc.home': 'نيوتريو', 'bc.ops': 'العمليات', 'bc.dash': 'لوحة التحكم', 'srch': 'بحث…',
+  'page.title': 'لوحة العمليات', 'tb.updated': 'آخر تحديث', 'tb.compare': 'مقارنة بالفترة السابقة', 'tb.export': 'تصدير', 'tb.new': 'موعد جديد',
+  'r.today': 'اليوم', 'r.7d': '٧ أيام', 'r.30d': '٣٠ يوماً', 'r.quarter': 'الربع', 'r.custom': 'مخصص',
+  'c.visits': 'الزيارات أسبوعياً', 'c.prog': 'المرضى حسب البرنامج', 'c.cap': 'الطاقة حسب الأخصائي', 'c.heat': 'خريطة المواعيد', 'c.adh': 'الالتزام بالخطة حسب البرنامج',
+  'c.appts': 'المواعيد', 'c.queue': 'طابور اليوم', 'c.activity': 'النشاط', 'c.tasks': 'المهام',
+  'kpi.consult': 'استشارات', 'kpi.follow': 'متابعات', 'kpi.noshow': 'نسبة عدم الحضور', 'kpi.revenue': 'الإيرادات', 'kpi.newp': 'مرضى جدد', 'kpi.wait': 'متوسط الانتظار',
+  'c.visits.sub': '١٢ أسبوعاً · انقر عنصراً في المفتاح لإخفاء سلسلة', 'c.prog.sub': 'المرضى النشطون', 'c.cap.sub': 'نسبة المواعيد المحجوزة هذا الأسبوع', 'c.heat.sub': 'الحجوزات بالساعة، ٠٩:٠٠–٢٠:٠٠، هذا الأسبوع',
+  'c.adh.sub': 'الهدف ٨٠٪ · آخر ٣٠ يوماً', 'c.queue.sub': 'اسحب البطاقات بين الأعمدة، أو استخدم لوحة المفاتيح من المقبض', 'sb.open': '٣ فروع مفتوحة · تغلق ٢٠:٠٠',
+} };
+const t = (k, en) => (state.lang === 'ar' && I18N.ar[k]) || en;
+function applyLang() {
+  const ar = state.lang === 'ar';
+  html.setAttribute('lang', ar ? 'ar' : 'en'); html.setAttribute('dir', ar ? 'rtl' : 'ltr');
+  $$('[data-i18n]').forEach(el => { if (el.dataset.en == null) el.dataset.en = el.textContent; el.textContent = ar && I18N.ar[el.dataset.i18n] ? I18N.ar[el.dataset.i18n] : el.dataset.en; });
+  const lt = $('#lang-toggle'); $('span', lt).textContent = ar ? 'EN' : 'AR';
+  lt.setAttribute('aria-label', ar ? 'Switch language to English' : 'Switch language to Arabic'); lt.dataset.tip = ar ? 'English' : 'العربية';
+  store.set('dir', ar ? 'rtl' : 'ltr');
+  renderKpis();
+}
+
+/* ===================== Row 1: KPIs + sparklines ===================== */
+const KPIS = [
+  { key: 'consult', label: 'Consultations', i18n: 'kpi.consult', base: 1284, kind: 'count', delta: 8.2, good: 'up', spark: [88, 92, 90, 97, 101, 99, 108, 112, 110, 118, 121, 128] },
+  { key: 'follow', label: 'Follow-ups', i18n: 'kpi.follow', base: 912, kind: 'count', delta: 3.1, good: 'up', spark: [70, 68, 74, 72, 76, 80, 78, 83, 81, 86, 88, 91] },
+  { key: 'noshow', label: 'No-show rate', i18n: 'kpi.noshow', base: 6.4, kind: 'pct', delta: -1.2, deltaUnit: 'pts', good: 'down', spark: [8.9, 8.4, 8.8, 7.9, 7.6, 8.1, 7.2, 7.0, 6.9, 6.6, 6.8, 6.4] },
+  { key: 'revenue', label: 'Revenue', i18n: 'kpi.revenue', base: 48260, kind: 'jod', delta: 11.4, good: 'up', spark: [31, 33, 32, 36, 38, 37, 41, 43, 42, 46, 47, 48] },
+  { key: 'newp', label: 'New patients', i18n: 'kpi.newp', base: 146, kind: 'count', delta: -2.7, good: 'up', spark: [14, 16, 15, 18, 17, 19, 16, 15, 17, 16, 15, 14] },
+  { key: 'wait', label: 'Avg. wait time', i18n: 'kpi.wait', base: 9, kind: 'min', delta: 1.5, deltaUnit: 'min', good: 'down', spark: [7, 7.5, 7, 8, 7.5, 8, 8.5, 8, 9, 8.5, 9, 9] },
+];
+function kpiValue(k) {
+  const f = BRANCHES[state.branch].share * RANGES[state.range].f;
+  if (k.kind === 'count') return Math.round(k.base * f);
+  if (k.kind === 'jod') return Math.round(k.base * f / 10) * 10;
+  return k.base;
+}
+function fmtKpi(k, v) {
+  if (k.kind === 'jod') return fmtJOD(Math.round(v));
+  if (k.kind === 'pct') return fmtN(v, 1) + '%';
+  if (k.kind === 'min') return fmtN(v, v % 1 ? 1 : 0) + ' min';
+  return fmtN(Math.round(v));
+}
+function sparkline(data, color) {
+  const w = 96, h = 40, min = Math.min(...data), max = Math.max(...data), span = (max - min) || 1;
+  const pts = data.map((v, i) => [i * (w / (data.length - 1)), h - 4 - (v - min) / span * (h - 8)]);
+  const line = pts.map(p => p.map(n => n.toFixed(1)).join(',')).join(' ');
+  const last = pts[pts.length - 1];
+  return `<svg class="h-10 w-24 shrink-0" viewBox="0 0 ${w} ${h}" aria-hidden="true"><polygon points="0,${h} ${line} ${w},${h}" fill="${color}" fill-opacity=".12"/><polyline points="${line}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="${last[0].toFixed(1)}" cy="${last[1].toFixed(1)}" r="2.5" fill="${color}"/></svg>`;
+}
+function renderKpis() {
+  const cmp = state.compare, prevLabel = RANGES[state.range].prev;
+  $('#kpis').innerHTML = KPIS.map(k => {
+    const v = kpiValue(k), d = k.delta, up = d > 0, good = d === 0 ? null : ((k.good === 'up') === up);
+    const prev = k.deltaUnit ? v - d : v / (1 + d / 100);
+    const cls = d === 0 ? 'badge-outline' : good ? 'badge-light-success' : 'badge-light-destructive';
+    const icon = d === 0 ? 'minus' : up ? 'trending-up' : 'trending-down';
+    const dtxt = (up ? '+' : '−') + fmtN(Math.abs(d), 1) + (k.deltaUnit === 'pts' ? ' pts' : k.deltaUnit === 'min' ? ' min' : '%');
+    const qual = d === 0 ? 'unchanged' : good ? 'better' : 'worse';
+    const sr = `<table class="sr-only"><caption>${esc(k.label)} trend, last 12 periods</caption><thead><tr><th scope="col">Period</th><th scope="col">Value</th></tr></thead><tbody>${k.spark.map((s, i) => `<tr><td>${i + 1}</td><td>${s}</td></tr>`).join('')}</tbody></table>`;
+    return `<div class="card kpi h-full p-(--card-p) flex flex-col gap-3">
+      <div class="flex items-center justify-between gap-2">
+        <span class="text-2sm text-secondary-foreground truncate">${esc(t(k.i18n, k.label))}</span>
+        <span class="badge badge-sm ${cls} ${cmp ? '' : 'invisible'}">${ico(icon, 'size-3')}<span class="num">${dtxt}</span><span class="sr-only">, ${qual} than ${esc(prevLabel)}</span></span>
+      </div>
+      <div class="flex items-end justify-between gap-3">
+        <span class="text-3xl font-display font-bold text-mono tabular-nums num leading-none tracking-tight">${fmtKpi(k, v)}</span>
+        ${sparkline(k.spark, 'var(--chart-1)')}
+      </div>
+      <span class="text-xs text-muted-foreground truncate num">${cmp ? `vs ${esc(fmtKpi(k, prev))} ${esc(prevLabel)}` : esc(RANGES[state.range].label)}</span>
+      ${sr}
+    </div>`;
+  }).join('');
+  icons();
+}
+
+/* ===================== Row 2a: multi-series line chart ===================== */
+const WEEKS = Array.from({ length: 12 }, (_, i) => 'W' + (i + 1));
+const SERIES = [
+  { key: 'consult', label: 'Consultations', color: 'var(--chart-1)', data: [98, 104, 101, 112, 118, 109, 121, 126, 130, 124, 133, 138], on: true },
+  { key: 'follow', label: 'Follow-ups', color: 'var(--chart-2)', data: [62, 66, 70, 68, 75, 79, 74, 82, 85, 88, 86, 91], on: true },
+  { key: 'noshow', label: 'No-shows', color: 'var(--chart-3)', data: [9, 8, 11, 7, 9, 6, 8, 7, 5, 8, 6, 5], on: true },
+];
+const PREV_F = [0.93, 0.9, 0.96, 0.88, 0.94, 0.91, 0.97, 0.9, 0.93, 0.95, 0.89, 0.92];
+const CH = { W: 720, H: 260, L: 42, R: 14, T: 14, B: 30 };
+let chartIdx = -1;
+function renderLegend() {
+  $('#chart-legend').innerHTML = SERIES.map(s => `<button type="button" class="legend-btn" aria-pressed="${s.on}" data-series="${s.key}"><span class="size-2 rounded-full shrink-0" style="background:${s.color}"></span>${esc(s.label)}</button>`).join('');
+}
+function renderLine() {
+  const { W, H, L, R, T, B } = CH, svg = $('#line-chart'), f = BRANCHES[state.branch].share;
+  const vis = SERIES.filter(s => s.on);
+  const all = vis.flatMap(s => s.data.map(v => v * f)), rawMax = all.length ? Math.max(...all) : 100;
+  const step = rawMax > 100 ? 40 : rawMax > 40 ? 20 : 5, yMax = Math.ceil(rawMax / step) * step || step;
+  const x = i => L + i * (W - L - R) / 11, y = v => T + (H - T - B) * (1 - v / yMax);
+  let g = '';
+  for (let k = 0; k <= 4; k++) { const v = yMax * k / 4; g += `<line x1="${L}" x2="${W - R}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}" stroke="var(--border)" stroke-dasharray="3 3"/><text x="${L - 8}" y="${(y(v) + 4).toFixed(1)}" text-anchor="end" font-size="11" fill="var(--muted-foreground)">${fmtN(Math.round(v))}</text>`; }
+  WEEKS.forEach((w, i) => { g += `<text x="${x(i).toFixed(1)}" y="${H - 8}" text-anchor="middle" font-size="11" fill="var(--muted-foreground)">${w}</text>`; });
+  let paths = '';
+  vis.forEach((s, si) => {
+    const pts = s.data.map((v, i) => `${x(i).toFixed(1)},${y(v * f).toFixed(1)}`).join(' ');
+    if (si === 0) paths += `<polygon points="${x(0).toFixed(1)},${y(0).toFixed(1)} ${pts} ${x(11).toFixed(1)},${y(0).toFixed(1)}" fill="${s.color}" fill-opacity=".1"/>`;
+    if (state.compare) { const pp = s.data.map((v, i) => `${x(i).toFixed(1)},${y(v * f * PREV_F[i]).toFixed(1)}`).join(' '); paths += `<polyline points="${pp}" fill="none" stroke="${s.color}" stroke-width="1.5" stroke-dasharray="4 4" opacity=".45"/>`; }
+    paths += `<polyline points="${pts}" fill="none" stroke="${s.color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+  });
+  let marker = '';
+  if (chartIdx >= 0) marker = `<line x1="${x(chartIdx).toFixed(1)}" x2="${x(chartIdx).toFixed(1)}" y1="${T}" y2="${H - B}" stroke="var(--muted-foreground)"/>` + vis.map(s => `<circle cx="${x(chartIdx).toFixed(1)}" cy="${y(s.data[chartIdx] * f).toFixed(1)}" r="4" fill="${s.color}" stroke="var(--card)" stroke-width="2"/>`).join('');
+  svg.innerHTML = `<g>${g}</g><g>${paths}</g><g>${marker}</g>`;
+  $('#line-table').innerHTML = `<caption>Visits by week, 12 weeks${state.branch !== 'all' ? ', ' + esc(BRANCHES[state.branch].name) : ''}</caption><thead><tr><th scope="col">Week</th>${SERIES.map(s => `<th scope="col">${esc(s.label)}</th>`).join('')}</tr></thead><tbody>${WEEKS.map((w, i) => `<tr><th scope="row">${w}</th>${SERIES.map(s => `<td>${Math.round(s.data[i] * f)}</td>`).join('')}</tr>`).join('')}</tbody>`;
+  const tip = $('#line-tip');
+  if (chartIdx >= 0 && vis.length) {
+    const rect = $('#line-chart-wrap').getBoundingClientRect(), px = x(chartIdx) / W * rect.width;
+    tip.innerHTML = `<div class="font-medium mb-1">${WEEKS[chartIdx]}${state.compare ? ' <span class="opacity-60 font-normal">· current / previous</span>' : ''}</div>` + vis.map(s => `<div class="flex items-center justify-between gap-3 num"><span class="inline-flex items-center gap-1.5"><span class="size-2 rounded-full" style="background:${s.color}"></span>${esc(s.label)}</span><span class="tabular-nums">${Math.round(s.data[chartIdx] * f)}${state.compare ? ` <span class="opacity-60">/ ${Math.round(s.data[chartIdx] * f * PREV_F[chartIdx])}</span>` : ''}</span></div>`).join('');
+    tip.classList.remove('hidden'); tip.style.top = '8px';
+    tip.style.left = (px > rect.width * 0.62 ? px - tip.offsetWidth - 12 : px + 12) + 'px';
+  } else tip.classList.add('hidden');
+}
+function wireLine() {
+  const svg = $('#line-chart'); svg.style.direction = 'ltr';
+  const idxFrom = e => { const r = svg.getBoundingClientRect(), rel = (e.clientX - r.left) / r.width * CH.W; return Math.max(0, Math.min(11, Math.round((rel - CH.L) / ((CH.W - CH.L - CH.R) / 11)))); };
+  svg.addEventListener('mousemove', e => { const i = idxFrom(e); if (i !== chartIdx) { chartIdx = i; renderLine(); } });
+  svg.addEventListener('mouseleave', () => { if (document.activeElement !== svg) { chartIdx = -1; renderLine(); } });
+  svg.addEventListener('focus', () => { if (chartIdx < 0) { chartIdx = 11; renderLine(); } });
+  svg.addEventListener('blur', () => { chartIdx = -1; renderLine(); });
+  svg.addEventListener('keydown', e => {
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return; e.preventDefault();
+    const d = (e.key === 'ArrowRight') !== isRtl() ? 1 : -1; chartIdx = Math.max(0, Math.min(11, (chartIdx < 0 ? 11 : chartIdx) + d)); renderLine();
+    live(`${WEEKS[chartIdx]}: ` + SERIES.filter(s => s.on).map(s => `${s.label} ${Math.round(s.data[chartIdx] * BRANCHES[state.branch].share)}`).join(', '));
+  });
+  $('#chart-legend').addEventListener('click', e => {
+    const b = e.target.closest('[data-series]'); if (!b) return; const s = SERIES.find(z => z.key === b.dataset.series);
+    if (s.on && SERIES.filter(z => z.on).length === 1) { live('Keep at least one series visible'); return; }
+    s.on = !s.on; b.setAttribute('aria-pressed', s.on); renderLine(); live(`${s.label} ${s.on ? 'shown' : 'hidden'}`);
+  });
+}
+
+/* ===================== Row 2b: donut ===================== */
+function renderDonut() {
+  const f = BRANCHES[state.branch].share, items = PROGRAMMES.map(p => ({ ...p, v: Math.round(p.n * f) })), total = items.reduce((a, b) => a + b.v, 0);
+  const r = 66, C = 2 * Math.PI * r; let acc = 0;
+  const segs = items.map(p => { const len = p.v / total * C, vis = Math.max(0, len - 2); const s = `<circle r="${r}" cx="90" cy="90" fill="none" stroke="${p.color}" stroke-width="18" stroke-dasharray="${vis.toFixed(2)} ${(C - vis).toFixed(2)}" stroke-dashoffset="${(-acc).toFixed(2)}" transform="rotate(-90 90 90)"><title>${esc(p.name)}: ${p.v}</title></circle>`; acc += len; return s; }).join('');
+  $('#donut').innerHTML = `<svg width="180" height="180" viewBox="0 0 180 180" role="img" aria-label="Donut chart: ${fmtN(total)} active patients; ${esc(items[0].name)} is the largest programme at ${Math.round(items[0].v / total * 100)} percent." style="direction:ltr"><circle r="${r}" cx="90" cy="90" fill="none" stroke="var(--muted)" stroke-width="18"/>${segs}<text x="90" y="86" text-anchor="middle" font-size="28" font-weight="700" fill="var(--mono)" font-family="var(--font-display)">${fmtN(total)}</text><text x="90" y="106" text-anchor="middle" font-size="11" fill="var(--muted-foreground)">active patients</text></svg>`;
+  $('#donut-legend').innerHTML = items.map(p => `<li class="flex items-center justify-between gap-2 text-2sm"><span class="inline-flex items-center gap-2 min-w-0"><span class="size-2 rounded-full shrink-0" style="background:${p.color}"></span><span class="truncate">${esc(p.name)}</span></span><span class="num tabular-nums text-mono font-medium whitespace-nowrap">${fmtN(p.v)} <span class="text-muted-foreground font-normal">· ${Math.round(p.v / total * 100)}%</span></span></li>`).join('');
+  $('#donut-table').innerHTML = `<caption>Active patients by programme</caption><thead><tr><th scope="col">Programme</th><th scope="col">Patients</th><th scope="col">Share</th></tr></thead><tbody>${items.map(p => `<tr><th scope="row">${esc(p.name)}</th><td>${p.v}</td><td>${Math.round(p.v / total * 100)}%</td></tr>`).join('')}</tbody>`;
+}
+
+/* ===================== Row 2c: capacity by dietitian ===================== */
+function renderCapacity() {
+  $('#capacity').innerHTML = DIETITIANS.map(d => {
+    const dim = state.branch !== 'all' && d.branch !== state.branch, full = d.pct >= 90;
+    return `<div class="flex flex-col gap-1.5 ${dim ? 'opacity-40' : ''}">
+      <div class="flex items-center justify-between gap-2 text-2sm"><span class="inline-flex items-center gap-2 min-w-0"><span class="text-mono font-medium truncate" title="${esc(d.name)}">${esc(d.name)}</span><span class="text-xs text-muted-foreground shrink-0">${esc(BRANCHES[d.branch].name)}</span></span><span class="inline-flex items-center gap-1.5 shrink-0">${full ? '<span class="badge badge-xs badge-light-warning">Near full</span>' : ''}<span class="num tabular-nums text-mono font-medium">${d.pct}%</span></span></div>
+      <div class="progress" role="progressbar" aria-valuenow="${d.pct}" aria-valuemin="0" aria-valuemax="100" aria-label="${esc(d.name)}, ${d.pct}% booked"><div style="width:${d.pct}%;background:${full ? 'var(--warning)' : 'var(--primary)'}"></div></div>
+    </div>`;
+  }).join('');
+  $('#cap-table').innerHTML = `<caption>Capacity by dietitian, percent of slots booked</caption><thead><tr><th scope="col">Dietitian</th><th scope="col">Branch</th><th scope="col">Booked</th></tr></thead><tbody>${DIETITIANS.map(d => `<tr><th scope="row">${esc(d.name)}</th><td>${esc(BRANCHES[d.branch].name)}</td><td>${d.pct}%</td></tr>`).join('')}</tbody>`;
+}
+
+/* ===================== Row 3a: heatmap ===================== */
+const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], HOURS = Array.from({ length: 12 }, (_, i) => 9 + i);
+const HEAT = [
+  [3, 5, 6, 7, 5, 2, 3, 6, 8, 7, 4, 2],
+  [4, 6, 8, 9, 6, 2, 4, 7, 9, 8, 5, 3],
+  [3, 5, 7, 8, 6, 3, 4, 6, 8, 7, 4, 2],
+  [4, 6, 7, 9, 7, 2, 5, 7, 9, 9, 5, 3],
+  [3, 5, 6, 7, 5, 2, 3, 6, 7, 6, 3, 1],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [2, 4, 5, 6, 4, 1, 2, 4, 5, 4, 2, 1],
+];
+const HM_BANDS = [[0, 'None'], [1, '1–2'], [3, '3–4'], [5, '5–6'], [7, '7+']];
+const hmShade = v => v === 0 ? 'var(--muted)' : `color-mix(in oklab, var(--primary) ${Math.round(15 + (v / 9) * 85)}%, var(--card))`;
+function renderHeatmap() {
+  const f = BRANCHES[state.branch].share;
+  let h = `<div class="grid gap-1" style="grid-template-columns: 2.5rem repeat(12, minmax(0, 1fr))"><div></div>` + HOURS.map(hr => `<div class="text-2xs text-muted-foreground text-center num">${hr}</div>`).join('');
+  HEAT.forEach((row, d) => { h += `<div class="text-xs text-muted-foreground flex items-center">${DAYS[d]}</div>` + row.map((raw, hi) => { const v = Math.round(raw * f); return `<button type="button" class="hm-cell" style="background:${hmShade(v)}" aria-label="${DAYS[d]} ${HOURS[hi]}:00, ${v} appointment${v === 1 ? '' : 's'}" data-tip="${DAYS[d]} ${HOURS[hi]}:00–${HOURS[hi] + 1}:00 · ${v} booked${d === 5 ? ' · closed Friday' : ''}"></button>`; }).join(''); });
+  $('#heatmap').innerHTML = h + '</div>';
+  $('#hm-legend').innerHTML = HM_BANDS.map(b => `<span class="inline-flex items-center gap-1"><span class="size-3 rounded-sm border border-border" style="background:${hmShade(b[0])}"></span>${b[1]}</span>`).join('');
+  $('#hm-table').innerHTML = `<caption>Appointments per hour and day</caption><thead><tr><th scope="col">Day</th>${HOURS.map(hr => `<th scope="col">${hr}:00</th>`).join('')}</tr></thead><tbody>${HEAT.map((row, d) => `<tr><th scope="row">${DAYS[d]}</th>${row.map(v => `<td>${Math.round(v * f)}</td>`).join('')}</tr>`).join('')}</tbody>`;
+}
+
+/* ===================== Row 3b: plan adherence ===================== */
+function renderAdherence() {
+  $('#adherence').innerHTML = PROGRAMMES.map(p => {
+    const below = p.adherence < 80, up = p.adDelta >= 0;
+    return `<div class="flex flex-col gap-1.5">
+      <div class="flex items-center justify-between gap-2 text-2sm"><span class="text-mono font-medium truncate">${esc(p.name)}</span><span class="inline-flex items-center gap-1.5 shrink-0">${below ? '<span class="badge badge-xs badge-light-warning">Below target</span>' : ''}<span class="badge badge-xs ${up ? 'badge-light-success' : 'badge-light-destructive'}">${ico(up ? 'trending-up' : 'trending-down', 'size-3')}<span class="num">${up ? '+' : '−'}${Math.abs(p.adDelta)} pts</span></span><span class="num tabular-nums text-mono font-medium w-9 text-end">${p.adherence}%</span></span></div>
+      <div class="progress" role="progressbar" aria-valuenow="${p.adherence}" aria-valuemin="0" aria-valuemax="100" aria-label="${esc(p.name)} adherence ${p.adherence}%, target 80%"><div style="width:${p.adherence}%;background:${below ? 'var(--warning)' : 'var(--primary)'}"></div><span class="absolute top-0 bottom-0 w-px bg-mono/50" style="inset-inline-start:80%" aria-hidden="true"></span></div>
+    </div>`;
+  }).join('');
+  icons();
+}
+</script>

@@ -1,0 +1,44 @@
+{
+  "expectations": [
+    {
+      "text": "tokens-not-raw-palette",
+      "passed": true,
+      "evidence": "0 raw palette classes in markup"
+    },
+    {
+      "text": "deliberate-personality",
+      "passed": true,
+      "evidence": "fonts=['Atkinson Hyperlegible Next', 'Noto Sans Arabic'], blue-600 primary=no"
+    },
+    {
+      "text": "dark-mode-class",
+      "passed": true,
+      "evidence": "class toggle=yes, localStorage=yes"
+    },
+    {
+      "text": "rtl-logical-properties",
+      "passed": true,
+      "evidence": "logical=33, physical=0, rtl variants=yes"
+    },
+    {
+      "text": "table-states-and-actions",
+      "passed": true,
+      "evidence": "badge text=True, row actions=True, loading/empty state=True"
+    },
+    {
+      "text": "control-sizing-consistency",
+      "passed": true,
+      "evidence": "control heights used: ['h-10', 'h-8', 'h-9'] (7 occurrences)"
+    },
+    {
+      "text": "one-primary-per-view",
+      "passed": true,
+      "evidence": "2 solid primary button(s) found (KPI chips excluded heuristically)"
+    },
+    {
+      "text": "keyboard-and-focus",
+      "passed": true,
+      "evidence": "focus-visible=True, Esc handler=True, Ctrl/Cmd+K=False"
+    }
+  ]
+}

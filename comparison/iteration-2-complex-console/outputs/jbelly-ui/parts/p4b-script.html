@@ -1,0 +1,551 @@
+<script>
+'use strict';
+/* ===================== Row 4: appointments table ===================== */
+const STATUSES = ['Confirmed', 'Pending', 'Checked in', 'No-show risk', 'Cancelled'];
+const STATUS_CLS = { 'Confirmed': 'badge-light-success', 'Pending': 'badge-light-warning', 'Checked in': 'badge-light-primary', 'No-show risk': 'badge-light-destructive', 'Cancelled': 'badge-outline' };
+const APPTS = [
+  ['NP-2401', 'Sara Al-Khalili', 'weight', 0, 'abdoun', '2026-09-09T09:00', 'Follow-up', 'Checked in', 20, 34, '079 512 3344'],
+  ['NP-2402', 'Omar Haddad', 'diabetes', 3, 'abdoun', '2026-09-09T09:30', 'Consultation', 'Checked in', 35, 52, '077 641 2210'],
+  ['NP-2403', 'Rana Saleh', 'sports', 1, 'sweifieh', '2026-09-09T09:30', 'Follow-up', 'Confirmed', 20, 27, '079 220 9871'],
+  ['NP-2404', 'Yousef Amin', 'diabetes', 2, 'khalda', '2026-09-09T10:00', 'Consultation', 'Pending', 35, 61, '078 903 1145'],
+  ['NP-2405', 'Dana Qasem', 'pregnancy', 0, 'abdoun', '2026-09-09T10:30', 'Follow-up', 'Confirmed', 20, 29, '079 118 4402'],
+  ['NP-2406', 'Lama Abu-Ghazaleh', 'weight', 4, 'sweifieh', '2026-09-09T10:30', 'Consultation', 'No-show risk', 35, 41, '077 355 6690'],
+  ['NP-2407', 'Khaled Al-Zoubi', 'sports', 5, 'khalda', '2026-09-09T11:00', 'Follow-up', 'Confirmed', 20, 23, '079 764 2033'],
+  ['NP-2408', 'Noor Shaban', 'paediatric', 3, 'abdoun', '2026-09-09T11:30', 'Consultation', 'Pending', 35, 9, '079 402 7718'],
+  ['NP-2409', 'Ahmad Tarawneh', 'diabetes', 1, 'sweifieh', '2026-09-09T12:00', 'Follow-up', 'Confirmed', 20, 58, '078 611 0904'],
+  ['NP-2410', 'Farah Masri', 'weight', 2, 'khalda', '2026-09-09T12:30', 'Consultation', 'Cancelled', 35, 36, '079 887 5561'],
+  ['NP-2411', 'Laith Bataineh', 'sports', 0, 'abdoun', '2026-09-09T13:00', 'Consultation', 'Confirmed', 35, 31, '077 290 3388'],
+  ['NP-2412', 'Maya Khouri', 'pregnancy', 4, 'sweifieh', '2026-09-09T13:30', 'Follow-up', 'No-show risk', 20, 33, '079 534 9012'],
+  ['NP-2413', 'Zaid Al-Rawashdeh', 'weight', 5, 'khalda', '2026-09-09T14:00', 'Follow-up', 'Confirmed', 20, 45, '078 176 4429'],
+  ['NP-2414', 'Salma Odeh', 'diabetes', 3, 'abdoun', '2026-09-09T14:30', 'Consultation', 'Pending', 35, 49, '079 951 2277'],
+  ['NP-2415', 'Hamza Al-Momani', 'sports', 1, 'sweifieh', '2026-09-09T15:00', 'Consultation', 'Confirmed', 35, 26, '077 480 1196'],
+  ['NP-2416', 'Reem Dabbas', 'paediatric', 2, 'khalda', '2026-09-09T15:30', 'Follow-up', 'Confirmed', 20, 7, '079 663 8850'],
+  ['NP-2417', 'Ibrahim Nabulsi', 'weight', 0, 'abdoun', '2026-09-09T16:00', 'Follow-up', 'Pending', 20, 55, '078 322 7741'],
+  ['NP-2418', 'Layan Shreim', 'pregnancy', 4, 'sweifieh', '2026-09-09T16:30', 'Consultation', 'Confirmed', 35, 30, '079 075 6613'],
+  ['NP-2419', 'Faisal Ghandour', 'diabetes', 5, 'khalda', '2026-09-09T17:00', 'Consultation', 'No-show risk', 35, 63, '077 718 2205'],
+  ['NP-2420', 'Yara Al-Tal', 'weight', 3, 'abdoun', '2026-09-09T17:30', 'Follow-up', 'Confirmed', 20, 38, '079 246 9930'],
+  ['NP-2421', 'Bilal Hijazi', 'sports', 1, 'sweifieh', '2026-09-09T18:00', 'Follow-up', 'Cancelled', 20, 24, '078 590 3376'],
+  ['NP-2422', 'Nadine Sukkar', 'weight', 2, 'khalda', '2026-09-09T18:30', 'Consultation', 'Confirmed', 35, 42, '079 809 4415'],
+  ['NP-2423', 'Karim Zureikat', 'diabetes', 0, 'abdoun', '2026-09-10T09:00', 'Consultation', 'Pending', 35, 57, '077 133 8809'],
+  ['NP-2424', 'Aisha Al-Adwan', 'paediatric', 5, 'khalda', '2026-09-10T10:00', 'Follow-up', 'Confirmed', 20, 11, '079 377 2260'],
+].map(a => ({ id: a[0], name: a[1], prog: a[2], diet: a[3], branch: a[4], time: a[5], type: a[6], status: a[7], fee: a[8], age: a[9], phone: a[10] }));
+const COLS = [
+  { key: 'patient', label: 'Patient', sort: 'name', fixed: true },
+  { key: 'programme', label: 'Programme', sort: 'prog' },
+  { key: 'dietitian', label: 'Dietitian', sort: 'diet' },
+  { key: 'branch', label: 'Branch', sort: 'branch' },
+  { key: 'time', label: 'Time', sort: 'time' },
+  { key: 'status', label: 'Status', sort: 'status', fixed: true },
+  { key: 'fee', label: 'Fee', sort: 'fee', cls: 'text-end' },
+];
+const tbl = { state: 'data', q: '', status: 'all', sort: { key: null, dir: null }, page: 1, size: 10, sel: new Set(), hidden: new Set(), density: 'standard' };
+function fmtDay(iso) { const d = iso.slice(0, 10); if (d === TODAY) return 'Today'; if (d === '2026-09-10') return 'Tomorrow'; return new Date(d + 'T00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }); }
+function sortVal(r, k) { switch (k) { case 'name': return r.name.toLowerCase(); case 'prog': return progName(r.prog); case 'diet': return DIETITIANS[r.diet].name; case 'branch': return BRANCHES[r.branch].name; case 'time': return r.time; case 'status': return STATUSES.indexOf(r.status); case 'fee': return r.fee; } return ''; }
+function baseRows() { return APPTS.filter(r => (state.branch === 'all' || r.branch === state.branch) && (!tbl.q || [r.name, r.id, DIETITIANS[r.diet].name, progName(r.prog), r.status].join(' ').toLowerCase().includes(tbl.q))); }
+function filteredRows() {
+  let rows = baseRows().filter(r => tbl.status === 'all' || r.status === tbl.status);
+  if (tbl.sort.key) { const k = tbl.sort.key, d = tbl.sort.dir === 'asc' ? 1 : -1; rows = rows.slice().sort((a, b) => { const va = sortVal(a, k), vb = sortVal(b, k); return (va > vb ? 1 : va < vb ? -1 : 0) * d; }); }
+  return rows;
+}
+function renderHead() {
+  $('#tbl-head').innerHTML = `<th class="w-12 text-center"><input id="check-all" type="checkbox" class="checkbox" aria-label="Select all rows on this page"></th>` + COLS.map(c => {
+    const sorted = tbl.sort.key === c.sort, aria = sorted ? (tbl.sort.dir === 'asc' ? 'ascending' : 'descending') : 'none', icon = sorted ? (tbl.sort.dir === 'asc' ? 'chevron-up' : 'chevron-down') : 'chevrons-up-down';
+    return `<th data-col="${c.key}" class="${c.cls || ''}" aria-sort="${aria}"><button type="button" class="sort-btn" data-sort="${c.sort}" aria-label="Sort by ${c.label}${sorted ? ', currently ' + aria : ''}">${esc(c.label)}${ico(icon)}</button></th>`;
+  }).join('') + `<th class="w-28 text-end"><span class="sr-only">Actions</span></th>`;
+  icons();
+}
+function rowHtml(r) {
+  const sel = tbl.sel.has(r.id), canc = r.status === 'Cancelled';
+  return `<tr class="${sel ? 'selected' : ''}" data-id="${r.id}" tabindex="0" aria-selected="${sel}">
+    <td class="text-center"><input type="checkbox" class="checkbox row-check" ${sel ? 'checked' : ''} aria-label="Select ${esc(r.name)}"></td>
+    <td data-col="patient"><div class="flex items-center gap-2.5"><span class="size-8 shrink-0 rounded-full inline-flex items-center justify-center bg-primary/10 text-primary font-semibold text-2xs">${initials(r.name)}</span><div class="flex flex-col min-w-0"><button type="button" class="text-sm font-medium text-mono hover:text-primary text-start truncate ${canc ? 'line-through opacity-70' : ''}" data-open="${r.id}">${esc(r.name)}</button><span class="text-xs text-muted-foreground font-mono num">${r.id} · ${esc(r.type)}</span></div></div></td>
+    <td data-col="programme" class="text-secondary-foreground whitespace-nowrap">${esc(progName(r.prog))}</td>
+    <td data-col="dietitian" class="text-secondary-foreground whitespace-nowrap">${esc(DIETITIANS[r.diet].name)}</td>
+    <td data-col="branch" class="text-secondary-foreground whitespace-nowrap">${esc(BRANCHES[r.branch].name)}</td>
+    <td data-col="time" class="whitespace-nowrap text-secondary-foreground num"><span class="font-mono text-mono">${r.time.slice(11, 16)}</span> <span class="text-xs">${fmtDay(r.time)}</span></td>
+    <td data-col="status"><span class="badge badge-sm ${STATUS_CLS[r.status]}"><span class="dot"></span>${esc(r.status)}</span></td>
+    <td data-col="fee" class="text-end tabular-nums num whitespace-nowrap">${fmtJOD(r.fee)}</td>
+    <td class="text-end"><div class="row-actions"><button type="button" class="btn btn-ghost btn-icon btn-sm" aria-label="Open ${esc(r.name)}" data-tip="Open" data-open="${r.id}">${ico('panel-right-open')}</button><button type="button" class="btn btn-ghost btn-icon btn-sm" aria-label="Reschedule ${esc(r.name)}" data-tip="Reschedule" data-resched="${r.id}">${ico('calendar-clock')}</button><button type="button" class="btn btn-ghost btn-icon btn-sm" aria-label="More actions for ${esc(r.name)}" data-tip="More" data-row-menu="${r.id}" aria-haspopup="menu" aria-expanded="false">${ico('ellipsis')}</button></div></td>
+  </tr>`;
+}
+function renderBody() {
+  const tb = $('#tbody'), rows = filteredRows(), total = rows.length, pages = Math.max(1, Math.ceil(total / tbl.size));
+  if (tbl.page > pages) tbl.page = pages;
+  const start = (tbl.page - 1) * tbl.size, page = rows.slice(start, start + tbl.size), colspan = COLS.length + 2;
+  $('#appt-count').textContent = fmtN(baseRows().length);
+  if (tbl.state === 'loading') tb.innerHTML = Array.from({ length: 6 }, () => `<tr aria-hidden="true"><td class="text-center"><span class="skeleton inline-block size-4"></span></td><td><div class="flex items-center gap-2.5"><span class="skeleton size-8 rounded-full"></span><div class="flex flex-col gap-1.5"><span class="skeleton h-3 w-32"></span><span class="skeleton h-2.5 w-20"></span></div></div></td>${COLS.slice(1).map(c => `<td data-col="${c.key}"><span class="skeleton h-3 w-20 inline-block"></span></td>`).join('')}<td></td></tr>`).join('');
+  else if (tbl.state === 'error') tb.innerHTML = `<tr><td colspan="${colspan}" class="p-5"><div class="alert alert-destructive" role="alert">${ico('circle-alert')}<div class="grow"><div class="font-semibold">Couldn't load appointments.</div><div class="text-2sm opacity-90">The booking service timed out. Check your connection and try again.</div></div><button type="button" class="btn btn-outline btn-sm shrink-0" data-state="data">${ico('refresh-cw')}Retry</button></div></td></tr>`;
+  else if (tbl.state === 'empty' || total === 0) {
+    const filtered = tbl.state !== 'empty' && (tbl.q || tbl.status !== 'all');
+    tb.innerHTML = `<tr><td colspan="${colspan}"><div class="flex flex-col items-center justify-center text-center gap-3 py-12"><span class="inline-flex size-12 items-center justify-center rounded-full bg-muted text-muted-foreground [&_svg]:size-5">${ico('calendar-x')}</span><span class="text-sm font-semibold text-mono">${filtered ? `No results${tbl.q ? ` for “${esc(tbl.q)}”` : ''}` : 'No appointments yet'}</span><span class="text-2sm text-secondary-foreground max-w-xs">${filtered ? 'Try another status or search term.' : 'Book the first appointment for today and it will appear here.'}</span>${filtered ? `<button type="button" class="btn btn-outline btn-sm" id="clear-filters">Clear filters</button>` : `<button type="button" class="btn btn-primary btn-sm" id="empty-new">${ico('plus')}New appointment</button>`}</div></td></tr>`;
+  } else tb.innerHTML = page.map(rowHtml).join('');
+  $('#tbl-range').textContent = tbl.state === 'data' && total ? `${fmtN(start + 1)}–${fmtN(Math.min(start + tbl.size, total))} of ${fmtN(total)}` : `0 of ${fmtN(total)}`;
+  renderPager(pages);
+  updateSelectionUi();
+  icons();
+}
+function renderPager(pages) {
+  const pb = (p, on, label, inner) => `<button type="button" class="inline-flex items-center justify-center size-7 rounded-md text-xs num focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${on ? 'bg-accent text-mono font-medium' : 'text-secondary-foreground hover:bg-accent'} ${p < 1 || p > pages ? 'opacity-50 pointer-events-none' : ''}" data-page="${p}" aria-label="${label}" ${on ? 'aria-current="page"' : ''} ${p < 1 || p > pages ? 'aria-disabled="true" tabindex="-1"' : ''}>${inner}</button>`;
+  let h = pb(tbl.page - 1, false, 'Previous page', ico('chevron-left', 'size-4 rtl:rotate-180'));
+  for (let p = 1; p <= pages; p++) h += pb(p, p === tbl.page, `Page ${p}`, p);
+  h += pb(tbl.page + 1, false, 'Next page', ico('chevron-right', 'size-4 rtl:rotate-180'));
+  $('#pager').innerHTML = h;
+}
+function updateSelectionUi() {
+  const n = tbl.sel.size; $('#sel-count').textContent = n;
+  $('#bulk-bar').classList.toggle('hidden', n === 0); $('#bulk-bar').classList.toggle('flex', n > 0); $('#tbl-toolbar').classList.toggle('hidden', n > 0);
+  const pageIds = $$('#tbody tr[data-id]').map(tr => tr.dataset.id), allPage = pageIds.length > 0 && pageIds.every(id => tbl.sel.has(id)), some = pageIds.some(id => tbl.sel.has(id));
+  const ca = $('#check-all'); if (ca) { ca.checked = allPage; ca.indeterminate = some && !allPage; }
+  const total = filteredRows().length; $('#sel-all-link').classList.toggle('hidden', !(allPage && n < total)); $('#sel-all-n').textContent = fmtN(total);
+}
+function renderChips() {
+  const base = baseRows(), counts = { all: base.length }; STATUSES.forEach(s => { counts[s] = base.filter(r => r.status === s).length; });
+  $('#status-chips').innerHTML = ['all', ...STATUSES].map(s => `<button type="button" class="chip" data-status="${esc(s)}" aria-pressed="${tbl.status === s}">${s === 'all' ? 'All' : esc(s)}<span class="count num">${counts[s]}</span></button>`).join('');
+}
+function renderColsMenu() { $('#cols-menu').innerHTML = `<div class="menu-heading">Show columns</div>` + COLS.map(c => `<label class="menu-item ${c.fixed ? 'opacity-60' : ''}"><input type="checkbox" class="checkbox" data-colkey="${c.key}" ${tbl.hidden.has(c.key) ? '' : 'checked'} ${c.fixed ? 'disabled' : ''}>${esc(c.label)}</label>`).join(''); }
+function applyCols() { const w = $('#tbl-wrap'); ['programme', 'dietitian', 'branch', 'time', 'fee'].forEach(k => w.classList.toggle('hide-' + k, tbl.hidden.has(k))); store.set('cols', [...tbl.hidden].join(',')); }
+function setTableState(s) { tbl.state = s; $$('#tbl-state [data-state]').forEach(b => b.setAttribute('aria-pressed', b.dataset.state === s)); if (s === 'loading') $('#tbl-wrap').setAttribute('aria-busy', 'true'); else $('#tbl-wrap').removeAttribute('aria-busy'); renderBody(); }
+function cycleSort(key) {
+  if (tbl.sort.key !== key) tbl.sort = { key, dir: 'asc' }; else if (tbl.sort.dir === 'asc') tbl.sort.dir = 'desc'; else tbl.sort = { key: null, dir: null };
+  renderHead(); renderBody(); $(`[data-sort="${key}"]`).focus(); live(tbl.sort.key ? `Sorted ${tbl.sort.dir}ending` : 'Sorting cleared');
+}
+function toggleSel(id, on) { if (on) tbl.sel.add(id); else tbl.sel.delete(id); const tr = $(`#tbody tr[data-id="${id}"]`); if (tr) { tr.classList.toggle('selected', on); tr.setAttribute('aria-selected', on); $('.row-check', tr).checked = on; } updateSelectionUi(); }
+function clearSel() { tbl.sel.clear(); renderBody(); }
+const listNames = names => names.length <= 3 ? names.join(', ') : `${names.slice(0, 3).join(', ')} and ${names.length - 3} more`;
+async function cancelAppts(ids) {
+  const items = ids.map(id => APPTS.find(a => a.id === id)).filter(a => a && a.status !== 'Cancelled'); if (!items.length) { toast({ title: 'Nothing to cancel', desc: 'The selected appointments are already cancelled.', kind: 'info' }); return; }
+  const names = items.map(a => a.name);
+  const ok = await confirmDialog({ title: items.length === 1 ? `Cancel ${names[0]}'s appointment?` : `Cancel ${items.length} appointments?`, body: `<b class="text-mono">${esc(listNames(names))}</b> will be notified by SMS. The slots free up immediately; you can undo for 6 seconds.`, verb: items.length === 1 ? 'Cancel appointment' : 'Cancel appointments' });
+  if (!ok) return;
+  const prev = items.map(a => { const p = a.status; a.status = 'Cancelled'; return [a, p]; });
+  tbl.sel.clear(); renderChips(); renderBody();
+  toast({ title: `${items.length} appointment${items.length > 1 ? 's' : ''} cancelled`, desc: 'Patients notified.', ttl: 6000, undo: () => { prev.forEach(([a, p]) => { a.status = p; }); renderChips(); renderBody(); toast({ title: 'Cancellation undone', kind: 'info' }); } });
+}
+function bulk(action) {
+  const ids = [...tbl.sel]; if (!ids.length) return;
+  if (action === 'remind') { toast({ title: `Reminder sent to ${ids.length} patient${ids.length > 1 ? 's' : ''}`, desc: 'SMS + WhatsApp, Arabic and English.' }); clearSel(); }
+  else if (action === 'reschedule') toast({ title: `Reschedule ${ids.length} appointment${ids.length > 1 ? 's' : ''}`, desc: 'Pick new slots in the calendar (demo).', kind: 'info' });
+  else if (action === 'cancel') cancelAppts(ids);
+}
+/* row "more" menu — one floating menu, positioned per row */
+const rowMenu = document.createElement('div'); rowMenu.id = 'row-menu'; rowMenu.className = 'menu fixed hidden'; rowMenu.setAttribute('role', 'menu'); document.body.appendChild(rowMenu);
+function openRowMenu(btn) {
+  closeMenus(); const id = btn.dataset.rowMenu, r = APPTS.find(a => a.id === id); rowMenu.dataset.id = id;
+  rowMenu.innerHTML = `<div class="menu-heading truncate">${esc(r.name)}</div><button type="button" class="menu-item" role="menuitem" data-rm="remind">${ico('send')}Send reminder</button><button type="button" class="menu-item" role="menuitem" data-rm="checkin">${ico('circle-check')}Mark checked in</button><button type="button" class="menu-item" role="menuitem" data-rm="resched">${ico('calendar-clock')}Reschedule</button><div class="menu-sep"></div><button type="button" class="menu-item destructive" role="menuitem" data-rm="cancel">${ico('ban')}Cancel appointment</button>`;
+  rowMenu.classList.remove('hidden'); icons();
+  const rect = btn.getBoundingClientRect(), w = rowMenu.offsetWidth, h = rowMenu.offsetHeight;
+  let left = isRtl() ? rect.left : rect.right - w; left = Math.max(8, Math.min(innerWidth - w - 8, left)); let top = rect.bottom + 6; if (top + h > innerHeight - 8) top = rect.top - h - 6;
+  rowMenu.style.left = left + 'px'; rowMenu.style.top = top + 'px';
+  btn.setAttribute('aria-expanded', 'true'); openMenu = { btn, menu: rowMenu }; $('.menu-item', rowMenu).focus();
+}
+
+/* ===================== Patient drawer ===================== */
+let drawerRow = null, noteDirty = false;
+function weights(r) { const n = parseInt(r.id.slice(3), 10), base = 58 + (n % 31); return Array.from({ length: 8 }, (_, i) => +(base - i * (0.35 + (n % 3) * 0.15) + ((i * 7 + n) % 3) * 0.2).toFixed(1)); }
+function openDrawer(id) {
+  const r = APPTS.find(a => a.id === id); if (!r) return; drawerRow = r;
+  $('#drawer-initials').textContent = initials(r.name); $('#drawer-name').textContent = r.name; $('#drawer-meta').textContent = `${r.id} · ${progName(r.prog)} · ${BRANCHES[r.branch].name}`;
+  renderDrawerOverview(r); renderDrawerMeasure(r);
+  $('#note').value = ''; noteDirty = false; $('#note-save').disabled = true; $('#note-status').textContent = 'Saved · 2 h ago';
+  selectDrawerTab('overview');
+  const list = filteredRows(), i = list.findIndex(a => a.id === id); $('#drawer-prev').disabled = i <= 0; $('#drawer-next').disabled = i < 0 || i >= list.length - 1;
+  if (!isOpen('#patient-drawer')) openOverlay('#patient-drawer', { overlay: '#drawer-overlay', focus: '#drawer-tabs [role=tab]', onEsc: tryCloseDrawer });
+  icons();
+}
+async function guardNote() { if (!noteDirty) return true; return confirmDialog({ title: 'Discard unsaved note?', body: `Your note for <b class="text-mono">${esc(drawerRow.name)}</b> has not been saved.`, verb: 'Discard note' }); }
+async function tryCloseDrawer() { if (await guardNote()) closeOverlay('#patient-drawer'); }
+function renderDrawerOverview(r) {
+  const w = weights(r), last = w[w.length - 1], bmi = (last / (1.68 * 1.68)).toFixed(1), adh = PROGRAMMES.find(p => p.key === r.prog).adherence;
+  $('#dtab-overview').innerHTML = `<div class="grid grid-cols-3 divide-x divide-border rounded-lg border border-border">${[['Weight', fmtN(last, 1) + ' kg'], ['BMI', bmi], ['Adherence', adh + '%']].map(([l, v]) => `<div class="p-3 flex flex-col gap-0.5"><span class="text-xs text-muted-foreground">${l}</span><span class="text-lg font-display font-bold text-mono num tabular-nums">${v}</span></div>`).join('')}</div>
+  <dl class="grid grid-cols-[110px_1fr] gap-x-4 gap-y-2.5 text-2sm [&_dt]:text-muted-foreground [&_dd]:min-w-0">
+    <dt>Appointment</dt><dd class="text-mono num">${fmtDay(r.time)} ${r.time.slice(11, 16)} · ${esc(r.type)}</dd>
+    <dt>Status</dt><dd><span class="badge badge-sm ${STATUS_CLS[r.status]}"><span class="dot"></span>${esc(r.status)}</span></dd>
+    <dt>Programme</dt><dd>${esc(progName(r.prog))}</dd>
+    <dt>Dietitian</dt><dd>${esc(DIETITIANS[r.diet].name)}</dd>
+    <dt>Branch</dt><dd>${esc(BRANCHES[r.branch].name)}</dd>
+    <dt>Fee</dt><dd class="num">${fmtJOD(r.fee)}</dd>
+    <dt>Phone</dt><dd class="font-mono num">${esc(r.phone)}</dd>
+    <dt>Age</dt><dd class="num">${r.age}</dd>
+  </dl>
+  <div class="flex flex-col gap-2"><span class="label">Next steps</span><ul class="flex flex-col gap-1.5 text-2sm text-secondary-foreground list-disc ps-4"><li>Review the meal log since the last visit</li><li>Update the weekly target in the plan</li><li>Book the follow-up before the patient leaves</li></ul></div>`;
+}
+function renderDrawerMeasure(r) {
+  const w = weights(r), W = 400, H = 160, L = 34, R = 10, T = 12, B = 24, min = Math.min(...w) - 1, max = Math.max(...w) + 1;
+  const x = i => L + i * (W - L - R) / 7, y = v => T + (H - T - B) * (1 - (v - min) / (max - min)), target = +(w[0] - 3).toFixed(1);
+  const pts = w.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' '), bandTop = y(Math.min(max, target + 0.75)), bandBot = y(Math.max(min, target - 0.75));
+  $('#dtab-measure').innerHTML = `<div class="flex items-center justify-between"><span class="label">Weight, last 8 visits</span><span class="text-xs text-muted-foreground num">Target ${fmtN(target, 1)} kg</span></div>
+  <svg viewBox="0 0 ${W} ${H}" class="w-full h-40" role="img" aria-label="Weight went from ${w[0]} to ${w[7]} kilograms over 8 visits; target ${target} kilograms." style="direction:ltr">
+    <rect x="${L}" y="${bandTop.toFixed(1)}" width="${W - L - R}" height="${Math.max(2, bandBot - bandTop).toFixed(1)}" fill="var(--primary)" fill-opacity=".1"/>
+    ${[0, 1, 2, 3].map(k => { const v = min + (max - min) * k / 3; return `<line x1="${L}" x2="${W - R}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}" stroke="var(--border)" stroke-dasharray="3 3"/><text x="${L - 6}" y="${(y(v) + 4).toFixed(1)}" text-anchor="end" font-size="10" fill="var(--muted-foreground)">${v.toFixed(0)}</text>`; }).join('')}
+    ${w.map((v, i) => `<text x="${x(i).toFixed(1)}" y="${H - 6}" text-anchor="middle" font-size="10" fill="var(--muted-foreground)">V${i + 1}</text>`).join('')}
+    <polyline points="${pts}" fill="none" stroke="var(--chart-1)" stroke-width="2" stroke-linejoin="round"/>
+    ${w.map((v, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="3" fill="var(--card)" stroke="var(--chart-1)" stroke-width="2"><title>Visit ${i + 1}: ${v} kg</title></circle>`).join('')}
+  </svg>
+  <table class="sr-only"><caption>Weight by visit, kilograms</caption><thead><tr><th scope="col">Visit</th><th scope="col">Weight</th></tr></thead><tbody>${w.map((v, i) => `<tr><td>${i + 1}</td><td>${v}</td></tr>`).join('')}</tbody></table>
+  <div class="grid grid-cols-2 gap-2.5">${[['Waist', '84 cm', 'down 3 cm'], ['Body fat', '27.4%', 'down 1.1 pts']].map(([l, v, d]) => `<div class="rounded-lg border border-border p-3 flex flex-col gap-0.5"><span class="text-xs text-muted-foreground">${l}</span><span class="text-base font-display font-bold text-mono num">${v}</span><span class="text-xs text-success inline-flex items-center gap-1">${ico('trending-down', 'size-3')}${d}</span></div>`).join('')}</div>`;
+}
+function selectDrawerTab(key) { $$('#drawer-tabs [role=tab]').forEach(b => { const on = b.dataset.tab === key; b.setAttribute('aria-selected', on); b.tabIndex = on ? 0 : -1; }); ['overview', 'measure', 'notes'].forEach(k => $('#dtab-' + k).classList.toggle('hidden', k !== key)); }
+function arrowTabs(e, sel) {
+  if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
+  const tabs = $$(sel + ' [role=tab]'); let i = tabs.indexOf(document.activeElement); if (i < 0) return; e.preventDefault();
+  if (e.key === 'Home') i = 0; else if (e.key === 'End') i = tabs.length - 1; else i = (i + (((e.key === 'ArrowRight') !== isRtl()) ? 1 : -1) + tabs.length) % tabs.length;
+  tabs[i].focus(); tabs[i].click();
+}
+
+/* ===================== Row 5a: kanban ===================== */
+const QUEUE = {
+  waiting: { label: 'Waiting', cards: [{ n: 'Yousef Amin', p: 'diabetes', d: 2, t: '10:00' }, { n: 'Dana Qasem', p: 'pregnancy', d: 0, t: '10:30' }, { n: 'Lama Abu-Ghazaleh', p: 'weight', d: 4, t: '10:30' }, { n: 'Khaled Al-Zoubi', p: 'sports', d: 5, t: '11:00' }] },
+  session: { label: 'In session', cards: [{ n: 'Sara Al-Khalili', p: 'weight', d: 0, t: '09:00' }, { n: 'Omar Haddad', p: 'diabetes', d: 3, t: '09:30' }, { n: 'Rana Saleh', p: 'sports', d: 1, t: '09:30' }] },
+  done: { label: 'Done', cards: [{ n: 'Mariam Al-Fayez', p: 'weight', d: 1, t: '08:30' }, { n: 'Tamer Sawalha', p: 'sports', d: 5, t: '08:30' }, { n: 'Hind Abu-Rumman', p: 'paediatric', d: 3, t: '08:00' }] },
+};
+const PROG_BADGE = { weight: 'badge-light-primary', diabetes: 'badge-light-info', sports: 'badge-light-warning', pregnancy: 'badge-light-success', paediatric: 'badge-outline' };
+const colLabel = col => QUEUE[col.dataset.col].label;
+function kbCard(c) {
+  return `<div class="kb-card" draggable="true" data-card="${esc(c.n)}" role="listitem">
+    <div class="flex items-start gap-2"><span class="size-7 rounded-full inline-flex items-center justify-center bg-primary/10 text-primary font-semibold text-2xs shrink-0">${initials(c.n)}</span><div class="flex flex-col min-w-0 grow"><span class="font-medium text-mono truncate">${esc(c.n)}</span><span class="text-xs text-muted-foreground truncate">${esc(DIETITIANS[c.d].name)}</span></div><button type="button" class="kb-handle" aria-pressed="false" aria-label="Move ${esc(c.n)}. Space lifts, arrow keys move, Space drops, Escape cancels." data-tip="Space to lift · ← → move between columns · ↑ ↓ within · Space to drop · Esc to cancel">${ico('grip-vertical')}</button></div>
+    <div class="flex items-center justify-between gap-2"><span class="badge badge-xs ${PROG_BADGE[c.p]}">${esc(progName(c.p))}</span><span class="text-xs text-muted-foreground font-mono num inline-flex items-center gap-1">${ico('clock', 'size-3')}${c.t}</span></div>
+  </div>`;
+}
+function renderKanban() {
+  $('#kanban').innerHTML = Object.entries(QUEUE).map(([k, col]) => `<div class="kb-col" data-col="${k}" role="list" aria-label="${col.label}, ${col.cards.length} patients"><div class="flex items-center justify-between px-1 pb-1"><span class="text-2sm font-medium text-mono">${col.label}</span><span class="badge badge-xs badge-outline num kb-count">${col.cards.length}</span></div>${col.cards.map(kbCard).join('')}</div>`).join('');
+  icons();
+}
+function kbCounts() { $$('#kanban .kb-col').forEach(col => { const n = $$('.kb-card', col).length; $('.kb-count', col).textContent = n; col.setAttribute('aria-label', `${colLabel(col)}, ${n} patients`); }); }
+let dragEl = null, lifted = null, liftedOrigin = null;
+function wireKanban() {
+  const kb = $('#kanban');
+  kb.addEventListener('dragstart', e => { const card = e.target.closest('.kb-card'); if (!card) return; dragEl = card; card.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; try { e.dataTransfer.setData('text/plain', card.dataset.card); } catch (err) { /* older engines */ } });
+  kb.addEventListener('dragend', () => { if (dragEl) dragEl.classList.remove('dragging'); dragEl = null; $$('.kb-col.drop', kb).forEach(c => c.classList.remove('drop')); });
+  kb.addEventListener('dragover', e => { const col = e.target.closest('.kb-col'); if (!col || !dragEl) return; e.preventDefault(); e.dataTransfer.dropEffect = 'move'; $$('.kb-col.drop', kb).forEach(c => { if (c !== col) c.classList.remove('drop'); }); col.classList.add('drop'); });
+  kb.addEventListener('dragleave', e => { const col = e.target.closest('.kb-col'); if (col && !col.contains(e.relatedTarget)) col.classList.remove('drop'); });
+  kb.addEventListener('drop', e => { const col = e.target.closest('.kb-col'); if (!col || !dragEl) return; e.preventDefault(); const after = e.target.closest('.kb-card'); if (after && after !== dragEl && after.parentElement === col) col.insertBefore(dragEl, after); else col.appendChild(dragEl); col.classList.remove('drop'); kbCounts(); live(`${dragEl.dataset.card} moved to ${colLabel(col)}`); });
+  kb.addEventListener('keydown', e => {
+    const h = e.target.closest('.kb-handle'); if (!h) return; const card = h.closest('.kb-card');
+    if (e.key === ' ' || e.key === 'Enter') {
+      e.preventDefault();
+      if (lifted === card) { card.classList.remove('lifted'); h.setAttribute('aria-pressed', 'false'); lifted = null; kbCounts(); live(`${card.dataset.card} dropped in ${colLabel(card.parentElement)}`); }
+      else { if (lifted) { lifted.classList.remove('lifted'); $('.kb-handle', lifted).setAttribute('aria-pressed', 'false'); } lifted = card; liftedOrigin = { col: card.parentElement, next: card.nextElementSibling }; card.classList.add('lifted'); h.setAttribute('aria-pressed', 'true'); live(`${card.dataset.card} lifted. Arrow keys move, Space drops, Escape cancels.`); }
+      return;
+    }
+    if (lifted !== card) return;
+    const cols = $$('.kb-col', kb), ci = cols.indexOf(card.parentElement);
+    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); const target = cols[ci + (((e.key === 'ArrowRight') !== isRtl()) ? 1 : -1)]; if (target) { target.appendChild(card); h.focus(); kbCounts(); live(`Moved to ${colLabel(target)}`); } }
+    else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); const sib = e.key === 'ArrowDown' ? card.nextElementSibling : card.previousElementSibling; if (sib && sib.classList.contains('kb-card')) { if (e.key === 'ArrowDown') sib.after(card); else sib.before(card); h.focus(); live(`Position ${$$('.kb-card', card.parentElement).indexOf(card) + 1} in ${colLabel(card.parentElement)}`); } }
+    else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); const next = liftedOrigin.next && liftedOrigin.next.parentElement === liftedOrigin.col ? liftedOrigin.next : null; liftedOrigin.col.insertBefore(card, next); card.classList.remove('lifted'); h.setAttribute('aria-pressed', 'false'); h.focus(); lifted = null; kbCounts(); live('Move cancelled'); }
+  });
+}
+
+/* ===================== Row 5b/c: activity + tasks ===================== */
+const ACTIVITY = [
+  { day: 'Today', items: [{ a: 'Dr. Lina Al-Khatib', m: 'closed the session with Sara Al-Khalili and updated her plan', t: '09:42' }, { a: 'Reception · Abdoun', m: 'checked in Omar Haddad', t: '09:31' }, { a: 'Reminder bot', m: 'sent 14 WhatsApp reminders for this afternoon', t: '08:00' }, { a: 'Rania Abu-Zaid', m: 'marked Bilal Hijazi as cancelled (patient request)', t: '07:55' }] },
+  { day: 'Yesterday', items: [{ a: 'Billing', m: 'issued 21 invoices, JOD 705 collected', t: '20:00' }, { a: 'Maha Al-Sharif', m: 'approved 3 refunds totalling JOD 95', t: '18:20' }, { a: 'Mohammad Al-Omari', m: 'added 2 new patients at Khalda', t: '16:05' }] },
+];
+function renderActivity() {
+  $('#activity').innerHTML = ACTIVITY.map((g, gi) => `<div class="text-xs font-medium uppercase tracking-wide text-muted-foreground pb-3 ${gi ? 'pt-1' : ''}">${g.day}</div>` + g.items.map((it, i) => { const last = gi === ACTIVITY.length - 1 && i === g.items.length - 1; return `<div class="relative flex gap-3 pb-5 ps-6 ${last ? '' : 'before:absolute before:start-2 before:top-5 before:bottom-0 before:w-px before:bg-border'}"><span class="absolute start-0 top-0.5 size-4 rounded-full border-2 border-card ${gi === 0 && i === 0 ? 'bg-primary' : 'bg-muted-foreground'}" aria-hidden="true"></span><div class="flex flex-col gap-0.5 min-w-0"><span class="text-2sm text-foreground"><span class="font-medium text-mono">${esc(it.a)}</span> ${esc(it.m)}</span><span class="text-xs text-muted-foreground font-mono num">${it.t}</span></div></div>`; }).join('')).join('');
+}
+const TASKS = [
+  { t: 'Call no-show risks for this afternoon', due: 'Today 12:00', pri: 'high', done: false },
+  { t: 'Approve Sweifieh roster for next week', due: 'Today 17:00', pri: 'high', done: false },
+  { t: 'Renew Khalda lab supplier contract', due: 'Thu 11 Sep', pri: 'medium', done: false },
+  { t: 'Review pregnancy programme adherence dip', due: 'Fri 12 Sep', pri: 'medium', done: false },
+  { t: 'Send August revenue report to owners', due: 'Mon 15 Sep', pri: 'low', done: true },
+  { t: 'Order new InBody consumables', due: 'Tue 16 Sep', pri: 'low', done: false },
+];
+function renderTasks() {
+  $('#tasks').innerHTML = TASKS.map((tk, i) => `<li class="flex items-start gap-2.5 px-5 py-3"><input id="task-${i}" type="checkbox" class="checkbox mt-0.5" data-task="${i}" ${tk.done ? 'checked' : ''}><label for="task-${i}" class="flex flex-col gap-0.5 min-w-0 grow cursor-pointer"><span class="text-2sm ${tk.done ? 'line-through text-muted-foreground' : 'text-mono font-medium'}">${esc(tk.t)}</span><span class="text-xs text-muted-foreground inline-flex items-center gap-1.5">${ico('calendar', 'size-3')}${tk.due}${tk.pri === 'high' && !tk.done ? ' <span class="badge badge-xs badge-light-destructive">High</span>' : ''}</span></label></li>`).join('');
+  $('#task-count').textContent = `${TASKS.filter(tk => !tk.done).length} open`; icons();
+}
+
+/* ===================== Notifications ===================== */
+const NOTIFS = [
+  { who: 'Reminder bot', ini: 'RB', m: '3 patients have not confirmed for this afternoon at Sweifieh.', t: '12 min ago', tab: 'inbox', unread: true, action: 'Call list' },
+  { who: 'Rania Abu-Zaid', ini: 'RA', m: 'Requested Thursday 14:00–16:00 off. The roster needs your approval.', t: '40 min ago', tab: 'team', unread: true, action: 'Review' },
+  { who: 'Billing', ini: 'BL', m: 'Card terminal at Khalda reconnected; 2 pending payments synced.', t: '1 h ago', tab: 'inbox', unread: true },
+  { who: 'Mohammad Al-Omari', ini: 'MO', m: 'Shared the new paediatric intake checklist with the Khalda team.', t: '3 h ago', tab: 'team', unread: false },
+  { who: 'System', ini: 'SY', m: 'Weekly capacity report is ready to download.', t: 'Yesterday', tab: 'inbox', unread: false },
+  { who: 'Hala Nsour', ini: 'HN', m: 'Asked to swap the Wednesday clinic with Dr. Lina.', t: 'Yesterday', tab: 'team', unread: false },
+];
+let notifTab = 'all';
+function renderNotifs() {
+  const list = NOTIFS.filter(n => notifTab === 'all' || n.tab === notifTab);
+  $('#notif-list').innerHTML = list.length ? list.map(n => `<li class="flex gap-2.5 px-5 py-3 ${n.unread ? 'bg-primary/5' : ''}"><span class="size-8 shrink-0 rounded-full inline-flex items-center justify-center bg-primary/10 text-primary font-semibold text-2xs">${n.ini}</span><div class="flex flex-col gap-1 min-w-0 grow"><span class="text-2sm"><span class="font-medium text-mono">${esc(n.who)}</span> <span class="text-xs text-muted-foreground">· ${esc(n.t)}</span></span><span class="text-2sm text-secondary-foreground">${esc(n.m)}</span>${n.action ? `<div class="flex gap-2 pt-1"><button type="button" class="btn btn-outline btn-sm" data-toast="${esc(n.action)} opened (demo)">${esc(n.action)}</button><button type="button" class="btn btn-ghost btn-sm" data-notif-read="${NOTIFS.indexOf(n)}">Mark read</button></div>` : ''}</div>${n.unread ? '<span class="size-2 rounded-full bg-primary mt-1.5 shrink-0" aria-hidden="true"></span><span class="sr-only">Unread</span>' : ''}</li>`).join('')
+    : `<li class="flex flex-col items-center justify-center text-center gap-3 py-12"><span class="inline-flex size-12 items-center justify-center rounded-full bg-muted text-muted-foreground [&_svg]:size-5">${ico('inbox')}</span><span class="text-sm font-semibold text-mono">Nothing here</span><span class="text-2sm text-secondary-foreground">You're all caught up.</span></li>`;
+  const unread = NOTIFS.filter(n => n.unread).length;
+  $('#nc-all').textContent = NOTIFS.length; $('#nc-inbox').textContent = NOTIFS.filter(n => n.tab === 'inbox').length; $('#nc-team').textContent = NOTIFS.filter(n => n.tab === 'team').length;
+  $('#notif-dot').classList.toggle('hidden', unread === 0); $('#notif-btn').setAttribute('aria-label', unread ? `Notifications, ${unread} unread` : 'Notifications');
+  icons();
+}
+
+/* ===================== Command palette ===================== */
+const PAGES = [['Dashboard', 'layout-dashboard'], ['Appointments', 'calendar-days'], ["Today's queue", 'list-checks'], ['Patients', 'users'], ['Programmes', 'clipboard-list'], ['Dietitians', 'stethoscope'], ['Meal plans', 'utensils'], ['Billing', 'receipt'], ['Reports', 'chart-column'], ['Settings', 'settings']];
+const ACTIONS = [
+  ['New appointment', 'plus', () => openApptModal()],
+  ['Send reminders to unconfirmed', 'send', () => toast({ title: 'Reminders queued', desc: '5 unconfirmed patients will get an SMS.' })],
+  ['Export appointments (CSV)', 'download', () => doExport()],
+  ['Toggle dark mode', 'moon', () => setDark(!html.classList.contains('dark'))],
+  ['Switch language · العربية', 'languages', () => toggleLang()],
+  ['Keyboard shortcuts', 'keyboard', () => openOverlay('#sc-modal', { overlay: '#sc-overlay' })],
+];
+let palItems = [], palIdx = 0;
+function renderPalette() {
+  const q = $('#palette-input').value.trim().toLowerCase(), m = s => !q || s.toLowerCase().includes(q);
+  const groups = [
+    ['Pages', PAGES.filter(p => m(p[0])).slice(0, 6).map(p => ({ label: p[0], icon: p[1], meta: 'Page', run: () => toast({ title: `Opening ${p[0]}`, kind: 'info' }) }))],
+    ['Patients', APPTS.filter(a => m(a.name) || m(a.id)).slice(0, 6).map(a => ({ label: a.name, icon: 'user', meta: `${a.id} · ${progName(a.prog)}`, run: () => openDrawer(a.id) }))],
+    ['Actions', ACTIONS.filter(a => m(a[0])).slice(0, 6).map(a => ({ label: a[0], icon: a[1], meta: 'Action', run: a[2] }))],
+  ];
+  palItems = groups.flatMap(g => g[1]); palIdx = 0;
+  $('#palette-list').innerHTML = palItems.length
+    ? groups.filter(g => g[1].length).map(g => `<div class="px-4 py-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">${g[0]}</div>` + g[1].map(it => { const i = palItems.indexOf(it); return `<div class="menu-item mx-2 ${i === 0 ? 'bg-accent' : ''}" role="option" id="pal-${i}" aria-selected="${i === 0}" data-pal="${i}">${ico(it.icon)}<span class="grow truncate">${esc(it.label)}</span><span class="text-xs text-muted-foreground">${esc(it.meta)}</span></div>`; }).join('')).join('')
+    : `<div class="flex flex-col items-center justify-center text-center gap-2 py-10"><span class="text-sm font-semibold text-mono">No results for “${esc(q)}”</span><span class="text-2sm text-secondary-foreground">Try a patient name, file number or an action.</span></div>`;
+  $('#palette-input').setAttribute('aria-activedescendant', palItems.length ? 'pal-0' : ''); icons();
+}
+function palSet(i) { if (!palItems.length) return; palIdx = (i + palItems.length) % palItems.length; $$('[data-pal]').forEach(el => { const on = +el.dataset.pal === palIdx; el.classList.toggle('bg-accent', on); el.setAttribute('aria-selected', on); if (on) el.scrollIntoView({ block: 'nearest' }); }); $('#palette-input').setAttribute('aria-activedescendant', 'pal-' + palIdx); }
+function palRun(i) { const it = palItems[i]; if (!it) return; closeOverlay('#palette'); it.run(); }
+function openPalette() { $('#palette-input').value = ''; renderPalette(); openOverlay('#palette', { overlay: '#palette-overlay', focus: '#palette-input' }); }
+
+/* ===================== Overlay manager (focus trap, Esc, focus return, scroll lock) ===================== */
+const stack = [];
+const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]):not([type=hidden]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+const focusables = el => $$(FOCUSABLE, el).filter(e => e.offsetParent !== null);
+function openOverlay(id, { overlay, focus, onEsc } = {}) {
+  const el = $(id); if (!el || !el.classList.contains('hidden')) return;
+  const prev = document.activeElement; el.classList.remove('hidden'); if (el.dataset.display) el.classList.add(el.dataset.display);
+  const ov = overlay ? $(overlay) : null; if (ov) { ov.classList.remove('hidden'); ov.onclick = () => (onEsc ? onEsc() : closeOverlay(id)); }
+  stack.push({ id, el, ov, prev, onEsc }); document.body.style.overflow = 'hidden';
+  const f = focus ? ($(focus, el) || $(focus)) : focusables(el)[0]; if (f) f.focus();
+}
+function closeOverlay(id) {
+  const i = stack.findIndex(s => s.id === id); if (i < 0) return; const s = stack.splice(i, 1)[0];
+  s.el.classList.add('hidden'); if (s.el.dataset.display) s.el.classList.remove(s.el.dataset.display); if (s.ov) s.ov.classList.add('hidden');
+  if (!stack.length) document.body.style.overflow = '';
+  if (s.prev && s.prev.isConnected && s.prev.focus) s.prev.focus();
+}
+const isOpen = id => stack.some(s => s.id === id);
+let confirmResolve = null;
+function confirmDialog({ title, body, verb = 'Confirm', destructive = true }) {
+  return new Promise(res => {
+    confirmResolve = res; $('#confirm-title').textContent = title; $('#confirm-body').innerHTML = body;
+    const y = $('#confirm-yes'); y.textContent = verb; y.className = 'btn ' + (destructive ? 'btn-destructive' : 'btn-primary');
+    openOverlay('#confirm-modal', { overlay: '#confirm-overlay', focus: '#confirm-no', onEsc: () => finishConfirm(false) });
+  });
+}
+function finishConfirm(v) { closeOverlay('#confirm-modal'); const r = confirmResolve; confirmResolve = null; if (r) r(v); }
+/* dropdown menus */
+let openMenu = null;
+function closeMenus(refocus) { if (!openMenu) return false; const { btn, menu } = openMenu; menu.classList.add('hidden'); btn.setAttribute('aria-expanded', 'false'); openMenu = null; if (refocus && btn.isConnected) btn.focus(); return true; }
+
+/* ===================== Toasts ===================== */
+function toast({ title, desc = '', kind = 'success', undo = null, ttl = 4000 }) {
+  const c = $('#toasts'); while (c.children.length >= 3) c.firstElementChild.remove();
+  const el = document.createElement('div'); el.className = 'flex items-start gap-2.5 rounded-lg border border-border bg-popover text-popover-foreground shadow-md p-3.5 text-sm';
+  const iconName = { success: 'circle-check', info: 'info', warning: 'triangle-alert', error: 'circle-alert' }[kind], iconCls = { success: 'text-success', info: 'text-info', warning: 'text-warning-foreground', error: 'text-destructive' }[kind];
+  el.innerHTML = `${ico(iconName, 'size-4 mt-0.5 shrink-0 ' + iconCls)}<div class="grow min-w-0"><div class="font-medium text-mono">${esc(title)}</div>${desc ? `<div class="text-2sm text-secondary-foreground">${esc(desc)}</div>` : ''}</div>${undo ? '<button type="button" class="btn btn-outline btn-sm" data-undo>Undo</button>' : ''}<button type="button" class="btn btn-ghost btn-icon btn-sm" aria-label="Dismiss" data-dismiss>${ico('x')}</button>`;
+  c.appendChild(el); icons();
+  let timer = setTimeout(() => el.remove(), ttl);
+  el.addEventListener('mouseenter', () => clearTimeout(timer)); el.addEventListener('focusin', () => clearTimeout(timer));
+  el.addEventListener('mouseleave', () => { timer = setTimeout(() => el.remove(), 2000); });
+  $('[data-dismiss]', el).onclick = () => el.remove();
+  if (undo) $('[data-undo]', el).onclick = () => { el.remove(); undo(); };
+  return el;
+}
+
+/* ===================== New appointment modal (form behaviours) ===================== */
+let apptDirty = false, apptMode = null;
+function openApptModal(resched) {
+  const f = $('#appt-form'); f.reset(); $$('.field.invalid', f).forEach(x => x.classList.remove('invalid')); $$('[aria-invalid]', f).forEach(x => x.removeAttribute('aria-invalid'));
+  apptDirty = false; apptMode = resched || null;
+  $('#appt-title').textContent = resched ? `Reschedule — ${resched.name}` : 'New appointment';
+  if (resched) { $('#f-patient').value = resched.name; $('#f-diet').value = String(resched.diet); $('#f-branch').value = resched.branch; $('#f-date').value = resched.time.slice(0, 10); $('#f-time').value = resched.time.slice(11, 16); $$('[name=f-type]', f).forEach(r => { r.checked = r.value === resched.type; }); }
+  else { $('#f-date').value = TODAY; if (state.branch !== 'all') $('#f-branch').value = state.branch; }
+  $('#appt-form button[type=submit]').textContent = resched ? 'Save new slot' : 'Book appointment';
+  openOverlay('#appt-modal', { overlay: '#appt-overlay', focus: resched ? '#f-date' : '#f-patient', onEsc: tryCloseAppt });
+}
+async function tryCloseAppt() { if (apptDirty) { const ok = await confirmDialog({ title: 'Discard this appointment?', body: 'The details you entered will be lost.', verb: 'Discard' }); if (!ok) return; } closeOverlay('#appt-modal'); }
+function validateField(el) { const wrap = el.closest('[data-field]'), ok = el.checkValidity(); if (wrap) wrap.classList.toggle('invalid', !ok); el.setAttribute('aria-invalid', ok ? 'false' : 'true'); return ok; }
+function submitAppt(e) {
+  e.preventDefault(); const bad = $$('#appt-form [required]').filter(el => !validateField(el));
+  if (bad.length) { bad[0].focus(); live(`${bad.length} field${bad.length > 1 ? 's need' : ' needs'} attention`); return; }
+  const name = $('#f-patient').value.trim(), diet = +$('#f-diet').value, branch = $('#f-branch').value, when = `${$('#f-date').value}T${$('#f-time').value}`, type = $('[name=f-type]:checked').value;
+  if (apptMode) { Object.assign(apptMode, { time: when, diet, branch, type, status: 'Confirmed', fee: type === 'Consultation' ? 35 : 20 }); toast({ title: 'Appointment rescheduled', desc: `${name} · ${fmtDay(when)} ${when.slice(11, 16)} with ${DIETITIANS[diet].name}.` }); }
+  else { const id = 'NP-' + (2400 + APPTS.length + 1); APPTS.push({ id, name, prog: 'weight', diet, branch, time: when, type, status: 'Confirmed', fee: type === 'Consultation' ? 35 : 20, age: 30, phone: '079 000 0000' }); toast({ title: 'Appointment booked', desc: `${name} · ${fmtDay(when)} ${when.slice(11, 16)} with ${DIETITIANS[diet].name}.` }); }
+  apptDirty = false; closeOverlay('#appt-modal'); renderChips(); renderBody();
+}
+function doExport() { const n = filteredRows().length, filt = tbl.q || tbl.status !== 'all' || state.branch !== 'all'; toast({ title: `Exported ${n} ${filt ? 'filtered ' : ''}row${n === 1 ? '' : 's'} (CSV)`, desc: filt ? 'Current search, status and branch filters applied.' : 'All appointments in view.' }); }
+
+/* ===================== Preferences + shell ===================== */
+function setDark(on) { html.classList.toggle('dark', on); store.set('theme', on ? 'dark' : 'light'); $('#theme-toggle').setAttribute('aria-pressed', on); $('#ctl-dark').checked = on; }
+function setDensity(compact) { html.classList.toggle('density-compact', compact); store.set('density', compact ? 'compact' : 'standard'); const b = $('#density-toggle'); b.setAttribute('aria-pressed', compact); b.dataset.tip = 'Density: ' + (compact ? 'compact' : 'standard'); }
+function toggleLang() { state.lang = state.lang === 'ar' ? 'en' : 'ar'; applyLang(); }
+function openSb() { $('#sidebar').classList.remove('hidden'); $('#sidebar').classList.add('flex'); $('#sb-overlay').classList.remove('hidden'); $('#sb-close').focus(); }
+function closeSb() { $('#sidebar').classList.add('hidden'); $('#sidebar').classList.remove('flex'); $('#sb-overlay').classList.add('hidden'); $('#hamburger').focus(); }
+const sbOpen = () => !$('#sb-overlay').classList.contains('hidden');
+function setBranch(b) {
+  state.branch = b; $('#branch-label').textContent = BRANCHES[b].name; $('#branch-filter').value = b; $('#sub-branch').textContent = BRANCHES[b].name;
+  $$('#branch-menu [data-branch]').forEach(x => { const on = x.dataset.branch === b; x.setAttribute('aria-checked', on); const c = $('.branch-check', x); if (c) c.classList.toggle('invisible', !on); });
+  tbl.page = 1; renderAll(); live(`Showing ${BRANCHES[b].name}`);
+}
+function updateSubRange() { const R = RANGES[state.range]; let label = R.label; if (state.range === 'custom') label = `${$('#range-from').value} → ${$('#range-to').value}`; $('#sub-range').textContent = state.compare ? `${label} vs ${R.prev}` : label; }
+function setRange(r) { state.range = r; $$('#range-presets [data-range]').forEach(b => b.setAttribute('aria-pressed', b.dataset.range === r)); const cr = $('#custom-range'); cr.classList.toggle('hidden', r !== 'custom'); cr.classList.toggle('flex', r === 'custom'); updateSubRange(); renderKpis(); renderLine(); if (r === 'custom') $('#range-from').focus(); }
+let updatedAt = Date.now() - 4 * 60000;
+function tickUpdated() { const m = Math.round((Date.now() - updatedAt) / 60000); $('#updated-ago').textContent = m < 1 ? 'just now' : `${m} min ago`; }
+function renderAll() { renderKpis(); renderLine(); renderDonut(); renderCapacity(); renderHeatmap(); renderAdherence(); renderChips(); renderBody(); }
+
+/* ===================== Tooltip (hover + focus, 300ms) ===================== */
+const tip = $('#tip'); let tipTimer = null, tipEl = null;
+function showTip(el) {
+  const txt = el.dataset.tip; if (!txt) return; tip.textContent = txt; tip.classList.remove('hidden'); tipEl = el; el.setAttribute('aria-describedby', 'tip');
+  const r = el.getBoundingClientRect(), tw = tip.offsetWidth, th = tip.offsetHeight;
+  let left = Math.max(8, Math.min(innerWidth - tw - 8, r.left + r.width / 2 - tw / 2)), top = r.bottom + 8; if (top + th > innerHeight - 8) top = r.top - th - 8;
+  tip.style.left = left + 'px'; tip.style.top = top + 'px';
+}
+function hideTip() { clearTimeout(tipTimer); tip.classList.add('hidden'); if (tipEl) { tipEl.removeAttribute('aria-describedby'); tipEl = null; } }
+
+/* ===================== Init + event wiring ===================== */
+(function init() {
+  $('#f-diet').innerHTML = '<option value="">Choose…</option>' + DIETITIANS.map((d, i) => `<option value="${i}">${esc(d.name)} · ${esc(BRANCHES[d.branch].name)}</option>`).join('');
+  $('#theme-toggle').setAttribute('aria-pressed', html.classList.contains('dark')); $('#ctl-dark').checked = html.classList.contains('dark');
+  if (html.classList.contains('density-compact')) { $('#density-toggle').setAttribute('aria-pressed', 'true'); $('#density-toggle').dataset.tip = 'Density: compact'; }
+  if (html.classList.contains('sidebar-collapsed')) { const b = $('#sidebar-toggle'); b.setAttribute('aria-expanded', 'false'); b.setAttribute('aria-label', 'Expand sidebar'); b.dataset.tip = 'Expand sidebar'; }
+  const cols = store.get('cols'); if (cols) cols.split(',').filter(Boolean).forEach(k => tbl.hidden.add(k));
+
+  renderLegend(); renderHead(); renderColsMenu(); applyCols(); renderAll(); renderKanban(); renderActivity(); renderTasks(); renderNotifs(); tickUpdated();
+  wireLine(); wireKanban(); setInterval(tickUpdated, 30000);
+
+  /* header + toolbar */
+  $('#open-search').onclick = openPalette; $('#open-search-m').onclick = openPalette;
+  $('#notif-btn').onclick = () => { renderNotifs(); openOverlay('#notif-drawer', { overlay: '#notif-overlay', focus: '#notif-tabs [role=tab]' }); };
+  $('#notif-tabs').addEventListener('click', e => { const b = e.target.closest('[role=tab]'); if (!b) return; notifTab = b.dataset.tab; $$('#notif-tabs [role=tab]').forEach(x => { const on = x === b; x.setAttribute('aria-selected', on); x.tabIndex = on ? 0 : -1; }); renderNotifs(); });
+  $('#notif-tabs').addEventListener('keydown', e => arrowTabs(e, '#notif-tabs'));
+  $('#notif-list').addEventListener('click', e => { const b = e.target.closest('[data-notif-read]'); if (b) { NOTIFS[+b.dataset.notifRead].unread = false; renderNotifs(); } });
+  $('#notif-read').onclick = () => { NOTIFS.forEach(n => { n.unread = false; }); renderNotifs(); toast({ title: 'All notifications marked as read' }); };
+  $('#notif-archive').onclick = () => { NOTIFS.length = 0; renderNotifs(); toast({ title: 'Notifications archived', desc: 'Find them later under Settings → Archive.' }); };
+  $('#theme-toggle').onclick = () => setDark(!html.classList.contains('dark'));
+  $('#ctl-dark').addEventListener('change', e => setDark(e.target.checked));
+  $('#density-toggle').onclick = () => setDensity(!html.classList.contains('density-compact'));
+  $('#lang-toggle').onclick = toggleLang;
+  $('#open-shortcuts').onclick = () => { closeMenus(); openOverlay('#sc-modal', { overlay: '#sc-overlay' }); };
+  $('#hamburger').onclick = openSb; $('#sb-close').onclick = closeSb; $('#sb-overlay').onclick = closeSb;
+  $('#sidebar').addEventListener('mouseenter', () => html.classList.add('sb-anim'), { once: true });
+  $('#sidebar-toggle').onclick = () => { html.classList.add('sb-anim'); const c = html.classList.toggle('sidebar-collapsed'); store.set('sidebar', c ? 'collapsed' : 'open'); const b = $('#sidebar-toggle'); b.setAttribute('aria-expanded', !c); b.setAttribute('aria-label', c ? 'Expand sidebar' : 'Collapse sidebar'); b.dataset.tip = c ? 'Expand sidebar' : 'Collapse sidebar'; };
+  $$('[data-toggle-group]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); const open = a.closest('.nav-group').classList.toggle('open'); a.setAttribute('aria-expanded', open); }));
+  $('#sidebar').addEventListener('click', e => { const a = e.target.closest('.nav-link:not([data-toggle-group]), .nav-child'); if (!a) return; e.preventDefault(); $$('#sidebar .active').forEach(x => { x.classList.remove('active'); x.removeAttribute('aria-current'); }); a.classList.add('active'); a.setAttribute('aria-current', 'page'); live(`${a.textContent.trim()} (demo navigation)`); if (sbOpen()) closeSb(); });
+  $('#branch-menu').addEventListener('click', e => { const b = e.target.closest('[data-branch]'); if (b) { setBranch(b.dataset.branch); closeMenus(true); } });
+  $('#branch-filter').addEventListener('change', e => setBranch(e.target.value));
+  $('#range-presets').addEventListener('click', e => { const b = e.target.closest('[data-range]'); if (b) setRange(b.dataset.range); });
+  $('#range-from').addEventListener('change', updateSubRange); $('#range-to').addEventListener('change', updateSubRange);
+  $('#compare').addEventListener('change', e => { state.compare = e.target.checked; updateSubRange(); renderKpis(); renderLine(); });
+  $('#export').onclick = doExport; $('#new-appt').onclick = () => openApptModal();
+  $('#refresh').onclick = () => { const b = $('#refresh'), s = $('svg', b); b.disabled = true; if (s) s.classList.add('animate-spin'); setTimeout(() => { updatedAt = Date.now(); tickUpdated(); b.disabled = false; if (s) s.classList.remove('animate-spin'); renderAll(); live('Data refreshed'); }, 700); };
+
+  /* table */
+  $('#appt-card').addEventListener('click', e => {
+    const tg = e.target;
+    const sort = tg.closest('[data-sort]'); if (sort) return cycleSort(sort.dataset.sort);
+    const pg = tg.closest('[data-page]'); if (pg) { const p = +pg.dataset.page, pages = Math.max(1, Math.ceil(filteredRows().length / tbl.size)); if (p >= 1 && p <= pages) { tbl.page = p; renderBody(); const nb = $(`[data-page="${p}"]`); if (nb) nb.focus(); } return; }
+    const chip = tg.closest('[data-status]'); if (chip) { tbl.status = chip.dataset.status; tbl.page = 1; renderChips(); renderBody(); $(`[data-status="${chip.dataset.status}"]`).focus(); return; }
+    const st = tg.closest('[data-state]'); if (st) return setTableState(st.dataset.state);
+    const den = tg.closest('[data-density]'); if (den) { tbl.density = den.dataset.density; $$('#tbl-density [data-density]').forEach(b => b.setAttribute('aria-pressed', b === den)); $('#tbl-wrap').classList.toggle('tbl-compact', tbl.density === 'compact'); return; }
+    if (tg.closest('#clear-filters')) { tbl.q = ''; $('#tbl-search').value = ''; tbl.status = 'all'; tbl.page = 1; renderChips(); renderBody(); $('#tbl-search').focus(); return; }
+    if (tg.closest('#empty-new')) return openApptModal();
+    const op = tg.closest('[data-open]'); if (op) return openDrawer(op.dataset.open);
+    const rs = tg.closest('[data-resched]'); if (rs) return openApptModal(APPTS.find(a => a.id === rs.dataset.resched));
+    const rm = tg.closest('[data-row-menu]'); if (rm) { e.stopPropagation(); if (openMenu && openMenu.btn === rm) closeMenus(); else openRowMenu(rm); return; }
+    const bk = tg.closest('[data-bulk]'); if (bk) return bulk(bk.dataset.bulk);
+    if (tg.closest('#sel-clear')) return clearSel();
+    if (tg.closest('#sel-all-link')) { filteredRows().forEach(r => tbl.sel.add(r.id)); renderBody(); return; }
+    if (tg.closest('button, a, input, label, .menu')) return;
+    const tr = tg.closest('#tbody tr[data-id]'); if (tr) openDrawer(tr.dataset.id);
+  });
+  $('#appt-card').addEventListener('change', e => {
+    const tg = e.target;
+    if (tg.id === 'check-all') { $$('#tbody tr[data-id]').forEach(r => { if (tg.checked) tbl.sel.add(r.dataset.id); else tbl.sel.delete(r.dataset.id); }); renderBody(); $('#check-all').focus(); return; }
+    if (tg.classList.contains('row-check')) return toggleSel(tg.closest('tr').dataset.id, tg.checked);
+    if (tg.id === 'page-size') { tbl.size = +tg.value; tbl.page = 1; renderBody(); return; }
+    if (tg.dataset.colkey) { if (tg.checked) tbl.hidden.delete(tg.dataset.colkey); else tbl.hidden.add(tg.dataset.colkey); applyCols(); }
+  });
+  let qTimer; $('#tbl-search').addEventListener('input', e => { clearTimeout(qTimer); qTimer = setTimeout(() => { tbl.q = e.target.value.trim().toLowerCase(); tbl.page = 1; renderChips(); renderBody(); }, 150); });
+  $('#tbody').addEventListener('keydown', e => {
+    const tr = e.target.closest('tr[data-id]'); if (!tr) return; const onRow = e.target === tr;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); const n = e.key === 'ArrowDown' ? tr.nextElementSibling : tr.previousElementSibling; if (n && n.dataset.id) n.focus(); }
+    else if (onRow && e.key === 'Enter') { e.preventDefault(); openDrawer(tr.dataset.id); }
+    else if (onRow && e.key === ' ') { e.preventDefault(); toggleSel(tr.dataset.id, !tbl.sel.has(tr.dataset.id)); }
+    else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'a') { e.preventDefault(); const id = tr.dataset.id; $$('#tbody tr[data-id]').forEach(r => tbl.sel.add(r.dataset.id)); renderBody(); const again = $(`#tbody tr[data-id="${id}"]`); if (again) again.focus(); }
+    else if (e.key === 'Delete' && tbl.sel.size) { e.preventDefault(); cancelAppts([...tbl.sel]); }
+  });
+  rowMenu.addEventListener('click', e => {
+    const b = e.target.closest('[data-rm]'); if (!b) return; const r = APPTS.find(a => a.id === rowMenu.dataset.id); closeMenus(true);
+    if (b.dataset.rm === 'remind') toast({ title: `Reminder sent to ${r.name}`, desc: 'SMS + WhatsApp.' });
+    else if (b.dataset.rm === 'checkin') { r.status = 'Checked in'; renderChips(); renderBody(); toast({ title: `${r.name} checked in` }); }
+    else if (b.dataset.rm === 'resched') openApptModal(r);
+    else if (b.dataset.rm === 'cancel') cancelAppts([r.id]);
+  });
+
+  /* drawer */
+  $('#drawer-tabs').addEventListener('click', e => { const b = e.target.closest('[role=tab]'); if (b) selectDrawerTab(b.dataset.tab); });
+  $('#drawer-tabs').addEventListener('keydown', e => arrowTabs(e, '#drawer-tabs'));
+  $('#note').addEventListener('input', () => { noteDirty = !!$('#note').value.trim(); $('#note-save').disabled = !noteDirty; $('#note-status').textContent = noteDirty ? 'Unsaved changes' : 'Saved · 2 h ago'; });
+  $('#note').addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && !$('#note-save').disabled) $('#note-save').click(); });
+  $('#note-save').onclick = () => { noteDirty = false; $('#note-save').disabled = true; $('#note-status').textContent = 'Saved · just now'; toast({ title: 'Note saved', desc: `Added to ${drawerRow.name}'s record.` }); };
+  $('#drawer-prev').onclick = async () => { const list = filteredRows(), i = list.findIndex(a => a.id === drawerRow.id); if (i > 0 && await guardNote()) openDrawer(list[i - 1].id); };
+  $('#drawer-next').onclick = async () => { const list = filteredRows(), i = list.findIndex(a => a.id === drawerRow.id); if (i >= 0 && i < list.length - 1 && await guardNote()) openDrawer(list[i + 1].id); };
+  $('#drawer-remind').onclick = () => toast({ title: `Reminder sent to ${drawerRow.name}`, desc: 'SMS + WhatsApp.' });
+
+  /* palette */
+  $('#palette-input').addEventListener('input', renderPalette);
+  $('#palette-input').addEventListener('keydown', e => { if (e.key === 'ArrowDown') { e.preventDefault(); palSet(palIdx + 1); } else if (e.key === 'ArrowUp') { e.preventDefault(); palSet(palIdx - 1); } else if (e.key === 'Enter') { e.preventDefault(); palRun(palIdx); } });
+  $('#palette-list').addEventListener('click', e => { const it = e.target.closest('[data-pal]'); if (it) palRun(+it.dataset.pal); });
+  $('#palette-list').addEventListener('mousemove', e => { const it = e.target.closest('[data-pal]'); if (it && +it.dataset.pal !== palIdx) palSet(+it.dataset.pal); });
+
+  /* form modal */
+  $('#appt-form').addEventListener('input', () => { apptDirty = true; });
+  $('#appt-form').addEventListener('change', () => { apptDirty = true; });
+  $$('#appt-form [required]').forEach(el => { el.addEventListener('blur', () => validateField(el)); el.addEventListener('input', () => { if (el.getAttribute('aria-invalid') === 'true') validateField(el); }); el.addEventListener('change', () => { if (el.getAttribute('aria-invalid') === 'true') validateField(el); }); });
+  $('#appt-form').addEventListener('submit', submitAppt);
+  $('#appt-form').addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); $('#appt-form').requestSubmit(); } });
+
+  /* generic delegated handlers */
+  document.addEventListener('click', e => {
+    const mb = e.target.closest('[data-menu]');
+    if (mb) { e.stopPropagation(); const menu = $(mb.dataset.menu), was = openMenu && openMenu.menu === menu; closeMenus(); if (!was) { menu.classList.remove('hidden'); mb.setAttribute('aria-expanded', 'true'); openMenu = { btn: mb, menu }; if (e.detail === 0) { const f = $('.menu-item:not(label), .menu-item input, button', menu); if (f) f.focus(); } } return; }
+    if (openMenu && !openMenu.menu.contains(e.target)) closeMenus();
+    const c = e.target.closest('[data-close]'); if (c) { const s = stack.find(x => x.id === c.dataset.close); if (s && s.onEsc) s.onEsc(); else closeOverlay(c.dataset.close); return; }
+    const cf = e.target.closest('[data-confirm]'); if (cf) return finishConfirm(cf.dataset.confirm === 'yes');
+    const tb = e.target.closest('[data-toast]'); if (tb) { toast({ title: tb.dataset.toast, kind: 'info' }); if (tb.closest('.menu')) closeMenus(); return; }
+    const a = e.target.closest('a[href="#"]'); if (a) e.preventDefault();
+  });
+  document.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); if (isOpen('#palette')) closeOverlay('#palette'); else openPalette(); return; }
+    if (e.key === 'Escape') {
+      if (closeMenus(true)) { e.preventDefault(); return; }
+      if (sbOpen()) { e.preventDefault(); closeSb(); return; }
+      if (stack.length) { e.preventDefault(); const top = stack[stack.length - 1]; if (top.onEsc) top.onEsc(); else closeOverlay(top.id); }
+      return;
+    }
+    if (e.key === 'Tab' && stack.length) {
+      const top = stack[stack.length - 1].el, f = focusables(top); if (!f.length) { e.preventDefault(); return; }
+      const first = f[0], last = f[f.length - 1], inside = top.contains(document.activeElement);
+      if (e.shiftKey && (document.activeElement === first || !inside)) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && (document.activeElement === last || !inside)) { e.preventDefault(); first.focus(); }
+      return;
+    }
+    if (openMenu && openMenu.menu.contains(document.activeElement) && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+      e.preventDefault(); const items = $$('.menu-item:not(label), .menu-item input, .menu > button', openMenu.menu).filter(i => !i.disabled); let i = items.indexOf(document.activeElement); i = (i + (e.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length; if (items[i]) items[i].focus(); return;
+    }
+    const typing = ['input', 'textarea', 'select'].includes((e.target.tagName || '').toLowerCase()) || e.target.isContentEditable;
+    if (e.key === '?' && !typing && !stack.length) { e.preventDefault(); openOverlay('#sc-modal', { overlay: '#sc-overlay' }); }
+  });
+  document.addEventListener('mouseover', e => { const el = e.target.closest('[data-tip]'); if (!el || el === tipEl) return; clearTimeout(tipTimer); tipTimer = setTimeout(() => showTip(el), 300); });
+  document.addEventListener('mouseout', e => { const el = e.target.closest('[data-tip]'); if (el && !el.contains(e.relatedTarget)) hideTip(); });
+  document.addEventListener('focusin', e => { const el = e.target.closest && e.target.closest('[data-tip]'); if (el) showTip(el); });
+  document.addEventListener('focusout', e => { if (e.target.closest && e.target.closest('[data-tip]')) hideTip(); });
+  document.addEventListener('scroll', hideTip, true);
+  $('#tasks').addEventListener('change', e => { const i = e.target.dataset.task; if (i == null) return; TASKS[+i].done = e.target.checked; renderTasks(); $('#task-' + i).focus(); live(`${TASKS[+i].t} ${TASKS[+i].done ? 'completed' : 'reopened'}`); });
+
+  /* URL preset for the table state, then language */
+  const st = new URLSearchParams(location.hash.slice(1)).get('state'); if (['loading', 'empty', 'error'].includes(st)) setTableState(st);
+  applyLang(); icons();
+})();
+</script>
+</body>
+</html>
