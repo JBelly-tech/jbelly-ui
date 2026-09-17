@@ -1,5 +1,6 @@
 ---
 name: jbelly-ui
+license: MIT
 description: Licence-free UI system for web apps and sites: build, review or redesign dashboards, admin panels, settings/auth, tables and landing pages with exact tokens, a spec-driven page builder, a pre-flight against AI-default looks, and a mandatory personality step. Not for backend, API or non-visual work.
 ---
 
