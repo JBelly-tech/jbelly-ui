@@ -1,4 +1,4 @@
-# Quick card — the 90% of every app screen on one page (~1.2K tokens)
+# Quick card — the 90% of every app screen on one page (~2K tokens)
 
 Read this INSTEAD of the full references for a standard app screen. Open a
 full reference only for something this card does not cover. Start from
@@ -57,6 +57,7 @@ Card or no card? — data with a title and a toolbar: card · a single sentence 
 Which primary? — the one action the user came for (New order, Save, Book); Export/Filter/Import are outline; row actions ghost.
 
 ## Design read (first output, 4 fields)
+Write it with `python scripts/personality_init.py --product … --kind … --audience … --vibe … --preset … --change … --change …` (two dials minimum).
 `kind` · `audience` (who, how often, keyboard or touch) · `vibe` (three words) · `system` (preset + dials changed). Written to `design/personality.md`; every later choice is checked against it.
 
 ## Cost rules for the building agent

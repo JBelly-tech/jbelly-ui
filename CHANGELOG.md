@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.0-beta.2 — 2026-09-17
+
+- `scripts/personality_init.py` writes `design/personality.md` from a preset and the dials changed.
+- `SKILL.md` router trimmed (the one-screen summary now points to the quick card); quick-card size stated correctly (~2K tokens) everywhere.
+- Strict-YAML frontmatter (quoted description) so the `skills` CLI installs it; CI parses the frontmatter with PyYAML.
+- README: what each script touches.
+
 ## 0.5.0-beta.1 — 2026-09-17 (public beta)
 
 - Installers without Node (`install.sh`, `install.ps1`), `CONTRIBUTING.md`,
@@ -44,7 +51,7 @@
 
 ## 0.2.0 — 2026-09-09 (v2, cost-first)
 
-- `references/quick-card.md`: one-page entry (~1.2K tokens) instead of the
+- `references/quick-card.md`: one-page entry (~2K tokens) instead of the
   full references for standard screens.
 - `scripts/build-screen.py` + `assets/spec.example.json`: whole screen from a
   ~2 KB JSON spec, zero model tokens for markup.

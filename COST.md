@@ -24,7 +24,7 @@ page, and a self-invented verification loop.
 
 | Lever | Mechanism | Expected effect |
 |-------|-----------|-----------------|
-| Read 1.2K tokens, not 28K | `references/quick-card.md` replaces the full references for a standard screen | −25K context, × every later call |
+| Read 2K tokens, not 28K | `references/quick-card.md` replaces the full references for a standard screen | −25K context, × every later call |
 | Zero-token boilerplate | `scripts/new-screen.ps1` (copy the shell with personality set) and `scripts/build-screen.py` (whole page from a ~2 KB JSON spec) | −60–90% output tokens |
 | One verification call | `scripts/verify-page.ps1`: render variants + console errors + token lint → PASS/FAIL | 90 calls → ≤ 12 |
 | Hard budget | SKILL.md: read once in a batch, write once, ≤ 12 tool calls, no self-made test harnesses | caps the quadratic term |

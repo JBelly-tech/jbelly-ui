@@ -40,7 +40,7 @@ It is the contract everything else is checked against.
 
 **Cost first.** The references total ~28K tokens; every tool call after
 reading them re-sends them. So: for a standard app screen read only
-`references/quick-card.md` (~1.2K tokens) plus the one personality preset you
+`references/quick-card.md` (~2K tokens) plus the one personality preset you
 need, in a single batch at the start. Then **generate, do not compose**:
 write a ~2 KB JSON spec (see `assets/spec.example.json`) and run
 `python scripts/build-screen.py spec.json out.html` — nav, toolbar, KPIs with
@@ -55,8 +55,10 @@ top class for the personality decision and the final review.
 
 1. **Choose the personality first** — `references/personalities.md`. Pick the
    closest preset and change at least two dials, or derive one from the brief.
-   Write it to `design/personality.md` in the product. Never start on the
-   default look; the default exists only so the demo renders.
+   Write it to `design/personality.md` with
+   `python scripts/personality_init.py --product … --kind … --audience … --vibe … --preset … --change … --change …`
+   (or by hand in that format). Never start on the default look; the
+   default exists only so the demo renders.
 2. **Install the tokens** — copy `references/tokens.css` into the project,
    load it right after Tailwind (`@import "tailwindcss"; @import "./tokens.css";`),
    append the personality overrides. To change a colour later, edit a token,
@@ -81,60 +83,28 @@ compare behaviours, then ask whether the product has a personality at all.
 
 ## The foundation in one screen
 
-**Semantic colour tokens, never raw palette.** Components reference roles
-(`bg-card`, `text-muted-foreground`, `border-border`); the roles are
-redefined once under `.dark` and once per personality. This is why dark
-mode and re-branding cost nothing.
+Everything below is spelled out with exact values in `references/quick-card.md`;
+this is the shape of it.
 
-| Role | Used for |
-|------|----------|
-| `background` / `foreground` | the page |
-| `card` / `popover` (+ `-foreground`) | cards, panels, header, sidebar / dropdowns, modals |
-| `primary` / `primary-foreground` | the single brand action colour, active nav |
-| `secondary` · `muted` · `accent` (+ `-foreground`) | secondary buttons and badges · subtle fills and helper text · hover and selected fills |
-| `mono` / `mono-foreground` | strongest text (headings, KPI numbers), tooltips |
-| `destructive` · `success` · `warning` · `info` | states — always with text or an icon, never colour alone |
-| `border` · `input` · `ring` | hairlines · field borders · focus |
-| `sidebar-*` | lets the sidebar carry its own palette (dark sidebar on a light page) |
-
-**Rhythm.** 4px base unit. `--radius` per personality (default 0.5rem);
-cards `radius + 4px`, controls `radius − 2px`, chips `radius − 4px`. Cards
-sit in a grid with `gap-5 lg:gap-7.5`; rows inside use `gap-2.5`. Container
-max 80rem, `px-6 xl:px-7.5`.
-
-**Type.** Inter for display and text by default (the look of the best-selling admin templates), weights 400 / 500 / 600 only; a display face only for a brand reason.
-UI is small and dense: controls and body at **13px** (`text-2sm`), labels
-`text-xs`, card titles `text-base font-semibold tracking-tight`, page titles
-`text-xl font-medium`, KPI numbers `text-3xl font-semibold text-mono` in the
-display face. Headings `text-mono`, body `text-foreground`, secondary lines
-`text-secondary-foreground`, hints `text-muted-foreground`. Numbers
-`tabular-nums`.
-
-**Elevation is nearly flat.** Hairline border + `shadow-xs` on cards,
-buttons, inputs; `shadow-md` on popovers; nothing else. Depth comes from
-borders and `muted` / `accent` fills. (A personality may swap this for
-elevated or outlined surfaces — deliberately, everywhere.)
-
-**Control sizes** (buttons, inputs, selects, add-ons share them exactly):
-
-| Size | Height | Padding-x | Font |
-|------|--------|-----------|------|
-| sm | 28px `h-7` | `px-2.5` | 12px `text-xs` |
-| md | 34px `h-8.5` | `px-3` | 13px `text-2sm` |
-| lg | 40px `h-10` | `px-4` | 14px `text-sm` |
-
-Density presets (compact / standard / airy) scale these together; see
-personalities.md.
-
-**Layout.** Sidebar 280px (collapses to 80px, peeks on hover), header 70px
-desktop / 60px mobile, both fixed; sidebar becomes a drawer below `lg`.
-Logical properties throughout (`ps-`, `pe-`, `start-`, `inset-inline-*`), so
-RTL is `dir="rtl"` on `<html>` and nothing else — essential for Arabic products.
-
-**Charts.** ApexCharts (MIT) themed from tokens (`references/charts.md`): smooth gradient areas, sparklines in KPI cards, donuts with a centre total, heatmaps with printed values. This is the chart look buyers of the best-selling templates expect; hand-drawn SVG charts read as unfinished.
-
-**Icons.** Lucide (MIT) at 16–20px, stroke-width 2, colour inherits. Never
-a per-project-licensed icon set; never emoji.
+- **Semantic colour roles, never raw palette**: `background/foreground`, `card`,
+  `popover`, `primary` (the single brand action), `secondary`, `muted`, `accent`,
+  `mono` (strongest text), `destructive/success/warning/info` (always with text
+  or an icon), `border/input/ring`, `sidebar-*`. Roles are redefined once under
+  `.dark` and once per personality; that is why dark mode and re-branding cost nothing.
+- **Rhythm**: 4px unit; `--radius` per personality (cards +4px, controls −2px,
+  chips −4px); cards `gap-5 lg:gap-7.5`, rows `gap-2.5`; container max 80rem.
+- **Type**: Inter for display and text by default (weights 400/500/600), UI at
+  13px, card titles 16px semibold tracking-tight, page title 20px, KPI numbers
+  30px semibold `tabular-nums`; a display face only for a brand reason.
+- **Controls share three sizes**: 28 / 34 / 40px high with 12 / 13 / 14px text,
+  so mixed rows always align. Density presets scale them together.
+- **Elevation nearly flat**: hairline border + `shadow-xs` on cards, buttons,
+  inputs; `shadow-md` on popovers; nothing else.
+- **Layout**: sidebar 280px (80px collapsed, peeks on hover), header 70px (60px
+  mobile), both fixed; sidebar is a drawer below `lg`; logical properties only,
+  so RTL is `dir="rtl"` and nothing else.
+- **Charts**: ApexCharts themed from tokens (`references/charts.md`). **Icons**:
+  Lucide 16–20px, stroke 2; never per-project-licensed sets, never emoji.
 
 ## Rules
 
@@ -213,6 +183,7 @@ region; open the page once in light, dark and RTL.
 | `references/stacks.md` | When the project is not Tailwind v4: the same recipes in plain CSS and React; DTCG tokens (`assets/tokens.json`, built by `scripts/export_tokens.py`). |
 | `references/sources.md` | To check or add a rule: which research, design system or measured run each rule family comes from. |
 | `references/charts.md` | Any chart: the ApexCharts house theme (from tokens), 8 chart recipes, the rules (heights, legends in card headers, sr-only tables, dark re-render). |
+| `scripts/personality_init.py` | Step 1: writes `design/personality.md` (the design read + dials) from a preset and the dials you changed; the file every later screen is checked against. |
 | `references/personalities.md` | Step 1, always. Eight dials, six presets with token overrides, density block, how to derive a new one, the persisted file format. |
 | `references/tokens.css` | Step 2. Light/dark roles, states, sidebar roles, radius scale, Tailwind v4 `@theme` mapping, base resets, reduced-motion. |
 | `references/layouts.md` | Step 3. App shell, sidebar nav, header bar, collapse + mobile drawer, page toolbar, grids, settings variants, profile hero, header-only shell, auth pages, landing page order, containers, RTL. |

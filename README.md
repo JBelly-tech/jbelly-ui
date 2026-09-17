@@ -26,7 +26,7 @@ utility class strings.
   palette, shape, density, surface, motion, signature element) is mandatory
   and written to a file per product, so two products never ship the same page.
 - **Agent cost is Σ(context × steps).** The skill is built to be cheap:
-  a 1.2K-token quick card, a zero-token scaffold, a JSON-spec page builder,
+  a 2K-token quick card, a zero-token scaffold, a JSON-spec page builder,
   and a one-call verifier. Measured on the same complex brief: **−51% tokens,
   −81% tool calls, −47% time** from v1 to v2 (`COST.md`).
 
@@ -81,6 +81,7 @@ python skills/jbelly-ui/scripts/verify_page.py out/dashboard.html --variants ",#
 | `references/industry-playbooks.md` | Page inventories, flows and rules for 10 business types, from what buyers of top-selling templates expect |
 | `assets/app-shell.html` | Self-contained demo and scaffold: shell, dark mode, RTL + i18n, density, personality switcher, table states, drawer, ⌘K palette, toasts, ApexCharts |
 | `assets/spec.example.json` | Example spec for the page builder |
+| `scripts/personality_init.py` | Writes `design/personality.md` (design read + dials) so every product starts with its own look |
 | `scripts/build-screen.py` | Whole screen from a ~2 KB JSON spec, zero model tokens for markup |
 | `scripts/new_screen.py` (+ `new-screen.ps1`) | Scaffold copy with personality / density / RTL / dark preset |
 | `scripts/verify_page.py` (+ `verify-page.ps1`) | One call: render variants headlessly, console errors, token lint, pre-flight, PASS/FAIL |
@@ -104,6 +105,10 @@ python skills/jbelly-ui/scripts/verify_page.py out/dashboard.html --variants ",#
 1. Install, ask your agent for a real screen, run `verify_page.py` and `preflight.py` on the result.
 2. Open an issue with the template: brief, agent, model, verdict lines, screenshot.
 3. Want to change something? `CONTRIBUTING.md` explains the layout, the tests (`python tests/smoke.py`) and the one rule that matters: nothing copied, every rule sourced.
+
+## What the scripts touch
+
+Every script is read-only except for the file it says it writes: `build-screen.py` and `new_screen.py` write the page you name, `personality_init.py` writes `design/personality.md`, `verify_page.py` writes screenshots to a folder you name (default: the OS temp folder), `export_tokens.py` and `build_dist.py` write into the skill's own `assets/` and `dist/`. Nothing calls a network API; the only network use is the page itself loading CDN scripts when rendered.
 
 ## Principles
 
