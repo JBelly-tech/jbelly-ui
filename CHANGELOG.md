@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.0-beta.1 — 2026-09-17 (public beta)
+
+- Installers without Node (`install.sh`, `install.ps1`), `CONTRIBUTING.md`,
+  issue and PR templates, CI (frontmatter/size limits, lint, pre-flight,
+  dist drift, smoke test with a headless browser), `tests/smoke.py`.
+
 ## 0.5.0 — 2026-09-17 (publish-ready structure)
 
 - Lean install: the skill lives in `skills/jbelly-ui/` (312 KB); evaluation,

@@ -15,3 +15,4 @@ __pycache__/
 
 # vendor template reference material (local yardstick only)
 comparison/reference-template/
+tests/out/

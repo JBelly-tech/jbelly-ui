@@ -1,5 +1,9 @@
 # jbelly-ui — UI design skill for AI agents
 
+> **Public beta (0.5.0-beta.1).** The system, recipes and scripts are complete and measured on a handful of briefs with one model family. What the beta tests is the claim that it works well in *every* agent and model. Try it on your own screens and report with the [issue templates](.github/ISSUE_TEMPLATE/); bad results are the most useful. Fork freely (MIT).
+
+[![ci](https://github.com/<owner>/jbelly-ui/actions/workflows/ci.yml/badge.svg)](https://github.com/<owner>/jbelly-ui/actions/workflows/ci.yml) · MIT · Agent Skills format · Python 3.9+ tooling, no dependencies
+
 **A licence-free UI system for web products, packaged as an agent skill.**
 Dashboards, admin panels, settings and auth pages, data tables, landing
 pages. Exact tokens and recipes, a spec-driven page builder, admin-grade
@@ -34,7 +38,7 @@ utility class strings.
 npx skills add <owner>/jbelly-ui -a claude-code     # or -a cursor, -a codex, -a copilot, -a gemini-cli …
 npx skills add <owner>/jbelly-ui -g -y              # user-wide, no prompts
 ```
-Manual: copy `skills/jbelly-ui/` into your agent's skills folder (`docs/compatibility.md` lists the paths).
+No Node? `./install.sh cursor` (macOS/Linux) or `.\install.ps1 -Agent cursor` (Windows) copies the skill into the agent's folder; `docs/compatibility.md` lists every path.
 
 **2. Tools that read a rules file** (Lovable and other AGENTS.md readers): copy `dist/AGENTS.md` to your project root (or into the tool's knowledge box).
 
@@ -94,6 +98,12 @@ python skills/jbelly-ui/scripts/verify_page.py out/dashboard.html --variants ",#
 
 - Measured runs so far: one model family, in one agent, on the briefs in `comparison/` (see `COST.md`).
 - Format-compatible but not yet measured: every other agent the `skills` CLI supports, and the two `dist/` tiers. The eval plan (`docs/power-up-plan.md`, Phase 3) covers models, agents and blind human rating; results will replace this paragraph.
+
+## Help test the beta
+
+1. Install, ask your agent for a real screen, run `verify_page.py` and `preflight.py` on the result.
+2. Open an issue with the template: brief, agent, model, verdict lines, screenshot.
+3. Want to change something? `CONTRIBUTING.md` explains the layout, the tests (`python tests/smoke.py`) and the one rule that matters: nothing copied, every rule sourced.
 
 ## Principles
 

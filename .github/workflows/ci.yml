@@ -1,0 +1,50 @@
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install a headless browser (Playwright Chromium)
+        run: |
+          python -m pip install --quiet playwright
+          python -m playwright install --with-deps chromium
+      - name: Skill frontmatter and size limits
+        run: |
+          python - <<'EOF'
+          import re, sys
+          s = open("skills/jbelly-ui/SKILL.md", encoding="utf-8").read()
+          fm = re.search(r"^---\n(.*?)\n---", s, re.S).group(1)
+          name = re.search(r"^name:\s*(.+)$", fm, re.M).group(1).strip()
+          desc = re.search(r"^description:\s*(.+)$", fm, re.M).group(1).strip()
+          assert name == "jbelly-ui", name
+          assert "license:" in fm, "license missing in frontmatter"
+          assert len(desc) <= 1024, "description too long"
+          assert s.count("\n") < 500, "SKILL.md over 500 lines"
+          assert len(s) // 4 < 5000, "SKILL.md over ~5000 tokens"
+          print("frontmatter ok:", name, "|", len(desc), "chars |", s.count("\n"), "lines")
+          EOF
+      - name: Token lint and pre-flight on the shipped assets
+        run: |
+          python skills/jbelly-ui/scripts/lint_tokens.py skills/jbelly-ui
+          python skills/jbelly-ui/scripts/preflight.py skills/jbelly-ui/assets/app-shell.html
+          python skills/jbelly-ui/scripts/preflight.py skills/jbelly-ui/references/tokens.css
+      - name: dist/ must match the sources
+        run: |
+          python skills/jbelly-ui/scripts/build_dist.py
+          python skills/jbelly-ui/scripts/export_tokens.py
+          git diff --exit-code -- dist skills/jbelly-ui/assets/tokens.json
+      - name: Smoke test (build a page from the example spec, render, verify)
+        run: python tests/smoke.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: smoke-screenshots
+          path: tests/out/**
+          if-no-files-found: ignore
