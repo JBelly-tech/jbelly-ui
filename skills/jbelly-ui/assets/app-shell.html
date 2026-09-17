@@ -35,7 +35,7 @@
   --sidebar-primary: var(--primary); --sidebar-border: var(--border);
   --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.06);
-  --sidebar-width: 280px; --sidebar-width-collapsed: 80px; --header-height: 70px;
+  --sidebar-width: 280px; --sidebar-default-width: 280px; --sidebar-width-collapsed: 80px; --header-height: 70px;
   --ctl-h: 34px; --ctl-h-sm: 28px; --row-h: 46px; --card-p: 1.25rem; --page-gap: 1.25rem;
   --chart-2: var(--info); --chart-3: var(--success); --chart-4: var(--warning);
 }
@@ -173,16 +173,22 @@
   .menu-item { @apply flex items-center gap-2.5 rounded-md px-2 py-2 text-2sm text-foreground cursor-pointer hover:bg-accent [&_svg]:size-4 [&_svg]:text-muted-foreground; }
   .kbd { @apply inline-flex h-5 items-center rounded-sm border border-border bg-muted px-1.5 font-mono text-2xs text-secondary-foreground; }
   .skeleton { @apply animate-pulse rounded-md bg-accent; }
-  /* collapsed sidebar (desktop) */
-  @media (width >= 64rem) {
-    .sidebar-collapsed { --sidebar-width: var(--sidebar-width-collapsed); }
-    .sidebar-collapsed #sidebar:hover { width: 280px; }
-    .sidebar-collapsed #sidebar:not(:hover) :is(.nav-title, .nav-badge, .nav-arrow, .nav-children, .logo-full) { display: none; }
-    .sidebar-collapsed #sidebar:not(:hover) .nav-heading { visibility: hidden; height: 1.75rem; }
-    .sidebar-collapsed #sidebar:not(:hover) .logo-mark { display: flex; }
-  }
-  .logo-mark { display: none; }
 }
+
+/* ===== sidebar collapse: unlayered on purpose (must beat :root variables and utility classes) ===== */
+@media (width >= 64rem) {
+  html.sidebar-collapsed { --sidebar-width: var(--sidebar-width-collapsed); }
+  html.sidebar-collapsed #sidebar:hover:not(.no-peek) { width: var(--sidebar-default-width, 280px); }
+  html.sidebar-collapsed #sidebar:is(:not(:hover), .no-peek) :is(.nav-title, .nav-badge, .nav-arrow, .nav-children, .logo-full) { display: none !important; }
+  html.sidebar-collapsed #sidebar:is(:not(:hover), .no-peek) .nav-heading { visibility: hidden; height: 1.75rem; padding: 0; }
+  html.sidebar-collapsed #sidebar:is(:not(:hover), .no-peek) .logo-mark { display: flex; }
+  html.sidebar-collapsed #sidebar:is(:not(:hover), .no-peek) .nav-link, html.sidebar-collapsed #sidebar:is(:not(:hover), .no-peek) .nav-child { justify-content: center; }
+  html.sidebar-collapsed #sidebar:is(:not(:hover), .no-peek) .nav-children { display: none !important; }
+  html.sidebar-collapsed #sidebar-toggle svg { transform: rotate(180deg); }
+  html[dir="rtl"] #sidebar-toggle svg { transform: rotate(180deg); }
+  html[dir="rtl"].sidebar-collapsed #sidebar-toggle svg { transform: none; }
+}
+.logo-mark { display: none; }
 </style>
 </head>
 <body class="h-full flex text-2sm">
@@ -219,8 +225,15 @@
     <a class="nav-link" href="#"><i data-lucide="settings"></i><span class="nav-title grow truncate" data-i18n="Settings">Settings</span></a>
   </nav>
 <!-- @endregion nav -->
-<div class="p-3 border-t border-sidebar-border">
-    <button class="w-full flex items-center gap-2.5 rounded-lg px-2 py-2 hover:bg-sidebar-accent text-start" aria-haspopup="menu">
+<div class="p-3 border-t border-sidebar-border relative">
+    <div id="side-user-menu" class="menu absolute bottom-full start-3 end-3 mb-1 hidden" role="menu">
+      <a class="menu-item" href="#"><i data-lucide="user"></i><span data-i18n="Profile">Profile</span></a>
+      <a class="menu-item" href="#"><i data-lucide="settings"></i><span data-i18n="Settings">Settings</span></a>
+      <a class="menu-item" href="#"><i data-lucide="keyboard"></i>Shortcuts<span class="ms-auto kbd">?</span></a>
+      <div class="my-1 h-px bg-border"></div>
+      <a class="menu-item text-destructive hover:bg-destructive/10" href="#"><i data-lucide="log-out" class="text-destructive!"></i><span data-i18n="Log out">Log out</span></a>
+    </div>
+    <button id="side-user-btn" class="w-full flex items-center gap-2.5 rounded-lg px-2 py-2 hover:bg-sidebar-accent text-start" aria-haspopup="menu" aria-expanded="false" title="Account">
       <span class="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold text-2xs">LA</span>
       <span class="nav-title flex flex-col min-w-0 grow"><span class="text-sm font-medium text-sidebar-foreground truncate">Lina Ahmad</span><span class="text-xs text-sidebar-muted truncate">Operations · Admin</span></span>
       <i data-lucide="chevrons-up-down" class="nav-arrow size-4 text-sidebar-muted"></i>
@@ -268,7 +281,7 @@
           <h1 class="text-xl font-medium text-mono font-display" data-i18n="Dashboard">Dashboard</h1>
           <p class="text-2sm text-secondary-foreground">Business overview · <span id="period-label" data-i18n="Last 30 days">Last 30 days</span> vs previous period</p>
         </div>
-        <div class="flex items-center gap-2.5">
+        <div class="flex flex-wrap items-center gap-2.5">
           <select id="period" class="input select w-40"><option data-i18n="Last 7 days">Last 7 days</option><option selected data-i18n="Last 30 days">Last 30 days</option><option data-i18n="This quarter">This quarter</option></select>
           <button class="btn btn-outline"><i data-lucide="download"></i>Export</button>
           <button class="btn btn-primary" data-toast="Order created" data-toast-undo><i data-lucide="plus"></i>New order</button>
@@ -423,7 +436,7 @@
 <div id="toasts" aria-live="polite" aria-relevant="additions" class="fixed bottom-5 end-5 z-50 flex flex-col gap-2.5 w-[360px] max-w-[calc(100%-2.5rem)]"></div>
 
 <!-- ===== Demo controls (not part of the shell) ===== -->
-<details class="fixed bottom-5 start-5 z-40 rounded-lg border border-border bg-popover shadow-md text-2sm w-64 open:pb-3" open>
+<details class="fixed bottom-5 end-5 z-20 rounded-lg border border-border bg-popover shadow-md text-2sm w-64 open:pb-3">
   <summary class="cursor-pointer select-none px-3 py-2 font-medium text-mono flex items-center gap-2"><i data-lucide="sliders-horizontal" class="size-4 text-muted-foreground"></i>Demo controls</summary>
   <div class="px-3 flex flex-col gap-2.5">
     <label class="flex flex-col gap-1"><span class="text-xs text-muted-foreground">Personality</span>
@@ -477,9 +490,9 @@ document.addEventListener('change', e => {
     const t0 = performance.now(); (function tick(t) { const p = Math.min(1, (t - t0) / 600), e = 1 - Math.pow(1 - p, 3); el.textContent = Math.round(end * e).toLocaleString(); if (p < 1) requestAnimationFrame(tick); })(t0); });
 })();
 // sidebar
-$('#sidebar-toggle').onclick = () => { html.classList.toggle('sidebar-collapsed'); try { localStorage.setItem('ui.sidebar', html.classList.contains('sidebar-collapsed') ? 'collapsed' : 'open'); } catch {} };
+$('#sidebar-toggle').onclick = () => { html.classList.toggle('sidebar-collapsed'); $('#sidebar').classList.add('no-peek'); $('#sidebar').addEventListener('mouseleave', () => $('#sidebar').classList.remove('no-peek'), { once: true }); try { localStorage.setItem('ui.sidebar', html.classList.contains('sidebar-collapsed') ? 'collapsed' : 'open'); } catch {} };
 try { if (localStorage.getItem('ui.sidebar') === 'collapsed') html.classList.add('sidebar-collapsed'); } catch {}
-$('#hamburger').onclick = () => { $('#sidebar').classList.remove('hidden'); $('#overlay').classList.remove('hidden'); };
+$('#hamburger').onclick = () => { $('#sidebar').classList.remove('hidden'); $('#sidebar').classList.add('flex'); $('#overlay').classList.remove('hidden'); $('#sidebar .nav-link').focus(); };
 $('#overlay').onclick = () => { $('#sidebar').classList.add('hidden'); $('#overlay').classList.add('hidden'); };
 $$('[data-toggle-group]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); a.closest('.nav-group').classList.toggle('open'); }));
 // theme
@@ -507,7 +520,7 @@ $('#open-search').onclick = openPalette; $('#palette-overlay').onclick = closePa
 $('#palette-input').addEventListener('input', e => { const q = e.target.value.toLowerCase(); $$('#palette-list .menu-item').forEach(i => i.classList.toggle('hidden', q && !i.textContent.toLowerCase().includes(q))); });
 document.addEventListener('keydown', e => {
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); openPalette(); }
-  if (e.key === 'Escape') { if (!$('#palette').classList.contains('hidden')) closePalette(); else if (!$('#drawer').classList.contains('hidden')) closeDrawer(); else um.classList.add('hidden'); }
+  if (e.key === 'Escape') { if (!$('#palette').classList.contains('hidden')) closePalette(); else if (!$('#drawer').classList.contains('hidden')) closeDrawer(); else if (innerWidth < 1024 && !$('#sidebar').classList.contains('hidden')) closeMobileSidebar(); else { um.classList.add('hidden'); if ($('#side-user-menu')) $('#side-user-menu').classList.add('hidden'); } }
 });
 // toasts
 function toast(msg, undo) { const el = document.createElement('div');
@@ -584,6 +597,24 @@ function mountCharts() {
   charts.forEach(c => c.render());
 }
 new MutationObserver(() => { clearTimeout(window.__rechart); window.__rechart = setTimeout(mountCharts, 120); }).observe(html, { attributes: true, attributeFilter: ['class', 'dir'] });
+
+// ===== sidebar behaviour: active state, tooltips, mobile drawer, persistence =====
+function closeMobileSidebar() { if (innerWidth < 1024) { $('#sidebar').classList.add('hidden'); $('#overlay').classList.add('hidden'); } }
+$$('#sidebar .nav-link:not([data-toggle-group]), #sidebar .nav-child').forEach(a => a.addEventListener('click', e => {
+  if (a.getAttribute('aria-disabled') === 'true') { e.preventDefault(); return; }
+  e.preventDefault();
+  $$('#sidebar .active').forEach(x => { x.classList.remove('active'); x.removeAttribute('aria-current'); });
+  a.classList.add('active'); a.setAttribute('aria-current', 'page');
+  const label = (a.querySelector('.nav-title') || a).textContent.trim();
+  const h1 = $('main h1'); if (h1) h1.textContent = label;
+  const crumb = $('nav[aria-label="Breadcrumb"] .text-mono'); if (crumb) crumb.textContent = label;
+  closeMobileSidebar();
+}));
+$$('#sidebar .nav-link').forEach(a => { const t = a.querySelector('.nav-title'); if (t && !a.title) a.title = t.textContent.trim(); });
+$$('#sidebar .nav-group').forEach((g, i) => { g.querySelector('[data-toggle-group]').addEventListener('click', () => { try { localStorage.setItem('ui.group.' + i, g.classList.contains('open') ? '1' : '0'); } catch {} }); try { const v = localStorage.getItem('ui.group.' + i); if (v === '0') g.classList.remove('open'); if (v === '1') g.classList.add('open'); } catch {} });
+const sub = $('#side-user-btn'), sum = $('#side-user-menu');
+if (sub && sum) { sub.onclick = e => { e.stopPropagation(); sum.classList.toggle('hidden'); sub.setAttribute('aria-expanded', !sum.classList.contains('hidden')); }; document.addEventListener('click', () => { sum.classList.add('hidden'); sub.setAttribute('aria-expanded', 'false'); }); }
+window.addEventListener('resize', () => { if (innerWidth >= 1024) { $('#sidebar').classList.remove('hidden'); $('#overlay').classList.add('hidden'); } else if (!$('#overlay').classList.contains('hidden')) {} else { $('#sidebar').classList.add('hidden'); } });
 renderRows(); lucide.createIcons(); mountCharts();
 </script>
 </body>

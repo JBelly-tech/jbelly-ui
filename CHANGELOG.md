@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.0-beta.3 — 2026-09-17
+
+- Demo sidebar fixed: the collapse toggle now works (collapse rules moved out of `@layer components`, where the unlayered `:root` width silently won), the hover-peek no longer re-opens the sidebar while the pointer is still on the toggle, nav and child clicks move the active state and `aria-current`, collapsed items get tooltips, group open state persists, the user card opens a menu, the mobile drawer closes on tap and Esc.
+- Demo controls panel moved to the bottom-end corner and closed by default; it used to cover the sidebar's bottom items.
+- Toolbar wraps on phone widths.
+- `references/layouts.md`: the collapse recipe is now unlayered with the `no-peek` guard, so generated screens do not inherit the bug.
+- Showcase captures refreshed.
+
 ## 0.5.0-beta.2 — 2026-09-17
 
 - `scripts/personality_init.py` writes `design/personality.md` from a preset and the dials changed.

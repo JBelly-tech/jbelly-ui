@@ -97,16 +97,32 @@ hamburger.onclick = () => { sidebar.classList.remove('hidden'); overlay.classLis
 overlay.onclick    = () => { sidebar.classList.add('hidden');    overlay.classList.add('hidden'); };
 ```
 
-CSS for the collapsed state (put in your `@layer components`):
+CSS for the collapsed state. Keep it **outside every `@layer`** (unlayered rules beat both the `:root` variables and Tailwind's utility layer; inside `@layer components` the toggle silently does nothing):
 
 ```css
 @media (width >= 64rem) {
-  .sidebar-collapsed { --sidebar-width: var(--sidebar-width-collapsed); }
-  .sidebar-collapsed #sidebar:hover { width: 280px; }                       /* peek on hover */
-  .sidebar-collapsed #sidebar:not(:hover) :is(.nav-title, .nav-badge, .nav-arrow, .nav-children, .logo-full) { display: none; }
-  .sidebar-collapsed #sidebar:not(:hover) .logo-mark { display: flex; }
-  .sidebar-collapsed #sidebar:not(:hover) .nav-heading { visibility: hidden; height: 1.75rem; }
+  html.sidebar-collapsed { --sidebar-width: var(--sidebar-width-collapsed); }
+  html.sidebar-collapsed #sidebar:hover:not(.no-peek) { width: 280px; }        /* peek on hover */
+  html.sidebar-collapsed #sidebar:is(:not(:hover), .no-peek) :is(.nav-title, .nav-badge, .nav-arrow, .nav-children, .logo-full) { display: none !important; }
+  html.sidebar-collapsed #sidebar:is(:not(:hover), .no-peek) .logo-mark { display: flex; }
+  html.sidebar-collapsed #sidebar:is(:not(:hover), .no-peek) .nav-heading { visibility: hidden; height: 1.75rem; padding: 0; }
+  html.sidebar-collapsed #sidebar:is(:not(:hover), .no-peek) :is(.nav-link, .nav-child) { justify-content: center; }
+  html.sidebar-collapsed #sidebar-toggle svg { transform: rotate(180deg); }
 }
+```
+
+The toggle button sits on the sidebar edge, so the pointer is still hovering after the click. Add `no-peek` on click and drop it on `mouseleave`, otherwise the peek rule keeps the sidebar open and the button looks broken:
+
+```js
+toggle.onclick = () => { html.classList.toggle('sidebar-collapsed'); sidebar.classList.add('no-peek');
+  sidebar.addEventListener('mouseleave', () => sidebar.classList.remove('no-peek'), { once: true }); };
+// every nav link gets a title for the collapsed state; clicks move the active state and close the mobile drawer
+sidebar.querySelectorAll('.nav-link').forEach(a => { const t = a.querySelector('.nav-title'); if (t) a.title = t.textContent.trim(); });
+sidebar.querySelectorAll('.nav-link:not([data-toggle-group]), .nav-child').forEach(a => a.addEventListener('click', () => {
+  sidebar.querySelectorAll('.active').forEach(x => { x.classList.remove('active'); x.removeAttribute('aria-current'); });
+  a.classList.add('active'); a.setAttribute('aria-current', 'page');
+  if (innerWidth < 1024) { sidebar.classList.add('hidden'); overlay.classList.add('hidden'); }
+}));
 ```
 
 Below `lg`: sidebar is `hidden`, shown as a drawer with an overlay
