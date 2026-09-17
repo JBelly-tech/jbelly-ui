@@ -1,8 +1,10 @@
 # jbelly-ui — UI design skill for AI agents
 
-> **Public beta (0.5.0-beta.1).** The system, recipes and scripts are complete and measured on a handful of briefs with one model family. What the beta tests is the claim that it works well in *every* agent and model. Try it on your own screens and report with the [issue templates](.github/ISSUE_TEMPLATE/); bad results are the most useful. Fork freely (MIT).
+> **Public beta.** The system, recipes and scripts are complete and measured on a handful of briefs with one model family. What the beta tests is the claim that it works well in *every* agent and model. Try it on your own screens and report with the [issue templates](.github/ISSUE_TEMPLATE/); bad results are the most useful. Fork freely (MIT). Versions: [`CHANGELOG.md`](CHANGELOG.md).
 
 [![ci](https://github.com/mohammadJohar/jbelly-ui/actions/workflows/ci.yml/badge.svg)](https://github.com/mohammadJohar/jbelly-ui/actions/workflows/ci.yml) · MIT · Agent Skills format · Python 3.9+ tooling, no dependencies
+
+**[Live demo](https://mohammadjohar.github.io/jbelly-ui/skills/jbelly-ui/assets/app-shell.html)** · [Landing page](https://mohammadjohar.github.io/jbelly-ui/) · [Cost, measured](COST.md) · [Comparison](comparison/) · [Roadmap](docs/roadmap.md)
 
 **A licence-free UI system for web products, packaged as an agent skill.**
 Dashboards, admin panels, settings and auth pages, data tables, landing
@@ -50,9 +52,7 @@ Then ask for any UI ("add a dashboard", "build the settings page", "restyle this
 
 ## Try it in 30 seconds
 
-Open `skills/jbelly-ui/assets/app-shell.html` in a browser. Use the *Demo controls* panel to
-switch personality, density, dark mode, sidebar style, and AR/EN (RTL). Or
-build a page from a spec:
+Open the [live demo](https://mohammadjohar.github.io/jbelly-ui/skills/jbelly-ui/assets/app-shell.html) (or `skills/jbelly-ui/assets/app-shell.html` locally). The *Demo controls* panel in the corner switches personality, density, dark mode, sidebar style and AR/EN (RTL); everything in the page works: collapse, ⌘K palette, table states, drawer, sort, notifications. Or build a page from a spec:
 
 ```bash
 python skills/jbelly-ui/scripts/build-screen.py skills/jbelly-ui/assets/spec.example.json out/dashboard.html
@@ -65,40 +65,50 @@ python skills/jbelly-ui/scripts/verify_page.py out/dashboard.html --variants ",#
 
 ## What is inside
 
+`skills/jbelly-ui/` is the installable skill (what `npx skills add` copies). Everything else is evidence and tooling around it.
+
+**The skill**
+
 | Path | Purpose |
 |------|---------|
-| `skills/jbelly-ui/` | **The installable skill** (what `npx skills add` copies): |
-| `SKILL.md` | The workflow, the system in one screen, the rules, the done list |
+| `SKILL.md` | The workflow, the system in one screen, the rules, the done list (about 4K tokens) |
 | `references/quick-card.md` | One page: tokens, sizes, the 20 most-used recipes, cost rules. The only reference a standard screen needs |
 | `references/personalities.md` | 8 dials, 6 presets, density block, how to derive a new one, the persisted file format |
 | `references/tokens.css` | Drop-in tokens: light/dark roles, states, sidebar roles, radius scale, Tailwind v4 mapping, base resets |
-| `references/components.md` | Exact class strings and sizes for 25 controls |
-| `references/layouts.md` | App shell, sidebar nav, header, page toolbar, settings variants, auth pages, landing page order, RTL |
-| `references/patterns.md` | KPI cards, chart/table/list cards, feeds, drawers, settings forms, pricing, checkout, search palette, empty states |
-| `references/charts.md` | ApexCharts theme from tokens + 8 chart recipes |
-| `references/ux-behaviours.md` | Loading/empty/error states, tables, forms, overlays, keyboard, dashboards, responsive, preferences, copy |
-| `references/integrations.md` | Licence-safe libraries per need and how to style them with tokens; interaction rules |
-| `references/industry-playbooks.md` | Page inventories, flows and rules for 10 business types, from what buyers of top-selling templates expect |
+| `references/components.md` · `layouts.md` · `patterns.md` | Exact class strings for 25 controls; shells, nav, toolbar, settings, auth, landing, RTL; KPI, chart, table, feed, drawer, pricing, checkout, palette, empty states |
+| `references/charts.md` · `ux-behaviours.md` · `integrations.md` | ApexCharts theme from tokens + 8 recipes; loading/empty/error, tables, forms, overlays, keyboard, responsive; licence-safe libraries per need |
+| `references/industry-playbooks.md` · `interface-guidelines.md` · `anti-patterns.md` · `review-rubric.md` · `stacks.md` · `sources.md` | Page inventories for 10 business types; exact-value interface rules; the AI-tells list; ten scored review dimensions; plain-CSS and React mappings; where every rule comes from |
 | `assets/app-shell.html` | Self-contained demo and scaffold: shell, dark mode, RTL + i18n, density, personality switcher, table states, drawer, ⌘K palette, toasts, ApexCharts |
-| `assets/spec.example.json` | Example spec for the page builder |
-| `scripts/personality_init.py` | Writes `design/personality.md` (design read + dials) so every product starts with its own look |
-| `scripts/build-screen.py` | Whole screen from a ~2 KB JSON spec, zero model tokens for markup |
-| `scripts/new_screen.py` (+ `new-screen.ps1`) | Scaffold copy with personality / density / RTL / dark preset |
-| `scripts/verify_page.py` (+ `verify-page.ps1`) | One call: render variants headlessly, console errors, token lint, pre-flight, PASS/FAIL |
-| `scripts/preflight.py` | Deterministic judgement: AI-default tells, structure checks, WCAG contrast of the token pairs |
-| `scripts/audit_styles.py` | Redesign inventory: fonts, colours, radii, shadows, spacing, raw palette classes; deviation list in fix order |
-| `references/review-rubric.md` | Ten scored dimensions for reviews, `file:line` output format, audit-first redesign protocol |
-| `docs/compatibility.md` | Which agents, models and machines; install commands per agent |
-| `scripts/lint_tokens.py` (+ `lint-tokens.ps1`) | Deterministic check: no raw palette colours outside `tokens.css` |
+| `assets/spec.example.json` · `assets/tokens.json` | Example spec for the page builder; DTCG tokens for design tools |
+
+**The scripts** (Python 3.9+, no dependencies; PowerShell twins where noted)
+
+| Script | Does |
+|--------|------|
+| `personality_init.py` | Writes `design/personality.md` (design read + dials) so every product starts with its own look |
+| `build-screen.py` | Whole screen from a ~2 KB JSON spec, zero model tokens for markup |
+| `new_screen.py` (`new-screen.ps1`) | Scaffold copy with personality / density / RTL / dark preset |
+| `verify_page.py` (`verify-page.ps1`) | One call: render variants headlessly, console errors, token lint, pre-flight, PASS/FAIL |
+| `preflight.py` | Deterministic judgement: AI-default tells, structure checks, WCAG contrast of the token pairs |
+| `lint_tokens.py` (`lint-tokens.ps1`) | No raw palette colours outside `tokens.css` |
+| `audit_styles.py` | Redesign inventory: fonts, colours, radii, shadows, spacing, raw palette classes; deviation list in fix order |
+| `export_tokens.py` · `build_dist.py` | Generate `assets/tokens.json` and the two `dist/` tiers from the sources |
+
+**Around the skill**
+
+| Path | Purpose |
+|------|---------|
 | `COST.md` | Measured token/time cost per screen and the levers that cut it |
-| `comparison/` | The evaluation: three iterations, four candidates, deterministic grader and metrics, HTML report |
+| `comparison/` | The evaluation: two briefs, four candidates, deterministic grader and metrics, HTML report |
 | `evals/` | 12 fixed briefs (incl. RTL Arabic, mobile, dark-first, empty states) and 24 trigger / no-trigger prompts |
 | `dist/` | Generated delivery tiers: `AGENTS.md` (rules-file tools) and `jbelly-ui-prompt.md` (chat-only tools) |
+| `docs/` | `compatibility.md` (agents, models, install paths), `roadmap.md`, showcase captures |
+| `tests/smoke.py` · `.github/workflows/ci.yml` | What CI runs on every push: frontmatter limits, lint, pre-flight, dist drift, build + render + verify |
 
 ## What was tested, honestly
 
 - Measured runs so far: one model family, in one agent, on the briefs in `comparison/` (see `COST.md`).
-- Format-compatible but not yet measured: every other agent the `skills` CLI supports, and the two `dist/` tiers. The eval plan (`docs/power-up-plan.md`, Phase 3) covers models, agents and blind human rating; results will replace this paragraph.
+- Format-compatible but not yet measured: every other agent the `skills` CLI supports, and the two `dist/` tiers. The [roadmap](docs/roadmap.md) covers models, agents and blind human rating; results will replace this paragraph.
 
 ## Help test the beta
 

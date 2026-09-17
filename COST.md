@@ -32,8 +32,7 @@ page, and a self-invented verification loop.
 | Cache-friendly order | stable skill text first, volatile content last | cache reads at ~0.1× |
 
 Target for the complex-console brief with v2: **≤ 120K tokens, ≤ 12 minutes,
-≤ 12 tool calls**, same or better grade. Measured result is recorded below
-once the iteration-3 run exists.
+≤ 12 tool calls**, same or better grade. The measured result follows.
 
 ## Iteration 3 (v2 skill, same brief) — measured 2026-09-09
 

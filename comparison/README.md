@@ -8,7 +8,7 @@ viewing.
 
 | Folder | What |
 |--------|------|
-| `iteration-1-simple-dashboard/` | First eval (single-branch dashboard). `outputs/<maker>/dashboard-<maker>.html` (`jbelly-ui`, `ui-ux-pro-max`, `no-skill`), `notes.md`, `grading.json`, `timing.json`; screenshots; `review-iteration-1.html` (side-by-side viewer) |
+| `iteration-1-simple-dashboard/` | First eval (single-branch dashboard). `brief.md`, `outputs/<maker>/dashboard-<maker>.html` (`jbelly-ui`, `ui-ux-pro-max`, `no-skill`), `notes.md`, `grading.json`, `timing.json`; screenshots; `review-iteration-1.html` (side-by-side viewer) |
 | `iteration-2-complex-console/` | Second eval (complex operations console: 6 KPIs, 3 charts, heatmap, full table, kanban, drawer, ⌘K, notifications). `brief.md`, `outputs/<maker>/dashboard-<maker>.html`, `shots/<maker>-<config>.png`, `metrics/`, `report-complex.html` |
 | `demo-shots/` | The skill's own demo page (`../skills/jbelly-ui/assets/app-shell.html`) in five personality / state combinations |
 | `reference-template/` | Screenshots and metrics of a purchased commercial admin template rendered locally, used only as a quality yardstick. **Git-ignored** — those images are the template vendor's, not ours, and must not be published |

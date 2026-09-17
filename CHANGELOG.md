@@ -8,6 +8,7 @@
 - `references/layouts.md`: the collapse recipe is now unlayered with the `no-peek` guard, so generated screens do not inherit the bug.
 - Every header and table control now does something: notifications popover with mark-all-read, Export and View report feedback, sortable Customer column (`aria-sort`), palette actions close the palette.
 - Showcase captures refreshed.
+- Repository tidied for readers: live-demo links and a grouped file map in the README, a public `docs/roadmap.md`, the iteration-1 brief written out, build leftovers (rendered-DOM dumps, part files, an `as-produced` copy, an eval-harness page) removed from `comparison/`.
 
 ## 0.5.0-beta.2 — 2026-09-17
 
