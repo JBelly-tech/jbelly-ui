@@ -36,7 +36,7 @@ finding; 3 is not.
 score: 3.6/5  (colour 4, states 2, a11y 3 …)
 | file:line | dimension | before | after | why |
 | index.html:212 | states | table shows nothing while loading | 5 skeleton rows (skeleton recipe) | users think it is broken |
-| index.html:88 | colour | bg-blue-600 on the CTA | bg-primary | tokens drive dark mode and re-brand |
+| index.html:88 | colour | bg-blue-600 on the CTA | bg-primary | tokens drive dark mode and re-brand | <!-- ui-lint-ignore: example of a bad value -->
 ```
 
 One row per finding, ordered by impact (colour and states first, copy last),
