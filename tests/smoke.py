@@ -7,6 +7,8 @@ Rendering needs Playwright (pip install playwright && playwright install chromiu
 without either, the render step is skipped and reported.
 """
 import os, subprocess, sys
+try: sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+except Exception: pass
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SK = os.path.join(ROOT, "skills", "jbelly-ui")

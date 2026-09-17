@@ -9,6 +9,8 @@ Renderer, in order of preference:
   2. A local Chrome / Chromium / Edge binary in headless mode                                    - console via --enable-logging
 """
 import os, re, shutil, subprocess, sys, tempfile, time, uuid
+try: sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+except Exception: pass
 
 def find_browser():
     cands = ["google-chrome", "chrome", "chromium", "chromium-browser", "msedge", "microsoft-edge",

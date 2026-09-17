@@ -10,6 +10,8 @@ Presets: theme-clinic theme-graphite theme-editorial theme-neo theme-slate theme
 The file is short on purpose: four fields of the design read plus the dials; agents read it first on every screen.
 """
 import argparse, datetime, os, sys
+try: sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+except Exception: pass
 
 PRESETS = {
  "theme-clinic":    ("Inter (display + text); Arabic: Noto Sans Arabic", "oklch(50% 0.12 195) teal", "0.75rem", "airy", "tinted page", "micro", "display numerals + 3px start rail on active nav", "teal · amber · slate-blue · sage"),

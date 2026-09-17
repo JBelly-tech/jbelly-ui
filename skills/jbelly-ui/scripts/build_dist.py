@@ -8,6 +8,8 @@ Usage: python scripts/build_dist.py            (from anywhere; writes <repo>/dis
 Fails (exit 1) if a tier exceeds its size limit.
 """
 import os, re, sys, time
+try: sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+except Exception: pass
 
 SKILL = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REPO = os.path.dirname(os.path.dirname(SKILL))

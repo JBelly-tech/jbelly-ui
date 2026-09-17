@@ -13,6 +13,8 @@ Checks
                muted-foreground/background) computed from oklch()/hex; text pairs must reach 4.5, muted 4.5, large 3
 """
 import json, math, os, re, sys
+try: sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+except Exception: pass
 
 TELLS = [
     ("purple-indigo-gradient", r"(?:from|via|to)-(?:purple|indigo|violet|fuchsia)-\d{3}|#(?:6366f1|8b5cf6|a855f7|7c3aed|4f46e5|c084fc)\b", "purple/indigo gradient palette", 0),
