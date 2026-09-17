@@ -253,7 +253,18 @@
       </div>
       <div class="flex items-center gap-1.5">
         <button id="open-search" class="btn btn-outline btn-sm hidden md:inline-flex gap-2 text-muted-foreground w-52 justify-start"><i data-lucide="search"></i><span class="grow text-start">Search…</span><span class="kbd">⌘K</span></button>
-        <button class="btn btn-ghost btn-icon relative" aria-label="Notifications"><i data-lucide="bell"></i><span class="absolute top-2 end-2 size-2 rounded-full bg-destructive ring-2 ring-background"></span></button>
+        <div class="relative">
+          <button id="notif-btn" class="btn btn-ghost btn-icon relative" aria-label="Notifications" aria-haspopup="menu" aria-expanded="false"><i data-lucide="bell"></i><span id="notif-dot" class="absolute top-2 end-2 size-2 rounded-full bg-destructive ring-2 ring-background"></span></button>
+          <div id="notif-menu" class="menu absolute end-0 top-full mt-1 w-80 hidden" role="menu">
+            <div class="flex items-center justify-between px-2.5 py-1.5"><span class="text-sm font-semibold" data-i18n="Notifications">Notifications</span><button id="notif-read" class="text-2xs text-primary hover:underline" data-i18n="Mark all read">Mark all read</button></div>
+            <div class="my-1 h-px bg-border"></div>
+            <a class="menu-item items-start" href="#"><span class="mt-0.5 inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-success/10 text-success"><i data-lucide="check" class="size-3.5!"></i></span><span class="flex flex-col gap-0.5 min-w-0"><span class="text-2sm text-foreground">Order #1042 delivered</span><span class="text-2xs text-muted-foreground">Sara Khalil · 5 min ago</span></span></a>
+            <a class="menu-item items-start" href="#"><span class="mt-0.5 inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-warning/10 text-warning"><i data-lucide="clock" class="size-3.5!"></i></span><span class="flex flex-col gap-0.5 min-w-0"><span class="text-2sm text-foreground">Payment pending on #1039</span><span class="text-2xs text-muted-foreground">Omar Haddad · 1 h ago</span></span></a>
+            <a class="menu-item items-start" href="#"><span class="mt-0.5 inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"><i data-lucide="user-plus" class="size-3.5!"></i></span><span class="flex flex-col gap-0.5 min-w-0"><span class="text-2sm text-foreground">New wholesale account</span><span class="text-2xs text-muted-foreground">Rana Saleh · yesterday</span></span></a>
+            <div class="my-1 h-px bg-border"></div>
+            <a class="menu-item justify-center text-primary" href="#" data-i18n="View all">View all</a>
+          </div>
+        </div>
         <button id="theme-toggle" class="btn btn-ghost btn-icon" aria-label="Toggle dark mode"><i data-lucide="moon" class="dark:hidden"></i><i data-lucide="sun" class="hidden dark:block"></i></button>
         <div class="relative">
           <button id="user-btn" class="flex items-center gap-2 rounded-full ms-1" aria-haspopup="menu" aria-expanded="false">
@@ -283,7 +294,7 @@
         </div>
         <div class="flex flex-wrap items-center gap-2.5">
           <select id="period" class="input select w-40"><option data-i18n="Last 7 days">Last 7 days</option><option selected data-i18n="Last 30 days">Last 30 days</option><option data-i18n="This quarter">This quarter</option></select>
-          <button class="btn btn-outline"><i data-lucide="download"></i>Export</button>
+          <button class="btn btn-outline" data-toast="Export started · CSV will download shortly"><i data-lucide="download"></i>Export</button>
           <button class="btn btn-primary" data-toast="Order created" data-toast-undo><i data-lucide="plus"></i>New order</button>
         </div>
       </div>
@@ -336,7 +347,7 @@
                 <div class="flex justify-between"><span class="flex items-center gap-2"><span class="size-2 rounded-full bg-warning"></span>In-store</span><span class="text-mono font-medium tabular-nums">22</span></div>
               </div>
             </div>
-            <div class="card-footer justify-center"><a href="#" class="text-primary hover:underline underline-offset-4 text-2sm font-medium" data-i18n="View report">View report</a></div>
+            <div class="card-footer justify-center"><a href="#" class="text-primary hover:underline underline-offset-4 text-2sm font-medium" data-toast="Opening the full report" data-i18n="View report">View report</a></div>
           </div>
         </div>
 
@@ -520,7 +531,7 @@ $('#open-search').onclick = openPalette; $('#palette-overlay').onclick = closePa
 $('#palette-input').addEventListener('input', e => { const q = e.target.value.toLowerCase(); $$('#palette-list .menu-item').forEach(i => i.classList.toggle('hidden', q && !i.textContent.toLowerCase().includes(q))); });
 document.addEventListener('keydown', e => {
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); openPalette(); }
-  if (e.key === 'Escape') { if (!$('#palette').classList.contains('hidden')) closePalette(); else if (!$('#drawer').classList.contains('hidden')) closeDrawer(); else if (innerWidth < 1024 && !$('#sidebar').classList.contains('hidden')) closeMobileSidebar(); else { um.classList.add('hidden'); if ($('#side-user-menu')) $('#side-user-menu').classList.add('hidden'); } }
+  if (e.key === 'Escape') { if (!$('#palette').classList.contains('hidden')) closePalette(); else if (!$('#drawer').classList.contains('hidden')) closeDrawer(); else if (innerWidth < 1024 && !$('#sidebar').classList.contains('hidden')) closeMobileSidebar(); else { um.classList.add('hidden'); $('#side-user-menu')?.classList.add('hidden'); $('#notif-menu')?.classList.add('hidden'); } }
 });
 // toasts
 function toast(msg, undo) { const el = document.createElement('div');
@@ -536,7 +547,7 @@ $('#period').onchange = e => $('#period-label').textContent = e.target.value;
 const THEMES = ['theme-clinic', 'theme-graphite', 'theme-editorial', 'theme-neo', 'theme-slate', 'theme-mint'], DENS = ['density-compact', 'density-airy'];
 if ($('#ctl-theme')) $('#ctl-theme').onchange = e => { html.classList.remove(...THEMES); if (e.target.value) html.classList.add(e.target.value); };
 if ($('#ctl-density')) $('#ctl-density').onchange = e => { html.classList.remove(...DENS); if (e.target.value) html.classList.add(e.target.value); };
-const I18N = {"Dashboard": "لوحة التحكم", "Customers": "العملاء", "Orders": "الطلبات", "Products": "المنتجات", "Catalogue": "الكتالوج", "Collections": "المجموعات", "Inventory": "المخزون", "Business": "الأعمال", "Billing": "الفوترة", "Reports": "التقارير", "Settings": "الإعدادات", "Storage": "التخزين", "Export": "تصدير", "New order": "طلب جديد", "Active customers": "العملاء النشطون", "Fulfilment rate": "نسبة التنفيذ", "Revenue": "الإيرادات", "Orders per week": "الطلبات أسبوعياً", "Completed": "مكتملة", "Refunded": "مستردّ", "Highlights": "أبرز النتائج", "Orders completed": "طلبات مكتملة", "Online store": "المتجر الإلكتروني", "Marketplace": "السوق", "Wholesale": "الجملة", "In-store": "في المتجر", "View report": "عرض التقرير", "Recent orders": "أحدث الطلبات", "Customer": "العميل", "Item": "الصنف", "Status": "الحالة", "Time": "الوقت", "Activity": "النشاط", "View all": "عرض الكل", "Search customers": "ابحث عن عميل", "All status": "كل الحالات", "Confirmed": "مؤكد", "Pending": "قيد التأكيد", "Data": "بيانات", "Loading": "تحميل", "Empty": "فارغ", "Profile": "الملف الشخصي", "Log out": "تسجيل الخروج", "Business overview": "نظرة عامة على الأعمال", "Last 30 days": "آخر 30 يوماً", "Last 7 days": "آخر 7 أيام", "This quarter": "هذا الربع", "Docs": "التوثيق", "Support": "الدعم", "Privacy": "الخصوصية", "Month": "شهر", "Quarter": "ربع"};
+const I18N = {"Notifications": "الإشعارات", "Mark all read": "تعليم الكل كمقروء", "View all": "عرض الكل", "Dashboard": "لوحة التحكم", "Customers": "العملاء", "Orders": "الطلبات", "Products": "المنتجات", "Catalogue": "الكتالوج", "Collections": "المجموعات", "Inventory": "المخزون", "Business": "الأعمال", "Billing": "الفوترة", "Reports": "التقارير", "Settings": "الإعدادات", "Storage": "التخزين", "Export": "تصدير", "New order": "طلب جديد", "Active customers": "العملاء النشطون", "Fulfilment rate": "نسبة التنفيذ", "Revenue": "الإيرادات", "Orders per week": "الطلبات أسبوعياً", "Completed": "مكتملة", "Refunded": "مستردّ", "Highlights": "أبرز النتائج", "Orders completed": "طلبات مكتملة", "Online store": "المتجر الإلكتروني", "Marketplace": "السوق", "Wholesale": "الجملة", "In-store": "في المتجر", "View report": "عرض التقرير", "Recent orders": "أحدث الطلبات", "Customer": "العميل", "Item": "الصنف", "Status": "الحالة", "Time": "الوقت", "Activity": "النشاط", "View all": "عرض الكل", "Search customers": "ابحث عن عميل", "All status": "كل الحالات", "Confirmed": "مؤكد", "Pending": "قيد التأكيد", "Data": "بيانات", "Loading": "تحميل", "Empty": "فارغ", "Profile": "الملف الشخصي", "Log out": "تسجيل الخروج", "Business overview": "نظرة عامة على الأعمال", "Last 30 days": "آخر 30 يوماً", "Last 7 days": "آخر 7 أيام", "This quarter": "هذا الربع", "Docs": "التوثيق", "Support": "الدعم", "Privacy": "الخصوصية", "Month": "شهر", "Quarter": "ربع"};
 function setLang(lang) {
   const ar = lang === 'ar';
   html.setAttribute('dir', ar ? 'rtl' : 'ltr'); html.setAttribute('lang', ar ? 'ar' : 'en');
@@ -615,6 +626,24 @@ $$('#sidebar .nav-group').forEach((g, i) => { g.querySelector('[data-toggle-grou
 const sub = $('#side-user-btn'), sum = $('#side-user-menu');
 if (sub && sum) { sub.onclick = e => { e.stopPropagation(); sum.classList.toggle('hidden'); sub.setAttribute('aria-expanded', !sum.classList.contains('hidden')); }; document.addEventListener('click', () => { sum.classList.add('hidden'); sub.setAttribute('aria-expanded', 'false'); }); }
 window.addEventListener('resize', () => { if (innerWidth >= 1024) { $('#sidebar').classList.remove('hidden'); $('#overlay').classList.add('hidden'); } else if (!$('#overlay').classList.contains('hidden')) {} else { $('#sidebar').classList.add('hidden'); } });
+
+// ===== notifications popover, column sort, palette actions =====
+const nb = $('#notif-btn'), nm = $('#notif-menu');
+if (nb && nm) {
+  nb.onclick = e => { e.stopPropagation(); um.classList.add('hidden'); nm.classList.toggle('hidden'); nb.setAttribute('aria-expanded', !nm.classList.contains('hidden')); };
+  nm.addEventListener('click', e => e.stopPropagation());
+  document.addEventListener('click', () => { nm.classList.add('hidden'); nb.setAttribute('aria-expanded', 'false'); });
+  $('#notif-read').onclick = () => { $('#notif-dot')?.remove(); nm.classList.add('hidden'); toast('All notifications marked as read'); };
+}
+let sortDir = 0;
+$$('[data-sort]').forEach(b => b.addEventListener('click', () => {
+  sortDir = sortDir === 1 ? -1 : 1;
+  rows.sort((a, c) => a.n.localeCompare(c.n) * sortDir);
+  b.closest('th').setAttribute('aria-sort', sortDir === 1 ? 'ascending' : 'descending');
+  const ic = b.querySelector('svg, i'); if (ic) ic.style.transform = sortDir === 1 ? '' : 'rotate(180deg)';
+  renderRows();
+}));
+$$('#palette-list .menu-item').forEach(a => a.addEventListener('click', e => { e.preventDefault(); closePalette(); toast((a.textContent.trim().split(/\s{2,}|\n/)[0] || 'Action').slice(0, 40)); }));
 renderRows(); lucide.createIcons(); mountCharts();
 </script>
 </body>

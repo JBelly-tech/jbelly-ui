@@ -6,6 +6,7 @@
 - Demo controls panel moved to the bottom-end corner and closed by default; it used to cover the sidebar's bottom items.
 - Toolbar wraps on phone widths.
 - `references/layouts.md`: the collapse recipe is now unlayered with the `no-peek` guard, so generated screens do not inherit the bug.
+- Every header and table control now does something: notifications popover with mark-all-read, Export and View report feedback, sortable Customer column (`aria-sort`), palette actions close the palette.
 - Showcase captures refreshed.
 
 ## 0.5.0-beta.2 — 2026-09-17
