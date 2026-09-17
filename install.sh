@@ -4,7 +4,7 @@
 #   ./install.sh cursor              # Cursor, user-wide
 #   ./install.sh codex --project     # Codex, into ./.agents/skills of the current project
 #   ./install.sh custom /path/to/skills
-# With Node: npx skills add <owner>/jbelly-ui -a claude-code -g
+# With Node: npx skills add mohammadJohar/jbelly-ui -a claude-code -g
 set -e
 here="$(cd "$(dirname "$0")" && pwd)"
 src="$here/skills/jbelly-ui"

@@ -294,13 +294,7 @@
   {
    "id": "reference-template",
    "label": "Commercial template (vendor demo, reference)",
-   "shots": {
-    "1440 \u00d7 1000 \u00b7 light": "reference-template\\reference-template-light-1440.png",
-    "1440 \u00d7 1000 \u00b7 dark": "reference-template\\reference-template-dark-1440.png",
-    "1440 \u00d7 1000 \u00b7 RTL": "reference-template\\reference-template-rtl-1440.png",
-    "1024 \u00d7 900 \u00b7 light": "reference-template\\reference-template-light-1024.png",
-    "500 \u00d7 900 \u00b7 light (mobile)": "reference-template\\reference-template-light-500.png"
-   },
+   "shots": {},
    "metrics": {
     "name": "reference-template-demo1",
     "source_bytes": 423201,

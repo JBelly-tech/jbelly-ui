@@ -8,7 +8,7 @@
   .\install.ps1 -Agent codex -Project # Codex, into ./.agents/skills of the current project
   .\install.ps1 -Dest "C:\path\to\skills"   # any folder
 
-  With Node installed you can use the skills CLI instead:  npx skills add <owner>/jbelly-ui -a claude-code -g
+  With Node installed you can use the skills CLI instead:  npx skills add mohammadJohar/jbelly-ui -a claude-code -g
 #>
 param(
   [ValidateSet("claude-code", "cursor", "copilot", "codex", "windsurf", "gemini-cli", "custom")] [string] $Agent = "claude-code",

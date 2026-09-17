@@ -33,6 +33,7 @@ def candidate(it, maker):
         try: c["notes"] = open(os.path.join(run, "notes.md"), encoding="utf-8").read()
         except Exception: pass
     if maker == "reference-template":
+        c["shots"] = {}  # screenshots of a commercial product are not published
         c["notes"] = "Vendor demo dashboard rendered locally from its own package. Not built for this brief; a quality and weight yardstick only."
     return c
 

@@ -2,7 +2,7 @@
 
 > **Public beta (0.5.0-beta.1).** The system, recipes and scripts are complete and measured on a handful of briefs with one model family. What the beta tests is the claim that it works well in *every* agent and model. Try it on your own screens and report with the [issue templates](.github/ISSUE_TEMPLATE/); bad results are the most useful. Fork freely (MIT).
 
-[![ci](https://github.com/<owner>/jbelly-ui/actions/workflows/ci.yml/badge.svg)](https://github.com/<owner>/jbelly-ui/actions/workflows/ci.yml) · MIT · Agent Skills format · Python 3.9+ tooling, no dependencies
+[![ci](https://github.com/mohammadJohar/jbelly-ui/actions/workflows/ci.yml/badge.svg)](https://github.com/mohammadJohar/jbelly-ui/actions/workflows/ci.yml) · MIT · Agent Skills format · Python 3.9+ tooling, no dependencies
 
 **A licence-free UI system for web products, packaged as an agent skill.**
 Dashboards, admin panels, settings and auth pages, data tables, landing
@@ -35,8 +35,8 @@ utility class strings.
 **1. Agents that read skills** (Claude Code, Codex, Cursor, GitHub Copilot, Gemini CLI, Windsurf, Kiro, Roo Code, OpenCode, Amp, Goose and ~70 more):
 
 ```bash
-npx skills add <owner>/jbelly-ui -a claude-code     # or -a cursor, -a codex, -a copilot, -a gemini-cli …
-npx skills add <owner>/jbelly-ui -g -y              # user-wide, no prompts
+npx skills add mohammadJohar/jbelly-ui -a claude-code     # or -a cursor, -a codex, -a copilot, -a gemini-cli …
+npx skills add mohammadJohar/jbelly-ui -g -y              # user-wide, no prompts
 ```
 No Node? `./install.sh cursor` (macOS/Linux) or `.\install.ps1 -Agent cursor` (Windows) copies the skill into the agent's folder; `docs/compatibility.md` lists every path.
 
