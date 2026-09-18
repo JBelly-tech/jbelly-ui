@@ -25,6 +25,32 @@ def run(label, args, must=True):
 ok = True
 page = os.path.join(OUT, "dashboard.html")
 ok &= run("build-screen.py (spec -> page)", [os.path.join(SK, "scripts", "build-screen.py"), os.path.join(SK, "assets", "spec.example.json"), page])
+# The generator swaps the shell's demo wording for the spec's. When the shell was reworded once,
+# those swaps silently stopped matching and every built page kept the demo's words, so this builds
+# from a spec whose labels share nothing with the shell and insists they all reach the page.
+import json
+distinct = json.loads(open(os.path.join(SK, "assets", "spec.example.json"), encoding="utf-8").read())
+distinct["product"] = "ZephyrLogistics"; distinct["title"] = "Fleet overview"
+distinct["chart"]["title"] = "Deliveries per week"
+distinct["chart"]["series"][0]["name"] = "Delivered"; distinct["chart"]["series"][1]["name"] = "Returned"
+distinct["highlights"]["title"] = "Route mix"; distinct["highlights"]["total_label"] = "Trips completed"
+distinct["table"]["title"] = "Live shipments"; distinct["table"]["columns"] = ["Driver", "Route", "State", "ETA"]
+spec_path = os.path.join(OUT, "spec-distinct.json"); page_distinct = os.path.join(OUT, "distinct.html")
+open(spec_path, "w", encoding="utf-8").write(json.dumps(distinct, indent=2))
+ok &= run("build-screen.py (a spec that shares no wording with the shell)",
+          [os.path.join(SK, "scripts", "build-screen.py"), spec_path, page_distinct])
+_html = open(page_distinct, encoding="utf-8").read() if os.path.isfile(page_distinct) else ""
+_want = ["ZephyrLogistics", "Deliveries per week", "Delivered", "Returned", "Route mix",
+         "Trips completed", "Live shipments", "Driver", "Route", "State"]
+_missing = [w for w in _want if w not in _html]
+_stale = [w for w in ("Acme Ops", "Orders per week", "Recent orders", "Orders completed") if w in _html]
+_label = "OK" if not _missing and not _stale else "FAIL"
+print("[" + _label + "] every spec label reaches the page")
+if _missing: print("    missing: " + ", ".join(_missing))
+if _stale: print("    shell wording left behind: " + ", ".join(_stale))
+if not _missing and not _stale: print("    10/10 labels applied, no demo wording left")
+ok &= not _missing and not _stale
+
 ok &= run("new_screen.py (scaffold)", [os.path.join(SK, "scripts", "new_screen.py"), os.path.join(OUT, "blank.html"), "--theme", "theme-graphite", "--dir", "rtl", "--strip-demo-controls"])
 ok &= run("personality_init.py", [os.path.join(SK, "scripts", "personality_init.py"), "--product", "Smoke", "--kind", "dashboard", "--audience", "ops, daily, keyboard", "--vibe", "precise, calm, plain", "--preset", "theme-clinic", "--change", "density compact", "--change", "radius 0.5rem", "--out", os.path.join(OUT, "personality.md")])
 ok &= run("lint_tokens.py", [os.path.join(SK, "scripts", "lint_tokens.py"), OUT])

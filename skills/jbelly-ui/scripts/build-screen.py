@@ -23,6 +23,18 @@ import json, os, re, sys, html
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TEMPLATE = os.path.join(ROOT, "assets", "app-shell.html")
+# What the shipped shell says today, per slot. The generator swaps these for the spec's words;
+# if the shell is reworded, update this table -- tests/smoke.py builds a spec with different
+# words on purpose and fails when a slot stops landing.
+SHELL = {
+    "brand": "Acme Ops",
+    "chart_title": "Orders per week",
+    "series": ["Completed", "Refunded"],
+    "highlights_title": "Highlights",
+    "highlights_total_label": "Orders completed",
+    "table_title": "Recent orders",
+    "columns": ["Customer", "Item", "Status", "Time"],
+}
 EXAMPLE = os.path.join(ROOT, "assets", "spec.example.json")
 
 def esc(x): return html.escape(str(x), quote=True)
@@ -83,6 +95,26 @@ def build_kpis(kpis):
           </div>''')
     return f'        <!-- KPIs -->\n        <div class="grid {cols} gap-(--page-gap)" id="kpis">\n' + "\n".join(cards) + "\n        </div>"
 
+def applied_check(spec, out_html):
+    """Every label the spec asked for must be in the page. A miss means an anchor went stale."""
+    want = []
+    if spec.get("product"): want.append(("product", spec["product"]))
+    ch = spec.get("chart") or {}
+    if ch.get("title"): want.append(("chart.title", ch["title"]))
+    for i, ser in enumerate((ch.get("series") or [])[:2]):
+        if ser.get("name"): want.append((f"chart.series[{i}].name", ser["name"]))
+    hl = spec.get("highlights") or {}
+    if hl.get("title"): want.append(("highlights.title", hl["title"]))
+    if hl.get("total_label"): want.append(("highlights.total_label", hl["total_label"]))
+    tb = spec.get("table") or {}
+    if tb.get("title"): want.append(("table.title", tb["title"]))
+    for i, c in enumerate(tb.get("columns") or []):
+        want.append((f"table.columns[{i}]", c))
+    missing = [(field, value) for field, value in want if html.escape(str(value), quote=True) not in out_html
+               and str(value) not in out_html]
+    return missing
+
+
 def main():
     if "--example" in sys.argv:
         print(open(EXAMPLE, encoding="utf-8").read()); return
@@ -92,7 +124,8 @@ def main():
     classes = " ".join(c for c in ["h-full", spec.get("theme", ""), spec.get("density", ""), "dark" if spec.get("dark") else ""] if c)
     s = s.replace('<html lang="en" dir="ltr" class="h-full">', f'<html lang="{esc(spec.get("lang","en"))}" dir="{esc(spec.get("dir","ltr"))}" class="{classes}">')
     s = s.replace("<title>jbelly-ui — app shell</title>", f"<title>{esc(product)} — {esc(title)}</title>")
-    s = s.replace("Nutrio Clinic", esc(product))
+    s = s.replace(f'<span class="font-display">{SHELL["brand"]}</span>', f'<span class="font-display">{esc(product)}</span>')
+    s = s.replace(f'© 2026 {SHELL["brand"]}', f'© 2026 {esc(product)}')
     theme_fonts = {"theme-clinic": ["Manrope:wght@400;500;600;700"], "theme-graphite": ["IBM+Plex+Sans:wght@400;500;600", "IBM+Plex+Mono:wght@400;500"],
                    "theme-editorial": ["Fraunces:opsz,wght@9..144,500;9..144,600", "Source+Sans+3:wght@400;500;600"], "theme-neo": ["Space+Grotesk:wght@500;600;700", "DM+Sans:wght@400;500;600"],
                    "theme-slate": [], "theme-mint": ["Plus+Jakarta+Sans:wght@400;500;600;700"]}
@@ -103,12 +136,14 @@ def main():
     if spec.get("kpis"): s = region(s, "kpis", build_kpis(spec["kpis"]))
     ch = spec.get("chart")
     if ch:
-        s = s.replace('data-i18n="Appointments per week">Appointments per week</h3>', f'data-i18n="{esc(ch.get("title","Trend"))}">{esc(ch.get("title","Trend"))}</h3>')
+        ct = ch.get("title", "Trend"); old_ct = SHELL["chart_title"]
+        s = s.replace(f'data-i18n="{old_ct}">{old_ct}</h3>', f'data-i18n="{esc(ct)}">{esc(ct)}</h3>')
+        s = s.replace(f"<caption>{old_ct}</caption>", f"<caption>{esc(ct)}</caption>")
         names = [x["name"] for x in ch.get("series", [])][:2]
-        if len(names) == 2:
-            s = s.replace('data-i18n="Completed">Completed</span>', f'data-i18n="{esc(names[0])}">{esc(names[0])}</span>')
-            s = s.replace('data-i18n="No-show">No-show</span>', f'data-i18n="{esc(names[1])}">{esc(names[1])}</span>')
-        s = re.sub(r"series: \[\{ name: 'Completed', data: \[[^\]]*\] \}, \{ name: 'No-show', data: \[[^\]]*\] \}\]",
+        for old, new in zip(SHELL["series"], names):            # legend chips and sr-only headers
+            s = s.replace(f"</span>{old}</span>", f"</span>{esc(new)}</span>")
+            s = s.replace(f"<th>{old}</th>", f"<th>{esc(new)}</th>")
+        s = re.sub(r"series: \[\{ name: '[^']*', data: \[[^\]]*\] \}, \{ name: '[^']*', data: \[[^\]]*\] \}\]",
                    "series: " + js([{"name": x["name"], "data": x["data"]} for x in ch.get("series", [])]), s, count=1)
         if ch.get("categories"):
             s = re.sub(r"categories: \['W1'[^\]]*\]", "categories: " + js(ch["categories"]), s, count=1)
@@ -120,8 +155,10 @@ def main():
     hl = spec.get("highlights")
     if hl and hl.get("items"):
         items = hl["items"]; total = sum(int(str(i.get("value", 0)).replace(",", "")) for i in items)
-        s = s.replace('data-i18n="Highlights">Highlights</h3>', f'data-i18n="{esc(hl.get("title","Highlights"))}">{esc(hl.get("title","Highlights"))}</h3>')
-        s = s.replace('data-i18n="Plans completed">Plans completed</span>', f'data-i18n="{esc(hl.get("total_label","Total"))}">{esc(hl.get("total_label","Total"))}</span>')
+        ht = hl.get("title", SHELL["highlights_title"]); old_ht = SHELL["highlights_title"]
+        s = s.replace(f'data-i18n="{old_ht}">{old_ht}</h3>', f'data-i18n="{esc(ht)}">{esc(ht)}</h3>')
+        old_tl = SHELL["highlights_total_label"]; tl = hl.get("total_label", old_tl)
+        s = s.replace(f'data-i18n="{old_tl}">{old_tl}</span>', f'data-i18n="{esc(tl)}">{esc(tl)}</span>')
         s = s.replace('<span class="text-2xl font-semibold text-mono tabular-nums font-display">214</span>', f'<span class="text-2xl font-semibold text-mono tabular-nums font-display">{esc(hl.get("total", total))}</span>')
         s = re.sub(r"series: \[98, 58, 36, 22\], labels: \[[^\]]*\]", "series: " + js([int(str(i.get("value", 0)).replace(",", "")) for i in items]) + ", labels: " + js([i["label"] for i in items]), s, count=1)
         dots = ["bg-primary", "bg-info", "bg-success", "bg-warning", "bg-muted-foreground"]
@@ -130,11 +167,12 @@ def main():
                    '<div class="flex flex-col gap-2.5 text-2sm">\n' + legend + '\n              </div>\n            </div>\n            <div class="card-footer justify-center">', s, count=1)
     tb = spec.get("table")
     if tb:
-        s = s.replace('data-i18n="Upcoming appointments">Upcoming appointments</h3><span class="badge badge-sm badge-outline">24</span>',
-                      f'data-i18n="{esc(tb.get("title","Records"))}">{esc(tb.get("title","Records"))}</h3><span class="badge badge-sm badge-outline">{esc(tb.get("count", len(tb.get("rows", []))))}</span>')
+        old_tt = SHELL["table_title"]; tt = tb.get("title", old_tt)
+        s = s.replace(f'data-i18n="{old_tt}">{old_tt}</h3><span class="badge badge-sm badge-outline">24</span>',
+                      f'data-i18n="{esc(tt)}">{esc(tt)}</h3><span class="badge badge-sm badge-outline">{esc(tb.get("count", len(tb.get("rows", []))))}</span>')
         cols = tb.get("columns")
-        if cols and len(cols) == 4:
-            for old, new in zip(["Patient", "Plan", "Status", "Time"], cols):
+        if cols and len(cols) == len(SHELL["columns"]):
+            for old, new in zip(SHELL["columns"], cols):
                 s = s.replace(f'data-i18n="{old}">{old}', f'data-i18n="{esc(new)}">{esc(new)}', 1)
         if tb.get("rows"):
             rows = [{"n": r.get("name", ""), "i": r.get("initials", "".join(w[0] for w in r.get("name", "??").split()[:2]).upper()), "p": r.get("plan", r.get("sub", "")), "s": r.get("status", ""), "t": r.get("time", "")} for r in tb["rows"]]
@@ -150,6 +188,13 @@ def main():
         s = re.sub(r'(<div class="card-content flex flex-col">\n)[\s\S]*?(\n            </div>\n          </div>\n        </div>\n<!-- @endregion row3 -->)', lambda m: m.group(1) + "\n".join(items) + m.group(2), s, count=1)
     if spec.get("extra_html"):
         s = s.replace("<!-- @endregion row3 -->", spec["extra_html"] + "\n<!-- @endregion row3 -->")
+    def prune_i18n(m):
+        d = json.loads(m.group(1))
+        page_without_dict = s.replace(m.group(0), "")
+        kept = {k: v for k, v in d.items() if k in page_without_dict}
+        kept.update((spec.get("i18n") or {}).get("ar") or {})
+        return "const I18N = " + js(kept) + ";"
+    s = re.sub(r"const I18N = (\{[\s\S]*?\});", prune_i18n, s, count=1)
     if spec.get("i18n", {}).get("ar"):
         s = re.sub(r"const I18N = (\{[\s\S]*?\});", lambda m: "const I18N = " + js({**json.loads(m.group(1)), **spec["i18n"]["ar"]}) + ";", s, count=1)
     # remove demo controls unless asked to keep them
@@ -158,6 +203,13 @@ def main():
     os.makedirs(os.path.dirname(os.path.abspath(out)) or ".", exist_ok=True)
     open(out, "w", encoding="utf-8", newline="\n").write(s)
     print(f"built {out} ({len(s.encode('utf-8')):,} bytes) from spec: nav={len(spec.get('nav',[]))} kpis={len(spec.get('kpis',[]))} rows={len((spec.get('table') or {}).get('rows',[]))}")
+    missing = applied_check(spec, s)
+    if missing:
+        print("SPEC NOT FULLY APPLIED - these fields never reached the page:", file=sys.stderr)
+        for field, value in missing:
+            print(f"  {field} = {value!r}", file=sys.stderr)
+        print("The shell's wording probably changed; update SHELL at the top of this script.", file=sys.stderr)
+        sys.exit(2)
 
 if __name__ == "__main__":
     main()

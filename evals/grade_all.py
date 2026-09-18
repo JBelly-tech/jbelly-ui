@@ -51,8 +51,10 @@ def collect(runs_dir: Path) -> list:
         try: t = json.loads(timing.read_text(encoding="utf-8"))
         except Exception: continue
         row = {k: t.get(k) for k in ("brief", "skill", "model", "total_tokens", "minutes",
-                                     "tool_calls", "skill_fired", "cost_usd", "is_error")}
-        page = timing.parent / "workspace" / (t.get("page") or "out/page.html")
+                                     "tool_calls", "skill_fired", "cost_usd", "is_error", "clean")}
+        page = timing.parent / "page.html"                      # copied out of the workspace
+        if not page.is_file():
+            page = timing.parent / "workspace" / (t.get("page") or "out/page.html")
         row["page_written"] = page.is_file()
         if page.is_file():
             row.update(grade_page(page))
@@ -62,15 +64,15 @@ def collect(runs_dir: Path) -> list:
 
 
 def markdown(rows: list) -> str:
-    head = ("| brief | skill | tokens | min | calls | page | lint | pre-flight | KB |\n"
-            "|---|---|---|---|---|---|---|---|---|\n")
+    head = ("| brief | skill | tokens | min | calls | page | lint | pre-flight | KB | isolated |\n"
+            "|---|---|---|---|---|---|---|---|---|---|\n")
     body = ""
     for r in sorted(rows, key=lambda r: (r.get("brief") or "", r.get("skill") or "")):
         body += (f"| {r.get('brief')} | {r.get('skill')} | {(r.get('total_tokens') or 0):,} | "
                  f"{r.get('minutes')} | {r.get('tool_calls')} | {'yes' if r.get('page_written') else 'NO'} | "
                  f"{'ok' if r.get('lint_ok') else 'fail'} | "
                  f"{'PASS' if r.get('preflight_ok') else str(r.get('preflight_fails', '?')) + ' FAIL'} | "
-                 f"{r.get('kb', '-')} |\n")
+                 f"{r.get('kb', '-')} | {'yes' if r.get('clean') else 'NO - leaked'} |\n")
     return head + body
 
 
