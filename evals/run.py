@@ -12,8 +12,15 @@ Usage:
 Writes <out>/timing.json (the numbers), <out>/stream.jsonl (the raw events),
 <out>/workspace/ (what the agent produced). Grading happens in grade_all.py.
 
-The agent runs with a tool allow-list, not with permissions bypassed: files, and python/node for
-the skills' own scripts. No network tools, no subagents, no arbitrary shell.
+What this costs, before you run it: each call starts a real, autonomous agent session on YOUR
+account and lets it write files. One screen-building brief is typically tens of thousands of
+tokens and several minutes, and a full matrix is that many times over -- enough to reach a plan's
+rate limit. Nothing here is free or instant.
+
+Where it can write: a workspace in the system temp directory, created per run. The repo, the user
+skills directory and the agent skills directory are denied for reading and writing, so a run cannot
+study the skill it is being measured without. Every run is scanned afterwards and records whether
+any call reached outside its workspace; a run that leaked is marked and must not be compared.
 """
 import argparse, json, os, re, shutil, subprocess, sys, tempfile, time
 from pathlib import Path
@@ -220,6 +227,7 @@ def main() -> int:
 
     print(f"[run] brief={brief.stem} skill={a.skill} model={a.model or '(default)'} "
           f"· {len(others)} other skills off")
+    print(f"[run] starting an autonomous agent session on your account; workspace {ws}")
     stream_path = out / "stream.jsonl"
     t0 = time.time()
     with open(stream_path, "w", encoding="utf-8") as fh, open(prompt_path, "rb") as pin:

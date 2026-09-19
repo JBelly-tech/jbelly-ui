@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.5.0-beta.4 — 2026-09-19
+
+- **`build-screen.py` now applies the whole spec, and fails instead of pretending.** It swapped the
+  shell's wording for the spec's by matching the shell's own copy; the shell had been reworded, so
+  the chart title, both series names, the highlights total label, the table title, the table columns
+  and the sidebar brand were silently ignored and every generated page kept the demo's words. The
+  anchors now live in one `SHELL` table, stale translation keys are dropped, and a post-build check
+  exits non-zero naming any spec field that did not reach the page.
+  **Behaviour change:** a build that previously "succeeded" while dropping fields now exits 2. If
+  that happens, the shell's wording moved: update `SHELL` at the top of the script.
+- `tests/smoke.py` builds from a spec that shares no wording with the shell, so this class of
+  breakage cannot return unnoticed.
+- `evals/`: a measurement harness. `run.py` runs one brief under one condition with every other
+  skill switched off, records context and billed tokens, wall minutes, real tool calls and which
+  skills fired, and flags any run whose calls reached outside its workspace. `matrix.py` runs briefs
+  across conditions and resumes where it stopped. `grade_all.py` grades every run with the shipped
+  deterministic checks. `blind.py` asks a judge which of two pages is better without telling it who
+  made either, in both orders. Read `evals/README.md` first: these spawn real agent sessions on your
+  own account.
+- The 12 briefs no longer name the skill's own scripts. A brief that says "must pass
+  `scripts/verify_page.py`" sends a no-skill baseline hunting for that file, which is how the first
+  measured baseline ended up reading the skill it was supposed to be measured without.
+
 ## 0.5.0-beta.3 — 2026-09-17
 
 - Demo sidebar fixed: the collapse toggle now works (collapse rules moved out of `@layer components`, where the unlayered `:root` width silently won), the hover-peek no longer re-opens the sidebar while the pointer is still on the toggle, nav and child clicks move the active state and `aria-current`, collapsed items get tooltips, group open state persists, the user card opens a menu, the mobile drawer closes on tap and Esc.
