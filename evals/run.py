@@ -251,7 +251,25 @@ def main() -> int:
     # Deny the places an agent could read its way to another condition's advantage.
     # Absolute path, no "//" prefix: on Windows the prefixed form is accepted and then never matches,
     # so a run that looked blocked would quietly read the repo it is being measured against.
-    off_limits = [REPO, Path.home() / ".claude" / "skills", Path.home() / ".agents" / "skills"]
+    # Everything the run must not see, listed one directory at a time. Naming the parents instead
+    # would also cover the skill under test, and a condition that cannot read its own files is not
+    # the condition we meant to measure.
+    def under(parent: Path, keep: Path | None) -> list:
+        out = []
+        try:
+            for child in sorted(parent.iterdir()):
+                if not child.is_dir(): continue
+                if keep and (child == keep or keep.is_relative_to(child)): continue
+                out.append(child)
+        except OSError:
+            pass
+        return out
+
+    keep = skill_src.resolve() if skill_src else None
+    off_limits = under(REPO, keep)
+    for base in (Path.home() / ".claude" / "skills", Path.home() / ".agents" / "skills"):
+        if base.is_dir():
+            off_limits += [d for d in under(base, keep) if d.name != a.skill]
     deny = [f"{tool}({p.as_posix()}/**)" for p in off_limits for tool in ("Read", "Edit", "Write", "Glob", "Grep")]
     # The rules above name file tools, and a shell call reaches a file without naming one. What
     # keeps the plain readers out today is only the allow-list, which --allowed-tools can widen,
@@ -338,7 +356,9 @@ def main() -> int:
         print(f"[run] INCOMPLETE - {record['incomplete_reason']}; tokens unknown, page not kept, "
               f"cell not done. Rerun it.")
     if isolation["blocked"]:
-        print(f"[run] guard held: {len(isolation['blocked'])} out-of-workspace call(s) were denied")
+        print(f"[run] {len(isolation['blocked'])} call(s) were denied. Check they were not the skill "
+              f"reading its own files, which would make this run unfair rather than isolated:")
+        for b in isolation["blocked"][:4]: print("       " + b)
     if leaks:
         print(f"[run] CONTAMINATED - {len(leaks)} out-of-workspace call(s) returned content; this "
               f"number is not comparable:")
