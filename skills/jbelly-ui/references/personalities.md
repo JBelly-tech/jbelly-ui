@@ -181,9 +181,6 @@ Tailwind usage: `h-(--ctl-h)`, `p-(--card-p)`, `gap-(--page-gap)`, `[&_td]:h-(--
 ## Persist
 
 Save the decision at `design/personality.md` in the product repo (or the
-project's design-system folder if a catalogue skill already created one — its
-`MASTER.md` and this file must agree; this file wins on tokens):
-
 ```md
 # Personality — <Product>
 feeling: precise, calm, premium

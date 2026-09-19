@@ -20,14 +20,12 @@ run you share makes the next version better.
 
 ## Running the evals
 
-- `evals/briefs/` has 12 fixed briefs. Run one with and without the skill and
-  put the outputs under `comparison/<iteration>/outputs/<maker>/dashboard-<maker>.html`
-  (name the maker after the tool that produced it).
-- Grade and measure: `python comparison/tools/grade.py <iteration-dir>`,
-  `python comparison/tools/dom_metrics.py`, `python comparison/tools/visual_metrics.py`,
-  then `assemble_report_data.py` + `build_report.py` for the side-by-side page.
-- Record tokens, minutes and tool calls in `timing.json` next to each output;
-  `COST.md` is built from those numbers.
+- `evals/briefs/` has 12 fixed briefs. `python evals/run.py --brief <brief> --skill jbelly-ui`
+  runs one and records what it cost; `python evals/matrix.py` runs several and resumes where it
+  stopped. These start a real agent session on your own subscription.
+- Grade what came out: `python evals/grade_all.py --markdown evals/results.md`, which runs the
+  token lint, the pre-flight and the assertion grader over every recorded run.
+- `COST.md` is written from those numbers, including the unflattering ones.
 
 ## Changing the skill
 

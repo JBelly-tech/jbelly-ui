@@ -1,83 +1,57 @@
 # Cost — what a screen costs to build with this skill, measured
 
-Agent cost is **Σ (context size × number of steps)**. A skill can blow that up
-two ways: by loading a lot of text into the context, and by making the agent
-take many tool calls. This file records what was measured and what the skill
-does about it. Numbers come from `comparison/` (same model, same brief, runs
-in parallel, headless-Edge captures).
+Agent cost is **Σ (context size × number of steps)**: every tool call re-sends the context built up
+before it, so a file read early is paid for again and again. A UI skill can inflate both terms, by
+loading a lot of text and by making the agent take many steps. This file records what was measured,
+what it exposed, and what changed because of it.
 
-## Measured (2026-09-09)
+## How the numbers are produced
 
-| Run | Brief | Tokens | Minutes | Tool calls | Result |
-|-----|-------|--------|---------|------------|--------|
-| no skill | simple dashboard | 72,494 | 5.4 | 1 | rendered; 238 raw palette classes, no loading/empty states, no keyboard |
-| catalogue skill (`ui-ux-pro-max`) | simple | 155,644 | 16.0 | 37 | rendered; searches + verify loop |
-| **jbelly-ui v1** (full references) | simple | 157,840 | 20.3 | 24 | one `@apply group` compile error (fixed in the skill) |
-| catalogue skill | complex console | 246,244 | 24.5 | 54 | complete |
-| **jbelly-ui v1** | complex console | 398,111 | 55.3 | 90 | complete, most distinct, 7/8 checks; **90 calls** (self-made smoke test + captures) |
+`python evals/run.py --brief evals/briefs/01-dashboard.md --skill jbelly-ui` runs one brief in a
+workspace outside this repository with every other skill switched off, and records what the agent
+CLI reports: tokens, wall minutes, tool calls counted from the actual tool-use blocks, and whether
+any call reached outside its workspace. A run that leaked is marked and not comparable. Anyone can
+repeat it; `evals/README.md` explains the isolation and warns that a run spends real subscription
+usage.
 
-Where the house-skill tokens went: ~28K reading every reference, re-sent on
-each of the 24–90 later calls (the quadratic term), ~40K output for a 150 KB
-page, and a self-invented verification loop.
+Two token figures, on purpose. **Context** is every token sent, cache reads included, because that
+is the term the cost model charges for. **Billed** excludes cache reads.
 
-## What v2 changes (all in this repo)
+## Measured: one screen, the dashboard brief (2026-09-19)
 
-| Lever | Mechanism | Expected effect |
-|-------|-----------|-----------------|
-| Read 2K tokens, not 28K | `references/quick-card.md` replaces the full references for a standard screen | −25K context, × every later call |
-| Zero-token boilerplate | `scripts/new-screen.ps1` (copy the shell with personality set) and `scripts/build-screen.py` (whole page from a ~2 KB JSON spec) | −60–90% output tokens |
-| One verification call | `scripts/verify-page.ps1`: render variants + console errors + token lint → PASS/FAIL | 90 calls → ≤ 12 |
-| Hard budget | SKILL.md: read once in a batch, write once, ≤ 12 tool calls, no self-made test harnesses | caps the quadratic term |
-| Cheaper class | implementation on a Class-B model; top class only for the personality decision and review | ~40% lower price at equal tokens |
-| Cache-friendly order | stable skill text first, volatile content last | cache reads at ~0.1× |
+| Version | Context tokens | Billed tokens | Minutes | Tool calls | Page passes the checks |
+|---|---|---|---|---|---|
+| before this work | 5,417,330 | 190,102 | 8.6 | 47 | no |
+| **now** | **778,232** | **42,859** | **2.3** | **12** | **yes** |
+| the same brief with no skill at all | 998,682 | 99,198 | 5.4 | 9 | no |
 
-Target for the complex-console brief with v2: **≤ 120K tokens, ≤ 12 minutes,
-≤ 12 tool calls**, same or better grade. The measured result follows.
+Building the page was never the expensive part. The losing run's transcript showed where its 47
+calls went: the same reference read four times by three different tools, a second reference opened
+only to learn the preset names, three probes of the environment, four calls reading the generator's
+source to learn its input format, two reading the shell, and seven edits patching the built page by
+hand afterwards. Nine calls built the page. The rest was the skill talking to itself.
 
-## Iteration 3 (v2 skill, same brief) — measured 2026-09-09
+## What changed
 
-| Run | Tokens | Minutes | Tool calls | Output |
-|-----|--------|---------|------------|--------|
-| **jbelly-ui v2** | **193,996** | **29.0** | **17** | 121 KB, all brief items, verify PASS first render |
-| jbelly-ui v1 | 398,111 | 55.3 | 90 | 150 KB |
-| catalogue skill | 246,244 | 24.5 | 54 | 144 KB |
+| Lever | What was wrong | What it saves |
+|---|---|---|
+| The router names the three calls | a budget was suggested, not the calls | most of the 35 wasted calls |
+| Refusals written out | re-reading, probing, reading source and hand-editing were left to judgement | each one was measured costing calls for nothing |
+| Presets moved into the quick card | choosing one meant opening a 2.9K-token reference | one file read, re-sent on every later call |
+| The reference directory compressed, third-party notes moved out of the router | 1.2K tokens of listing rode on every request | entry cost 6,843 → 5,907 tokens per screen |
+| The generator derives the palette, empty state and tray copy from the spec | the demo's own words survived into built pages | the seven hand edits |
+| Every generated slot is asserted after the build | a field that never landed still exited 0 | silent wrong output |
 
-v2 vs v1: **−51% tokens, −81% tool calls, −47% wall time**, same brief
-coverage and a better chart look. Target (≤ 120K) not yet reached: the
-bespoke widgets the generator does not know (heatmap, kanban, tasks,
-notifications, table engine) were still model-written. Next lever: generator
-flags for those widgets; expected to land a console like this near 100K.
+Two real defects surfaced while doing this, both caught by checks that had never been able to fail:
+four personality presets missed the 4.5:1 contrast floor, and every generated page overflowed
+horizontally at 375px because the generator rebuilt the toolbar without the wrap the shell had.
 
-## Measured again, in isolation (2026-09-19)
+## Honest limits
 
-The two runs above were timed by hand inside a working session, which cannot be repeated and cannot
-be trusted. `evals/run.py` now runs one brief under one condition with every other skill switched
-off, in a workspace outside this repository, and records what the agent CLI reports. The first
-honest result, on `evals/briefs/01-dashboard.md` with one model:
-
-| Condition | Context tokens | Billed tokens | Minutes | Tool calls |
-|---|---|---|---|---|
-| no skill | 998,682 | 99,198 | 5.4 | 9 |
-| a catalogue skill | 2,855,005 | 152,948 | 9.7 | 30 |
-| **jbelly-ui** | **5,417,330** | **190,102** | **8.6** | **47** |
-
-**We are the most expensive of the three.** That is the finding, and it is the reason for the work
-now in progress. "Context tokens" counts every token sent, cache reads included, because that is
-what the cost model charges for: each step re-sends the prefix. "Billed tokens" excludes cache reads.
-
-Where the 47 calls went, from the transcript: four reads of the same reference, two of another,
-three probes of the environment, four calls reading the source of the generator and its example to
-learn the spec format, two reading the shell, and seven edits patching the built page by hand. Nine
-tool calls built the page; the rest was the skill talking to itself.
-
-What changed because of it:
-
-- `SKILL.md` no longer suggests a budget, it names the three calls and refuses the wasteful moves by
-  name: no re-reading, no environment probing, no reading script source, no hand-editing what the
-  spec could say, no home-made verification.
-- The quick card carries the personality presets, so choosing one costs no second file.
-- The generator derives the palette, empty state and notification copy from the spec instead of
-  leaving the demo's own words for the model to patch.
-
-The number to beat is the catalogue skill's row. `python evals/scoreboard.py` prints WIN or LOSS
-against it from the recorded runs; it is not a matter of opinion.
+- One brief, one model, one agent, one machine, one run. No repeats, so no variance.
+- The dashboard is the shape the generator was written for. A landing page or a pricing page has no
+  generator shape yet, so the model writes the markup and these numbers do not carry over. Those
+  briefs are next, and their results will be published here whether or not they flatter the skill.
+- "Passes the checks" means this project's own deterministic checks: token lint, pre-flight
+  (AI-default tells, structure, WCAG contrast of the token pairs), a headless render in light, dark
+  and RTL with console errors collected, and no horizontal overflow at 375 or 1440.

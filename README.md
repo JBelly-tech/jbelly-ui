@@ -4,7 +4,7 @@
 
 [![ci](https://github.com/mohammadJohar/jbelly-ui/actions/workflows/ci.yml/badge.svg)](https://github.com/mohammadJohar/jbelly-ui/actions/workflows/ci.yml) · MIT · Agent Skills format · Python 3.9+ tooling, no dependencies
 
-**[Live demo](https://mohammadjohar.github.io/jbelly-ui/skills/jbelly-ui/assets/app-shell.html)** · [Landing page](https://mohammadjohar.github.io/jbelly-ui/) · [Cost, measured](COST.md) · [Comparison](comparison/) · [Roadmap](docs/roadmap.md)
+**[Live demo](https://mohammadjohar.github.io/jbelly-ui/skills/jbelly-ui/assets/app-shell.html)** · [Landing page](https://mohammadjohar.github.io/jbelly-ui/) · [Cost, measured](COST.md) · [Roadmap](docs/roadmap.md)
 
 **A licence-free UI system for web products, packaged as an agent skill.**
 Dashboards, admin panels, settings and auth pages, data tables, landing
@@ -18,19 +18,36 @@ utility class strings.
 
 ![Default shell](docs/showcase/default-light.png)
 
-## Why
+## What it is good at
 
-- **Commercial admin templates cost a licence per project** and their code
-  and assets cannot be reused across products. This skill carries the
-  *knowledge* those templates sell (tokens, sizes, layouts, complete page
-  states, interaction behaviour) as instructions, with nothing copied.
-- **AI-built UIs converge on the same look.** The personality step (type,
-  palette, shape, density, surface, motion, signature element) is mandatory
-  and written to a file per product, so two products never ship the same page.
-- **Agent cost is Σ(context × steps).** The skill is built to be cheap:
-  a 2K-token quick card, a zero-token scaffold, a JSON-spec page builder,
-  and a one-call verifier. Measured on the same complex brief: **−51% tokens,
-  −81% tool calls, −47% time** from v1 to v2 (`COST.md`).
+Four claims, each with the thing in this repository that proves it.
+
+**1. A screen costs little to build.** The dashboard brief measures at 778,232 context tokens,
+42,859 billed tokens, 2.3 minutes and 12 tool calls, and the page it produces passes every
+deterministic check. Reproduce it with `python evals/run.py --brief evals/briefs/01-dashboard.md
+--skill jbelly-ui`; the method, the isolation and the honest limits are in [`COST.md`](COST.md).
+
+**2. Quality is decided by scripts, not by opinion.** One call renders the page headlessly in
+light, dark and RTL, collects console errors, fails on horizontal overflow, runs the token lint and
+runs a pre-flight that checks WCAG contrast of the token pairs, page structure, and the tells that
+make a page read as AI-generated. Every one of those checks exits non-zero when it fails, and CI
+runs them on every push.
+
+**3. Two products cannot ship the same page by accident.** The personality step is mandatory and
+persisted: eight dials, six presets, written to `design/personality.md` before any code, and every
+later screen is checked against that file. Colour lives in semantic tokens, so a re-brand is one
+token, not a sweep.
+
+**4. Nothing here is licensed per project, and nothing is copied.** MIT, one copyright holder, no
+dependencies beyond a stock Python 3.9+, under 500 KB installed. Every rule is restated in the
+project's own words with its source recorded in `references/sources.md`.
+
+## Where it is weak
+
+Said plainly, because you will find out anyway. The page builder knows the shape of an app screen,
+so a dashboard, a settings page or a data table is nearly free while a landing page or a marketing
+site is not yet — the model writes that markup itself and the numbers above do not apply. It has
+been measured with one model family in one agent, so treat the rest as untested. It is web only.
 
 ## Install (three ways, one source)
 
@@ -99,7 +116,7 @@ python skills/jbelly-ui/scripts/verify_page.py out/dashboard.html --variants ",#
 | Path | Purpose |
 |------|---------|
 | `COST.md` | Measured token/time cost per screen and the levers that cut it |
-| `comparison/` | The evaluation: two briefs, four candidates, deterministic grader and metrics, HTML report |
+| `evals/tools/` | The deterministic graders: assertion grader, source and DOM metrics, screenshot analytics |
 | `evals/` | 12 fixed briefs (incl. RTL Arabic, mobile, dark-first, empty states) and 24 trigger / no-trigger prompts |
 | `dist/` | Generated delivery tiers: `AGENTS.md` (rules-file tools) and `jbelly-ui-prompt.md` (chat-only tools) |
 | `docs/` | `compatibility.md` (agents, models, install paths), `roadmap.md`, showcase captures |
@@ -107,7 +124,7 @@ python skills/jbelly-ui/scripts/verify_page.py out/dashboard.html --variants ",#
 
 ## What was tested, honestly
 
-- Measured runs so far: one model family, in one agent, on the briefs in `comparison/` (see `COST.md`).
+- Measured runs so far: one model family, in one agent, on the briefs in `evals/briefs/` (see `COST.md`).
 - Format-compatible but not yet measured: every other agent the `skills` CLI supports, and the two `dist/` tiers. The [roadmap](docs/roadmap.md) covers models, agents and blind human rating; results will replace this paragraph.
 
 ## Help test the beta
@@ -135,8 +152,8 @@ Distilled from public, licence-free sources developers already trust:
 shadcn/ui and Radix conventions, Shopify Polaris and GitHub Primer content
 and data-table guidance, the Refactoring UI rules, Vercel's Web Interface
 Guidelines, Linear-style keyboard and density patterns, Tremor/shadcn
-dashboard blocks, and a study of the page inventories and flows of the
-best-selling commercial templates in ten business categories. Nothing is
+dashboard blocks, and and a study of the page inventories and flows that
+buyers of admin and SaaS products expect in ten business categories. Nothing is
 copied; every rule is restated as an instruction.
 
 ## Licence

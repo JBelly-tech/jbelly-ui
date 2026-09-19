@@ -108,7 +108,7 @@ os.makedirs(os.path.join(GRADE, "outputs", "smoke"), exist_ok=True)
 import shutil; shutil.copy(page, os.path.join(GRADE, "outputs", "smoke", "dashboard-smoke.html"))
 # tests/out survives between runs, so last run's scores would otherwise be read back as this run's
 for _g in glob.glob(os.path.join(GRADE, "**", "grading.json"), recursive=True): os.remove(_g)
-ok &= run("grade.py (8 heuristics)", [os.path.join(ROOT, "comparison", "tools", "grade.py"), GRADE])
+ok &= run("grade.py (8 heuristics)", [os.path.join(ROOT, "evals", "tools", "grade.py"), GRADE])
 # grade.py reports a score and exits 0 whatever it is -- even when it graded nothing at all -- so the
 # score it wrote is read back and enforced here; otherwise this step passes on a page that fails all 8.
 _scores = [(os.path.basename(os.path.dirname(g)), e) for g in sorted(glob.glob(os.path.join(GRADE, "**", "grading.json"), recursive=True))

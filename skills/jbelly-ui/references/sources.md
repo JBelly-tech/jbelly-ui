@@ -1,7 +1,7 @@
 # Sources — where the rules come from
 
 Every rule in this skill traces to one of these public sources or to a
-measured run in `comparison/`. Nothing is copied from any of them; rules are
+measured run recorded in `evals/`. Nothing is copied from any of them; rules are
 restated as instructions with exact values. Use this file to check a rule
 or to add one (a new rule needs a row here).
 
@@ -35,7 +35,7 @@ or to add one (a new rule needs a row here).
 | frontend-design (anthropics/skills) | the AI-tells list, "spend boldness in one place", copy rules | — |
 | web-design-guidelines (vercel-labs/agent-skills) | terse `file:line` findings; interface checklist restated locally | runtime fetch of the rules on every review |
 | design-taste-frontend | design read before code, mechanical pre-flight with thresholds, audit-first redesign | 35K-token file loaded every time |
-| ui-ux-pro-max | accessibility-first priority table; searchable data as an idea | 75-word description (fires greedily), style catalogue without build recipes |
+| a catalogue-style UI skill | accessibility-first priority table; searchable data as an idea | 75-word description (fires greedily), style catalogue without build recipes |
 | redesign-existing-projects | scan → diagnose → fix, fix-priority order | — |
 | emil-design-eng | animation frequency and duration tables, Before/After/Why review rows | — |
 | impeccable (critique) | ten-dimension rubric | mandatory two-subagent assessments |
@@ -43,5 +43,5 @@ or to add one (a new rule needs a row here).
 
 ## Measured, in this repo
 
-`comparison/` and `COST.md`: three iterations, four candidates, deterministic
+`evals/` and `COST.md`: fixed briefs, isolated runs, deterministic
 grader and metrics, tokens and minutes per run.

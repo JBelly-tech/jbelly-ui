@@ -17,7 +17,7 @@ except Exception: pass
 
 REPO = Path(__file__).resolve().parent.parent
 SCRIPTS = REPO / "skills" / "jbelly-ui" / "scripts"
-TOOLS = REPO / "comparison" / "tools"
+TOOLS = REPO / "evals" / "tools"
 PREFLIGHT_SUMMARY = re.compile(r"^preflight:.*?(\d+) FAIL.*$", re.M)
 _grader = None
 

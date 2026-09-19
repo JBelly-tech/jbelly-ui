@@ -13,8 +13,6 @@ node_modules/
 __pycache__/
 *.pyc
 
-# vendor template reference material (local yardstick only)
-comparison/reference-template/
 tests/out/
 
 # working notes of the maintainer (not part of the published skill)

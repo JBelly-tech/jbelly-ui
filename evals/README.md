@@ -42,8 +42,7 @@ counted from the actual `tool_use` blocks, which skills fired, cost, and whether
 python evals/grade_all.py --json evals/results.json --markdown evals/results.md
 ```
 
-Deterministic only: token lint, pre-flight, page size. No model opinion enters the table. For the
-side-by-side visual report use `comparison/tools/`.
+Deterministic only: token lint, pre-flight, page size. No model opinion enters the table. The graders live in `evals/tools/`.
 
 ## What is not here yet
 
