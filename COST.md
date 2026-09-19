@@ -47,3 +47,37 @@ coverage and a better chart look. Target (≤ 120K) not yet reached: the
 bespoke widgets the generator does not know (heatmap, kanban, tasks,
 notifications, table engine) were still model-written. Next lever: generator
 flags for those widgets; expected to land a console like this near 100K.
+
+## Measured again, in isolation (2026-09-19)
+
+The two runs above were timed by hand inside a working session, which cannot be repeated and cannot
+be trusted. `evals/run.py` now runs one brief under one condition with every other skill switched
+off, in a workspace outside this repository, and records what the agent CLI reports. The first
+honest result, on `evals/briefs/01-dashboard.md` with one model:
+
+| Condition | Context tokens | Billed tokens | Minutes | Tool calls |
+|---|---|---|---|---|
+| no skill | 998,682 | 99,198 | 5.4 | 9 |
+| a catalogue skill | 2,855,005 | 152,948 | 9.7 | 30 |
+| **jbelly-ui** | **5,417,330** | **190,102** | **8.6** | **47** |
+
+**We are the most expensive of the three.** That is the finding, and it is the reason for the work
+now in progress. "Context tokens" counts every token sent, cache reads included, because that is
+what the cost model charges for: each step re-sends the prefix. "Billed tokens" excludes cache reads.
+
+Where the 47 calls went, from the transcript: four reads of the same reference, two of another,
+three probes of the environment, four calls reading the source of the generator and its example to
+learn the spec format, two reading the shell, and seven edits patching the built page by hand. Nine
+tool calls built the page; the rest was the skill talking to itself.
+
+What changed because of it:
+
+- `SKILL.md` no longer suggests a budget, it names the three calls and refuses the wasteful moves by
+  name: no re-reading, no environment probing, no reading script source, no hand-editing what the
+  spec could say, no home-made verification.
+- The quick card carries the personality presets, so choosing one costs no second file.
+- The generator derives the palette, empty state and notification copy from the spec instead of
+  leaving the demo's own words for the model to patch.
+
+The number to beat is the catalogue skill's row. `python evals/scoreboard.py` prints WIN or LOSS
+against it from the recorded runs; it is not a matter of opinion.

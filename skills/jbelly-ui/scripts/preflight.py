@@ -2,19 +2,24 @@
 """Mechanical pre-flight for a UI page or folder (Class D): AI-tells, structure thresholds, token contrast.
 
 Usage: python scripts/preflight.py <file-or-dir> [--json]
-Exit 1 on any FAIL. Every check prints file:line evidence so a fix is one edit away.
+Exit 1 on any FAIL, 2 when there was nothing to check. Every check prints file:line evidence so a fix is one edit away.
 
 Checks
   tells      — signatures of default-AI UI: purple/indigo gradient hexes, gradient text, glass-by-reflex,
                `uppercase tracking-` eyebrows over budget, Sparkles/Zap icons, marketing filler words, emoji icons,
                DiceBear avatars, `transition: all`, pure #000 text, rounded-2xl+shadow-lg on everything
   structure  — one primary action per view, h1 count, skip link present when a nav exists, icon-only buttons labelled
-  contrast   — WCAG ratio of the token pairs in :root and .dark (foreground/background, primary-foreground/primary,
-               muted-foreground/background) computed from oklch()/hex; text pairs must reach 4.5, muted 4.5, large 3
+  contrast   — WCAG ratio of the token pairs in every scope that declares them - :root, .dark, a theme class,
+               a wrapped @layer/@media block (foreground/background, primary-foreground/primary,
+               muted-foreground/background) computed from oklch()/hex; text pairs must reach 4.5, muted 4.5,
+               large 3. A declared pair whose value cannot be read is a FAIL, never a skip
 """
 import json, math, os, re, sys
 try: sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 except Exception: pass
+
+EXTS = (".html", ".htm", ".css", ".jsx", ".tsx", ".vue", ".svelte", ".razor", ".cshtml")
+CLASS_ATTR = r"class(?:Name)?\s*=\s*[\"'{]"  # .jsx/.tsx are collected too, and React spells it className
 
 TELLS = [
     ("purple-indigo-gradient", r"(?:from|via|to)-(?:purple|indigo|violet|fuchsia)-\d{3}|#(?:6366f1|8b5cf6|a855f7|7c3aed|4f46e5|c084fc)\b", "purple/indigo gradient palette", 0),
@@ -22,12 +27,13 @@ TELLS = [
     ("glass-by-reflex", r"backdrop-blur-(?:md|lg|xl|2xl)\b(?![^\"]*(?:header|nav|sticky))", "glassmorphism outside a sticky header", 2),
     ("sparkle-icons", r"data-lucide=\"(?:sparkles|zap|rocket|wand-2)\"|lucide-(?:sparkles|zap|rocket)|<Sparkles|<Zap|<Rocket", "Sparkles/Zap/Rocket icons", 0),
     ("filler-copy", r"\b(?:Elevate|Seamless(?:ly)?|Unleash|Supercharge|Effortless(?:ly)?|Next-gen|Revolutioni[sz]e|Empower)\b", "marketing filler words", 0),
-    ("emoji-icons", r"[\U0001F300-\U0001FAFF☀-➿](?=\s*(?:<|$))", "emoji used as icons", 0),
+    ("emoji-icons", r"[>\w\"']\s*[\U0001F300-\U0001FAFF☀-➿]|[\U0001F300-\U0001FAFF☀-➿]\s*[<\w\"']", "emoji used as icons", 0),
     ("dicebear", r"dicebear\.com|api\.dicebear", "DiceBear avatars", 0),
     ("transition-all", r"transition:\s*all\b|\btransition-all\b", "transition: all", 0),
-    ("pure-black-text", r"(?:color|--foreground)\s*:\s*#000\b|text-\[#000\]|text-black\b", "pure black text", 0),
+    ("pure-black-text", r"(?:color|--foreground)\s*:\s*(?:#000(?:000)?\b|rgba?\(\s*0\s*,\s*0\s*,\s*0\b)|text-\[#000(?:000)?\]|text-black\b", "pure black text", 0),
     ("rounded-2xl-shadow-lg", r"rounded-2xl[^\"]*shadow-(?:lg|xl|2xl)|shadow-(?:lg|xl|2xl)[^\"]*rounded-2xl", "rounded-2xl + shadow-lg cards", 2),
-    ("hero-three-cards", r"grid-cols-3[^\"]*\"[^>]*>\s*(?:<div[^>]*class=\"[^\"]*(?:card|rounded)[^\"]*\"[\s\S]{0,400}){3}", "hero + three identical feature cards", 1),
+    # allowed 0: one hit IS the layout this names, so the first match has to report
+    ("hero-three-cards", r"grid-cols-3[^>]*>\s*(?:<div[^>]*" + CLASS_ATTR + r"[^>]*(?:card|rounded)[\s\S]{0,400}){3}", "hero + three identical feature cards", 0),
 ]
 EYEBROW = r"uppercase[^\"]*tracking-(?:wide|wider|widest|\[)"
 
@@ -60,9 +66,24 @@ def lum(rgb):
 def contrast(a, b):
     la, lb = lum(a), lum(b); hi, lo = max(la, lb), min(la, lb); return (hi + 0.05) / (lo + 0.05)
 
-def token_block(css, selector):
-    m = re.search(re.escape(selector) + r"\s*\{([^}]*)\}", css)
-    return dict(re.findall(r"--([\w-]+)\s*:\s*([^;]+);", m.group(1))) if m else {}
+def token_scopes(css):
+    """[(selector, narrowing-set, tokens)] for every block that declares custom properties, in source order.
+
+    Palettes live under @layer, @media, a theme class or a data-attribute as often as under a bare
+    :root; a scope that is never collected is a palette that is never contrast-checked, which reads
+    as a clean PASS. The narrowing-set is what makes a scope more specific than another (its classes
+    and attribute selectors), so `.theme-mint.dark` can inherit `:root`, `.dark` and `.theme-mint`.
+    """
+    scopes = []
+    css = re.sub(r"/\*[\s\S]*?\*/", " ", css)  # a comment is neither a selector nor a live declaration
+    end = 0
+    for m in re.finditer(r"\{([^{}]*)\}", css):  # innermost blocks only, so @layer/@media wrappers are stepped over
+        pre, end = css[end:m.start()], m.end()  # anchor on the brace and slice the selector out, or a 200KB page costs O(n^2)
+        decls = re.findall(r"--([\w-]+)\s*:\s*([^;\n}]+)", m.group(1))
+        if not decls: continue
+        sel = " ".join(re.split(r"[{};>]", pre)[-1].split())[:60] or ":root"  # tail only: drop the rule or tag before it
+        scopes.append((sel, frozenset(re.findall(r"\.[\w-]+|\[[^\]]*\]", sel)), {k: v.strip() for k, v in decls}))
+    return scopes
 
 def resolve(tokens, name, depth=0):
     v = tokens.get(name)
@@ -80,44 +101,61 @@ def check_file(path, results):
         hits = [m for m in re.finditer(pat, txt, re.I)]
         if len(hits) > allowed:
             results.append(("FAIL", "tells", f"{path}:{where(hits[0].start())}", f"{label} ({len(hits)} hit{'s' if len(hits) != 1 else ''}, allowed {allowed})"))
-    sections = max(1, len(re.findall(r"<section\b|<div[^>]*class=\"[^\"]*\bcard\b", txt)))
+    sections = max(1, len(re.findall(r"<section\b|<div[^>]*" + CLASS_ATTR + r"[^>]*\bcard\b", txt)))
     eyebrows = len(re.findall(EYEBROW, txt))
     budget = math.ceil(sections / 3)
     if eyebrows > max(3, budget):
         results.append(("FAIL", "tells", f"{path}", f"{eyebrows} uppercase-tracking eyebrows for {sections} sections (budget {max(3, budget)})"))
     # structure
     body = re.sub(r"<(nav|aside)\b[\s\S]*?</\1>", "", re.sub(r"<script[\s\S]*?</script>|<style[\s\S]*?</style>", "", txt))
-    prim = len(re.findall(r"<(?:button|a)\b[^>]*class=\"[^\"]*(?:btn-primary|bg-primary text-primary-foreground)[^\"]*\"", body))
+    prim = len(re.findall(r"<(?:button|a)\b[^>]*" + CLASS_ATTR + r"[^>]*(?:btn-primary|bg-primary\s+text-primary-foreground)", body))
     if prim > 2: results.append(("WARN", "structure", path, f"{prim} primary controls outside nav (aim for 1, max 2)"))
     h1 = len(re.findall(r"<h1\b", txt))
     if h1 != 1 and "<main" in txt: results.append(("WARN", "structure", path, f"{h1} <h1> elements (expected exactly 1)"))
     if re.search(r"<nav\b", txt) and not re.search(r"skip to (?:main )?content", txt, re.I):
         results.append(("WARN", "structure", path, "nav present but no skip link"))
-    icon_only = re.findall(r"<button\b(?![^>]*aria-label)[^>]*>\s*<(?:i|svg)\b[^>]*>(?:\s*</(?:i|svg)>)?\s*</button>", txt)
-    if icon_only: results.append(("FAIL", "structure", f"{path}:{where(txt.find(icon_only[0]))}", f"{len(icon_only)} icon-only button(s) without aria-label"))
+    icon_only = []
+    for m in re.finditer(r"<button\b([^>]*)>([\s\S]*?)</button>", txt, re.I):
+        if re.search(r"aria-label(?:ledby)?\s*=", m.group(1), re.I): continue  # title= is a tooltip, not a name
+        # the accessible name comes from text, not from markup: empty text = icon-only, whatever the icon is made of
+        if re.sub(r"<[^>]*>|&[a-z]+;|&#\d+;|\s", "", m.group(2)): continue
+        icon_only.append(m)
+    if icon_only: results.append(("FAIL", "structure", f"{path}:{where(icon_only[0].start())}", f"{len(icon_only)} icon-only button(s) without aria-label"))
     # contrast on tokens (css or html with <style>)
-    for sel in (":root", ".dark"):
-        toks = token_block(txt, sel)
-        if not toks: continue
-        pairs = [("foreground", "background", 4.5), ("primary-foreground", "primary", 4.5), ("muted-foreground", "background", 4.5), ("secondary-foreground", "secondary", 4.5), ("card-foreground", "card", 4.5)]
+    scopes = token_scopes(txt)
+    pairs = [("foreground", "background", 4.5), ("primary-foreground", "primary", 4.5), ("muted-foreground", "background", 4.5), ("secondary-foreground", "secondary", 4.5), ("card-foreground", "card", 4.5)]
+    envs = {}  # keyed by narrowing-set: a page repeats few distinct scopes but can repeat them often
+    for sel, sig, toks in scopes:
+        if sig not in envs:
+            envs[sig] = env = {}
+            for _, sig2, toks2 in scopes:
+                if sig2 <= sig: env.update(toks2)  # every scope this one narrows, later definition winning
+        env = envs[sig]
         for fg, bg, need in pairs:
-            a, b = resolve(toks, fg), resolve(toks, bg)
-            if sel == ".dark":  # fall back to :root values for tokens not overridden in .dark
-                root = token_block(txt, ":root"); a = a or resolve(root, fg); b = b or resolve(root, bg)
+            if fg not in toks and bg not in toks: continue  # scope leaves the pair alone; whoever set it reports it
+            if fg not in env or bg not in env: continue  # half a pair: there is nothing to compare against
+            a, b = resolve(env, fg), resolve(env, bg)
             ra, rb = (to_srgb(a) if a else None), (to_srgb(b) if b else None)
-            if ra and rb:
-                cr = contrast(ra, rb)
-                results.append(("FAIL" if cr < need else "OK", "contrast", f"{path} {sel}", f"--{fg} on --{bg}: {cr:.2f}:1 (need {need})"))
+            if ra is None or rb is None:
+                for name, rgb in ((fg, ra), (bg, rb)):  # an unreadable value is an unchecked pair, so say so and fail
+                    if rgb is None: results.append(("FAIL", "contrast", f"{path} {sel}", f"--{name}: cannot read {env[name]!r}, pair --{fg} on --{bg} left unchecked"))
+                continue
+            cr = contrast(ra, rb)
+            results.append(("FAIL" if cr < need else "OK", "contrast", f"{path} {sel}", f"--{fg} on --{bg}: {cr:.2f}:1 (need {need})"))
 
 def main():
     a = sys.argv[1:]
     if not a: print(__doc__); return 2
     target = a[0]; files = []
+    if not os.path.exists(target):
+        print(f"preflight: target not found: {target}", file=sys.stderr); return 2
     if os.path.isfile(target): files = [target]
     else:
         for d, dirs, fs in os.walk(target):
             dirs[:] = [x for x in dirs if x not in ("node_modules", "dist", ".git", "vendor", "__pycache__")]
-            files += [os.path.join(d, f) for f in fs if os.path.splitext(f)[1] in (".html", ".htm", ".css", ".jsx", ".tsx", ".vue", ".svelte", ".razor", ".cshtml")]
+            files += [os.path.join(d, f) for f in fs if os.path.splitext(f)[1] in EXTS]
+    if not files:  # scanning nothing is not a pass, it is a typo in the path or the wrong folder
+        print(f"preflight: no reviewable files under {target} (looking for {' '.join(EXTS)})", file=sys.stderr); return 2
     results = []
     for f in files: check_file(f, results)
     fails = [r for r in results if r[0] == "FAIL"]

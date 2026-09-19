@@ -21,6 +21,18 @@ PRESETS = {
  "theme-slate":     ("Inter (display + text)", "oklch(42% 0.12 260) navy", "0.375rem", "standard", "tinted page + dark sidebar", "micro", "gold active marker on navy", "navy · gold · steel · teal"),
  "theme-mint":      ("Plus Jakarta Sans display / Inter text", "oklch(60% 0.15 165) mint", "1rem", "airy", "elevated, pill controls", "one moment (KPI count-up)", "pill controls + rounded avatar chips", "mint · coral · navy · sand"),
 }
+# The body below is printed from the preset table, so a dial name is the one thing --change may not get wrong.
+DIALS = ("type", "primary", "radius", "density", "surface", "motion", "signature", "data colours")
+ALIASES = {"data": "data colours", "data colors": "data colours"}
+
+def split_change(c):
+    """Peel a known dial name off the front: a dial name can be two words and a value can contain ':' or '.'."""
+    s = " ".join(c.split())
+    for name in sorted(DIALS + tuple(ALIASES), key=len, reverse=True):
+        head, tail = s[:len(name)].lower(), s[len(name):]
+        if head == name and (tail == "" or tail[0] in " :"):
+            return ALIASES.get(name, name), tail.lstrip(" :").strip()
+    return None, s
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -31,14 +43,22 @@ def main():
     a = ap.parse_args()
     if len(a.change) < 2:
         print("warning: fewer than two dials changed; the product will look like the stock preset", file=sys.stderr)
-    t, p, r, d, s, m, sig, data = PRESETS[a.preset]
+    dials, applied = dict(zip(DIALS, PRESETS[a.preset])), []
+    for c in a.change:
+        name, value = split_change(c)
+        if name is None:
+            sys.exit(f"error: --change {c!r} does not start with a dial name; dials are: {', '.join(DIALS)}")
+        if not value:
+            sys.exit(f"error: --change {c!r} names the dial '{name}' but gives it no value")
+        dials[name] = value; applied.append(f"{name} {value}")
+    t, p, r, d, s, m, sig, data = (dials[k] for k in DIALS)
     avoid = a.avoid or ["blue-600 primary", "rounded-2xl + shadow-lg everywhere", "gradient text", "icon-in-a-square on every card"]
     body = f"""# Personality — {a.product}
 
 kind: {a.kind}
 audience: {a.audience}
 vibe: {a.vibe}
-system: {a.preset} · changed: {'; '.join(a.change) or '(none yet)'}
+system: {a.preset} · changed: {'; '.join(applied) or '(none yet)'}
 
 type: {t}
 primary: {p}

@@ -29,7 +29,10 @@ $pattern = "(?<![\w-])(?:[\w-]+:)*(?:$prefix)-(?:$palette)-\d{2,3}(?:/\d{1,3})?(
 $extensions = '*.html','*.htm','*.css','*.scss','*.js','*.jsx','*.ts','*.tsx','*.vue','*.svelte','*.razor','*.cshtml','*.php','*.astro','*.md'
 $skipDirs   = @('node_modules', 'dist', 'build', '.git', '.next', 'bin', 'obj', 'vendor') + $Exclude
 
-$files = Get-ChildItem -Path $Path -Recurse -File -Include $extensions |
+# -Force: without it Get-ChildItem silently skips hidden directories (.github,
+# .storybook, every dot-dir under Unix pwsh), so this twin would report OK on a
+# tree lint_tokens.py fails. What is skipped must come from $skipDirs alone.
+$files = Get-ChildItem -Path $Path -Recurse -Force -File -Include $extensions |
   Where-Object {
     $full = $_.FullName
     -not ($skipDirs | Where-Object { $full -match "[\\/]$([regex]::Escape($_))[\\/]" }) -and

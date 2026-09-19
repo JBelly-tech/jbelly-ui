@@ -1,6 +1,7 @@
 <#
 .SYNOPSIS
-  One-call verification of a page: render in headless Edge, capture console errors, lint tokens, screenshot.
+  One-call verification of a page: render in headless Edge, capture console errors, lint tokens, screenshot,
+  run the pre-flight (scripts/preflight.py). The verdict names the checks that actually ran.
   Replaces multi-step verify loops (the main cost driver in agent runs). Class D.
 
 .EXAMPLE
@@ -47,4 +48,28 @@ foreach ($v in $Variants) {
 }
 "[{0}] token lint: {1}" -f $(if ($lintCode -eq 0) { "OK" } else { "FAIL" }), $(if ($lintCode -eq 0) { "no raw palette classes" } else { ($lintOut | Select-Object -Last 3) -join " | " })
 if ($lintCode -ne 0) { $fail = $true }
-if ($fail) { "VERDICT: FAIL - fix the items above, then run this script once more."; exit 1 } else { "VERDICT: PASS - done; do not add further verification rounds."; exit 0 }
+$checks = @(("render ({0} variant(s))" -f $Variants.Count), "token lint")
+# The PASS line tells the agent to stop verifying, so every check it names must really have run:
+# a pre-flight that cannot start fails the run instead of quietly dropping off the list.
+$pfScript = Join-Path $PSScriptRoot "preflight.py"
+$py = @("py", "python", "python3") | Where-Object { Get-Command $_ -ErrorAction SilentlyContinue } | Select-Object -First 1
+if (-not (Test-Path $pfScript)) {
+  "[FAIL] pre-flight: preflight.py not found next to this script ($pfScript)"
+  $fail = $true
+} elseif (-not $py) {
+  "[FAIL] pre-flight: no Python interpreter on PATH; install Python 3.9+ or run scripts/verify_page.py instead"
+  $fail = $true
+} else {
+  $ErrorActionPreference = "Continue"
+  $pfOut = & $py $pfScript $full 2>&1
+  $pfCode = $LASTEXITCODE
+  $ErrorActionPreference = "Stop"
+  $pfLines = @($pfOut | ForEach-Object { "$_" })
+  $pfLast = $pfLines | Where-Object { $_.Trim() } | Select-Object -Last 1
+  "[{0}] pre-flight: {1}" -f $(if ($pfCode -eq 0) { "OK" } else { "FAIL" }), $(if ($pfLast) { $pfLast } else { "no output" })
+  foreach ($l in $pfLines | Where-Object { $_ -match '^\[(FAIL|WARN)\]' } | Select-Object -First 6) { "    " + $l }
+  if ($pfCode -ne 0) { $fail = $true }
+  $checks += "pre-flight"
+}
+$ran = $checks -join ", "
+if ($fail) { "VERDICT: FAIL (ran: $ran) - fix the items above, then run this script once more."; exit 1 } else { "VERDICT: PASS (ran: $ran) - done; do not add further verification rounds."; exit 0 }

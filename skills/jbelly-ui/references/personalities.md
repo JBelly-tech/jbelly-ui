@@ -58,13 +58,13 @@ Surface: tinted-page. Motion: micro only. Signature: KPI numerals in `--font-dis
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
   --primary: oklch(65% 0.17 150);                        /* signal green */
   --primary-foreground: oklch(14% 0 0);
-  --background: oklch(97% 0.002 260);
+  --background: oklch(97% 0.002 260); --muted-foreground: oklch(54% 0.014 285);
   --card: oklch(100% 0 0);
   --border: oklch(88% 0.004 260);
   --radius: 0.25rem;
   --density: compact;
 }
-.theme-graphite.dark { --background: oklch(12% 0.004 260); --card: oklch(15% 0.004 260); --border: oklch(24% 0.005 260); }
+.theme-graphite.dark { --background: oklch(12% 0.004 260); --muted-foreground: oklch(60% 0.014 285); --card: oklch(15% 0.004 260); --border: oklch(24% 0.005 260); }
 ```
 Surface: flat-bordered, tables everywhere, `tabular-nums` on all numbers. Motion: still. Signature: monospaced meta text (IDs, timestamps, amounts) and 1px dotted separators. Data colours: green · sky · amber · magenta (all at equal lightness).
 
@@ -117,7 +117,7 @@ Surface: outlined-only with offset shadows. Motion: micro + button press `transl
   --font-sans: "Public Sans", ui-sans-serif, system-ui, sans-serif;
   --primary: oklch(42% 0.12 260);                         /* navy */
   --primary-foreground: oklch(100% 0 0);
-  --background: oklch(96.5% 0.004 250);
+  --background: oklch(96.5% 0.004 250); --muted-foreground: oklch(53% 0.014 285);
   --card: oklch(100% 0 0);
   --foreground: oklch(18% 0.02 260);
   --border: oklch(88% 0.008 250);
@@ -181,7 +181,7 @@ Tailwind usage: `h-(--ctl-h)`, `p-(--card-p)`, `gap-(--page-gap)`, `[&_td]:h-(--
 ## Persist
 
 Save the decision at `design/personality.md` in the product repo (or the
-project's design-system folder if `ui-ux-pro-max` already created one — its
+project's design-system folder if a catalogue skill already created one — its
 `MASTER.md` and this file must agree; this file wins on tokens):
 
 ```md

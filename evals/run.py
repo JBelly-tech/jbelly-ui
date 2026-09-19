@@ -21,6 +21,9 @@ Where it can write: a workspace in the system temp directory, created per run. T
 skills directory and the agent skills directory are denied for reading and writing, so a run cannot
 study the skill it is being measured without. Every run is scanned afterwards and records whether
 any call reached outside its workspace; a run that leaked is marked and must not be compared.
+
+Exit codes: 0 finished and wrote the page, 1 finished without one, 2 the run was cut short before
+the CLI's result event -- its numbers are unknown, so it records no page and no cell is done.
 """
 import argparse, json, os, re, shutil, subprocess, sys, tempfile, time
 from pathlib import Path
@@ -37,6 +40,12 @@ EXTRA_OFF = ("doctor", "docs", "import-memory", "morning")
 WORKSPACE_ROOT = Path(tempfile.gettempdir()) / "jbelly-evals"
 DEFAULT_TOOLS = ("Read,Write,Edit,Glob,Grep,Skill,"
                  "Bash(python:*),Bash(python3:*),Bash(py:*),Bash(node:*)")
+TOKEN_KEYS = ("input_tokens", "output_tokens", "cache_read_tokens", "cache_creation_tokens")
+
+
+def count(n) -> str:
+    """Never print an unknown total as a number: a printed 0 reads as a run that cost nothing."""
+    return f"{n:,}" if isinstance(n, int) else "unknown"
 
 
 def claude_cli() -> str:
@@ -103,6 +112,7 @@ def parse_stream(stream_path: Path) -> dict:
                 result_event = ev
     u = (result_event or {}).get("usage", {}) or {}
     return {
+        "result_event_seen": result_event is not None,
         "tool_calls": tool_calls,
         "tools_used": dict(sorted(tools_used.items(), key=lambda kv: -kv[1])),
         "assistant_messages": assistant_msgs,
@@ -119,24 +129,53 @@ def parse_stream(stream_path: Path) -> dict:
     }
 
 
+# A shell call carries its target inside one command string instead of in a path field. Quoted
+# spans are read whole (a Windows path with a space in it is one target), the two quote styles are
+# scanned separately so a path nested in `python -c "open('...')"` is still seen, and the
+# drive-rooted scan catches what was never quoted at all.
+_QUOTES = (re.compile(r'"([^"]*)"'), re.compile(r"'([^']*)'"))
+_ABS = re.compile(r"""(?<![A-Za-z0-9_])(?:[A-Za-z]:[\\/]|/[A-Za-z]/)[^\s"'`;|&<>)]*""")
+
+
+def shell_targets(command: str) -> list:
+    """Every absolute-looking path hiding inside a shell command string."""
+    quoted = [m.group(1) for rx in _QUOTES for m in rx.finditer(command)]
+    return quoted + [m.group(0) for m in _ABS.finditer(command)]
+
+
+def normalize(value: str) -> str:
+    """One spelling per path: posix separators, lower case, and git-bash's /c/x written as c:/x.
+
+    Without the drive rewrite a bash-style path never matches the workspace it is inside, so every
+    legitimate `cd` into the workspace would read as a leak.
+    """
+    q = value.replace("\\", "/").lower().strip()
+    m = re.match(r"^/([a-z])/", q)
+    return f"{m.group(1)}:/{q[3:]}" if m else q
+
+
 def outside_workspace(stream_path: Path, ws: Path) -> dict:
     """Out-of-workspace tool calls, split by what actually happened.
 
     A denied attempt is not contamination: the guard did its job. A call that came back with
     content is, because the run then knew something the condition was supposed to hide. Only the
     fields that name a target are inspected -- scanning whole inputs matches paths that merely
-    appear inside the page the agent is writing.
+    appear inside the page the agent is writing -- except for a shell command, whose target is the
+    string itself and so is parsed out of it.
     """
-    ws_s = ws.as_posix().lower()
-    path_fields = ("file_path", "path", "pattern", "command", "notebook_path", "url")
+    ws_s = normalize(ws.as_posix())
+    tmp_s = normalize(Path(tempfile.gettempdir()).as_posix())
+    path_fields = ("file_path", "path", "pattern", "notebook_path", "url")
+    shell_fields = ("command", "script", "code")
     calls, out = {}, {"leaked": [], "blocked": []}
 
     def is_outside(value: str) -> bool:
-        q = value.replace("\\", "/").lower()
-        if not re.search(r"(?:^[a-z]:/|^/[a-z]/)", q): return False
-        if ws_s in q: return False
-        tmp = Path(tempfile.gettempdir()).as_posix().lower()
-        return not q.startswith(tmp)
+        q = normalize(value)
+        if not re.match(r"^[a-z]:/", q): return False
+        if ws_s in q or q.startswith(tmp_s): return False
+        # An unquoted path clips at its first space, leaving a fragment such as c:/users/msi that
+        # is only an ancestor of a safe directory; the real target was quoted and is caught above.
+        return not (ws_s.startswith(q) or tmp_s.startswith(q))
 
     with open(stream_path, encoding="utf-8", errors="replace") as fh:
         for line in fh:
@@ -147,6 +186,8 @@ def outside_workspace(stream_path: Path, ws: Path) -> dict:
                     if block.get("type") != "tool_use": continue
                     inp = block.get("input") or {}
                     targets = [str(inp[f]) for f in path_fields if isinstance(inp.get(f), str)]
+                    for f in shell_fields:
+                        if isinstance(inp.get(f), str): targets += shell_targets(inp[f])
                     hit = next((t for t in targets if is_outside(t)), None)
                     if hit: calls[block["id"]] = f"{block.get('name')}: {hit[:110]}"
             elif ev.get("type") == "user":
@@ -203,6 +244,14 @@ def main() -> int:
     # so a run that looked blocked would quietly read the repo it is being measured against.
     off_limits = [REPO, Path.home() / ".claude" / "skills", Path.home() / ".agents" / "skills"]
     deny = [f"{tool}({p.as_posix()}/**)" for p in off_limits for tool in ("Read", "Edit", "Write", "Glob", "Grep")]
+    # The rules above name file tools, and a shell call reaches a file without naming one. What
+    # keeps the plain readers out today is only the allow-list, which --allowed-tools can widen,
+    # so deny them by name as well. An interpreter cannot be denied this way without taking the
+    # skills' own scripts with it -- an archived run reached the skill under test through
+    # `python -c open(...)` -- which is why every run is also scanned afterwards.
+    readers = ("cat", "head", "tail", "more", "less", "type", "sed", "awk", "grep", "egrep", "rg",
+               "Get-Content", "gc", "Select-String", "sls")
+    deny += [f"{tool}({r}:*)" for tool in ("Bash", "PowerShell") for r in readers]
     settings = {"includeCoAuthoredBy": False, "disableBundledSkills": True,
                 "skillOverrides": others, "permissions": {"deny": deny}}
     settings_path = out / "settings.json"
@@ -238,8 +287,15 @@ def main() -> int:
         print(f"[run] CLI exited {proc.returncode}: {(proc.stderr or '')[:400]}")
 
     m = parse_stream(stream_path)
+    complete = m.pop("result_event_seen")
+    if not complete:
+        # The CLI emits its result event last. Without it the usage was never reported at all, and
+        # a recorded 0 would enter the comparison table as a run that finished for free.
+        for k in TOKEN_KEYS: m[k] = None
+        m["is_error"] = True
     isolation = outside_workspace(stream_path, ws)
     leaks = isolation["leaked"]
+    produced_page = ws / "out" / "page.html"
     produced = sorted(p.relative_to(ws).as_posix() for p in (ws / "out").rglob("*") if p.is_file())
     record = {
         "brief": brief.stem, "skill": a.skill, "model": a.model or "(cli default)",
@@ -247,23 +303,31 @@ def main() -> int:
         "minutes": round(wall / 60, 2), "wall_seconds": round(wall, 1),
         # Two numbers on purpose: context is what the cost model charges for (every step re-sends
         # the prefix), billed is what is not served from cache.
-        "total_tokens": m["input_tokens"] + m["output_tokens"] + m["cache_read_tokens"] + m["cache_creation_tokens"],
-        "billed_tokens": m["input_tokens"] + m["output_tokens"] + m["cache_creation_tokens"],
+        "total_tokens": sum(m[k] for k in TOKEN_KEYS) if complete else None,
+        "billed_tokens": sum(m[k] for k in TOKEN_KEYS if k != "cache_read_tokens") if complete else None,
         **m,
+        "complete": complete,
+        "incomplete_reason": None if complete else
+            f"no result event in stream.jsonl (CLI exit {proc.returncode}): the run was cut short",
         "skill_fired": (a.skill in m["skills_used"]) if a.skill != "none" else (not m["skills_used"]),
-        "produced": produced, "page": "out/page.html" if (ws / "out" / "page.html").is_file() else None,
+        # A cut-short run has no deliverable to offer: any page on disk was caught mid-write, so it
+        # is not copied out, not graded, and leaves the cell un-done for the next matrix pass.
+        "produced": produced, "page": "out/page.html" if (complete and produced_page.is_file()) else None,
         "exit_code": proc.returncode, "skill_source": str(skill_src) if skill_src else None,
         "skills_switched_off": len(others), "allowed_tools": allowed,
         "workspace": str(ws), "outside_workspace": leaks,
         "blocked_attempts": isolation["blocked"], "clean": not leaks,
     }
-    produced_page = ws / "out" / "page.html"
-    if produced_page.is_file():
+    if record["page"]:
         shutil.copy2(produced_page, out / "page.html")
     (out / "timing.json").write_text(json.dumps(record, indent=2), encoding="utf-8")
-    print(f"[run] {record['total_tokens']:,} context tokens ({record['billed_tokens']:,} billed) · "
+    print(f"[run] {count(record['total_tokens'])} context tokens "
+          f"({count(record['billed_tokens'])} billed) · "
           f"{record['minutes']} min · {record['tool_calls']} tool calls "
           f"· skill fired: {record['skill_fired']} · page: {bool(record['page'])}")
+    if not complete:
+        print(f"[run] INCOMPLETE - {record['incomplete_reason']}; tokens unknown, page not kept, "
+              f"cell not done. Rerun it.")
     if isolation["blocked"]:
         print(f"[run] guard held: {len(isolation['blocked'])} out-of-workspace call(s) were denied")
     if leaks:
@@ -271,6 +335,7 @@ def main() -> int:
               f"number is not comparable:")
         for h in leaks[:6]: print("       " + h)
     print(f"[run] -> {out / 'timing.json'}")
+    if not complete: return 2
     return 0 if record["page"] else 1
 
 

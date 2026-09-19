@@ -5,7 +5,9 @@
   dist/jbelly-ui-prompt.md  Tier 3: one paste-in file for chat-only tools (no files, no scripts). < 8K tokens.
 
 Usage: python scripts/build_dist.py            (from anywhere; writes <repo>/dist/)
-Fails (exit 1) if a tier exceeds its size limit.
+Fails (exit 1) if a tier exceeds its size limit, a source section is missing or empty, a colour
+role in references/tokens.css has no Tailwind mapping, or the paste-in tier still points at a
+repo path.
 """
 import os, re, sys, time
 try: sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -17,19 +19,69 @@ DIST = os.path.join(REPO, "dist")
 LIMITS = {"AGENTS.md": 2200, "jbelly-ui-prompt.md": 8000}  # tokens (~4 chars each)
 
 def read(rel): return open(os.path.join(SKILL, rel), encoding="utf-8").read()
-def section(md, heading):
+
+def need(value, what):
+    # An empty extraction reads exactly like an empty section in the output, so it has to stop the
+    # build: returning "" shipped a tier with a blank heading and still printed OK.
+    if not value: sys.exit("build_dist: nothing extracted for " + what + " - the source changed shape")
+    return value
+
+def section(md, heading, src="references/quick-card.md"):
     m = re.search(r"^## " + re.escape(heading) + r"\n([\s\S]*?)(?=^## |\Z)", md, re.M)
-    return m.group(1).strip() if m else ""
-def strip_links(md): return re.sub(r"`(?:scripts|references|assets)/[^`]+`", lambda m: m.group(0), md)
+    return need(m.group(1).strip() if m else "", "section '## " + heading + "' of " + src)
+
+def anti_lines(anti, prefix): return need(chr(10).join(l for l in anti.splitlines() if l.startswith(prefix)), "anti-pattern lines starting " + repr(prefix))
+
+def _alias(value):
+    m = re.fullmatch(r"var\(--([a-z-]+)\)", value.strip())
+    return m.group(1) if m else None
+
+def colour_roles(tokens):
+    """Every custom property in tokens.css whose value is a colour, or an alias of one
+    (--sidebar: var(--card)) - exactly the set a Tailwind mapping has to cover."""
+    body = re.sub(r"@theme[^{]*\{[\s\S]*?\n\}", "", tokens)  # a mapping entry is not a declaration
+    decls = dict(re.findall(r"^\s*--([a-z-]+):\s*([^;]+);", body, re.M))
+    roles = {n for n, v in decls.items() if re.match(r"(oklch|rgba?|hsla?|color-mix)\(|#[0-9a-fA-F]{3,8}", v.strip())}
+    for _ in range(len(decls)):  # an alias may point at an alias, so grow until the set is stable
+        grew = {n for n, v in decls.items() if _alias(v) in roles}
+        if grew <= roles: break
+        roles |= grew
+    return roles
+
+def theme_map(tokens):
+    """The Tailwind mapping is lifted from tokens.css, never retyped here: a hand-copied copy drifts
+    the moment a role is added, and nothing in the generated file shows that it has."""
+    blocks = []
+    for pat, what in ((r"^@theme inline \{[\s\S]*?\n\}", "the @theme inline block"),
+                      (r"^@theme \{[\s\S]*?\n\}", "the @theme block"),
+                      (r"^@custom-variant dark [^\n]+", "the @custom-variant dark line")):
+        m = re.search(pat, tokens, re.M)
+        blocks.append(need(m.group(0) if m else "", what + " of references/tokens.css"))
+    mapped, roles = set(re.findall(r"--color-([a-z-]+):", blocks[0])), colour_roles(tokens)
+    if roles - mapped: sys.exit("build_dist: colour roles in tokens.css with no --color-* mapping: " + ", ".join(sorted(roles - mapped)))
+    if mapped - roles: sys.exit("build_dist: --color-* mappings for roles tokens.css never declares: " + ", ".join(sorted(mapped - roles)))
+    return "\n\n".join(blocks)
+
+def strip_links(md):
+    """Tier 3 is pasted into a chat with no checkout, so a repo path in it is a pointer the reader can
+    never follow. A parenthesised pointer is dropped; anything else has to be reworded in the source,
+    because a builder cannot rewrite prose safely."""
+    md = re.sub(r"[ \t]*\(`?(?:scripts|references|assets)/[^`)\s]+`?\)", "", md)
+    left = sorted(set(re.findall(r"(?:scripts|references|assets)/[\w./-]+", md)))
+    if left: sys.exit("build_dist: the paste-in tier still points at repo paths a chat tool cannot open: " + ", ".join(left) + " - reword them in the source")
+    return md
 
 def build():
     quick = read("references/quick-card.md")
     anti = read("references/anti-patterns.md")
     pers = read("references/personalities.md")
     tokens = read("references/tokens.css")
-    tokens_core = re.search(r":root \{[\s\S]*?\n\}\n\n[\s\S]*?\.dark \{[\s\S]*?\n\}", tokens).group(0)
+    _core = re.search(r":root \{[\s\S]*?\n\}\n\n[\s\S]*?\.dark \{[\s\S]*?\n\}", tokens)
+    tokens_core = need(_core.group(0) if _core else "", "the :root/.dark blocks of references/tokens.css")
+    tmap = theme_map(tokens)
     presets = re.findall(r"^### \d\. `(theme-[a-z]+)` — ([^\n]+)\n\n```css\n([\s\S]*?)```", pers, re.M)
-    presets_md = "\n".join(f"- **{n}** ({d}):\n```css\n{c.strip()}\n```" for n, d, c in presets[:3])
+    presets_md = need("\n".join(f"- **{n}** ({d}):\n```css\n{c.strip()}\n```" for n, d, c in presets[:3]),
+                      "personality presets of references/personalities.md")
     rules = section(quick, "Rules that decide the grade")
     manual = """## Without tools (manual checklist)
 If you cannot run scripts, apply by hand before you finish:
@@ -58,11 +110,11 @@ You are building or changing a web UI. Follow these rules exactly; values are no
 {rules}
 
 ## Anti-patterns (never)
-{chr(10).join(l for l in anti.splitlines() if l.startswith("- ⚙"))}
+{anti_lines(anti, "- ⚙")}
 
 {manual}
 """
-    prompt = f"""# jbelly-ui — paste-in UI system for chat tools (generated; self-contained)
+    prompt = strip_links(f"""# jbelly-ui — paste-in UI system for chat tools (generated; self-contained)
 
 Use this whole message as instructions for any UI you produce in this conversation.
 Output complete HTML with Tailwind v4 (`<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>`) and Lucide icons unless the user names another stack; then translate the class strings to that stack.
@@ -74,7 +126,10 @@ Output complete HTML with Tailwind v4 (`<script src="https://cdn.jsdelivr.net/np
 ```css
 {tokens_core}
 ```
-Tailwind mapping: `@theme inline {{ --color-background: var(--background); --color-foreground: var(--foreground); --color-card: var(--card); --color-primary: var(--primary); --color-primary-foreground: var(--primary-foreground); --color-secondary: var(--secondary); --color-secondary-foreground: var(--secondary-foreground); --color-muted: var(--muted); --color-muted-foreground: var(--muted-foreground); --color-accent: var(--accent); --color-accent-foreground: var(--accent-foreground); --color-mono: var(--mono); --color-mono-foreground: var(--mono-foreground); --color-destructive: var(--destructive); --color-success: var(--success); --color-warning: var(--warning); --color-info: var(--info); --color-border: var(--border); --color-input: var(--input); --color-ring: var(--ring); --radius-xl: calc(var(--radius) + 4px); --radius-lg: var(--radius); --radius-md: calc(var(--radius) - 2px); --radius-sm: calc(var(--radius) - 4px); }} @theme {{ --text-2sm: 0.8125rem; --text-2xs: 0.6875rem; }} @custom-variant dark (&:where(.dark, .dark *));`
+Tailwind mapping — paste this too (generated from the token file, so no role is missing):
+```css
+{tmap}
+```
 
 ## 3. Personality presets (append one after the tokens, then change two dials)
 {presets_md}
@@ -97,10 +152,10 @@ Tailwind mapping: `@theme inline {{ --color-background: var(--background); --col
 {rules}
 
 ## 9. Anti-patterns — never do these
-{chr(10).join(l for l in anti.splitlines() if l.startswith("- "))}
+{anti_lines(anti, "- ")}
 
 {manual}
-"""
+""")
     os.makedirs(DIST, exist_ok=True)
     ok = True
     for name, text in (("AGENTS.md", agents), ("jbelly-ui-prompt.md", prompt)):

@@ -56,10 +56,25 @@ Animate it? — appears > 10×/session (hover, toggles, list rows): no or ≤ 10
 Card or no card? — data with a title and a toolbar: card · a single sentence of help: plain text in the toolbar · a list inside a card: `divide-y`, never nested cards.
 Which primary? — the one action the user came for (New order, Save, Book); Export/Filter/Import are outline; row actions ghost.
 
+## Personality presets (pick one, then change at least two dials)
+| preset | type | primary | radius · density · surface | signature |
+|---|---|---|---|---|
+| `theme-clinic` | Inter | teal `oklch(50% 0.12 195)` | 0.75rem · airy · tinted page | display numerals, 3px rail on active nav |
+| `theme-graphite` | Inter + Plex Mono meta | signal green `oklch(65% 0.17 150)` | 0.25rem · compact · flat bordered | monospaced meta, dotted separators |
+| `theme-editorial` | Fraunces / Source Sans 3 | brick `oklch(48% 0.16 30)` | 0.5rem · standard · elevated | serif headings, hairline rules |
+| `theme-neo` | Space Grotesk / DM Sans | violet `oklch(55% 0.25 290)` | 0.25rem · standard · outlined + offset shadow | offset shadow, uppercase tracked labels |
+| `theme-slate` | Inter | navy `oklch(42% 0.12 260)` | 0.375rem · standard · tinted + dark sidebar | gold active marker on navy |
+| `theme-mint` | Plus Jakarta / Inter | mint `oklch(60% 0.15 165)` | 1rem · airy · elevated, pill controls | pill controls, rounded avatar chips |
+
+Dials you can change: type · primary · radius · density · surface · motion · signature · data colours. Open `references/personalities.md` only to derive a new preset from scratch.
+
 ## Design read (first output, 4 fields)
 Write it with `python scripts/personality_init.py --product … --kind … --audience … --vibe … --preset … --change … --change …` (two dials minimum).
 `kind` · `audience` (who, how often, keyboard or touch) · `vibe` (three words) · `system` (preset + dials changed). Written to `design/personality.md`; every later choice is checked against it.
 
 ## Cost rules for the building agent
-Read this card + the personality preset you need in ONE batch at the start; do not re-read. Copy the scaffold, then edit.
-Write the file once (no parts). Verify once with `python scripts/verify_page.py <page> --variants ",#dark=1,#dir=rtl"`, fix, verify once more at most. Budget: ≤ 12 tool calls for a screen.
+Three calls build a screen: `personality_init.py`, `build-screen.py`, `verify_page.py`. Get the spec's shape from `python scripts/build-screen.py --example`, not from the script's source.
+Read this card once. Re-reading it, or `cat`-ing a file you already read, pays for it again on every later call.
+Never probe the environment (`python --version`, `pwd`, a shell test) and never read `assets/app-shell.html`: the generator fills it and fails loudly when a spec field does not land.
+A value came out wrong? Fix the spec and rebuild. Hand-editing the built page is for bespoke markup only, appended through `extra_html`.
+Verify once, with `python scripts/verify_page.py <page>`. No screenshot loop, no second opinion, no subagents. Budget: 5 tool calls for a standard screen, 12 for a complex one.

@@ -38,48 +38,72 @@ It is the contract everything else is checked against.
 
 ## Workflow
 
-**Cost first.** The references total ~28K tokens; every tool call after
-reading them re-sends them. So: for a standard app screen read only
-`references/quick-card.md` (~2K tokens) plus the one personality preset you
-need, in a single batch at the start. Then **generate, do not compose**:
-write a ~2 KB JSON spec (see `assets/spec.example.json`) and run
-`python scripts/build-screen.py spec.json out.html` — nav, toolbar, KPIs with
-sparklines, chart, highlights donut, table with states, activity, i18n all
-come from the shell for zero model tokens; add only bespoke widgets as
-`extra_html` or by editing the built file. (For a blank shell use
-`python scripts/new_screen.py`.) Write once; verify once with
-`python scripts/verify_page.py <page>` (render + console + lint + pre-flight in one call). Open a full reference only for something the card and scaffold do not
-cover. Budget: no more than 12 tool calls per screen. Implementation belongs
-to the cheapest model class that passes the done list (Class B); reserve the
-top class for the personality decision and the final review.
+**Three calls build a standard screen. Make exactly these, in this order.**
 
-1. **Choose the personality first** — `references/personalities.md`. Pick the
-   closest preset and change at least two dials, or derive one from the brief.
-   Write it to `design/personality.md` with
-   `python scripts/personality_init.py --product … --kind … --audience … --vibe … --preset … --change … --change …`
-   (or by hand in that format). Never start on the default look; the
-   default exists only so the demo renders.
-2. **Install the tokens** — copy `references/tokens.css` into the project,
-   load it right after Tailwind (`@import "tailwindcss"; @import "./tokens.css";`),
-   append the personality overrides. To change a colour later, edit a token,
-   never a component.
-3. **Pick a shell** — `references/layouts.md`: app shell (sidebar + header),
-   header-only, auth, or landing. Copy the skeleton.
-4. **Build with the recipes** — `references/components.md` for controls,
-   `references/patterns.md` for screens. Every element has a recipe with
-   exact sizes; that is what keeps mixed rows aligned and ten screens coherent.
-5. **Wire the behaviours** — `references/ux-behaviours.md`. Loading, empty and
-   error states, table selection and bulk actions, form validation, overlay
-   focus rules, keyboard, persistence. Not optional.
-6. **Lint and check** — `python scripts/lint_tokens.py <src-dir>` (or the
-   PowerShell twin `scripts/lint-tokens.ps1`) flags raw palette classes that
-   bypass tokens. Then the done list below.
+```bash
+python scripts/personality_init.py --product "<name>" --kind <kind> --audience "<who, how often>" \
+    --vibe "<three words>" --preset <theme-…> --change "<dial>" --change "<dial>"
+python scripts/build-screen.py <spec.json> <out.html>
+python scripts/verify_page.py <out.html>
+```
 
-Want to see it first? Open `assets/app-shell.html` — a self-contained page
-with the shell, the core recipes, dark mode and a personality switcher.
+Before them, read **one** file: `references/quick-card.md`. Before writing the spec, get its shape
+from `python scripts/build-screen.py --example`, which prints a complete annotated spec.
 
-Reviewing an existing UI? Run steps 6 → 5 → 1 in that order: lint, then
-compare behaviours, then ask whether the product has a personality at all.
+**What not to do, because each one was measured costing calls for nothing:**
+
+- **Do not read the same file twice.** Reading a reference, then `cat`-ing it, then opening it again
+  is three calls and three copies of it in context, which every later call re-sends.
+- **Do not probe the environment.** No `python --version`, no `pwd && ls`, no shell test. Run the
+  command; if the interpreter is missing you will be told, and the manual fallback below applies.
+- **Do not read the source of the scripts or of `assets/app-shell.html`.** `--example` tells you the
+  spec, `--help` tells you the flags, and the shell's contents are not your concern: the generator
+  fills them from the spec and fails loudly when a field does not land.
+- **Do not hand-edit the built page to add what the spec could have said.** If a value came out
+  wrong, fix the spec and rebuild: one call instead of a chain of edits. Hand-editing is only for
+  genuinely bespoke markup, appended through `extra_html`.
+- **Do not build your own verification.** `verify_page.py` renders the variants, collects console
+  errors, runs the token lint and the pre-flight, and prints one verdict. No screenshot loop, no
+  second opinion, no subagents.
+
+Why this is worth obeying: agent cost is the size of the context multiplied by the number of steps,
+so a file read early is paid for again on every later call. The generator exists to move the whole
+page out of the model's output entirely — nav, toolbar, KPIs with sparklines, chart, donut, table
+with its loading, empty and error states, activity feed and the Arabic dictionary all come from the
+shell at zero model tokens.
+
+**When the screen is not a dashboard:** `python scripts/new_screen.py` gives a blank shell with the
+personality, density, direction and dark default already set. Everything above still applies.
+
+**When a reference is genuinely needed:** open one, by name, from the table at the end of this file,
+and only for something the quick card does not cover. Reading them all costs about 28K tokens.
+
+Implementation belongs to the cheapest model class that passes the done list; reserve the top class
+for the personality decision and the final review.
+
+### When the generator does not apply
+
+A page the generator has no shape for (a marketing site, a bespoke app) is built by hand. The order
+matters, because each step decides the one after it:
+
+1. **Personality first.** Pick a preset from the quick card's table and change at least two dials,
+   then write it with `personality_init.py`. Never start on the default look; the default exists so
+   the demo renders, nothing more. Open `references/personalities.md` only to derive a new preset.
+2. **Tokens next.** Copy `references/tokens.css` into the project and load it right after Tailwind
+   (`@import "tailwindcss"; @import "./tokens.css";`), then append the personality overrides. A
+   colour changes in one token, never in a component.
+3. **Then the shell**, from `references/layouts.md`: sidebar + header, header-only, auth, or
+   landing.
+4. **Then the parts**: `references/components.md` for controls, `references/patterns.md` for whole
+   screens. Every element has exact sizes; that is what keeps mixed rows aligned and ten screens
+   looking like one product.
+5. **Then the behaviours**, from `references/ux-behaviours.md`: loading, empty and error states,
+   table selection and bulk actions, form validation, overlay focus, keyboard, persistence. Not
+   optional — they are most of what separates this from a mock-up.
+6. **Then verify**, the same single call as always: `python scripts/verify_page.py <page>`.
+
+Reviewing an existing UI instead? Run it backwards: verify first for the deterministic faults, then
+compare behaviours, then ask whether the product has any personality at all.
 
 ## The foundation in one screen
 
@@ -145,17 +169,6 @@ this is the shape of it.
   see `references/integrations.md` for the vetted list per need (charts,
   tables, calendars, editors, uploads, maps, drag-and-drop).
 
-## Working alongside `ui-ux-pro-max`
-
-If that skill is installed, it is a catalogue (styles, 192 palettes, 74 font
-pairings, 119 UX rules); this skill is the system. Use them together like
-this: run its `--design-system` search **only** to shortlist a type pairing or
-palette for step 1, then encode the choice as jbelly-ui tokens in
-`design/personality.md`. Its `MASTER.md` must not define colours that
-`tokens.css` does not; on any conflict, tokens.css wins. Do not adopt a
-"style" it names (glassmorphism, neumorphism…) unless the personality dials
-call for it — that is exactly how products end up looking random.
-
 ## Without tools (manual fallback)
 
 If scripts cannot run in your environment, do these by hand before finishing:
@@ -169,31 +182,37 @@ region; open the page once in light, dark and RTL.
 
 ## Reference files
 
-| File | Read when |
-|------|-----------|
-| `references/quick-card.md` | **First, for any standard app screen**: tokens, sizes and the 20 most-used recipes on one page, plus the cost rules. Usually the only reference you need together with the scaffold. |
-| `scripts/verify_page.py` (`verify-page.ps1` on Windows) | The one verification call before done: renders variants headlessly (Playwright, or Chrome/Chromium/Edge), reports console errors, runs the token lint, prints PASS/FAIL. Replaces multi-step verify loops. |
-| `scripts/build-screen.py` + `assets/spec.example.json` | **The default build path**: a small JSON spec in, a complete verified-pattern page out (charts, table states, drawer, palette, i18n included). Edit the output only for bespoke widgets. |
-| `scripts/new_screen.py` (`new-screen.ps1` on Windows) | A blank copy of the shell with personality, density, direction and dark default set, when the page is unlike a dashboard. |
-| `references/review-rubric.md` | Review and Redesign modes: ten scored dimensions with evidence, the `file:line` output format, the audit-first protocol. |
-| `scripts/preflight.py` | Any mode, before done: AI-tells list (gradient purple, gradient text, Sparkles icons, filler copy, emoji icons…), structure checks (one primary, h1, skip link, labelled icon buttons), WCAG contrast of the token pairs. Runs inside `verify_page.py`. |
-| `scripts/audit_styles.py` | Redesign mode, first: inventory of fonts, colours, radii, shadows, spacing, durations, raw palette classes; prints the deviation list in fix order. |
-| `references/interface-guidelines.md` | Building or reviewing any control: the exact-value rules for forms, focus, motion, typography, colour, layout, copy, accessibility and performance, restated from the most-used interface guidelines. |
-| `references/anti-patterns.md` | When a page looks generated, or in Review mode: each tell, why it fails, what to do instead; the marked ones are checked by `preflight.py`. |
-| `references/stacks.md` | When the project is not Tailwind v4: the same recipes in plain CSS and React; DTCG tokens (`assets/tokens.json`, built by `scripts/export_tokens.py`). |
-| `references/sources.md` | To check or add a rule: which research, design system or measured run each rule family comes from. |
-| `references/charts.md` | Any chart: the ApexCharts house theme (from tokens), 8 chart recipes, the rules (heights, legends in card headers, sr-only tables, dark re-render). |
-| `scripts/personality_init.py` | Step 1: writes `design/personality.md` (the design read + dials) from a preset and the dials you changed; the file every later screen is checked against. |
-| `references/personalities.md` | Step 1, always. Eight dials, six presets with token overrides, density block, how to derive a new one, the persisted file format. |
-| `references/tokens.css` | Step 2. Light/dark roles, states, sidebar roles, radius scale, Tailwind v4 `@theme` mapping, base resets, reduced-motion. |
-| `references/layouts.md` | Step 3. App shell, sidebar nav, header bar, collapse + mobile drawer, page toolbar, grids, settings variants, profile hero, header-only shell, auth pages, landing page order, containers, RTL. |
-| `references/components.md` | Step 4. Button, input, select, textarea, checkbox, radio, switch, label, badge, avatar, card, table, tabs, dropdown, modal, drawer, alert, toast, tooltip, progress, skeleton, pagination, breadcrumb, kbd, separator, link, empty state — exact class strings. |
-| `references/patterns.md` | Step 4. KPI cards, callout, chart card, table card with toolbar, list card, progress list, activity feed, notification drawer, settings form, datatable page, pricing, checkout, search palette, cards grid, empty/error states, dashboard blueprint. |
-| `references/ux-behaviours.md` | Step 5. Navigation, loading & feedback, tables, forms, overlays, keyboard, dashboards, responsive, preferences, copy, behaviour checklist. |
-| `references/integrations.md` | Any time a screen needs a chart, data grid, calendar, date picker, rich-text editor, file upload, map, drag-and-drop, command palette, toasts, forms/validation, i18n or animation: the licence-safe library per need, how to style it with tokens, and the interaction rules (state layers, motion durations, density steps). |
-| `references/industry-playbooks.md` | Step 3–4 when the product is a known business type (SaaS, admin/ops, e-commerce, clinic/wellness, restaurant, education, real estate, finance, travel, corporate/agency): the page inventory, the flows, and the patterns buyers of top-selling templates consistently expect. |
-| `assets/app-shell.html` | A working, self-contained starting point and visual check (dark mode, RTL, personality switcher). |
-| `scripts/lint_tokens.py` (`lint-tokens.ps1` on Windows) | Step 6. Finds raw palette colours outside the token file. |
+Open one, by name, only for what the quick card does not cover. Reading them all costs ~28K tokens.
+
+**Scripts** (`scripts/`, all `--help`):
+`build-screen.py` spec to page · `new_screen.py` blank shell · `verify_page.py` the one verification
+call · `preflight.py` AI-tells, structure, contrast · `lint_tokens.py` raw palette colours ·
+`audit_styles.py` redesign inventory · `personality_init.py` the design read ·
+`export_tokens.py` DTCG tokens · `build_dist.py` the delivery tiers.
+Windows twins: `verify-page.ps1`, `new-screen.ps1`, `lint-tokens.ps1`.
+
+**References** (`references/`):
+
+| Open when you need | File |
+|---|---|
+| anything on a standard screen | `quick-card.md` |
+| to derive a new personality | `personalities.md` |
+| the colour system to copy into a project | `tokens.css` |
+| a control's exact class string | `components.md` |
+| a shell, nav, toolbar, settings, auth or landing skeleton | `layouts.md` |
+| a whole pattern: KPI row, chart card, table page, pricing, checkout, palette | `patterns.md` |
+| a chart | `charts.md` |
+| states, tables, forms, overlays, keyboard, responsive behaviour | `ux-behaviours.md` |
+| a library for charts, grids, calendars, editors, uploads, maps | `integrations.md` |
+| the pages and flows a known business type expects | `industry-playbooks.md` |
+| exact-value rules for forms, focus, motion, type, colour, copy | `interface-guidelines.md` |
+| to explain why a page looks generated | `anti-patterns.md` |
+| to score a review | `review-rubric.md` |
+| plain CSS or React instead of Tailwind | `stacks.md` |
+| where a rule comes from | `sources.md` |
+
+`assets/app-shell.html` is the working demo; `assets/spec.example.json` is the spec the generator
+prints with `--example`.
 
 ## Done list
 

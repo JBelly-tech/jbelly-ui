@@ -115,7 +115,67 @@ Output complete HTML with Tailwind v4 (`<script src="https://cdn.jsdelivr.net/np
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.4);
 }
 ```
-Tailwind mapping: `@theme inline { --color-background: var(--background); --color-foreground: var(--foreground); --color-card: var(--card); --color-primary: var(--primary); --color-primary-foreground: var(--primary-foreground); --color-secondary: var(--secondary); --color-secondary-foreground: var(--secondary-foreground); --color-muted: var(--muted); --color-muted-foreground: var(--muted-foreground); --color-accent: var(--accent); --color-accent-foreground: var(--accent-foreground); --color-mono: var(--mono); --color-mono-foreground: var(--mono-foreground); --color-destructive: var(--destructive); --color-success: var(--success); --color-warning: var(--warning); --color-info: var(--info); --color-border: var(--border); --color-input: var(--input); --color-ring: var(--ring); --radius-xl: calc(var(--radius) + 4px); --radius-lg: var(--radius); --radius-md: calc(var(--radius) - 2px); --radius-sm: calc(var(--radius) - 4px); } @theme { --text-2sm: 0.8125rem; --text-2xs: 0.6875rem; } @custom-variant dark (&:where(.dark, .dark *));`
+Tailwind mapping — paste this too (generated from the token file, so no role is missing):
+```css
+@theme inline {
+  --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
+  --font-mono: var(--font-mono);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-mono: var(--mono);
+  --color-mono-foreground: var(--mono-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-muted: var(--sidebar-muted);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-border: var(--sidebar-border);
+
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  --shadow-xs: var(--shadow-xs);
+  --shadow-md: var(--shadow-md);
+}
+
+@theme {
+  /* the two extra UI sizes the system relies on */
+  --text-2sm: 0.8125rem;
+  --text-2sm--line-height: 1.3;
+  --text-2xs: 0.6875rem;
+  --text-2xs--line-height: 1.2;
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+```
 
 ## 3. Personality presets (append one after the tokens, then change two dials)
 - **theme-clinic** (calm, clinical, trustworthy (health, nutrition, insurance)):
@@ -143,13 +203,13 @@ Tailwind mapping: `@theme inline { --color-background: var(--background); --colo
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
   --primary: oklch(65% 0.17 150);                        /* signal green */
   --primary-foreground: oklch(14% 0 0);
-  --background: oklch(97% 0.002 260);
+  --background: oklch(97% 0.002 260); --muted-foreground: oklch(54% 0.014 285);
   --card: oklch(100% 0 0);
   --border: oklch(88% 0.004 260);
   --radius: 0.25rem;
   --density: compact;
 }
-.theme-graphite.dark { --background: oklch(12% 0.004 260); --card: oklch(15% 0.004 260); --border: oklch(24% 0.005 260); }
+.theme-graphite.dark { --background: oklch(12% 0.004 260); --muted-foreground: oklch(60% 0.014 285); --card: oklch(15% 0.004 260); --border: oklch(24% 0.005 260); }
 ```
 - **theme-editorial** (warm, human, content-first (community, education, media)):
 ```css
@@ -203,7 +263,7 @@ Shell: sidebar 280 (collapsed 80) · header 70 (60 mobile) · container `px-6 xl
 - **grid** page `grid gap-5 lg:gap-7.5` · row `grid lg:grid-cols-3 … items-stretch`, wide card `lg:col-span-2`, every card `h-full`
 
 ## 6. Charts, i18n, weight
-- **Charts**: ApexCharts with `apexBase()` from the scaffold (`references/charts.md`): smooth area with gradient fill for trends, sparklines (`height: 40`) in KPI cards, donut with centre total, heatmap with printed values. Explicit pixel heights. Never hand-draw dashboard charts.
+- **Charts**: ApexCharts with `apexBase()` from the scaffold: smooth area with gradient fill for trends, sparklines (`height: 40`) in KPI cards, donut with centre total, heatmap with printed values. Explicit pixel heights. Never hand-draw dashboard charts.
 - **RTL + Arabic**: `dir` alone is not enough for an Arabic product: use the scaffold's `data-i18n` pattern (one dictionary, `setLang('ar')` flips `dir`, `lang` and every tagged string, numbers stay LTR). Translate nav, titles, KPI labels, legends, table headers and statuses.
 - **Weight budget**: ≤ 2,300 DOM elements for a full console, ≤ 45 nesting depth, no wrapper divs around single children; 5 skeleton rows, not 12.
 - **Production**: the Tailwind browser build and CDN scripts are for demos and prototypes; a shipped product compiles Tailwind and self-hosts fonts and Lucide.

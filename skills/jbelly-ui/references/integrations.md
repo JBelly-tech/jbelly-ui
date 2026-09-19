@@ -224,3 +224,14 @@ Tailwind v4 + tokens.css + Lucide sprite + Floating UI + a 150-line
 focus trap and `Esc`, tabs, toasts, command palette, and `data-confirm`
 buttons. Everything else is a library from the table. Do not write a custom
 datepicker, editor or chart.
+
+## Working alongside a catalogue skill
+Some projects also install a catalogue skill: a searchable body of styles, palettes, font
+pairings and UX rules. If one is present, it is a catalogue (styles, 192 palettes, 74 font
+pairings, 119 UX rules); this skill is the system. Use them together like
+this: run its `--design-system` search **only** to shortlist a type pairing or
+palette for step 1, then encode the choice as jbelly-ui tokens in
+`design/personality.md`. Its `MASTER.md` must not define colours that
+`tokens.css` does not; on any conflict, tokens.css wins. Do not adopt a
+"style" it names (glassmorphism, neumorphism…) unless the personality dials
+call for it — that is exactly how products end up looking random.

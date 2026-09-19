@@ -81,11 +81,17 @@ def ask_judge(first: Path, second: Path, model: str, timeout: int) -> dict:
         text = r.stdout or ""
     m = re.search(r"\{[\s\S]*\}", text)
     if not m:
-        return {"winner": "error", "why": (text or r.stderr or "")[:200]}
+        return {"winner": "error",
+                "why": (text or r.stderr or f"claude exited {r.returncode} with no output")[:200]}
     try:
         return json.loads(m.group(0))
     except json.JSONDecodeError:
         return {"winner": "error", "why": m.group(0)[:200]}
+
+
+def judged(v: dict, first: str, second: str) -> str:
+    """Label the winner of one judgement. Empty string means the judge cast no usable vote."""
+    return {"A": first, "B": second, "tie": "tie"}.get(v.get("winner"), "")
 
 
 def one(path_arg: str) -> Path:
@@ -116,20 +122,30 @@ def main() -> int:
     print("[blind] judging, order 2 (swapped) …")
     v2 = ask_judge(png_b, png_a, a.model, a.timeout)          # A = label_b
 
-    pick1 = {"A": a.label_a, "B": a.label_b}.get(v1.get("winner"), v1.get("winner"))
-    pick2 = {"A": a.label_b, "B": a.label_a}.get(v2.get("winner"), v2.get("winner"))
+    pick1 = judged(v1, a.label_a, a.label_b)
+    pick2 = judged(v2, a.label_b, a.label_a)
+    # A judge that never named A, B or tie has not voted at all. Filing that as a draw would hide a
+    # broken judge behind a result that looks like a real comparison.
+    unanswered = {f"order{i}": (v.get("why") or "no winner field")[:200]
+                  for i, (v, pick) in enumerate(((v1, pick1), (v2, pick2)), 1) if not pick}
     agreed = pick1 == pick2 and pick1 in (a.label_a, a.label_b)
+    if unanswered: winner = "no verdict (judge failed to answer)"
+    elif agreed: winner = pick1
+    else: winner = "draw (judge disagreed with itself when swapped)"
     verdict = {
         "page_a": str(page_a), "page_b": str(page_b), "label_a": a.label_a, "label_b": a.label_b,
         "judge_model": a.model, "order1": v1, "order2": v2,
-        "pick_order1": pick1, "pick_order2": pick2,
-        "winner": pick1 if agreed else "draw (judge disagreed with itself when swapped)",
+        "pick_order1": pick1 or "no answer", "pick_order2": pick2 or "no answer",
+        "unanswered": unanswered,
+        "winner": winner,
     }
     (out / f"{stamp}-verdict.json").write_text(json.dumps(verdict, indent=2), encoding="utf-8")
-    print(f"[blind] order 1 -> {pick1} | order 2 -> {pick2}")
+    print(f"[blind] order 1 -> {pick1 or 'no answer'} | order 2 -> {pick2 or 'no answer'}")
     print(f"[blind] WINNER: {verdict['winner']}")
     print(f"[blind] -> {out / f'{stamp}-verdict.json'}")
-    return 0
+    for key, why in unanswered.items():
+        print(f"[blind] {key}: judge gave no usable verdict -> {why}", file=sys.stderr)
+    return 1 if unanswered else 0
 
 
 if __name__ == "__main__":
