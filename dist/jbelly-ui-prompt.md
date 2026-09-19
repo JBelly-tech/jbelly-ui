@@ -31,6 +31,8 @@ Output complete HTML with Tailwind v4 (`<script src="https://cdn.jsdelivr.net/np
 
   /* brand — the one colour that carries identity */
   --primary: oklch(54% 0.2 258);
+  /* the brand colour as text: a link has to be readable on the surface, which a fill does not */
+  --primary-accent: oklch(54% 0.2 258);
   --primary-foreground: oklch(100% 0 0);
 
   /* neutrals */
@@ -81,7 +83,7 @@ Output complete HTML with Tailwind v4 (`<script src="https://cdn.jsdelivr.net/np
   :root { --header-height: 60px; }
 }
 
-.dark {
+.dark { --primary-accent: oklch(59% 0.21 258);
   color-scheme: dark;
 
   --background: oklch(14.5% 0.005 285);
@@ -128,7 +130,7 @@ Tailwind mapping — paste this too (generated from the token file, so no role i
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
+  --color-primary: var(--primary); --color-primary-accent: var(--primary-accent);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
@@ -234,6 +236,8 @@ Tailwind mapping — paste this too (generated from the token file, so no role i
 `bg-primary text-primary-foreground` the ONE action · `bg-secondary` / `bg-muted` / `bg-accent` fills ·
 `text-mono` headings & numbers · `text-secondary-foreground` second lines · `text-muted-foreground` hints ·
 `border-input` fields · `ring-ring` focus · states `success` `warning` `info` `destructive` (always with text/icon).
+
+`text-primary-accent` is the brand colour **as text** (links, emphasised labels). `bg-primary` with `text-primary-foreground` is the brand colour as a fill. They are different values on purpose: a fill light enough to carry white text is too light to be read as text.
 
 Controls: sm `h-7 px-2.5 text-xs` · md `h-8.5 px-3 text-2sm` · lg `h-10 px-4 text-sm`; all `rounded-md`.
 Type: **Inter** (display + text, house default; Arabic companion Noto Sans Arabic) · body 13px `text-2sm` · labels `text-xs` · card title `text-base font-semibold tracking-tight text-mono` ·

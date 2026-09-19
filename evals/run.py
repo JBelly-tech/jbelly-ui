@@ -170,7 +170,7 @@ def outside_workspace(stream_path: Path, ws: Path, own: Path | None = None,
     own_s = normalize(own.as_posix()) if own else None
     # Agents reach the skill through whichever path their client installed it under, often a link
     # rather than the folder it resolves to, so the folder name is what identifies it.
-    own_tail = f"/skills/{own_name.lower()}/" if own_name and own_name != "none" else None
+    own_tail = f"/skills/{own_name.lower()}" if own_name and own_name != "none" else None
     tmp_s = normalize(Path(tempfile.gettempdir()).as_posix())
     path_fields = ("file_path", "path", "pattern", "notebook_path", "url")
     shell_fields = ("command", "script", "code")
@@ -181,7 +181,7 @@ def outside_workspace(stream_path: Path, ws: Path, own: Path | None = None,
         if not re.match(r"^[a-z]:/", q): return False
         if ws_s in q or q.startswith(tmp_s): return False
         if own_s and own_s in q: return False
-        if own_tail and own_tail in q: return False
+        if own_tail and (q.endswith(own_tail) or own_tail + "/" in q): return False
         # An unquoted path clips at its first space, leaving a fragment such as c:/users/msi that
         # is only an ancestor of a safe directory; the real target was quoted and is caught above.
         return not (ws_s.startswith(q) or tmp_s.startswith(q))
@@ -306,12 +306,18 @@ def main() -> int:
     print(f"[run] starting an autonomous agent session on your account; workspace {ws}")
     stream_path = out / "stream.jsonl"
     t0 = time.time()
+    timed_out = False
     with open(stream_path, "w", encoding="utf-8") as fh, open(prompt_path, "rb") as pin:
-        proc = subprocess.run(cmd, cwd=ws, stdin=pin, stdout=fh, stderr=subprocess.PIPE,
-                              text=True, timeout=a.timeout)
+        try:
+            proc = subprocess.run(cmd, cwd=ws, stdin=pin, stdout=fh, stderr=subprocess.PIPE,
+                                  text=True, timeout=a.timeout)
+            returncode, stderr = proc.returncode, proc.stderr
+        except subprocess.TimeoutExpired as exc:
+            timed_out, returncode, stderr = True, 124, (exc.stderr or "")
+            print(f"[run] the deadline of {a.timeout}s passed; recording what the transcript holds")
     wall = time.time() - t0
-    if proc.returncode != 0:
-        print(f"[run] CLI exited {proc.returncode}: {(proc.stderr or '')[:400]}")
+    if returncode != 0:
+        print(f"[run] CLI exited {returncode}: {(stderr or '')[:400]}")
 
     m = parse_stream(stream_path)
     complete = m.pop("result_event_seen")
@@ -340,7 +346,7 @@ def main() -> int:
         # A cut-short run has no deliverable to offer: any page on disk was caught mid-write, so it
         # is not copied out, not graded, and leaves the cell un-done for the next matrix pass.
         "produced": produced, "page": "out/page.html" if (complete and produced_page.is_file()) else None,
-        "exit_code": proc.returncode, "skill_source": str(skill_src) if skill_src else None,
+        "exit_code": returncode, "timed_out": timed_out, "skill_source": str(skill_src) if skill_src else None,
         "skills_switched_off": len(others), "allowed_tools": allowed,
         "workspace": str(ws), "outside_workspace": leaks,
         "blocked_attempts": isolation["blocked"], "clean": not leaks,
@@ -365,7 +371,7 @@ def main() -> int:
         for h in leaks[:6]: print("       " + h)
     print(f"[run] -> {out / 'timing.json'}")
     if not complete: return 2
-    return 0 if record["page"] else 1
+    return 0 if record["page"] and not timed_out else 1
 
 
 if __name__ == "__main__":

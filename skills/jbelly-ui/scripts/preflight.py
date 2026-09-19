@@ -123,7 +123,7 @@ def check_file(path, results):
     if icon_only: results.append(("FAIL", "structure", f"{path}:{where(icon_only[0].start())}", f"{len(icon_only)} icon-only button(s) without aria-label"))
     # contrast on tokens (css or html with <style>)
     scopes = token_scopes(txt)
-    pairs = [("foreground", "background", 4.5), ("primary-foreground", "primary", 4.5), ("muted-foreground", "background", 4.5), ("secondary-foreground", "secondary", 4.5), ("card-foreground", "card", 4.5)]
+    pairs = [("foreground", "background", 4.5), ("primary-foreground", "primary", 4.5), ("muted-foreground", "background", 4.5), ("secondary-foreground", "secondary", 4.5), ("card-foreground", "card", 4.5), ("primary-accent", "card", 4.5), ("primary-accent", "background", 4.5)]
     envs = {}  # keyed by narrowing-set: a page repeats few distinct scopes but can repeat them often
     for sel, sig, toks in scopes:
         if sig not in envs:

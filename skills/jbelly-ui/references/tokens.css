@@ -33,6 +33,8 @@
 
   /* brand — the one colour that carries identity */
   --primary: oklch(54% 0.2 258);
+  /* the brand colour as text: a link has to be readable on the surface, which a fill does not */
+  --primary-accent: oklch(54% 0.2 258);
   --primary-foreground: oklch(100% 0 0);
 
   /* neutrals */
@@ -83,7 +85,7 @@
   :root { --header-height: 60px; }
 }
 
-.dark {
+.dark { --primary-accent: oklch(59% 0.21 258);
   color-scheme: dark;
 
   --background: oklch(14.5% 0.005 285);
@@ -143,7 +145,7 @@
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
+  --color-primary: var(--primary); --color-primary-accent: var(--primary-accent);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);

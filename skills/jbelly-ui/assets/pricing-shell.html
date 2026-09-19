@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="en" dir="ltr" class="h-full">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>jbelly-ui — pricing page</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Source+Sans+3:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=DM+Sans:wght@400;500;600&family=Public+Sans:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+<style type="text/tailwindcss">
+/* ===== tokens.css (inlined for the single-file demo) ===== */
+:root {
+  color-scheme: light;
+  --radius: 0.5rem;
+  --font-display: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Arabic", sans-serif;
+  --font-mono: ui-monospace, "JetBrains Mono", Consolas, monospace;
+  --background: oklch(100% 0 0); --foreground: oklch(14.5% 0.005 285);
+  --card: oklch(100% 0 0); --card-foreground: oklch(14.5% 0.005 285);
+  --popover: oklch(100% 0 0); --popover-foreground: oklch(14.5% 0.005 285);
+  --primary: oklch(54% 0.2 258); --primary-foreground: oklch(100% 0 0);
+  --secondary: oklch(96.5% 0.002 285); --secondary-foreground: oklch(21% 0.006 285);
+  --muted: oklch(96.5% 0.002 285); --muted-foreground: oklch(55% 0.014 285);
+  --accent: oklch(96.5% 0.002 285); --accent-foreground: oklch(21% 0.006 285);
+  --mono: oklch(14.5% 0.005 285); --mono-foreground: oklch(100% 0 0);
+  --destructive: oklch(57.5% 0.22 27); --destructive-foreground: oklch(100% 0 0);
+  --success: oklch(72% 0.19 150); --success-foreground: oklch(100% 0 0);
+  --warning: oklch(85% 0.17 90); --warning-foreground: oklch(30% 0.05 90);
+  --info: oklch(60% 0.22 293); --info-foreground: oklch(100% 0 0);
+  --border: oklch(94% 0.004 286); --input: oklch(92% 0.004 286); --ring: oklch(71% 0.01 286);
+  --sidebar: var(--card); --sidebar-foreground: var(--foreground); --sidebar-muted: var(--muted-foreground);
+  --sidebar-accent: var(--accent); --sidebar-accent-foreground: var(--accent-foreground);
+  --sidebar-primary: var(--primary); --sidebar-border: var(--border);
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.06);
+  --sidebar-width: 280px; --sidebar-default-width: 280px; --sidebar-width-collapsed: 80px; --header-height: 70px;
+  --ctl-h: 34px; --ctl-h-sm: 28px; --row-h: 46px; --card-p: 1.25rem; --page-gap: 1.25rem;
+  --chart-2: var(--info); --chart-3: var(--success); --chart-4: var(--warning);
+}
+@media (max-width: 63.99rem) { :root { --header-height: 60px; } }
+.dark {
+  color-scheme: dark;
+  --background: oklch(14.5% 0.005 285); --foreground: oklch(98.5% 0 0);
+  --card: oklch(14.5% 0.005 285); --card-foreground: oklch(98.5% 0 0);
+  --popover: oklch(14.5% 0.005 285); --popover-foreground: oklch(98.5% 0 0);
+  --primary: oklch(55% 0.21 258);
+  --secondary: oklch(27.5% 0.006 286); --secondary-foreground: oklch(98.5% 0 0);
+  --muted: oklch(21% 0.006 285); --muted-foreground: oklch(64% 0.014 285);
+  --accent: oklch(21% 0.006 285); --accent-foreground: oklch(98.5% 0 0);
+  --mono: oklch(87% 0.006 286); --mono-foreground: oklch(0% 0 0);
+  --warning-foreground: oklch(92% 0.12 90);
+  --border: oklch(27.5% 0.006 286); --input: oklch(27.5% 0.006 286); --ring: oklch(44% 0.01 286);
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.4);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.4);
+}
+/* ===== optional dark sidebar on a light page (the popular semi-dark layout) ===== */
+.sidebar-dark { --sidebar: oklch(16% 0.02 262); --sidebar-foreground: oklch(90% 0.01 250); --sidebar-muted: oklch(62% 0.02 250); --sidebar-accent: oklch(22% 0.025 262); --sidebar-accent-foreground: oklch(100% 0 0); --sidebar-primary: oklch(78% 0.13 195); --sidebar-border: oklch(25% 0.025 262); }
+.sidebar-dark.dark { --sidebar: oklch(11% 0.015 262); --sidebar-border: oklch(20% 0.02 262); }
+/* ===== density ===== */
+.density-compact { --ctl-h: 30px; --ctl-h-sm: 24px; --row-h: 38px; --card-p: 1rem; --page-gap: 1rem; }
+.density-airy    { --ctl-h: 40px; --ctl-h-sm: 32px; --row-h: 56px; --card-p: 1.75rem; --page-gap: 1.75rem; }
+/* ===== personalities (from references/personalities.md) ===== */
+.theme-clinic { --font-display: "Manrope", sans-serif; --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --primary: oklch(50% 0.12 195); --background: oklch(98.5% 0.006 190); --card: oklch(100% 0 0);
+  --border: oklch(92% 0.012 190); --input: oklch(90% 0.014 190); --muted: oklch(96% 0.01 190); --accent: oklch(95% 0.012 190); --radius: 0.75rem; }
+.theme-clinic.dark { --background: oklch(15% 0.012 195); --card: oklch(18% 0.012 195); --popover: oklch(18% 0.012 195); --border: oklch(28% 0.015 195); --input: oklch(28% 0.015 195); --muted: oklch(22% 0.012 195); --accent: oklch(24% 0.014 195); --primary: oklch(70% 0.13 195); --primary-foreground: oklch(12% 0.02 195); }
+.theme-graphite { --muted-foreground: oklch(54% 0.014 285); --font-display: "IBM Plex Sans", sans-serif; --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif; --font-mono: "IBM Plex Mono", monospace;
+  --primary: oklch(65% 0.17 150); --primary-foreground: oklch(14% 0 0); --background: oklch(97% 0.002 260); --card: oklch(100% 0 0); --border: oklch(88% 0.004 260); --input: oklch(86% 0.004 260); --radius: 0.25rem; }
+.theme-graphite.dark { --muted-foreground: oklch(60.0% 0.014 285); --background: oklch(12% 0.004 260); --card: oklch(15% 0.004 260); --popover: oklch(15% 0.004 260); --border: oklch(24% 0.005 260); --input: oklch(26% 0.005 260); }
+.theme-editorial { --font-display: "Fraunces", Georgia, serif; --font-sans: "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
+  --primary: oklch(48% 0.16 30); --primary-foreground: oklch(98% 0.01 60); --background: oklch(97.5% 0.012 75); --card: oklch(99% 0.008 75);
+  --foreground: oklch(22% 0.02 50); --mono: oklch(22% 0.02 50); --border: oklch(90% 0.02 70); --input: oklch(88% 0.02 70); --muted: oklch(94% 0.015 75); --accent: oklch(93% 0.018 75); --muted-foreground: oklch(50% 0.03 50);
+  --radius: 0.5rem; --shadow-xs: 0 1px 3px rgb(60 30 10 / 0.08); --shadow-md: 0 6px 16px -6px rgb(60 30 10 / 0.18); }
+.theme-editorial.dark { --background: oklch(16% 0.012 60); --card: oklch(19% 0.012 60); --popover: oklch(19% 0.012 60); --foreground: oklch(95% 0.01 75); --mono: oklch(95% 0.01 75); --border: oklch(28% 0.015 60); --input: oklch(28% 0.015 60); --muted: oklch(23% 0.012 60); --accent: oklch(25% 0.014 60); --muted-foreground: oklch(65% 0.02 60); --primary: oklch(70% 0.15 35); --primary-foreground: oklch(14% 0.02 40); }
+.theme-neo { --font-display: "Space Grotesk", sans-serif; --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --primary: oklch(55% 0.25 290); --background: oklch(99% 0 0); --card: oklch(100% 0 0); --foreground: oklch(10% 0 0); --mono: oklch(10% 0 0);
+  --border: oklch(10% 0 0); --input: oklch(10% 0 0); --radius: 0.25rem; --shadow-xs: 3px 3px 0 0 var(--foreground); --shadow-md: 5px 5px 0 0 var(--foreground); }
+.theme-neo.dark { --background: oklch(12% 0 0); --card: oklch(15% 0 0); --popover: oklch(15% 0 0); --foreground: oklch(98% 0 0); --mono: oklch(98% 0 0); --border: oklch(98% 0 0); --input: oklch(98% 0 0); --primary: oklch(75% 0.2 290); --primary-foreground: oklch(10% 0 0); }
+.theme-slate { --muted-foreground: oklch(53% 0.014 285); --font-display: "Inter", sans-serif; --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --primary: oklch(42% 0.12 260); --background: oklch(96.5% 0.004 250); --card: oklch(100% 0 0); --foreground: oklch(18% 0.02 260); --border: oklch(88% 0.008 250); --input: oklch(86% 0.008 250); --radius: 0.375rem;
+  --sidebar: oklch(18% 0.03 260); --sidebar-foreground: oklch(92% 0.01 250); --sidebar-muted: oklch(65% 0.02 250); --sidebar-accent: oklch(24% 0.03 260); --sidebar-accent-foreground: oklch(100% 0 0); --sidebar-primary: oklch(78% 0.12 80); --sidebar-border: oklch(26% 0.03 260); }
+.theme-slate.dark { --muted-foreground: oklch(60.0% 0.014 285); --background: oklch(13% 0.02 260); --card: oklch(17% 0.02 260); --popover: oklch(17% 0.02 260); --foreground: oklch(95% 0.01 250); --border: oklch(26% 0.02 260); --input: oklch(26% 0.02 260); --primary: oklch(72% 0.12 80); --primary-foreground: oklch(15% 0.03 80); --sidebar: oklch(11% 0.02 260); }
+.theme-mint { --font-display: "Plus Jakarta Sans", sans-serif; --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --primary: oklch(60% 0.15 165); --primary-foreground: oklch(14% 0 0); --background: oklch(98% 0.01 160); --card: oklch(100% 0 0); --border: oklch(93% 0.02 160); --input: oklch(90% 0.02 160); --muted: oklch(96% 0.012 160); --accent: oklch(95% 0.015 160); --radius: 1rem;
+  --shadow-xs: 0 1px 2px rgb(20 60 40 / 0.06); --shadow-md: 0 8px 24px -8px rgb(20 60 40 / 0.18); }
+.theme-mint.dark { --background: oklch(14% 0.01 160); --card: oklch(18% 0.012 160); --popover: oklch(18% 0.012 160); --border: oklch(27% 0.015 160); --input: oklch(27% 0.015 160); --muted: oklch(22% 0.012 160); --accent: oklch(24% 0.014 160); --primary: oklch(72% 0.15 165); }
+
+@custom-variant dark (&:where(.dark, .dark *));
+@theme inline {
+  --font-sans: var(--font-sans); --font-mono: var(--font-mono); --font-display: var(--font-display);
+  --color-background: var(--background); --color-foreground: var(--foreground);
+  --color-card: var(--card); --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover); --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary); --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary); --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted); --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent); --color-accent-foreground: var(--accent-foreground);
+  --color-mono: var(--mono); --color-mono-foreground: var(--mono-foreground);
+  --color-destructive: var(--destructive); --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success); --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning); --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info); --color-info-foreground: var(--info-foreground);
+  --color-border: var(--border); --color-input: var(--input); --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar); --color-sidebar-foreground: var(--sidebar-foreground); --color-sidebar-muted: var(--sidebar-muted);
+  --color-sidebar-accent: var(--sidebar-accent); --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-primary: var(--sidebar-primary); --color-sidebar-border: var(--sidebar-border);
+  --radius-xl: calc(var(--radius) + 4px); --radius-lg: var(--radius); --radius-md: calc(var(--radius) - 2px); --radius-sm: calc(var(--radius) - 4px);
+  --shadow-xs: var(--shadow-xs); --shadow-md: var(--shadow-md);
+}
+@theme { --text-2sm: 0.8125rem; --text-2sm--line-height: 1.3; --text-2xs: 0.6875rem; --text-2xs--line-height: 1.2; }
+@layer base {
+  * { border-color: var(--border); }
+  html { font-family: var(--font-sans); }
+  body { background: var(--background); color: var(--foreground); -webkit-font-smoothing: antialiased; }
+  :focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+  .scroll-thin { scrollbar-width: thin; scrollbar-color: var(--accent) transparent; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+}
+@layer components {
+  .container-fixed { @apply w-full grow px-6 xl:mx-auto xl:px-7.5 xl:max-w-(--breakpoint-xl); }
+  /* buttons */
+  .btn { @apply inline-flex items-center justify-center gap-1.5 shrink-0 whitespace-nowrap font-medium rounded-md shadow-xs transition-colors cursor-pointer h-(--ctl-h) px-3 text-2sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background disabled:opacity-50 disabled:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0; }
+  .btn-sm { @apply h-(--ctl-h-sm) px-2.5 text-xs gap-1.25; }
+  .btn-icon { @apply p-0 w-(--ctl-h); }
+  .btn-icon.btn-sm { @apply w-(--ctl-h-sm); }
+  .btn-primary { @apply bg-primary text-primary-foreground hover:bg-primary/90; }
+  .btn-outline { @apply border border-input bg-background text-secondary-foreground hover:bg-accent hover:text-accent-foreground; }
+  .btn-ghost { @apply shadow-none bg-transparent text-accent-foreground hover:bg-accent; }
+  .btn-destructive { @apply bg-destructive text-destructive-foreground hover:bg-destructive/90; }
+  /* inputs */
+  .input { @apply flex w-full rounded-md border border-input bg-background text-foreground shadow-xs placeholder:text-muted-foreground transition-colors h-(--ctl-h) px-3 text-2sm focus-visible:outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40; }
+  .input-sm { @apply h-(--ctl-h-sm) px-2.5 text-xs; }
+  .select { @apply appearance-none cursor-pointer pe-8 bg-no-repeat bg-[length:14px_11px] bg-[position:right_0.6rem_center] rtl:bg-[position:left_0.6rem_center]; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%239f9fa9' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3E%3C/svg%3E"); }
+  .checkbox { @apply appearance-none shrink-0 size-4 rounded-sm border border-input bg-background shadow-xs cursor-pointer checked:bg-primary checked:border-primary bg-center bg-no-repeat focus-visible:ring-2 focus-visible:ring-ring/40; }
+  .checkbox:checked { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='white' stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='m3.5 8.5 3 3 6-7'/%3E%3C/svg%3E"); }
+  /* badges */
+  .badge { @apply inline-flex items-center justify-center gap-1.5 whitespace-nowrap font-medium rounded-md h-6 min-w-6 px-[0.45rem] text-xs bg-secondary text-accent-foreground; }
+  .badge-sm { @apply h-5 min-w-5 px-[0.325rem] text-2xs rounded-sm gap-1; }
+  .badge-light-primary { @apply bg-primary/10 text-primary; }
+  .badge-light-success { @apply bg-success/15 text-success; }
+  .badge-light-warning { @apply bg-warning/20 text-warning-foreground; }
+  .badge-light-destructive { @apply bg-destructive/10 text-destructive; }
+  .badge-outline { @apply border border-border bg-muted text-secondary-foreground; }
+  .dot { @apply size-1.5 rounded-full bg-current opacity-75; }
+  /* card */
+  .card { @apply flex flex-col rounded-xl border border-border bg-card text-card-foreground shadow-xs; }
+  .card-header { @apply flex min-h-14 flex-wrap items-center justify-between gap-2.5 border-b border-border px-5; }
+  .card-title { @apply text-base font-semibold tracking-tight leading-none text-mono; }
+  .card-content { @apply grow p-(--card-p); }
+  .card-footer { @apply flex items-center border-t border-border px-5 py-4; }
+  /* table */
+  .table { @apply w-full border-collapse text-sm text-foreground; }
+  .table th { @apply h-11 px-4 text-start align-middle text-xs font-normal text-secondary-foreground border-b border-border whitespace-nowrap; }
+  .table td { @apply px-4 align-middle border-b border-border h-(--row-h); }
+  .table tbody tr:last-child td { @apply border-b-0; }
+  .table tbody tr { @apply hover:bg-muted/40 transition-colors; }
+  .table tbody tr.selected { @apply bg-accent; }
+  /* ---- pricing page: segmented billing control, plan cards, comparison table, faq ---- */
+  .seg { @apply inline-flex h-(--ctl-h) cursor-pointer select-none items-center justify-center gap-1.5 whitespace-nowrap rounded-md px-3 text-2sm font-medium text-secondary-foreground transition-colors; }
+  .seg:hover { @apply text-mono; }
+  .seg-input:checked + .seg { @apply bg-background text-mono shadow-xs; }
+  .seg-input:focus-visible + .seg { @apply outline-2 outline-offset-2 outline-ring; }
+  .plan { @apply relative flex flex-col rounded-xl border border-border bg-card text-card-foreground shadow-xs; }
+  .plan-featured { @apply border-primary shadow-md ring-1 ring-primary; }
+  .plan-feature { @apply flex items-start gap-2.5 text-2sm text-secondary-foreground; }
+  .plan-feature i, .plan-feature svg { @apply mt-0.5 size-4 shrink-0 text-primary; }
+  .cmp { border-collapse: separate; border-spacing: 0; }
+  .cmp th, .cmp td { @apply border-b border-border; }
+  .cmp thead th { @apply sticky top-0 z-20 bg-card align-bottom; }
+  .cmp tbody th[scope="row"] { @apply sticky z-10 bg-card text-start text-2sm font-normal whitespace-normal text-foreground h-(--row-h); inset-inline-start: 0; border-inline-end: 1px solid var(--border); }
+  .cmp thead th:first-child { @apply z-30; inset-inline-start: 0; border-inline-end: 1px solid var(--border); }
+  .cmp tbody tr:last-child th, .cmp tbody tr:last-child td { @apply border-b; }
+  .cmp .group-row th { @apply h-9 bg-muted text-start text-xs font-medium text-muted-foreground; }
+  .cmp td { @apply text-center text-2sm text-secondary-foreground; }
+  .faq summary { @apply flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-2sm font-medium text-mono; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq[open] summary .faq-chevron { transform: rotate(180deg); }
+  .faq summary:focus-visible { @apply outline-2 outline-offset-2 outline-ring; }
+}
+/* unlayered: [hidden] must beat any utility the toggled element carries */
+[hidden] { display: none !important; }
+</style>
+</head>
+<body class="min-h-full flex flex-col text-2sm">
+<a href="#content" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:start-2 focus:z-50 btn btn-primary btn-sm">Skip to content</a>
+
+<!-- @region header -->
+<header class="sticky top-0 z-40 border-b border-border bg-background">
+  <div class="container-fixed flex h-(--header-height) items-center justify-between gap-4">
+    <a href="#" class="flex shrink-0 items-center gap-2.5 font-semibold text-mono">
+      <span class="inline-flex size-7 items-center justify-center rounded-md bg-primary text-xs font-bold text-primary-foreground">A</span>
+      <span class="font-display">Acme Ops</span>
+    </a>
+    <nav class="hidden items-center gap-0.5 md:flex" aria-label="Main">
+      <a href="#" class="rounded-md px-2.5 py-1.5 text-2sm text-secondary-foreground hover:bg-accent hover:text-mono"><span data-i18n="Product">Product</span></a>
+      <a href="#" aria-current="page" class="rounded-md bg-accent px-2.5 py-1.5 text-2sm font-medium text-mono"><span data-i18n="Pricing">Pricing</span></a>
+      <a href="#" class="rounded-md px-2.5 py-1.5 text-2sm text-secondary-foreground hover:bg-accent hover:text-mono"><span data-i18n="Docs">Docs</span></a>
+      <a href="#" class="rounded-md px-2.5 py-1.5 text-2sm text-secondary-foreground hover:bg-accent hover:text-mono"><span data-i18n="Changelog">Changelog</span></a>
+    </nav>
+    <div class="flex items-center gap-1.5">
+      <button id="lang-toggle" class="btn btn-ghost btn-icon" aria-label="Switch language" title="English / العربية"><i data-lucide="languages"></i></button>
+      <button id="theme-toggle" class="btn btn-ghost btn-icon" aria-label="Toggle dark mode"><i data-lucide="moon" class="dark:hidden"></i><i data-lucide="sun" class="hidden dark:block"></i></button>
+      <a href="#" class="btn btn-outline hidden sm:inline-flex"><span data-i18n="Sign in">Sign in</span></a>
+      <button id="nav-toggle" class="btn btn-ghost btn-icon md:hidden" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav"><i data-lucide="menu"></i></button>
+    </div>
+  </div>
+  <nav id="mobile-nav" hidden aria-label="Main, small screens" class="container-fixed flex flex-col gap-0.5 border-t border-border py-2 md:hidden">
+    <a href="#" class="rounded-md px-2.5 py-2 text-2sm text-secondary-foreground hover:bg-accent"><span data-i18n="Product">Product</span></a>
+    <a href="#" aria-current="page" class="rounded-md bg-accent px-2.5 py-2 text-2sm font-medium text-mono"><span data-i18n="Pricing">Pricing</span></a>
+    <a href="#" class="rounded-md px-2.5 py-2 text-2sm text-secondary-foreground hover:bg-accent"><span data-i18n="Docs">Docs</span></a>
+    <a href="#" class="rounded-md px-2.5 py-2 text-2sm text-secondary-foreground hover:bg-accent"><span data-i18n="Changelog">Changelog</span></a>
+    <a href="#" class="rounded-md px-2.5 py-2 text-2sm text-secondary-foreground hover:bg-accent sm:hidden"><span data-i18n="Sign in">Sign in</span></a>
+  </nav>
+</header>
+<!-- @endregion header -->
+
+<main id="content" class="grow">
+
+  <!-- @region pricing-intro -->
+<section class="container-fixed flex flex-col items-center gap-4 pt-10 pb-7.5 text-center md:pt-14">
+    <h1 class="max-w-2xl font-display text-3xl font-medium text-mono md:text-4xl"><span data-i18n="Pricing that follows your order volume">Pricing that follows your order volume</span></h1>
+    <p class="max-w-xl text-sm text-secondary-foreground"><span data-i18n="Every plan carries the whole order pipeline. What changes is how many orders, stores and people you bring to it.">Every plan carries the whole order pipeline. What changes is how many orders, stores and people you bring to it.</span></p>
+    <fieldset class="mt-2 flex flex-col items-center gap-2.5">
+      <legend class="sr-only" data-i18n="Billing period">Billing period</legend>
+      <div class="inline-flex items-center gap-1 rounded-lg border border-border bg-muted p-1">
+        <label class="inline-flex"><input type="radio" name="billing" value="monthly" class="seg-input sr-only" checked><span class="seg"><span data-i18n="Monthly">Monthly</span></span></label>
+        <label class="inline-flex"><input type="radio" name="billing" value="yearly" class="seg-input sr-only"><span class="seg"><span data-i18n="Yearly">Yearly</span><span class="badge badge-sm bg-primary text-primary-foreground"><span data-i18n="Save 17%">Save 17%</span></span></span></label>
+      </div>
+      <p class="min-h-4 text-xs text-muted-foreground" aria-live="polite">
+        <span data-when="monthly"><span data-i18n="Switch to yearly and two months come free on every plan.">Switch to yearly and two months come free on every plan.</span></span>
+        <span data-when="yearly" hidden><span data-i18n="Yearly billing is ten months for twelve, 17% less than paying month by month.">Yearly billing is ten months for twelve, 17% less than paying month by month.</span></span>
+      </p>
+    </fieldset>
+  </section>
+<!-- @endregion pricing-intro -->
+
+  <!-- @region plans -->
+<section class="container-fixed pb-12" aria-labelledby="plans-heading">
+    <h2 id="plans-heading" class="sr-only" data-i18n="Plans">Plans</h2>
+    <div class="grid items-stretch gap-5 md:grid-cols-3 lg:gap-7.5">
+
+      <article class="plan">
+        <div class="flex grow flex-col gap-5 p-(--card-p)">
+          <div class="flex flex-col gap-1">
+            <h3 class="text-base font-semibold tracking-tight text-mono"><span data-i18n="Starter">Starter</span></h3>
+            <p class="min-h-9 text-2sm text-secondary-foreground"><span data-i18n="For one shop and a team that fits around one table.">For one shop and a team that fits around one table.</span></p>
+          </div>
+          <div>
+            <div class="flex items-baseline gap-1.5">
+              <span dir="ltr" class="font-display text-4xl font-semibold tabular-nums text-mono" data-price data-m="$19" data-y="$15.83">$19</span>
+              <span class="text-2sm text-muted-foreground"><span data-i18n="per month">per month</span></span>
+            </div>
+            <p class="mt-1.5 text-xs text-muted-foreground">
+              <span data-when="monthly"><span data-i18n="Billed monthly, cancel any time">Billed monthly, cancel any time</span></span>
+              <span data-when="yearly" hidden><span data-i18n="Billed once a year">Billed once a year</span>, <span dir="ltr" class="tabular-nums">$190</span></span>
+            </p>
+          </div>
+          <a href="#cta" class="btn btn-outline w-full"><span data-i18n="Choose Starter">Choose Starter</span></a>
+          <ul class="flex grow flex-col gap-2.5 border-t border-border pt-5">
+            <li class="plan-feature"><i data-lucide="check"></i><span data-i18n="3 team seats">3 team seats</span></li>
+            <li class="plan-feature"><i data-lucide="check"></i><span data-i18n="1 connected store">1 connected store</span></li>
+            <li class="plan-feature"><i data-lucide="check"></i><span data-i18n="1,500 orders a month">1,500 orders a month</span></li>
+            <li class="plan-feature"><i data-lucide="check"></i><span data-i18n="5 automation rules">5 automation rules</span></li>
+            <li class="plan-feature"><i data-lucide="check"></i><span data-i18n="12 months of order history">12 months of order history</span></li>
+            <li class="plan-feature"><i data-lucide="check"></i><span data-i18n="Email support, answered in 2 business days">Email support, answered in 2 business days</span></li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="plan plan-featured md:-mt-4 md:mb-4">
+        <span class="badge badge-sm absolute -top-2.5 start-1/2 -translate-x-1/2 bg-primary text-primary-foreground rtl:translate-x-1/2"><span data-i18n="Recommended">Recommended</span></span>
+        <div class="flex grow flex-col gap-5 p-(--card-p)">
+          <div class="flex flex-col gap-1">
+            <h3 class="text-base font-semibold tracking-tight text-mono"><span data-i18n="Growth">Growth</span></h3>
+            <p class="min-h-9 text-2sm text-secondary-foreground"><span data-i18n="For a team selling on several channels and done with the spreadsheet.">For a team selling on several channels and done with the spreadsheet.</span></p>
+          </div>
+          <div>
+            <div class="flex items-baseline gap-1.5">
+              <span dir="ltr" class="font-display text-4xl font-semibold tabular-nums text-mono" data-price data-m="$49" data-y="$40.83">$49</span>
+              <span class="text-2sm text-muted-foreground"><span data-i18n="per month">per month</span></span>
+            </div>
+            <p class="mt-1.5 text-xs text-muted-foreground">
+              <span data-when="monthly"><span data-i18n="Billed monthly, cancel any time">Billed monthly, cancel any time</span></span>
+              <span data-when="yearly" hidden><span data-i18n="Billed once a year">Billed once a year</span>, <span dir="ltr" class="tabular-nums">$490</span></span>
+            </p>
+          </div>
+          <a href="#cta" class="btn btn-outline w-full border-primary text-primary hover:bg-primary/10"><span data-i18n="Choose Growth">Choose Growth</span></a>
+          <ul class="flex grow flex-col gap-2.5 border-t border-border pt-5">
+            <li class="text-xs font-medium text-mono"><span data-i18n="Everything in Starter, plus">Everything in Starter, plus</span></li>
+            <li class="plan-feature"><i data-lucide="check"></i><span data-i18n="12 team seats">12 team seats</span></li>
+            <li class="plan-feature"><i data-lucide="check"></i><span data-i18n="5 connected stores">5 connected stores</span></li>
+            <li class="plan-feature"><i data-lucide="check"></i><span data-i18n="12,000 orders a month">12,000 orders a month</span></li>
+            <li class="plan-feature"><i data-lucide="check"></i><span data-i18n="50 automation rules and webhooks">50 automation rules and webhooks</span></li>
+            <li class="plan-feature"><i data-lucide="check"></i><span data-i18n="Roles, permissions and a 30-day audit log">Roles, permissions and a 30-day audit log</span></li>
+            <li class="plan-feature"><i data-lucide="check"></i><span data-i18n="Email and chat support, answered in 8 hours">Email and chat support, answered in 8 hours</span></li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="plan">
+        <div class="flex grow flex-col gap-5 p-(--card-p)">
+          <div class="flex flex-col gap-1">
+            <h3 class="text-base font-semibold tracking-tight text-mono"><span data-i18n="Scale">Scale</span></h3>
+            <p class="min-h-9 text-2sm text-secondary-foreground"><span data-i18n="For operations that need single sign-on, a sandbox and an SLA in writing.">For operations that need single sign-on, a sandbox and an SLA in writing.</span></p>
+          </div>
+          <div>
+            <div class="flex items-baseline gap-1.5">
+              <span dir="ltr" class="font-display text-4xl font-semibold tabular-nums text-mono" data-price data-m="$129" data-y="$107.50">$129</span>
+              <span class="text-2sm text-muted-foreground"><span data-i18n="per month">per month</span></span>
+            </div>
+            <p class="mt-1.5 text-xs text-muted-foreground">
+              <span data-when="monthly"><span data-i18n="Billed monthly, cancel any time">Billed monthly, cancel any time</span></span>
+              <span data-when="yearly" hidden><span data-i18n="Billed once a year">Billed once a year</span>, <span dir="ltr" class="tabular-nums">$1,290</span></span>
+            </p>
+          </div>
+          <a href="#cta" class="btn btn-outline w-full"><span data-i18n="Choose Scale">Choose Scale</span></a>
+          <ul class="flex grow flex-col gap-2.5 border-t border-border pt-5">
+            <li class="text-xs font-medium text-mono"><span data-i18n="Everything in Growth, plus">Everything in Growth, plus</span></li>
+            <li class="plan-feature"><i data-lucide="check"></i><span data-i18n="Team seats without a limit">Team seats without a limit</span></li>
+            <li class="plan-feature"><i data-lucide="check"></i><span data-i18n="25 connected stores">25 connected stores</span></li>
+            <li class="plan-feature"><i data-lucide="check"></i><span data-i18n="60,000 orders a month">60,000 orders a month</span></li>
+            <li class="plan-feature"><i data-lucide="check"></i><span data-i18n="Single sign-on and a full audit log">Single sign-on and a full audit log</span></li>
+            <li class="plan-feature"><i data-lucide="check"></i><span data-i18n="Sandbox environment and a 99.95% uptime SLA">Sandbox environment and a 99.95% uptime SLA</span></li>
+            <li class="plan-feature"><i data-lucide="check"></i><span data-i18n="Priority support, answered in 1 hour">Priority support, answered in 1 hour</span></li>
+          </ul>
+        </div>
+      </article>
+
+    </div>
+    <p class="pt-5 text-center text-xs text-muted-foreground"><span data-i18n="Prices in US dollars per workspace. Tax is added at checkout. Extra seats on Starter and Growth cost $6 each a month.">Prices in US dollars per workspace. Tax is added at checkout. Extra seats on Starter and Growth cost $6 each a month.</span></p>
+  </section>
+<!-- @endregion plans -->
+  <!-- @region comparison -->
+<section class="container-fixed pb-12" aria-labelledby="compare-heading">
+    <div class="flex flex-col gap-1 pb-5">
+      <h2 id="compare-heading" class="font-display text-xl font-medium text-mono"><span data-i18n="Compare every plan">Compare every plan</span></h2>
+      <p class="text-2sm text-secondary-foreground"><span data-i18n="The table scrolls inside its own frame. The feature column and the plan headers stay in place while you read across.">The table scrolls inside its own frame. The feature column and the plan headers stay in place while you read across.</span></p>
+    </div>
+    <div class="card overflow-hidden">
+      <div class="relative max-h-[32rem] overflow-auto scroll-thin">
+        <table class="table cmp min-w-[46rem]">
+          <caption class="sr-only" data-i18n="Feature comparison of the Starter, Growth and Scale plans. The price under each plan name follows the billing period chosen above the table.">Feature comparison of the Starter, Growth and Scale plans. The price under each plan name follows the billing period chosen above the table.</caption>
+          <thead>
+            <tr>
+              <th scope="col" class="h-auto min-w-[15rem] py-3.5"><span data-i18n="Feature">Feature</span></th>
+              <th scope="col" class="h-auto py-3.5 text-center">
+                <span class="block text-2sm font-medium text-mono" data-i18n="Starter">Starter</span>
+                <span dir="ltr" class="mt-1 block text-xs tabular-nums text-muted-foreground" data-price data-m="$19" data-y="$15.83">$19</span>
+              </th>
+              <th scope="col" class="h-auto py-3.5 text-center">
+                <span class="block text-2sm font-medium text-mono" data-i18n="Growth">Growth</span>
+                <span dir="ltr" class="mt-1 block text-xs tabular-nums text-muted-foreground" data-price data-m="$49" data-y="$40.83">$49</span>
+                <span class="mt-1 block text-2xs text-primary" data-i18n="Recommended">Recommended</span>
+              </th>
+              <th scope="col" class="h-auto py-3.5 text-center">
+                <span class="block text-2sm font-medium text-mono" data-i18n="Scale">Scale</span>
+                <span dir="ltr" class="mt-1 block text-xs tabular-nums text-muted-foreground" data-price data-m="$129" data-y="$107.50">$129</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="group-row"><th scope="colgroup" colspan="4"><span data-i18n="Orders and stores">Orders and stores</span></th></tr>
+            <tr><th scope="row"><span data-i18n="Orders a month">Orders a month</span></th><td dir="ltr" class="tabular-nums">1,500</td><td dir="ltr" class="tabular-nums">12,000</td><td dir="ltr" class="tabular-nums">60,000</td></tr>
+            <tr><th scope="row"><span data-i18n="Connected stores">Connected stores</span></th><td dir="ltr" class="tabular-nums">1</td><td dir="ltr" class="tabular-nums">5</td><td dir="ltr" class="tabular-nums">25</td></tr>
+            <tr><th scope="row"><span data-i18n="Order history kept">Order history kept</span></th><td><span data-i18n="12 months">12 months</span></td><td><span data-i18n="3 years">3 years</span></td><td><span data-i18n="7 years">7 years</span></td></tr>
+            <tr><th scope="row"><span data-i18n="Bulk import from CSV">Bulk import from CSV</span></th><td><i data-lucide="check" class="mx-auto block size-4 text-primary"></i><span class="sr-only" data-i18n="Included">Included</span></td><td><i data-lucide="check" class="mx-auto block size-4 text-primary"></i><span class="sr-only" data-i18n="Included">Included</span></td><td><i data-lucide="check" class="mx-auto block size-4 text-primary"></i><span class="sr-only" data-i18n="Included">Included</span></td></tr>
+          </tbody>
+          <tbody>
+            <tr class="group-row"><th scope="colgroup" colspan="4"><span data-i18n="People and access">People and access</span></th></tr>
+            <tr><th scope="row"><span data-i18n="Team seats">Team seats</span></th><td dir="ltr" class="tabular-nums">3</td><td dir="ltr" class="tabular-nums">12</td><td><span data-i18n="No limit">No limit</span></td></tr>
+            <tr><th scope="row"><span data-i18n="Roles and permissions">Roles and permissions</span></th><td><i data-lucide="minus" class="mx-auto block size-4 text-muted-foreground"></i><span class="sr-only" data-i18n="Not included">Not included</span></td><td><i data-lucide="check" class="mx-auto block size-4 text-primary"></i><span class="sr-only" data-i18n="Included">Included</span></td><td><i data-lucide="check" class="mx-auto block size-4 text-primary"></i><span class="sr-only" data-i18n="Included">Included</span></td></tr>
+            <tr><th scope="row"><span data-i18n="Single sign-on (SAML)">Single sign-on (SAML)</span></th><td><i data-lucide="minus" class="mx-auto block size-4 text-muted-foreground"></i><span class="sr-only" data-i18n="Not included">Not included</span></td><td><i data-lucide="minus" class="mx-auto block size-4 text-muted-foreground"></i><span class="sr-only" data-i18n="Not included">Not included</span></td><td><i data-lucide="check" class="mx-auto block size-4 text-primary"></i><span class="sr-only" data-i18n="Included">Included</span></td></tr>
+            <tr><th scope="row"><span data-i18n="Audit log">Audit log</span></th><td><i data-lucide="minus" class="mx-auto block size-4 text-muted-foreground"></i><span class="sr-only" data-i18n="Not included">Not included</span></td><td><span data-i18n="30 days">30 days</span></td><td><span data-i18n="Full history">Full history</span></td></tr>
+          </tbody>
+          <tbody>
+            <tr class="group-row"><th scope="colgroup" colspan="4"><span data-i18n="Automation and API">Automation and API</span></th></tr>
+            <tr><th scope="row"><span data-i18n="Automation rules">Automation rules</span></th><td dir="ltr" class="tabular-nums">5</td><td dir="ltr" class="tabular-nums">50</td><td><span data-i18n="No limit">No limit</span></td></tr>
+            <tr><th scope="row"><span data-i18n="Outgoing webhooks">Outgoing webhooks</span></th><td><i data-lucide="minus" class="mx-auto block size-4 text-muted-foreground"></i><span class="sr-only" data-i18n="Not included">Not included</span></td><td><i data-lucide="check" class="mx-auto block size-4 text-primary"></i><span class="sr-only" data-i18n="Included">Included</span></td><td><i data-lucide="check" class="mx-auto block size-4 text-primary"></i><span class="sr-only" data-i18n="Included">Included</span></td></tr>
+            <tr><th scope="row"><span data-i18n="API requests a minute">API requests a minute</span></th><td dir="ltr" class="tabular-nums">60</td><td dir="ltr" class="tabular-nums">600</td><td dir="ltr" class="tabular-nums">3,000</td></tr>
+            <tr><th scope="row"><span data-i18n="Sandbox environment">Sandbox environment</span></th><td><i data-lucide="minus" class="mx-auto block size-4 text-muted-foreground"></i><span class="sr-only" data-i18n="Not included">Not included</span></td><td><i data-lucide="minus" class="mx-auto block size-4 text-muted-foreground"></i><span class="sr-only" data-i18n="Not included">Not included</span></td><td><i data-lucide="check" class="mx-auto block size-4 text-primary"></i><span class="sr-only" data-i18n="Included">Included</span></td></tr>
+          </tbody>
+          <tbody>
+            <tr class="group-row"><th scope="colgroup" colspan="4"><span data-i18n="Support">Support</span></th></tr>
+            <tr><th scope="row"><span data-i18n="Support channel">Support channel</span></th><td><span data-i18n="Email">Email</span></td><td><span data-i18n="Email and chat">Email and chat</span></td><td><span data-i18n="Priority queue">Priority queue</span></td></tr>
+            <tr><th scope="row"><span data-i18n="First reply target">First reply target</span></th><td><span data-i18n="2 business days">2 business days</span></td><td><span data-i18n="8 hours">8 hours</span></td><td><span data-i18n="1 hour">1 hour</span></td></tr>
+            <tr><th scope="row"><span data-i18n="Onboarding">Onboarding</span></th><td><span data-i18n="Documentation">Documentation</span></td><td><span data-i18n="Guided setup call">Guided setup call</span></td><td><span data-i18n="Named specialist">Named specialist</span></td></tr>
+            <tr><th scope="row"><span data-i18n="Uptime SLA">Uptime SLA</span></th><td><i data-lucide="minus" class="mx-auto block size-4 text-muted-foreground"></i><span class="sr-only" data-i18n="Not included">Not included</span></td><td dir="ltr" class="tabular-nums">99.5%</td><td dir="ltr" class="tabular-nums">99.95%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+<!-- @endregion comparison -->
+
+  <!-- @region faq -->
+<section class="container-fixed pb-12" aria-labelledby="faq-heading">
+    <h2 id="faq-heading" class="pb-5 font-display text-xl font-medium text-mono"><span data-i18n="Asked before signing">Asked before signing</span></h2>
+    <div class="card divide-y divide-border">
+      <details class="faq px-5">
+        <summary><span data-i18n="Can we change plan in the middle of a billing period?">Can we change plan in the middle of a billing period?</span><i data-lucide="chevron-down" class="faq-chevron size-4 shrink-0 text-muted-foreground transition-transform"></i></summary>
+        <p class="pb-4 pe-8 text-2sm text-secondary-foreground"><span data-i18n="An upgrade takes effect the moment you confirm it, and we charge only the difference for the days left in the period. A downgrade takes effect on the next renewal date, so you keep what you already paid for.">An upgrade takes effect the moment you confirm it, and we charge only the difference for the days left in the period. A downgrade takes effect on the next renewal date, so you keep what you already paid for.</span></p>
+      </details>
+      <details class="faq px-5">
+        <summary><span data-i18n="What counts as an order?">What counts as an order?</span><i data-lucide="chevron-down" class="faq-chevron size-4 shrink-0 text-muted-foreground transition-transform"></i></summary>
+        <p class="pb-4 pe-8 text-2sm text-secondary-foreground"><span data-i18n="One order created in a connected store, whatever number of items it holds. Cancellations, refunds and orders made in the sandbox are not counted.">One order created in a connected store, whatever number of items it holds. Cancellations, refunds and orders made in the sandbox are not counted.</span></p>
+      </details>
+      <details class="faq px-5">
+        <summary><span data-i18n="What happens if we go past the monthly order limit?">What happens if we go past the monthly order limit?</span><i data-lucide="chevron-down" class="faq-chevron size-4 shrink-0 text-muted-foreground transition-transform"></i></summary>
+        <p class="pb-4 pe-8 text-2sm text-secondary-foreground"><span data-i18n="Orders keep syncing and nothing is blocked. We email the account owner in the same week, and if you are over the limit two months in a row we ask you to move up a plan.">Orders keep syncing and nothing is blocked. We email the account owner in the same week, and if you are over the limit two months in a row we ask you to move up a plan.</span></p>
+      </details>
+      <details class="faq px-5">
+        <summary><span data-i18n="Do extra seats cost more?">Do extra seats cost more?</span><i data-lucide="chevron-down" class="faq-chevron size-4 shrink-0 text-muted-foreground transition-transform"></i></summary>
+        <p class="pb-4 pe-8 text-2sm text-secondary-foreground"><span data-i18n="Starter and Growth include the seats listed in the table; each seat after that is $6 a month. Scale has no seat limit, so adding people changes nothing on the invoice.">Starter and Growth include the seats listed in the table; each seat after that is $6 a month. Scale has no seat limit, so adding people changes nothing on the invoice.</span></p>
+      </details>
+      <details class="faq px-5">
+        <summary><span data-i18n="How do we cancel, and what happens to our data?">How do we cancel, and what happens to our data?</span><i data-lucide="chevron-down" class="faq-chevron size-4 shrink-0 text-muted-foreground transition-transform"></i></summary>
+        <p class="pb-4 pe-8 text-2sm text-secondary-foreground"><span data-i18n="Cancel from Settings, Billing, with no phone call and no retention script. Exports stay available for 30 days after the last billing day, then the workspace is deleted.">Cancel from Settings, Billing, with no phone call and no retention script. Exports stay available for 30 days after the last billing day, then the workspace is deleted.</span></p>
+      </details>
+    </div>
+  </section>
+<!-- @endregion faq -->
+
+  <!-- @region closing-cta -->
+<section id="cta" class="container-fixed pb-14" aria-labelledby="cta-heading">
+    <div class="card flex flex-col items-center gap-4 p-7.5 text-center md:p-10">
+      <h2 id="cta-heading" class="max-w-xl font-display text-2xl font-medium text-mono"><span data-i18n="Start on the plan you need this month">Start on the plan you need this month</span></h2>
+      <p class="max-w-lg text-2sm text-secondary-foreground"><span data-i18n="Every plan opens with a 14-day trial on the full feature set. No card to begin, nothing charged before the trial ends, and you can move up or down once you have watched your own order volume for a few weeks.">Every plan opens with a 14-day trial on the full feature set. No card to begin, nothing charged before the trial ends, and you can move up or down once you have watched your own order volume for a few weeks.</span></p>
+      <div class="flex flex-wrap items-center justify-center gap-2.5 pt-1">
+        <a href="#" class="btn btn-primary h-10 px-5 text-sm"><span data-i18n="Start a 14-day trial">Start a 14-day trial</span><i data-lucide="arrow-right" class="rtl:rotate-180"></i></a>
+        <a href="#" class="btn btn-ghost h-10 px-4 text-sm"><span data-i18n="Book a 20-minute walkthrough">Book a 20-minute walkthrough</span></a>
+      </div>
+    </div>
+  </section>
+<!-- @endregion closing-cta -->
+
+</main>
+
+<!-- @region footer -->
+<footer class="border-t border-border">
+  <div class="container-fixed flex flex-wrap items-center justify-between gap-2.5 py-5 text-2sm text-muted-foreground">
+    <span>© 2026 Acme Ops</span>
+    <nav class="flex flex-wrap gap-4" aria-label="Footer">
+      <a href="#" class="hover:text-primary"><span data-i18n="Docs">Docs</span></a>
+      <a href="#" class="hover:text-primary"><span data-i18n="Status">Status</span></a>
+      <a href="#" class="hover:text-primary"><span data-i18n="Terms">Terms</span></a>
+      <a href="#" class="hover:text-primary"><span data-i18n="Privacy">Privacy</span></a>
+    </nav>
+  </div>
+</footer>
+<!-- @endregion footer -->
+
+<!-- ===== Demo controls (not part of the page; build-screen.py strips them) ===== -->
+<details class="fixed bottom-5 end-5 z-20 w-64 max-w-[calc(100%-2.5rem)] rounded-lg border border-border bg-popover text-2sm shadow-md open:pb-3">
+  <summary class="flex cursor-pointer items-center gap-2 px-3 py-2 font-medium text-mono select-none"><i data-lucide="sliders-horizontal" class="size-4 text-muted-foreground"></i>Demo controls</summary>
+  <div class="flex flex-col gap-2.5 px-3">
+    <label class="flex flex-col gap-1"><span class="text-xs text-muted-foreground">Personality</span>
+      <select id="ctl-theme" class="input select input-sm"><option value="">Default (demo only)</option><option value="theme-clinic">Clinic</option><option value="theme-graphite">Graphite</option><option value="theme-editorial">Editorial</option><option value="theme-neo">Neo</option><option value="theme-slate">Slate</option><option value="theme-mint">Mint</option></select></label>
+    <label class="flex flex-col gap-1"><span class="text-xs text-muted-foreground">Density</span>
+      <select id="ctl-density" class="input select input-sm"><option value="">Standard</option><option value="density-compact">Compact</option><option value="density-airy">Airy</option></select></label>
+    <div class="flex items-center gap-2"><button id="ctl-rtl" class="btn btn-outline btn-sm grow">AR / EN</button><button id="ctl-dark" class="btn btn-outline btn-sm grow">Dark</button></div>
+  </div>
+</details>
+
+<script>
+const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const html = document.documentElement;
+
+// ===== dark mode: the class lives on <html> and is remembered =====
+function setDark(on) { html.classList.toggle('dark', on); try { localStorage.setItem('ui.dark', on ? '1' : '0'); } catch {} }
+$('#theme-toggle').onclick = () => setDark(!html.classList.contains('dark'));
+if ($('#ctl-dark')) $('#ctl-dark').onclick = () => setDark(!html.classList.contains('dark'));
+try { if (localStorage.getItem('ui.dark') === '1') setDark(true); } catch {}
+
+// ===== billing period: the toggle that changes the prices =====
+// Prices are attributes on the elements that show them, so a generator can fill both columns
+// without touching this function. Each price stays dir="ltr" while the page flips to RTL.
+function setBilling(period) {
+  const yearly = period === 'yearly';
+  $$('input[name="billing"]').forEach(r => { r.checked = r.value === period; });
+  $$('[data-price]').forEach(el => { el.textContent = yearly ? el.dataset.y : el.dataset.m; });
+  $$('[data-when]').forEach(el => { el.hidden = el.dataset.when !== period; });
+}
+$$('input[name="billing"]').forEach(r => r.addEventListener('change', () => setBilling(r.value)));
+
+// ===== small-screen navigation =====
+const navBtn = $('#nav-toggle'), mobileNav = $('#mobile-nav');
+navBtn.onclick = () => { const open = mobileNav.hidden; mobileNav.hidden = !open; navBtn.setAttribute('aria-expanded', String(open)); };
+
+// ===== language: one dictionary, every tagged string, numbers stay LTR =====
+// Every key here needs a data-i18n attribute to match, or it is dead weight that reads as translated.
+const I18N = {"Product": "المنتج", "Pricing": "الأسعار", "Docs": "التوثيق", "Changelog": "سجل التغييرات", "Sign in": "تسجيل الدخول", "Pricing that follows your order volume": "أسعار تمشي مع حجم طلباتك", "Every plan carries the whole order pipeline. What changes is how many orders, stores and people you bring to it.": "كل خطة تحمل مسار الطلبات كاملاً. ما يتغيّر هو عدد الطلبات والمتاجر والأشخاص الذين تضيفهم إليه.", "Billing period": "دورة الفوترة", "Monthly": "شهري", "Yearly": "سنوي", "Save 17%": "وفّر 17%", "Switch to yearly and two months come free on every plan.": "انتقل إلى الاشتراك السنوي واحصل على شهرين مجاناً في كل خطة.", "Yearly billing is ten months for twelve, 17% less than paying month by month.": "الفوترة السنوية عشرة أشهر مقابل اثني عشر، أي أقل بنسبة 17% من الدفع شهراً بشهر.", "Plans": "الخطط", "Starter": "البداية", "For one shop and a team that fits around one table.": "لمتجر واحد وفريق يتّسع له طاولة واحدة.", "per month": "شهرياً", "Billed monthly, cancel any time": "فوترة شهرية، والإلغاء متاح في أي وقت", "Billed once a year": "فوترة مرة واحدة في السنة", "Choose Starter": "اختر البداية", "3 team seats": "3 مقاعد للفريق", "1 connected store": "متجر واحد متصل", "1,500 orders a month": "1,500 طلب شهرياً", "5 automation rules": "5 قواعد أتمتة", "12 months of order history": "12 شهراً من سجل الطلبات", "Email support, answered in 2 business days": "دعم بالبريد، بالرد خلال يومَي عمل", "Recommended": "موصى به", "Growth": "النمو", "For a team selling on several channels and done with the spreadsheet.": "لفريق يبيع على عدة قنوات وانتهى من العمل على جداول البيانات.", "Choose Growth": "اختر النمو", "Everything in Starter, plus": "كل ما في خطة البداية، بالإضافة إلى", "12 team seats": "12 مقعداً للفريق", "5 connected stores": "5 متاجر متصلة", "12,000 orders a month": "12,000 طلب شهرياً", "50 automation rules and webhooks": "50 قاعدة أتمتة مع الويب هوك", "Roles, permissions and a 30-day audit log": "أدوار وصلاحيات وسجل تدقيق لـ 30 يوماً", "Email and chat support, answered in 8 hours": "دعم بالبريد والمحادثة، بالرد خلال 8 ساعات", "Scale": "التوسّع", "For operations that need single sign-on, a sandbox and an SLA in writing.": "للعمليات التي تحتاج دخولاً موحّداً وبيئة اختبار واتفاقية مستوى خدمة مكتوبة.", "Choose Scale": "اختر التوسّع", "Everything in Growth, plus": "كل ما في خطة النمو، بالإضافة إلى", "Team seats without a limit": "مقاعد فريق بلا حد", "25 connected stores": "25 متجراً متصلاً", "60,000 orders a month": "60,000 طلب شهرياً", "Single sign-on and a full audit log": "دخول موحّد وسجل تدقيق كامل", "Sandbox environment and a 99.95% uptime SLA": "بيئة اختبار واتفاقية جاهزية 99.95%", "Priority support, answered in 1 hour": "دعم ذو أولوية، بالرد خلال ساعة", "Prices in US dollars per workspace. Tax is added at checkout. Extra seats on Starter and Growth cost $6 each a month.": "الأسعار بالدولار الأمريكي لكل مساحة عمل، وتُضاف الضريبة عند الدفع. المقعد الإضافي في خطتَي البداية والنمو بستة دولارات شهرياً.", "Compare every plan": "قارن بين الخطط", "The table scrolls inside its own frame. The feature column and the plan headers stay in place while you read across.": "يتمرّر الجدول داخل إطاره، ويبقى عمود الميزات ورؤوس الخطط في مكانها بينما تقرأ عرضاً.", "Feature comparison of the Starter, Growth and Scale plans. The price under each plan name follows the billing period chosen above the table.": "مقارنة ميزات خطط البداية والنمو والتوسّع. السعر تحت اسم كل خطة يتبع دورة الفوترة المختارة فوق الجدول.", "Feature": "الميزة", "Orders and stores": "الطلبات والمتاجر", "Orders a month": "الطلبات شهرياً", "Connected stores": "المتاجر المتصلة", "Order history kept": "مدة حفظ سجل الطلبات", "12 months": "12 شهراً", "3 years": "3 سنوات", "7 years": "7 سنوات", "Bulk import from CSV": "استيراد جماعي من CSV", "Included": "مشمول", "People and access": "الأشخاص والصلاحيات", "Team seats": "مقاعد الفريق", "No limit": "بلا حد", "Roles and permissions": "الأدوار والصلاحيات", "Not included": "غير مشمول", "Single sign-on (SAML)": "الدخول الموحّد (SAML)", "Audit log": "سجل التدقيق", "30 days": "30 يوماً", "Full history": "السجل كاملاً", "Automation and API": "الأتمتة وواجهة البرمجة", "Automation rules": "قواعد الأتمتة", "Outgoing webhooks": "الويب هوك الصادر", "API requests a minute": "طلبات الواجهة في الدقيقة", "Sandbox environment": "بيئة الاختبار", "Support": "الدعم", "Support channel": "قناة الدعم", "Email": "البريد", "Email and chat": "البريد والمحادثة", "Priority queue": "طابور الأولوية", "First reply target": "مدة أول رد", "2 business days": "يوما عمل", "8 hours": "8 ساعات", "1 hour": "ساعة واحدة", "Onboarding": "بدء الاستخدام", "Documentation": "التوثيق", "Guided setup call": "مكالمة إعداد موجّهة", "Named specialist": "مختص مُسمّى", "Uptime SLA": "اتفاقية الجاهزية", "Asked before signing": "أسئلة تُطرح قبل الاشتراك", "Can we change plan in the middle of a billing period?": "هل يمكننا تغيير الخطة في منتصف دورة الفوترة؟", "An upgrade takes effect the moment you confirm it, and we charge only the difference for the days left in the period. A downgrade takes effect on the next renewal date, so you keep what you already paid for.": "الترقية تسري لحظة تأكيدها، ونحتسب فرق الأيام المتبقية في الدورة فقط. أما التخفيض فيسري في تاريخ التجديد التالي، فتبقى لك المدة التي دفعت ثمنها.", "What counts as an order?": "ما الذي يُحتسب طلباً؟", "One order created in a connected store, whatever number of items it holds. Cancellations, refunds and orders made in the sandbox are not counted.": "أي طلب يُنشأ في متجر متصل، مهما بلغ عدد أصنافه. الإلغاءات والمبالغ المستردة وطلبات بيئة الاختبار لا تُحتسب.", "What happens if we go past the monthly order limit?": "ماذا يحدث إذا تجاوزنا حد الطلبات الشهري؟", "Orders keep syncing and nothing is blocked. We email the account owner in the same week, and if you are over the limit two months in a row we ask you to move up a plan.": "تستمر مزامنة الطلبات ولا يتوقف شيء. نراسل مالك الحساب في الأسبوع نفسه، وإذا تجاوزت الحد شهرين متتاليين نطلب الانتقال إلى خطة أعلى.", "Do extra seats cost more?": "هل المقاعد الإضافية بتكلفة إضافية؟", "Starter and Growth include the seats listed in the table; each seat after that is $6 a month. Scale has no seat limit, so adding people changes nothing on the invoice.": "خطتا البداية والنمو تشملان المقاعد المذكورة في الجدول، وكل مقعد بعدها بستة دولارات شهرياً. خطة التوسّع بلا حد للمقاعد، فإضافة الأشخاص لا تغيّر الفاتورة.", "How do we cancel, and what happens to our data?": "كيف نلغي الاشتراك، وماذا يحدث لبياناتنا؟", "Cancel from Settings, Billing, with no phone call and no retention script. Exports stay available for 30 days after the last billing day, then the workspace is deleted.": "الإلغاء من الإعدادات ثم الفوترة، بلا مكالمة هاتفية وبلا محاولات إقناع. تبقى ملفات التصدير متاحة 30 يوماً بعد آخر يوم فوترة، ثم تُحذف مساحة العمل.", "Start on the plan you need this month": "ابدأ بالخطة التي تحتاجها هذا الشهر", "Every plan opens with a 14-day trial on the full feature set. No card to begin, nothing charged before the trial ends, and you can move up or down once you have watched your own order volume for a few weeks.": "كل خطة تبدأ بتجربة 14 يوماً بكامل الميزات. لا حاجة لبطاقة عند البدء، ولا يُخصم شيء قبل انتهاء التجربة، ويمكنك الانتقال صعوداً أو نزولاً بعد أن تراقب حجم طلباتك بضعة أسابيع.", "Start a 14-day trial": "ابدأ تجربة 14 يوماً", "Book a 20-minute walkthrough": "احجز جولة 20 دقيقة", "Status": "حالة الخدمة", "Terms": "الشروط", "Privacy": "الخصوصية"};
+function setLang(lang) {
+  const ar = lang === 'ar';
+  html.setAttribute('dir', ar ? 'rtl' : 'ltr'); html.setAttribute('lang', ar ? 'ar' : 'en');
+  $$('[data-i18n]').forEach(el => { const k = el.dataset.i18n; if (I18N[k]) { const t = ar ? I18N[k] : k; if (el.childNodes.length && el.lastChild.nodeType === 3) el.lastChild.nodeValue = t; else el.textContent = t; } });
+  try { localStorage.setItem('ui.lang', lang); } catch {}
+}
+const flip = () => setLang(html.getAttribute('dir') === 'rtl' ? 'en' : 'ar');
+$('#lang-toggle').onclick = flip;
+if ($('#ctl-rtl')) $('#ctl-rtl').onclick = flip;
+try { if (localStorage.getItem('ui.lang') === 'ar') setLang('ar'); } catch {}
+
+// ===== demo controls (build-screen.py strips them; every control below is optional) =====
+const THEMES = ['theme-clinic', 'theme-graphite', 'theme-editorial', 'theme-neo', 'theme-slate', 'theme-mint'], DENS = ['density-compact', 'density-airy'];
+if ($('#ctl-theme')) $('#ctl-theme').onchange = e => { html.classList.remove(...THEMES); if (e.target.value) html.classList.add(e.target.value); };
+if ($('#ctl-density')) $('#ctl-density').onchange = e => { html.classList.remove(...DENS); if (e.target.value) html.classList.add(e.target.value); };
+
+// URL presets for sharing and screenshots: #theme=theme-slate&density=density-compact&dark=1&dir=rtl&billing=yearly
+// A value we do not recognise is reported rather than dropped: a silently ignored preset screenshots the wrong page.
+(function fromUrl() {
+  const q = new URLSearchParams(location.search || location.hash.slice(1));
+  const reject = (k, v, allowed) => console.warn('URL preset ' + k + '=' + v + ' is not valid; expected ' + allowed);
+  const pick = (k, allowed, apply) => { const v = q.get(k); if (v === null) return; allowed.includes(v) ? apply(v) : reject(k, v, allowed.join(' | ')); };
+  const control = (sel, v) => { const c = $(sel); if (c) c.value = v; };
+  pick('theme', THEMES, v => { html.classList.remove(...THEMES); html.classList.add(v); control('#ctl-theme', v); });
+  pick('density', DENS, v => { html.classList.remove(...DENS); html.classList.add(v); control('#ctl-density', v); });
+  pick('dark', ['0', '1'], v => setDark(v === '1'));
+  pick('billing', ['monthly', 'yearly'], setBilling);
+  // Both directions are authoritative, so a page opened once in Arabic still has a way home to English.
+  const dir = q.get('dir'), lang = q.get('lang');
+  if (dir !== null && !['ltr', 'rtl'].includes(dir)) reject('dir', dir, 'ltr | rtl');
+  if (lang !== null && !['en', 'ar'].includes(lang)) reject('lang', lang, 'en | ar');
+  const wanted = ['en', 'ar'].includes(lang) ? lang : dir === 'rtl' ? 'ar' : dir === 'ltr' ? 'en' : null;
+  if (wanted) setLang(wanted);
+})();
+
+lucide.createIcons();
+</script>
+</body>
+</html>

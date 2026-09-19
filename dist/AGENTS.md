@@ -11,6 +11,8 @@ You are building or changing a web UI. Follow these rules exactly; values are no
 `text-mono` headings & numbers · `text-secondary-foreground` second lines · `text-muted-foreground` hints ·
 `border-input` fields · `ring-ring` focus · states `success` `warning` `info` `destructive` (always with text/icon).
 
+`text-primary-accent` is the brand colour **as text** (links, emphasised labels). `bg-primary` with `text-primary-foreground` is the brand colour as a fill. They are different values on purpose: a fill light enough to carry white text is too light to be read as text.
+
 ## Sizes
 Controls: sm `h-7 px-2.5 text-xs` · md `h-8.5 px-3 text-2sm` · lg `h-10 px-4 text-sm`; all `rounded-md`.
 Type: **Inter** (display + text, house default; Arabic companion Noto Sans Arabic) · body 13px `text-2sm` · labels `text-xs` · card title `text-base font-semibold tracking-tight text-mono` ·

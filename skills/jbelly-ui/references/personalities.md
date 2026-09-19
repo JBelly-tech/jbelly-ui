@@ -21,6 +21,13 @@ the primary colour produces "the same site in a different shirt".
 | **Signature element** | one recognisable device, used consistently | e.g. thick start-border on active nav, oversized KPI numerals, hairline grid backdrop, dotted separators, offset shadow, corner tab on cards, monospaced meta text |
 | **Data colour set** | the 3–5 series colours for charts | derived from primary + one contrasting hue, never rainbow |
 
+## Link colour
+
+Every preset declares `--primary-accent` next to `--primary`. It is the same hue, moved in
+lightness until it reaches 4.5:1 against that preset's card and page. Declare it inside the preset
+block: a `var(--primary)` written on `:root` is computed there, so it keeps the default blue no
+matter which preset is active.
+
 ## Six ready presets
 
 All presets keep **Inter** as the text face unless a line says otherwise; the `--font-display` lines are optional accents you may delete to stay 100% Inter (the recommended default for admin products).

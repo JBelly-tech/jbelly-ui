@@ -1,0 +1,864 @@
+<!doctype html>
+<html lang="en" dir="ltr" class="theme-graphite density-airy">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mishwar — route planning for delivery fleets</title>
+<meta name="description" content="Mishwar turns tonight's order list into tomorrow's van routes: capacity, delivery windows and driver shifts included.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Source+Sans+3:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=DM+Sans:wght@400;500;600&family=Public+Sans:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+<style type="text/tailwindcss">
+/* ===== tokens.css (inlined for the single-file demo) ===== */
+:root {
+  color-scheme: light;
+  --radius: 0.5rem;
+  --font-display: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Arabic", sans-serif;
+  --font-mono: ui-monospace, "JetBrains Mono", Consolas, monospace;
+  --background: oklch(100% 0 0); --foreground: oklch(14.5% 0.005 285);
+  --card: oklch(100% 0 0); --card-foreground: oklch(14.5% 0.005 285);
+  --popover: oklch(100% 0 0); --popover-foreground: oklch(14.5% 0.005 285);
+  --primary: oklch(54% 0.2 258); --primary-foreground: oklch(100% 0 0);
+  --secondary: oklch(96.5% 0.002 285); --secondary-foreground: oklch(21% 0.006 285);
+  --muted: oklch(96.5% 0.002 285); --muted-foreground: oklch(55% 0.014 285);
+  --accent: oklch(96.5% 0.002 285); --accent-foreground: oklch(21% 0.006 285);
+  --mono: oklch(14.5% 0.005 285); --mono-foreground: oklch(100% 0 0);
+  --destructive: oklch(57.5% 0.22 27); --destructive-foreground: oklch(100% 0 0);
+  --success: oklch(72% 0.19 150); --success-foreground: oklch(100% 0 0);
+  --warning: oklch(85% 0.17 90); --warning-foreground: oklch(30% 0.05 90);
+  --info: oklch(60% 0.22 293); --info-foreground: oklch(100% 0 0);
+  --border: oklch(94% 0.004 286); --input: oklch(92% 0.004 286); --ring: oklch(71% 0.01 286);
+  --sidebar: var(--card); --sidebar-foreground: var(--foreground); --sidebar-muted: var(--muted-foreground);
+  --sidebar-accent: var(--accent); --sidebar-accent-foreground: var(--accent-foreground);
+  --sidebar-primary: var(--primary); --sidebar-border: var(--border);
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.06);
+  --sidebar-width: 280px; --sidebar-default-width: 280px; --sidebar-width-collapsed: 80px; --header-height: 70px;
+  --ctl-h: 34px; --ctl-h-sm: 28px; --row-h: 46px; --card-p: 1.25rem; --page-gap: 1.25rem;
+  --chart-2: var(--info); --chart-3: var(--success); --chart-4: var(--warning);
+}
+@media (max-width: 63.99rem) { :root { --header-height: 60px; } }
+.dark {
+  color-scheme: dark;
+  --background: oklch(14.5% 0.005 285); --foreground: oklch(98.5% 0 0);
+  --card: oklch(14.5% 0.005 285); --card-foreground: oklch(98.5% 0 0);
+  --popover: oklch(14.5% 0.005 285); --popover-foreground: oklch(98.5% 0 0);
+  --primary: oklch(55% 0.21 258);
+  --secondary: oklch(27.5% 0.006 286); --secondary-foreground: oklch(98.5% 0 0);
+  --muted: oklch(21% 0.006 285); --muted-foreground: oklch(64% 0.014 285);
+  --accent: oklch(21% 0.006 285); --accent-foreground: oklch(98.5% 0 0);
+  --mono: oklch(87% 0.006 286); --mono-foreground: oklch(0% 0 0);
+  --warning-foreground: oklch(92% 0.12 90);
+  --border: oklch(27.5% 0.006 286); --input: oklch(27.5% 0.006 286); --ring: oklch(44% 0.01 286);
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.4);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.4);
+}
+/* ===== optional dark sidebar on a light page (the popular semi-dark layout) ===== */
+.sidebar-dark { --sidebar: oklch(16% 0.02 262); --sidebar-foreground: oklch(90% 0.01 250); --sidebar-muted: oklch(62% 0.02 250); --sidebar-accent: oklch(22% 0.025 262); --sidebar-accent-foreground: oklch(100% 0 0); --sidebar-primary: oklch(78% 0.13 195); --sidebar-border: oklch(25% 0.025 262); }
+.sidebar-dark.dark { --sidebar: oklch(11% 0.015 262); --sidebar-border: oklch(20% 0.02 262); }
+/* ===== density ===== */
+.density-compact { --ctl-h: 30px; --ctl-h-sm: 24px; --row-h: 38px; --card-p: 1rem; --page-gap: 1rem; }
+.density-airy    { --ctl-h: 40px; --ctl-h-sm: 32px; --row-h: 56px; --card-p: 1.75rem; --page-gap: 1.75rem; }
+/* ===== personalities (from references/personalities.md) ===== */
+.theme-clinic { --font-display: "Manrope", sans-serif; --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --primary: oklch(50% 0.12 195); --background: oklch(98.5% 0.006 190); --card: oklch(100% 0 0);
+  --border: oklch(92% 0.012 190); --input: oklch(90% 0.014 190); --muted: oklch(96% 0.01 190); --accent: oklch(95% 0.012 190); --radius: 0.75rem; }
+.theme-clinic.dark { --background: oklch(15% 0.012 195); --card: oklch(18% 0.012 195); --popover: oklch(18% 0.012 195); --border: oklch(28% 0.015 195); --input: oklch(28% 0.015 195); --muted: oklch(22% 0.012 195); --accent: oklch(24% 0.014 195); --primary: oklch(70% 0.13 195); --primary-foreground: oklch(12% 0.02 195); }
+.theme-graphite { --muted-foreground: oklch(54% 0.014 285); --font-display: "IBM Plex Sans", sans-serif; --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif; --font-mono: "IBM Plex Mono", monospace;
+  --primary: oklch(65% 0.17 150); --primary-foreground: oklch(14% 0 0); --background: oklch(97% 0.002 260); --card: oklch(100% 0 0); --border: oklch(88% 0.004 260); --input: oklch(86% 0.004 260); --radius: 0.25rem; }
+.theme-graphite.dark { --muted-foreground: oklch(60.0% 0.014 285); --background: oklch(12% 0.004 260); --card: oklch(15% 0.004 260); --popover: oklch(15% 0.004 260); --border: oklch(24% 0.005 260); --input: oklch(26% 0.005 260); }
+.theme-editorial { --font-display: "Fraunces", Georgia, serif; --font-sans: "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
+  --primary: oklch(48% 0.16 30); --primary-foreground: oklch(98% 0.01 60); --background: oklch(97.5% 0.012 75); --card: oklch(99% 0.008 75);
+  --foreground: oklch(22% 0.02 50); --mono: oklch(22% 0.02 50); --border: oklch(90% 0.02 70); --input: oklch(88% 0.02 70); --muted: oklch(94% 0.015 75); --accent: oklch(93% 0.018 75); --muted-foreground: oklch(50% 0.03 50);
+  --radius: 0.5rem; --shadow-xs: 0 1px 3px rgb(60 30 10 / 0.08); --shadow-md: 0 6px 16px -6px rgb(60 30 10 / 0.18); }
+.theme-editorial.dark { --background: oklch(16% 0.012 60); --card: oklch(19% 0.012 60); --popover: oklch(19% 0.012 60); --foreground: oklch(95% 0.01 75); --mono: oklch(95% 0.01 75); --border: oklch(28% 0.015 60); --input: oklch(28% 0.015 60); --muted: oklch(23% 0.012 60); --accent: oklch(25% 0.014 60); --muted-foreground: oklch(65% 0.02 60); --primary: oklch(70% 0.15 35); --primary-foreground: oklch(14% 0.02 40); }
+.theme-neo { --font-display: "Space Grotesk", sans-serif; --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --primary: oklch(55% 0.25 290); --background: oklch(99% 0 0); --card: oklch(100% 0 0); --foreground: oklch(10% 0 0); --mono: oklch(10% 0 0);
+  --border: oklch(10% 0 0); --input: oklch(10% 0 0); --radius: 0.25rem; --shadow-xs: 3px 3px 0 0 var(--foreground); --shadow-md: 5px 5px 0 0 var(--foreground); }
+.theme-neo.dark { --background: oklch(12% 0 0); --card: oklch(15% 0 0); --popover: oklch(15% 0 0); --foreground: oklch(98% 0 0); --mono: oklch(98% 0 0); --border: oklch(98% 0 0); --input: oklch(98% 0 0); --primary: oklch(75% 0.2 290); --primary-foreground: oklch(10% 0 0); }
+.theme-slate { --muted-foreground: oklch(53% 0.014 285); --font-display: "Inter", sans-serif; --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --primary: oklch(42% 0.12 260); --background: oklch(96.5% 0.004 250); --card: oklch(100% 0 0); --foreground: oklch(18% 0.02 260); --border: oklch(88% 0.008 250); --input: oklch(86% 0.008 250); --radius: 0.375rem;
+  --sidebar: oklch(18% 0.03 260); --sidebar-foreground: oklch(92% 0.01 250); --sidebar-muted: oklch(65% 0.02 250); --sidebar-accent: oklch(24% 0.03 260); --sidebar-accent-foreground: oklch(100% 0 0); --sidebar-primary: oklch(78% 0.12 80); --sidebar-border: oklch(26% 0.03 260); }
+.theme-slate.dark { --muted-foreground: oklch(60.0% 0.014 285); --background: oklch(13% 0.02 260); --card: oklch(17% 0.02 260); --popover: oklch(17% 0.02 260); --foreground: oklch(95% 0.01 250); --border: oklch(26% 0.02 260); --input: oklch(26% 0.02 260); --primary: oklch(72% 0.12 80); --primary-foreground: oklch(15% 0.03 80); --sidebar: oklch(11% 0.02 260); }
+.theme-mint { --font-display: "Plus Jakarta Sans", sans-serif; --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --primary: oklch(60% 0.15 165); --primary-foreground: oklch(14% 0 0); --background: oklch(98% 0.01 160); --card: oklch(100% 0 0); --border: oklch(93% 0.02 160); --input: oklch(90% 0.02 160); --muted: oklch(96% 0.012 160); --accent: oklch(95% 0.015 160); --radius: 1rem;
+  --shadow-xs: 0 1px 2px rgb(20 60 40 / 0.06); --shadow-md: 0 8px 24px -8px rgb(20 60 40 / 0.18); }
+.theme-mint.dark { --background: oklch(14% 0.01 160); --card: oklch(18% 0.012 160); --popover: oklch(18% 0.012 160); --border: oklch(27% 0.015 160); --input: oklch(27% 0.015 160); --muted: oklch(22% 0.012 160); --accent: oklch(24% 0.014 160); --primary: oklch(72% 0.15 165); }
+
+@custom-variant dark (&:where(.dark, .dark *));
+@theme inline {
+  --font-sans: var(--font-sans); --font-mono: var(--font-mono); --font-display: var(--font-display);
+  --color-background: var(--background); --color-foreground: var(--foreground);
+  --color-card: var(--card); --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover); --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary); --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary); --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted); --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent); --color-accent-foreground: var(--accent-foreground);
+  --color-mono: var(--mono); --color-mono-foreground: var(--mono-foreground);
+  --color-destructive: var(--destructive); --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success); --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning); --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info); --color-info-foreground: var(--info-foreground);
+  --color-border: var(--border); --color-input: var(--input); --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar); --color-sidebar-foreground: var(--sidebar-foreground); --color-sidebar-muted: var(--sidebar-muted);
+  --color-sidebar-accent: var(--sidebar-accent); --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-primary: var(--sidebar-primary); --color-sidebar-border: var(--sidebar-border);
+  --radius-xl: calc(var(--radius) + 4px); --radius-lg: var(--radius); --radius-md: calc(var(--radius) - 2px); --radius-sm: calc(var(--radius) - 4px);
+  --shadow-xs: var(--shadow-xs); --shadow-md: var(--shadow-md);
+}
+@theme { --text-2sm: 0.8125rem; --text-2sm--line-height: 1.3; --text-2xs: 0.6875rem; --text-2xs--line-height: 1.2; }
+@layer base {
+  * { border-color: var(--border); }
+  html { font-family: var(--font-sans); }
+  body { background: var(--background); color: var(--foreground); -webkit-font-smoothing: antialiased; }
+  :focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+  .scroll-thin { scrollbar-width: thin; scrollbar-color: var(--accent) transparent; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+}
+@layer components {
+  .container-fixed { @apply w-full mx-auto px-6 xl:px-7.5 xl:max-w-(--breakpoint-xl); }
+  /* buttons */
+  .btn { @apply inline-flex items-center justify-center gap-1.5 shrink-0 whitespace-nowrap font-medium rounded-md shadow-xs transition-colors cursor-pointer h-(--ctl-h) px-3 text-2sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0; }
+  .btn-sm { @apply h-(--ctl-h-sm) px-2.5 text-xs gap-1.25; }
+  .btn-lg { @apply px-5 text-sm gap-2; }
+  .btn-icon { @apply p-0 w-(--ctl-h); }
+  .btn-icon.btn-sm { @apply w-(--ctl-h-sm); }
+  .btn-primary { @apply bg-primary text-primary-foreground hover:bg-primary/90; }
+  .btn-outline { @apply border border-input bg-background text-secondary-foreground hover:bg-accent hover:text-accent-foreground; }
+  .btn-ghost { @apply shadow-none bg-transparent text-accent-foreground hover:bg-accent; }
+  /* badges */
+  .badge { @apply inline-flex items-center justify-center gap-1.5 whitespace-nowrap font-medium rounded-md h-6 px-[0.45rem] text-xs bg-secondary text-accent-foreground; }
+  .badge-sm { @apply h-5 px-[0.325rem] text-2xs rounded-sm gap-1; }
+  .badge-light-primary { @apply bg-primary/10 text-primary; }
+  .badge-light-success { @apply bg-success/15 text-success; }
+  .badge-light-warning { @apply bg-warning/20 text-warning-foreground; }
+  .badge-outline { @apply border border-border bg-muted text-secondary-foreground; }
+  .dot { @apply size-1.5 rounded-full bg-current opacity-75; }
+  /* card */
+  .card { @apply flex flex-col rounded-xl border border-border bg-card text-card-foreground shadow-xs; }
+  .card-header { @apply flex flex-wrap items-center justify-between gap-2.5 border-b border-border px-5 py-4; }
+  .card-title { @apply text-base font-semibold tracking-tight text-mono; }
+  .card-content { @apply grow p-(--card-p); }
+  .card-footer { @apply flex flex-wrap items-center gap-2.5 border-t border-border px-5 py-4; }
+  /* landing type: the display face carries more weight here than on an app screen */
+  .section { @apply py-16 lg:py-24; }
+  .h2 { @apply font-display text-3xl lg:text-4xl font-semibold tracking-tight text-mono text-balance; }
+  .lead { @apply text-base lg:text-lg leading-relaxed text-secondary-foreground text-pretty; }
+  .meta { @apply font-mono text-2xs text-muted-foreground; }
+  .step { @apply inline-flex items-center gap-2 font-mono text-2xs tracking-wide text-primary; }
+  .eyebrow { @apply inline-flex items-center gap-2 font-mono text-2xs tracking-wide text-muted-foreground; }
+  .link { @apply text-primary underline-offset-4 hover:underline; }
+  .top-link { @apply rounded-md px-2.5 py-1.5 text-2sm text-secondary-foreground hover:bg-accent hover:text-accent-foreground; }
+  .foot-link { @apply text-2sm text-secondary-foreground hover:text-primary; }
+  .tick { @apply flex items-start gap-2.5 text-2sm text-secondary-foreground [&_svg]:mt-0.5 [&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:text-primary; }
+}
+</style>
+</head>
+<body class="min-h-full bg-background text-foreground text-2sm">
+<a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:start-3 focus:z-50 btn btn-outline btn-sm" data-i18n="Skip to main content">Skip to main content</a>
+
+<!-- @region site-header -->
+<header class="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-sm">
+  <div class="container-fixed flex h-16 items-center justify-between gap-4">
+    <a href="#hero" class="flex items-center gap-2.5 font-display text-base font-semibold text-mono">
+      <span class="inline-flex size-7 items-center justify-center rounded-md bg-primary text-primary-foreground"><i data-lucide="route" class="size-4"></i></span>
+      Mishwar
+    </a>
+    <nav class="flex items-center gap-1" aria-label="Main">
+      <span class="hidden md:flex items-center gap-0.5 me-2">
+        <a class="top-link" href="#import" data-i18n="How it works">How it works</a>
+        <a class="top-link" href="#driver" data-i18n="Driver app">Driver app</a>
+        <a class="top-link" href="#pricing" data-i18n="Pricing">Pricing</a>
+        <a class="top-link" href="#customers" data-i18n="Customers">Customers</a>
+        <a class="top-link" href="#faq" data-i18n="Docs">Docs</a>
+      </span>
+      <button id="lang-toggle" class="btn btn-ghost btn-icon btn-sm" aria-label="Switch language" title="English / العربية"><i data-lucide="languages"></i></button>
+      <button id="theme-toggle" class="btn btn-ghost btn-icon btn-sm" aria-label="Toggle dark mode"><i data-lucide="moon" class="dark:hidden"></i><i data-lucide="sun" class="hidden dark:block"></i></button>
+      <a class="btn btn-ghost btn-sm hidden sm:inline-flex" href="#" data-i18n="Sign in">Sign in</a>
+      <a class="btn btn-primary btn-sm ms-1" href="#start" data-i18n="Start a trial">Start a trial</a>
+      <button id="menu-btn" class="btn btn-ghost btn-icon btn-sm md:hidden" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav"><i data-lucide="menu"></i></button>
+    </nav>
+  </div>
+  <nav id="mobile-nav" class="hidden md:hidden border-t border-border bg-background" aria-label="Mobile">
+    <div class="container-fixed flex flex-col py-2">
+      <a class="top-link py-2.5" href="#import" data-i18n="How it works">How it works</a>
+      <a class="top-link py-2.5" href="#driver" data-i18n="Driver app">Driver app</a>
+      <a class="top-link py-2.5" href="#pricing" data-i18n="Pricing">Pricing</a>
+      <a class="top-link py-2.5" href="#customers" data-i18n="Customers">Customers</a>
+      <a class="top-link py-2.5" href="#faq" data-i18n="Docs">Docs</a>
+      <a class="top-link py-2.5" href="#" data-i18n="Sign in">Sign in</a>
+    </div>
+  </nav>
+</header>
+<!-- @endregion site-header -->
+
+<main id="main">
+
+<!-- @region hero -->
+<section id="hero" class="section border-b border-border">
+  <div class="container-fixed grid gap-12 lg:grid-cols-[1.05fr_1fr] lg:items-center lg:gap-16">
+    <div class="flex flex-col items-start gap-6">
+      <span class="eyebrow"><i data-lucide="truck" class="size-3.5"></i><span data-i18n="Dispatch software for wholesale distributors">Dispatch software for wholesale distributors</span></span>
+      <h1 class="font-display text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight leading-[1.05] text-mono text-balance" data-i18n="Tomorrow's routes, planned before the depot opens.">Tomorrow's routes, planned before the depot opens.</h1>
+      <p class="lead max-w-xl" data-i18n="Mishwar turns tonight's order list into tomorrow's van routes, with capacity, delivery windows and driver shifts already accounted for. The 41 depots that moved over last year went from two hours of planning to under two minutes.">Mishwar turns tonight's order list into tomorrow's van routes, with capacity, delivery windows and driver shifts already accounted for. The 41 depots that moved over last year went from two hours of planning to under two minutes.</p>
+      <div class="flex flex-wrap items-center gap-3">
+        <a class="btn btn-primary btn-lg" href="#start"><span data-i18n="Start a 21-day trial">Start a 21-day trial</span><i data-lucide="arrow-right" class="rtl:rotate-180"></i></a>
+        <a class="btn btn-outline btn-lg" href="#driver"><i data-lucide="play" class="rtl:-scale-x-100"></i><span data-i18n="Watch a 4-minute plan run">Watch a 4-minute plan run</span></a>
+      </div>
+      <p class="meta max-w-md leading-relaxed" data-i18n="No card needed. Import one depot as CSV and plan it the same morning.">No card needed. Import one depot as CSV and plan it the same morning.</p>
+    </div>
+
+    <div class="card overflow-hidden">
+      <div class="card-header">
+        <span class="flex flex-col gap-0.5 min-w-0">
+          <span class="card-title" data-i18n="Beirut depot">Beirut depot</span>
+          <span class="meta" data-i18n="Plan for Thursday 12 October">Plan for Thursday 12 October</span>
+        </span>
+        <span class="badge badge-light-success"><i data-lucide="check" class="size-3.5"></i><span data-i18n="Planned in 94 s">Planned in 94 s</span></span>
+      </div>
+      <div class="divide-y divide-border">
+        <div class="flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-3.5">
+          <span class="flex w-20 items-center gap-2 font-mono text-2sm text-mono"><i data-lucide="truck" class="size-4 text-muted-foreground"></i>Van 03</span>
+          <span class="meta tabular-nums">24 <span data-i18n="stops">stops</span> · 86 <span data-i18n="km">km</span></span>
+          <span class="meta tabular-nums" dir="ltr">06:40 – 13:10</span>
+          <span class="ms-auto flex items-center gap-2">
+            <span class="block h-1.5 w-16 overflow-hidden rounded-full bg-muted"><span class="block h-full bg-primary" style="inline-size:92%"></span></span>
+            <span class="meta w-8 text-end tabular-nums">92%</span>
+          </span>
+        </div>
+        <div class="flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-3.5">
+          <span class="flex w-20 items-center gap-2 font-mono text-2sm text-mono"><i data-lucide="truck" class="size-4 text-muted-foreground"></i>Van 07</span>
+          <span class="meta tabular-nums">19 <span data-i18n="stops">stops</span> · 71 <span data-i18n="km">km</span></span>
+          <span class="meta tabular-nums" dir="ltr">07:00 – 12:25</span>
+          <span class="ms-auto flex items-center gap-2">
+            <span class="block h-1.5 w-16 overflow-hidden rounded-full bg-muted"><span class="block h-full bg-primary" style="inline-size:78%"></span></span>
+            <span class="meta w-8 text-end tabular-nums">78%</span>
+          </span>
+        </div>
+        <div class="flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-3.5">
+          <span class="flex w-20 items-center gap-2 font-mono text-2sm text-mono"><i data-lucide="truck" class="size-4 text-muted-foreground"></i>Van 11</span>
+          <span class="meta tabular-nums">26 <span data-i18n="stops">stops</span> · 104 <span data-i18n="km">km</span></span>
+          <span class="meta tabular-nums" dir="ltr">06:20 – 14:05</span>
+          <span class="ms-auto flex items-center gap-2">
+            <span class="block h-1.5 w-16 overflow-hidden rounded-full bg-muted"><span class="block h-full bg-primary" style="inline-size:96%"></span></span>
+            <span class="meta w-8 text-end tabular-nums">96%</span>
+          </span>
+        </div>
+        <div class="flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-3.5">
+          <span class="flex w-20 items-center gap-2 font-mono text-2sm text-mono"><i data-lucide="truck" class="size-4 text-muted-foreground"></i>Van 14</span>
+          <span class="meta tabular-nums">21 <span data-i18n="stops">stops</span> · 68 <span data-i18n="km">km</span></span>
+          <span class="meta tabular-nums" dir="ltr">07:30 – 13:40</span>
+          <span class="ms-auto flex items-center gap-2">
+            <span class="block h-1.5 w-16 overflow-hidden rounded-full bg-muted"><span class="block h-full bg-primary" style="inline-size:84%"></span></span>
+            <span class="meta w-8 text-end tabular-nums">84%</span>
+          </span>
+        </div>
+      </div>
+      <div class="card-footer justify-between bg-muted/40">
+        <span class="meta leading-relaxed" data-i18n="14 vans, 312 drops, 1,190 km. Three windows need a call.">14 vans, 312 drops, 1,190 km. Three windows need a call.</span>
+        <span class="badge badge-sm badge-outline"><span class="tabular-nums">+10</span> <span data-i18n="more vans">more vans</span></span>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- @endregion hero -->
+
+<!-- @region customer-logos -->
+<section id="customers" class="border-b border-border bg-muted/40 py-10 lg:py-12">
+  <div class="container-fixed flex flex-col gap-7">
+    <p class="meta text-center" data-i18n="Planning with Mishwar today">Planning with Mishwar today</p>
+    <ul class="grid grid-cols-2 items-center gap-x-6 gap-y-6 sm:grid-cols-3 lg:grid-cols-6">
+      <li class="flex items-center justify-center gap-2 text-secondary-foreground">
+        <svg viewBox="0 0 16 16" class="size-4 shrink-0" aria-hidden="true"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="8" cy="8" r="1.8" fill="currentColor"/></svg>
+        <span class="font-display text-sm font-semibold">Barakat Dairy</span>
+      </li>
+      <li class="flex items-center justify-center gap-2 text-secondary-foreground">
+        <svg viewBox="0 0 16 16" class="size-4 shrink-0" aria-hidden="true"><path d="M2 11c2-4 4-6 6-6s4 2 6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M2 14h12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <span class="font-display text-sm font-semibold">Nahr Foods</span>
+      </li>
+      <li class="flex items-center justify-center gap-2 text-secondary-foreground">
+        <svg viewBox="0 0 16 16" class="size-4 shrink-0" aria-hidden="true"><path d="M8 2 14 5.5v5L8 14 2 10.5v-5z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        <span class="font-display text-sm font-semibold">Cedar Cold Chain</span>
+      </li>
+      <li class="flex items-center justify-center gap-2 text-secondary-foreground">
+        <svg viewBox="0 0 16 16" class="size-4 shrink-0" aria-hidden="true"><rect x="2.5" y="2.5" width="11" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M5.5 8h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <span class="font-display text-sm font-semibold">Al-Hoda Beverages</span>
+      </li>
+      <li class="flex items-center justify-center gap-2 text-secondary-foreground">
+        <svg viewBox="0 0 16 16" class="size-4 shrink-0" aria-hidden="true"><path d="M3 13V6l5-3 5 3v7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M6.5 13V9.5h3V13" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+        <span class="font-display text-sm font-semibold">Sahel Paper</span>
+      </li>
+      <li class="flex items-center justify-center gap-2 text-secondary-foreground">
+        <svg viewBox="0 0 16 16" class="size-4 shrink-0" aria-hidden="true"><path d="M2.5 12.5 6 4l2 5 2-5 3.5 8.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        <span class="font-display text-sm font-semibold">Mavi Market</span>
+      </li>
+    </ul>
+    <p class="meta text-center leading-relaxed" data-i18n="Cold chain, dry goods and beverage distributors in Beirut, Amman and Jeddah.">Cold chain, dry goods and beverage distributors in Beirut, Amman and Jeddah.</p>
+  </div>
+</section>
+<!-- @endregion customer-logos -->
+
+<!-- @region capability-import -->
+<section id="import" class="section border-b border-border">
+  <div class="container-fixed grid gap-10 lg:grid-cols-2 lg:items-center lg:gap-16">
+    <div class="flex flex-col items-start gap-5">
+      <span class="step">01 · <span data-i18n="Import">Import</span></span>
+      <h2 class="h2" data-i18n="The plan starts from the order list you already keep">The plan starts from the order list you already keep</h2>
+      <p class="lead" data-i18n="Drop in the CSV your sales team exports, or point Mishwar at your order endpoint. Addresses are matched against the shops you delivered to last week, so a new spelling of the same grocery does not become a second stop.">Drop in the CSV your sales team exports, or point Mishwar at your order endpoint. Addresses are matched against the shops you delivered to last week, so a new spelling of the same grocery does not become a second stop.</p>
+      <ul class="flex flex-col gap-3">
+        <li class="tick"><i data-lucide="check"></i><span data-i18n="Column mapping is remembered per depot, so the second import is one click.">Column mapping is remembered per depot, so the second import is one click.</span></li>
+        <li class="tick"><i data-lucide="check"></i><span data-i18n="Rows that cannot be placed on the map are held in a review list, never dropped in silence.">Rows that cannot be placed on the map are held in a review list, never dropped in silence.</span></li>
+        <li class="tick"><i data-lucide="check"></i><span data-i18n="Crate counts and pallet weights feed straight into van capacity.">Crate counts and pallet weights feed straight into van capacity.</span></li>
+      </ul>
+      <a class="link text-2sm font-medium inline-flex items-center gap-1.5" href="#faq"><span data-i18n="Read the import guide">Read the import guide</span><i data-lucide="arrow-right" class="size-4 rtl:rotate-180"></i></a>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="flex items-center gap-2.5 min-w-0"><i data-lucide="file-text" class="size-4 text-muted-foreground"></i><span class="font-mono text-2sm text-mono truncate">orders-2025-10-11.csv</span></span>
+        <span class="badge badge-sm badge-outline tabular-nums">312 <span data-i18n="rows">rows</span></span>
+      </div>
+      <div class="divide-y divide-border">
+        <div class="flex flex-wrap items-center justify-between gap-2 px-5 py-3">
+          <span class="flex items-center gap-2 min-w-0"><span class="font-mono text-2xs text-muted-foreground">customer_name</span><i data-lucide="arrow-right" class="size-3.5 text-muted-foreground rtl:rotate-180"></i><span class="text-2sm text-mono" data-i18n="Customer">Customer</span></span>
+          <span class="badge badge-sm badge-light-success"><span class="dot"></span><span data-i18n="matched">matched</span></span>
+        </div>
+        <div class="flex flex-wrap items-center justify-between gap-2 px-5 py-3">
+          <span class="flex items-center gap-2 min-w-0"><span class="font-mono text-2xs text-muted-foreground">address_line</span><i data-lucide="arrow-right" class="size-3.5 text-muted-foreground rtl:rotate-180"></i><span class="text-2sm text-mono" data-i18n="Address">Address</span></span>
+          <span class="badge badge-sm badge-light-success"><span class="dot"></span><span data-i18n="matched">matched</span></span>
+        </div>
+        <div class="flex flex-wrap items-center justify-between gap-2 px-5 py-3">
+          <span class="flex items-center gap-2 min-w-0"><span class="font-mono text-2xs text-muted-foreground">window_start</span><i data-lucide="arrow-right" class="size-3.5 text-muted-foreground rtl:rotate-180"></i><span class="text-2sm text-mono" data-i18n="Window opens">Window opens</span></span>
+          <span class="badge badge-sm badge-light-success"><span class="dot"></span><span data-i18n="matched">matched</span></span>
+        </div>
+        <div class="flex flex-wrap items-center justify-between gap-2 px-5 py-3">
+          <span class="flex items-center gap-2 min-w-0"><span class="font-mono text-2xs text-muted-foreground">crates</span><i data-lucide="arrow-right" class="size-3.5 text-muted-foreground rtl:rotate-180"></i><span class="text-2sm text-mono" data-i18n="Load units">Load units</span></span>
+          <span class="badge badge-sm badge-light-success"><span class="dot"></span><span data-i18n="matched">matched</span></span>
+        </div>
+        <div class="flex flex-wrap items-center justify-between gap-2 px-5 py-3">
+          <span class="flex items-center gap-2 min-w-0"><span class="font-mono text-2xs text-muted-foreground">note_to_driver</span><i data-lucide="arrow-right" class="size-3.5 text-muted-foreground rtl:rotate-180"></i><span class="text-2sm text-mono" data-i18n="Driver note">Driver note</span></span>
+          <span class="badge badge-sm badge-light-warning"><span class="dot"></span><span data-i18n="needs a rule">needs a rule</span></span>
+        </div>
+      </div>
+      <div class="card-footer bg-muted/40">
+        <i data-lucide="info" class="size-4 shrink-0 text-muted-foreground"></i>
+        <span class="meta leading-relaxed" data-i18n="4 rows held for review, 308 ready to plan.">4 rows held for review, 308 ready to plan.</span>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- @endregion capability-import -->
+
+<!-- @region capability-windows -->
+<section id="windows" class="section border-b border-border bg-muted/40">
+  <div class="container-fixed grid gap-10 lg:grid-cols-2 lg:items-center lg:gap-16">
+    <div class="flex flex-col items-start gap-5 lg:order-last">
+      <span class="step">02 · <span data-i18n="Windows">Windows</span></span>
+      <h2 class="h2" data-i18n="A window you promised is a constraint, not a note">A window you promised is a constraint, not a note</h2>
+      <p class="lead" data-i18n="Every stop carries the window the customer agreed to, the service time your driver actually needs, and the hour the shop closes for lunch. Mishwar plans inside all three and says which promises cannot be kept before a van leaves the yard.">Every stop carries the window the customer agreed to, the service time your driver actually needs, and the hour the shop closes for lunch. Mishwar plans inside all three and says which promises cannot be kept before a van leaves the yard.</p>
+      <ul class="flex flex-col gap-3">
+        <li class="tick"><i data-lucide="check"></i><span data-i18n="Service time is learned per customer from the last twenty deliveries.">Service time is learned per customer from the last twenty deliveries.</span></li>
+        <li class="tick"><i data-lucide="check"></i><span data-i18n="Breaks and shift ends are hard limits, not suggestions.">Breaks and shift ends are hard limits, not suggestions.</span></li>
+        <li class="tick"><i data-lucide="check"></i><span data-i18n="Conflicts arrive as a short call list with the two nearest free slots.">Conflicts arrive as a short call list with the two nearest free slots.</span></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title" data-i18n="Shift 06:00 to 15:00">Shift 06:00 to 15:00</span>
+        <span class="badge badge-sm badge-light-warning"><i data-lucide="triangle-alert" class="size-3"></i><span data-i18n="3 conflicts">3 conflicts</span></span>
+      </div>
+      <div class="card-content flex flex-col gap-3">
+        <div class="flex items-center gap-3">
+          <span class="w-16 shrink-0 font-mono text-2xs text-mono">Van 03</span>
+          <span class="relative block h-6 grow rounded-md bg-muted"><span class="absolute top-0 bottom-0 rounded-md bg-primary/80" style="inset-inline-start:7.4%;inline-size:72.2%"></span></span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="w-16 shrink-0 font-mono text-2xs text-mono">Van 07</span>
+          <span class="relative block h-6 grow rounded-md bg-muted"><span class="absolute top-0 bottom-0 rounded-md bg-primary/80" style="inset-inline-start:11.1%;inline-size:60.2%"></span></span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="w-16 shrink-0 font-mono text-2xs text-mono">Van 11</span>
+          <span class="relative block h-6 grow rounded-md bg-muted"><span class="absolute top-0 bottom-0 rounded-md bg-primary/80" style="inset-inline-start:3.7%;inline-size:86.1%"></span></span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="w-16 shrink-0 font-mono text-2xs text-mono">Van 14</span>
+          <span class="relative block h-6 grow rounded-md bg-muted">
+            <span class="absolute top-0 bottom-0 rounded-md bg-primary/80" style="inset-inline-start:16.7%;inline-size:68.5%"></span>
+            <span class="absolute top-0 bottom-0 rounded-md bg-warning" style="inset-inline-start:61.1%;inline-size:5.6%" title="Stop 214 falls outside the promised window"></span>
+          </span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="w-16 shrink-0"></span>
+          <span class="flex grow justify-between font-mono text-2xs text-muted-foreground tabular-nums"><span>06:00</span><span>09:00</span><span>12:00</span><span>15:00</span></span>
+        </div>
+      </div>
+      <div class="card-footer bg-card">
+        <i data-lucide="phone" class="size-4 shrink-0 text-muted-foreground"></i>
+        <span class="meta leading-relaxed" data-i18n="Stop 214 cannot be served before 12:30. Mishwar lists it for a call at 06:15 with two slots to offer.">Stop 214 cannot be served before 12:30. Mishwar lists it for a call at 06:15 with two slots to offer.</span>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- @endregion capability-windows -->
+
+<!-- @region capability-driver -->
+<section id="driver" class="section border-b border-border">
+  <div class="container-fixed flex flex-col gap-12">
+    <div class="grid gap-10 lg:grid-cols-2 lg:items-center lg:gap-16">
+      <div class="flex flex-col items-start gap-5">
+        <span class="step">03 · <span data-i18n="Driver">Driver</span></span>
+        <h2 class="h2" data-i18n="The driver gets a sequence, not a map puzzle">The driver gets a sequence, not a map puzzle</h2>
+        <p class="lead" data-i18n="One stop at a time: where it is, when it is due, what is on the van for that shop, and the two buttons that matter. A change made in the office reaches the phone before the driver reaches the corner.">One stop at a time: where it is, when it is due, what is on the van for that shop, and the two buttons that matter. A change made in the office reaches the phone before the driver reaches the corner.</p>
+        <ul class="flex flex-col gap-3">
+          <li class="tick"><i data-lucide="check"></i><span data-i18n="Works with no signal in the valley and syncs when the bars come back.">Works with no signal in the valley and syncs when the bars come back.</span></li>
+          <li class="tick"><i data-lucide="check"></i><span data-i18n="A refusal is recorded on the spot, with a reason and a photo.">A refusal is recorded on the spot, with a reason and a photo.</span></li>
+          <li class="tick"><i data-lucide="check"></i><span data-i18n="Arabic and English, in the keyboard the driver already uses.">Arabic and English, in the keyboard the driver already uses.</span></li>
+        </ul>
+      </div>
+
+      <div class="mx-auto flex w-full max-w-sm flex-col gap-3">
+        <div class="card border-primary/40 p-4 gap-3">
+          <div class="flex items-center justify-between gap-2.5">
+            <span class="font-mono text-2xs text-muted-foreground">Stop 7 / 24</span>
+            <span class="badge badge-sm badge-light-primary"><span class="dot"></span><span data-i18n="Next">Next</span></span>
+          </div>
+          <div class="flex flex-col gap-1">
+            <span class="text-sm font-semibold text-mono">Abou Khalil Market</span>
+            <span class="text-2sm text-secondary-foreground">Furn el Chebbak, Rue 41</span>
+          </div>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-2xs text-muted-foreground tabular-nums">
+            <span class="inline-flex items-center gap-1.5" dir="ltr"><i data-lucide="clock" class="size-3.5"></i>08:35 – 08:50</span>
+            <span class="inline-flex items-center gap-1.5"><i data-lucide="package" class="size-3.5"></i>14 <span data-i18n="crates">crates</span></span>
+          </div>
+          <div class="flex items-center gap-2 pt-1">
+            <span class="btn btn-primary grow"><i data-lucide="check"></i><span data-i18n="Delivered">Delivered</span></span>
+            <span class="btn btn-outline grow"><i data-lucide="corner-up-left" class="rtl:-scale-x-100"></i><span data-i18n="Problem">Problem</span></span>
+          </div>
+        </div>
+        <div class="card p-4 gap-1.5">
+          <div class="flex items-center justify-between gap-2.5">
+            <span class="font-mono text-2xs text-muted-foreground">Stop 6 / 24</span>
+            <span class="badge badge-sm badge-light-success"><span class="dot"></span><span data-i18n="Delivered">Delivered</span></span>
+          </div>
+          <span class="text-2sm text-secondary-foreground">Hanna Grocery · 08:12 · <span data-i18n="signed by R. Aoun">signed by R. Aoun</span></span>
+        </div>
+        <div class="card p-4 gap-1.5">
+          <div class="flex items-center justify-between gap-2.5">
+            <span class="font-mono text-2xs text-muted-foreground">Stop 5 / 24</span>
+            <span class="badge badge-sm badge-light-warning"><span class="dot"></span><span data-i18n="Partly refused">Partly refused</span></span>
+          </div>
+          <span class="text-2sm text-secondary-foreground">Sanayeh Mini Market · <span data-i18n="2 of 9 crates refused, cold chain broken">2 of 9 crates refused, cold chain broken</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid gap-8 border-t border-border pt-10 sm:grid-cols-3">
+      <div class="flex flex-col gap-1.5">
+        <span class="font-display text-3xl font-semibold text-mono tabular-nums" dir="ltr">4.1 <i data-lucide="arrow-right" class="inline size-5 text-muted-foreground"></i> 0.8</span>
+        <span class="text-2sm text-secondary-foreground" data-i18n="Calls to the office per van, per day">Calls to the office per van, per day</span>
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <span class="font-display text-3xl font-semibold text-mono tabular-nums">96.4%</span>
+        <span class="text-2sm text-secondary-foreground" data-i18n="Stops served inside the promised window">Stops served inside the promised window</span>
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <span class="font-display text-3xl font-semibold text-mono tabular-nums">21,480</span>
+        <span class="text-2sm text-secondary-foreground" data-i18n="Delivery photos filed last month">Delivery photos filed last month</span>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- @endregion capability-driver -->
+
+<!-- @region capability-record -->
+<section id="record" class="section border-b border-border bg-muted/40">
+  <div class="container-fixed flex flex-col gap-10">
+    <div class="flex flex-col items-start gap-5 max-w-2xl">
+      <span class="step">04 · <span data-i18n="Record">Record</span></span>
+      <h2 class="h2" data-i18n="Every change is on the record">Every change is on the record</h2>
+      <p class="lead" data-i18n="A van breaks down at seven, somebody moves six stops, and the day carries on. Mishwar keeps who moved what, when and why, then hands the same log to your accounts at the end of the shift.">A van breaks down at seven, somebody moves six stops, and the day carries on. Mishwar keeps who moved what, when and why, then hands the same log to your accounts at the end of the shift.</p>
+    </div>
+    <div class="grid gap-6 lg:grid-cols-[1.4fr_1fr] lg:items-stretch">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title" data-i18n="Day log, Thursday 12 October">Day log, Thursday 12 October</span>
+          <span class="meta" data-i18n="kept for 7 years">kept for 7 years</span>
+        </div>
+        <div class="divide-y divide-border">
+          <div class="flex gap-4 px-5 py-4">
+            <span class="w-12 shrink-0 font-mono text-2xs text-muted-foreground tabular-nums">06:12</span>
+            <span class="text-2sm text-secondary-foreground" data-i18n="Rami N. moved 6 stops from Van 11 to Van 14 — refrigeration fault.">Rami N. moved 6 stops from Van 11 to Van 14 — refrigeration fault.</span>
+          </div>
+          <div class="flex gap-4 px-5 py-4">
+            <span class="w-12 shrink-0 font-mono text-2xs text-muted-foreground tabular-nums">07:48</span>
+            <span class="text-2sm text-secondary-foreground" data-i18n="Dispatch added stop 318 — top-up order for Nahr Foods.">Dispatch added stop 318 — top-up order for Nahr Foods.</span>
+          </div>
+          <div class="flex gap-4 px-5 py-4">
+            <span class="w-12 shrink-0 font-mono text-2xs text-muted-foreground tabular-nums">09:31</span>
+            <span class="text-2sm text-secondary-foreground" data-i18n="Ziad H. recorded a refusal at stop 214 — 2 crates, cold chain.">Ziad H. recorded a refusal at stop 214 — 2 crates, cold chain.</span>
+          </div>
+          <div class="flex gap-4 px-5 py-4">
+            <span class="w-12 shrink-0 font-mono text-2xs text-muted-foreground tabular-nums">13:05</span>
+            <span class="text-2sm text-secondary-foreground" data-i18n="Plan closed — 308 of 312 stops delivered.">Plan closed — 308 of 312 stops delivered.</span>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title" data-i18n="End-of-shift export">End-of-shift export</span></div>
+        <div class="card-content flex flex-col gap-4">
+          <span class="tick"><i data-lucide="file-spreadsheet"></i><span data-i18n="Delivered lines to the accounts system at 15:10">Delivered lines to the accounts system at 15:10</span></span>
+          <span class="tick"><i data-lucide="file-check"></i><span data-i18n="A signed sheet per van, with refusals and photos">A signed sheet per van, with refusals and photos</span></span>
+          <span class="tick"><i data-lucide="gauge"></i><span data-i18n="Kilometres and hours per driver for payroll">Kilometres and hours per driver for payroll</span></span>
+        </div>
+        <div class="card-footer bg-card">
+          <span class="meta leading-relaxed" data-i18n="CSV, or a POST to your endpoint. Same fields either way.">CSV, or a POST to your endpoint. Same fields either way.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- @endregion capability-record -->
+
+<!-- @region testimonial -->
+<section class="section border-b border-border">
+  <figure class="container-fixed flex max-w-3xl flex-col gap-7">
+    <i data-lucide="quote" class="size-7 text-primary"></i>
+    <blockquote class="font-display text-2xl lg:text-3xl font-medium leading-snug text-mono text-balance" data-i18n="We used to start planning at five in the morning and still push the last van out at nine. The plan lands at ten past six now, and nobody argues about who takes the mountain road.">We used to start planning at five in the morning and still push the last van out at nine. The plan lands at ten past six now, and nobody argues about who takes the mountain road.</blockquote>
+    <figcaption class="flex flex-wrap items-center gap-x-4 gap-y-2">
+      <span class="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 font-semibold text-2xs text-primary">RN</span>
+      <span class="flex flex-col gap-0.5 min-w-0">
+        <span class="text-sm font-medium text-mono">Rami Nasr</span>
+        <span class="text-2sm text-secondary-foreground" data-i18n="Dispatch supervisor, Barakat Dairy">Dispatch supervisor, Barakat Dairy</span>
+      </span>
+      <span class="badge badge-sm badge-outline ms-auto" data-i18n="41 vans across 3 depots">41 vans across 3 depots</span>
+    </figcaption>
+  </figure>
+</section>
+<!-- @endregion testimonial -->
+
+<!-- @region pricing-teaser -->
+<section id="pricing" class="section border-b border-border bg-muted/40">
+  <div class="container-fixed">
+    <div class="card flex-col lg:flex-row lg:items-stretch">
+      <div class="card-content flex flex-col items-start gap-4">
+        <span class="eyebrow"><i data-lucide="wallet" class="size-3.5"></i><span data-i18n="Pricing">Pricing</span></span>
+        <h2 class="h2 text-2xl lg:text-3xl" data-i18n="Priced per active van, not per seat">Priced per active van, not per seat</h2>
+        <p class="lead text-base max-w-xl" data-i18n="14 dollars per active van per month, billed monthly. Every desk in the office is included, and so is the driver app. Depots running fewer than six vans pay a flat 69 dollars.">14 dollars per active van per month, billed monthly. Every desk in the office is included, and so is the driver app. Depots running fewer than six vans pay a flat 69 dollars.</p>
+      </div>
+      <div class="flex shrink-0 flex-col gap-5 border-t border-border p-(--card-p) lg:w-80 lg:border-t-0 lg:border-s">
+        <div class="flex items-end gap-2">
+          <span class="font-display text-5xl font-semibold text-mono tabular-nums">$14</span>
+          <span class="meta pb-2 leading-tight" data-i18n="per active van, per month">per active van, per month</span>
+        </div>
+        <ul class="flex flex-col gap-2.5">
+          <li class="tick"><i data-lucide="check"></i><span data-i18n="Every office seat included">Every office seat included</span></li>
+          <li class="tick"><i data-lucide="check"></i><span data-i18n="Driver app included">Driver app included</span></li>
+          <li class="tick"><i data-lucide="check"></i><span data-i18n="Stop from the dashboard, no phone call">Stop from the dashboard, no phone call</span></li>
+        </ul>
+        <a class="btn btn-outline" href="#faq"><span data-i18n="See the full pricing">See the full pricing</span><i data-lucide="arrow-right" class="rtl:rotate-180"></i></a>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- @endregion pricing-teaser -->
+
+<!-- @region faq -->
+<section id="faq" class="section border-b border-border">
+  <div class="container-fixed grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
+    <div class="flex flex-col items-start gap-4">
+      <span class="eyebrow"><i data-lucide="message-circle" class="size-3.5"></i><span data-i18n="Questions from the first call">Questions from the first call</span></span>
+      <h2 class="h2" data-i18n="Asked by every dispatcher we meet">Asked by every dispatcher we meet</h2>
+      <p class="text-2sm leading-relaxed text-secondary-foreground" data-i18n="Something else? Write to sales@mishwar.app and a person answers.">Something else? Write to sales@mishwar.app and a person answers.</p>
+    </div>
+    <div class="flex flex-col gap-3">
+      <details name="faq" class="group rounded-lg border border-border bg-card px-5 shadow-xs" open>
+        <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-sm font-medium text-mono [&::-webkit-details-marker]:hidden">
+          <span data-i18n="Do we have to replace our ERP?">Do we have to replace our ERP?</span>
+          <i data-lucide="chevron-down" class="size-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180"></i>
+        </summary>
+        <p class="pb-5 text-2sm leading-relaxed text-secondary-foreground" data-i18n="No. Mishwar reads a CSV export, or a REST endpoint if you have one, and writes the finished plan back the same way. Three of our largest customers still run the system they bought in 2011.">No. Mishwar reads a CSV export, or a REST endpoint if you have one, and writes the finished plan back the same way. Three of our largest customers still run the system they bought in 2011.</p>
+      </details>
+      <details name="faq" class="group rounded-lg border border-border bg-card px-5 shadow-xs">
+        <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-sm font-medium text-mono [&::-webkit-details-marker]:hidden">
+          <span data-i18n="What happens when a driver leaves the planned sequence?">What happens when a driver leaves the planned sequence?</span>
+          <i data-lucide="chevron-down" class="size-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180"></i>
+        </summary>
+        <p class="pb-5 text-2sm leading-relaxed text-secondary-foreground" data-i18n="Nothing breaks. The remaining stops re-sequence on the phone, the office sees the new arrival times within a minute, and the change is written to the day log under the driver name.">Nothing breaks. The remaining stops re-sequence on the phone, the office sees the new arrival times within a minute, and the change is written to the day log under the driver name.</p>
+      </details>
+      <details name="faq" class="group rounded-lg border border-border bg-card px-5 shadow-xs">
+        <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-sm font-medium text-mono [&::-webkit-details-marker]:hidden">
+          <span data-i18n="Can two depots share vans?">Can two depots share vans?</span>
+          <i data-lucide="chevron-down" class="size-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180"></i>
+        </summary>
+        <p class="pb-5 text-2sm leading-relaxed text-secondary-foreground" data-i18n="Yes. A van belongs to a depot but can be lent for a day. The plan, the kilometres and the payroll export follow the van, not the depot.">Yes. A van belongs to a depot but can be lent for a day. The plan, the kilometres and the payroll export follow the van, not the depot.</p>
+      </details>
+      <details name="faq" class="group rounded-lg border border-border bg-card px-5 shadow-xs">
+        <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-sm font-medium text-mono [&::-webkit-details-marker]:hidden">
+          <span data-i18n="Is our customer data ours to take away?">Is our customer data ours to take away?</span>
+          <i data-lucide="chevron-down" class="size-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180"></i>
+        </summary>
+        <p class="pb-5 text-2sm leading-relaxed text-secondary-foreground" data-i18n="It is. One button exports every stop, address and delivery record as CSV, and account data is deleted thirty days after you ask.">It is. One button exports every stop, address and delivery record as CSV, and account data is deleted thirty days after you ask.</p>
+      </details>
+      <details name="faq" class="group rounded-lg border border-border bg-card px-5 shadow-xs">
+        <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-sm font-medium text-mono [&::-webkit-details-marker]:hidden">
+          <span data-i18n="Does the driver app work in Arabic?">Does the driver app work in Arabic?</span>
+          <i data-lucide="chevron-down" class="size-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180"></i>
+        </summary>
+        <p class="pb-5 text-2sm leading-relaxed text-secondary-foreground" data-i18n="Yes, right to left, with Arabic addresses and Arabic refusal reasons. Nine depots on Mishwar run the office in English and the phones in Arabic.">Yes, right to left, with Arabic addresses and Arabic refusal reasons. Nine depots on Mishwar run the office in English and the phones in Arabic.</p>
+      </details>
+      <details name="faq" class="group rounded-lg border border-border bg-card px-5 shadow-xs">
+        <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-sm font-medium text-mono [&::-webkit-details-marker]:hidden">
+          <span data-i18n="How long until the first real plan?">How long until the first real plan?</span>
+          <i data-lucide="chevron-down" class="size-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180"></i>
+        </summary>
+        <p class="pb-5 text-2sm leading-relaxed text-secondary-foreground" data-i18n="A depot with a clean order export is planning the same day. The slow part is agreeing service times per customer; Mishwar starts with a default and learns from the deliveries.">A depot with a clean order export is planning the same day. The slow part is agreeing service times per customer; Mishwar starts with a default and learns from the deliveries.</p>
+      </details>
+    </div>
+  </div>
+</section>
+<!-- @endregion faq -->
+
+<!-- @region closing-cta -->
+<section id="start" class="section">
+  <div class="container-fixed">
+    <div class="card gap-6 p-(--card-p) lg:flex-row lg:items-center lg:justify-between lg:gap-10">
+      <div class="flex flex-col gap-3">
+        <h2 class="h2 text-2xl lg:text-3xl" data-i18n="Plan one depot tomorrow morning.">Plan one depot tomorrow morning.</h2>
+        <p class="text-2sm leading-relaxed text-secondary-foreground max-w-xl" data-i18n="Start with a single depot and one day of orders. If the plan is not better than the one on the whiteboard, stop there — there is nothing to cancel.">Start with a single depot and one day of orders. If the plan is not better than the one on the whiteboard, stop there — there is nothing to cancel.</p>
+        <p class="meta leading-relaxed" data-i18n="Setup call included. Your data leaves as CSV whenever you ask.">Setup call included. Your data leaves as CSV whenever you ask.</p>
+      </div>
+      <div class="flex shrink-0 flex-wrap items-center gap-3">
+        <a class="btn btn-primary btn-lg" href="#"><span data-i18n="Start a 21-day trial">Start a 21-day trial</span><i data-lucide="arrow-right" class="rtl:rotate-180"></i></a>
+        <a class="btn btn-outline btn-lg" href="#"><i data-lucide="calendar"></i><span data-i18n="Book a 20-minute walkthrough">Book a 20-minute walkthrough</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- @endregion closing-cta -->
+
+</main>
+
+<!-- @region site-footer -->
+<footer class="border-t border-border bg-muted/40 py-12 lg:py-16">
+  <div class="container-fixed flex flex-col gap-10">
+    <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-5">
+      <div class="flex flex-col gap-3 lg:pe-8">
+        <span class="flex items-center gap-2.5 font-display text-base font-semibold text-mono">
+          <span class="inline-flex size-7 items-center justify-center rounded-md bg-primary text-primary-foreground"><i data-lucide="route" class="size-4"></i></span>
+          Mishwar
+        </span>
+        <p class="text-2sm leading-relaxed text-secondary-foreground" data-i18n="Route planning for wholesale delivery fleets.">Route planning for wholesale delivery fleets.</p>
+      </div>
+      <nav class="flex flex-col gap-2.5" aria-label="Product">
+        <span class="text-xs font-medium text-mono" data-i18n="Product">Product</span>
+        <a class="foot-link" href="#import" data-i18n="How it works">How it works</a>
+        <a class="foot-link" href="#driver" data-i18n="Driver app">Driver app</a>
+        <a class="foot-link" href="#record" data-i18n="Integrations">Integrations</a>
+        <a class="foot-link" href="#" data-i18n="Changelog">Changelog</a>
+      </nav>
+      <nav class="flex flex-col gap-2.5" aria-label="Company">
+        <span class="text-xs font-medium text-mono" data-i18n="Company">Company</span>
+        <a class="foot-link" href="#" data-i18n="About">About</a>
+        <a class="foot-link" href="#customers" data-i18n="Customers">Customers</a>
+        <a class="foot-link" href="#" data-i18n="Careers">Careers</a>
+        <a class="foot-link" href="#" data-i18n="Contact">Contact</a>
+      </nav>
+      <nav class="flex flex-col gap-2.5" aria-label="Resources">
+        <span class="text-xs font-medium text-mono" data-i18n="Resources">Resources</span>
+        <a class="foot-link" href="#" data-i18n="Documentation">Documentation</a>
+        <a class="foot-link" href="#import" data-i18n="Import guide">Import guide</a>
+        <a class="foot-link" href="#" data-i18n="Service status">Service status</a>
+        <a class="foot-link" href="#faq" data-i18n="Support">Support</a>
+      </nav>
+      <nav class="flex flex-col gap-2.5" aria-label="Legal">
+        <span class="text-xs font-medium text-mono" data-i18n="Legal">Legal</span>
+        <a class="foot-link" href="#" data-i18n="Privacy">Privacy</a>
+        <a class="foot-link" href="#" data-i18n="Terms">Terms</a>
+        <a class="foot-link" href="#" data-i18n="Data processing">Data processing</a>
+        <a class="foot-link" href="#" data-i18n="Security">Security</a>
+      </nav>
+    </div>
+    <div class="flex flex-col gap-3 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
+      <p class="meta">© 2025 Mishwar SAL · <span data-i18n="Beirut and Amman">Beirut and Amman</span></p>
+      <p class="meta">sales@mishwar.app</p>
+    </div>
+  </div>
+</footer>
+<!-- @endregion site-footer -->
+
+<script>
+const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const html = document.documentElement;
+const THEMES = ['theme-clinic', 'theme-graphite', 'theme-editorial', 'theme-neo', 'theme-slate', 'theme-mint'];
+const DENS = ['density-compact', 'density-airy'];
+
+// ===== mobile navigation =====
+const menuBtn = $('#menu-btn'), mobileNav = $('#mobile-nav');
+function closeMenu() { mobileNav.classList.add('hidden'); menuBtn.setAttribute('aria-expanded', 'false'); }
+menuBtn.onclick = () => menuBtn.setAttribute('aria-expanded', mobileNav.classList.toggle('hidden') === false);
+$$('#mobile-nav a').forEach(a => a.addEventListener('click', closeMenu));
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !mobileNav.classList.contains('hidden')) { closeMenu(); menuBtn.focus(); } });
+
+// ===== dark mode: the class lives on <html>, the choice is remembered =====
+function setDark(on) { html.classList.toggle('dark', on); try { localStorage.setItem('ui.theme', on ? 'dark' : 'light'); } catch {} }
+$('#theme-toggle').onclick = () => setDark(!html.classList.contains('dark'));
+try { if (localStorage.getItem('ui.theme') === 'dark') html.classList.add('dark'); } catch {}
+
+// ===== Arabic: one dictionary, one key per data-i18n attribute. Figures stay in Western digits. =====
+const I18N = {
+  "Skip to main content": "تخطَّ إلى المحتوى الرئيسي",
+  "How it works": "كيف يعمل",
+  "Driver app": "تطبيق السائق",
+  "Pricing": "الأسعار",
+  "Customers": "العملاء",
+  "Docs": "التوثيق",
+  "Sign in": "تسجيل الدخول",
+  "Start a trial": "ابدأ التجربة",
+  "Dispatch software for wholesale distributors": "برنامج توزيع لشركات الجملة",
+  "Tomorrow's routes, planned before the depot opens.": "خطوط سير الغد جاهزة قبل أن يفتح المستودع.",
+  "Mishwar turns tonight's order list into tomorrow's van routes, with capacity, delivery windows and driver shifts already accounted for. The 41 depots that moved over last year went from two hours of planning to under two minutes.": "مشوار يحوّل قائمة طلبات الليلة إلى خطوط سير الغد، محسوبة على حمولة كل سيارة ونوافذ التسليم ومناوبات السائقين. الـ 41 مستودعاً التي انتقلت إلينا العام الماضي نزلت من ساعتَي تخطيط إلى أقل من دقيقتين.",
+  "Start a 21-day trial": "ابدأ تجربة 21 يوماً",
+  "Watch a 4-minute plan run": "شاهد عملية تخطيط في 4 دقائق",
+  "No card needed. Import one depot as CSV and plan it the same morning.": "بدون بطاقة دفع. حمّل بيانات مستودع واحد بصيغة CSV وخطّطه في الصباح نفسه.",
+  "Beirut depot": "مستودع بيروت",
+  "Plan for Thursday 12 October": "خطة الخميس 12 تشرين الأول",
+  "Planned in 94 s": "خُطّطت في 94 ثانية",
+  "stops": "محطة",
+  "km": "كم",
+  "14 vans, 312 drops, 1,190 km. Three windows need a call.": "14 سيارة، 312 نقطة تسليم، 1,190 كم. ثلاث نوافذ تحتاج مكالمة.",
+  "more vans": "سيارة أخرى",
+  "Planning with Mishwar today": "يخططون مع مشوار اليوم",
+  "Cold chain, dry goods and beverage distributors in Beirut, Amman and Jeddah.": "موزّعو سلسلة التبريد والمواد الجافة والمشروبات في بيروت وعمّان وجدة.",
+  "Import": "الاستيراد",
+  "The plan starts from the order list you already keep": "الخطة تبدأ من قائمة الطلبات الموجودة عندك أصلاً",
+  "Drop in the CSV your sales team exports, or point Mishwar at your order endpoint. Addresses are matched against the shops you delivered to last week, so a new spelling of the same grocery does not become a second stop.": "حمّل ملف CSV الذي يصدّره فريق المبيعات، أو وجّه مشوار إلى واجهة الطلبات عندك. تُطابَق العناوين مع المحال التي سلّمت إليها الأسبوع الماضي، فلا يتحوّل اختلاف في كتابة اسم البقالة إلى محطة ثانية.",
+  "Column mapping is remembered per depot, so the second import is one click.": "ربط الأعمدة محفوظ لكل مستودع، فالاستيراد الثاني نقرة واحدة.",
+  "Rows that cannot be placed on the map are held in a review list, never dropped in silence.": "الأسطر التي يتعذّر تحديدها على الخريطة تُحجَز في قائمة مراجعة، ولا تُحذف بصمت.",
+  "Crate counts and pallet weights feed straight into van capacity.": "عدد الصناديق وأوزان المنصات تدخل مباشرة في حساب حمولة السيارة.",
+  "Read the import guide": "اقرأ دليل الاستيراد",
+  "rows": "سطر",
+  "Customer": "العميل",
+  "Address": "العنوان",
+  "Window opens": "بداية النافذة",
+  "Load units": "وحدات الحمولة",
+  "Driver note": "ملاحظة للسائق",
+  "matched": "مطابَق",
+  "needs a rule": "يحتاج قاعدة",
+  "4 rows held for review, 308 ready to plan.": "4 أسطر محجوزة للمراجعة، و308 جاهزة للتخطيط.",
+  "Windows": "النوافذ",
+  "A window you promised is a constraint, not a note": "النافذة التي وعدت بها قيد، لا ملاحظة",
+  "Every stop carries the window the customer agreed to, the service time your driver actually needs, and the hour the shop closes for lunch. Mishwar plans inside all three and says which promises cannot be kept before a van leaves the yard.": "كل محطة تحمل النافذة التي وافق عليها العميل، ومدة الخدمة التي يحتاجها سائقك فعلاً، وساعة إغلاق المحل للغداء. مشوار يخطط داخل الثلاثة معاً، ويقول أي وعد لا يمكن الوفاء به قبل أن تخرج السيارة.",
+  "Service time is learned per customer from the last twenty deliveries.": "مدة الخدمة تُتعلَّم لكل عميل من آخر عشرين عملية تسليم.",
+  "Breaks and shift ends are hard limits, not suggestions.": "الاستراحات ونهاية المناوبة حدود صارمة، لا اقتراحات.",
+  "Conflicts arrive as a short call list with the two nearest free slots.": "التعارضات تصلك كقائمة مكالمات قصيرة مع أقرب موعدين متاحين.",
+  "Shift 06:00 to 15:00": "المناوبة من 06:00 إلى 15:00",
+  "3 conflicts": "3 تعارضات",
+  "Stop 214 cannot be served before 12:30. Mishwar lists it for a call at 06:15 with two slots to offer.": "المحطة 214 لا يمكن خدمتها قبل 12:30. يدرجها مشوار لمكالمة عند 06:15 مع موعدين بديلين.",
+  "Driver": "السائق",
+  "The driver gets a sequence, not a map puzzle": "السائق يستلم تسلسلاً، لا أحجية خرائط",
+  "One stop at a time: where it is, when it is due, what is on the van for that shop, and the two buttons that matter. A change made in the office reaches the phone before the driver reaches the corner.": "محطة واحدة في كل شاشة: أين هي، ومتى موعدها، وما المحمّل لها في السيارة، والزرّان اللذان يهمّان. أي تعديل في المكتب يصل إلى الهاتف قبل أن يصل السائق إلى الزاوية.",
+  "Works with no signal in the valley and syncs when the bars come back.": "يعمل بلا تغطية في الوادي ويزامن عند عودة الشبكة.",
+  "A refusal is recorded on the spot, with a reason and a photo.": "الرفض يُسجَّل في مكانه، بسبب وصورة.",
+  "Arabic and English, in the keyboard the driver already uses.": "عربي وإنجليزي، بلوحة المفاتيح التي يستخدمها السائق أصلاً.",
+  "Next": "التالية",
+  "crates": "صندوق",
+  "Delivered": "سُلّمت",
+  "Problem": "مشكلة",
+  "signed by R. Aoun": "بتوقيع ر. عون",
+  "Partly refused": "مرفوضة جزئياً",
+  "2 of 9 crates refused, cold chain broken": "رُفض صندوقان من 9، انقطاع في سلسلة التبريد",
+  "Calls to the office per van, per day": "مكالمات إلى المكتب لكل سيارة يومياً",
+  "Stops served inside the promised window": "محطات خُدمت داخل النافذة الموعودة",
+  "Delivery photos filed last month": "صور تسليم محفوظة الشهر الماضي",
+  "Record": "السجل",
+  "Every change is on the record": "كل تغيير مسجَّل",
+  "A van breaks down at seven, somebody moves six stops, and the day carries on. Mishwar keeps who moved what, when and why, then hands the same log to your accounts at the end of the shift.": "تتعطل سيارة عند السابعة، فينقل أحدهم ست محطات، ويمضي اليوم. مشوار يحتفظ بمن نقل ماذا ومتى ولماذا، ثم يسلّم السجل نفسه إلى المحاسبة في نهاية المناوبة.",
+  "Day log, Thursday 12 October": "سجل اليوم، الخميس 12 تشرين الأول",
+  "kept for 7 years": "محفوظ 7 سنوات",
+  "Rami N. moved 6 stops from Van 11 to Van 14 — refrigeration fault.": "رامي ن. نقل 6 محطات من السيارة 11 إلى 14 — عطل تبريد.",
+  "Dispatch added stop 318 — top-up order for Nahr Foods.": "التوزيع أضاف المحطة 318 — طلب تعزيز لنهر للأغذية.",
+  "Ziad H. recorded a refusal at stop 214 — 2 crates, cold chain.": "زياد ح. سجّل رفضاً عند المحطة 214 — صندوقان، سلسلة التبريد.",
+  "Plan closed — 308 of 312 stops delivered.": "أُقفلت الخطة — 308 من 312 محطة سُلّمت.",
+  "End-of-shift export": "تصدير نهاية المناوبة",
+  "Delivered lines to the accounts system at 15:10": "بنود التسليم إلى نظام المحاسبة عند 15:10",
+  "A signed sheet per van, with refusals and photos": "كشف موقّع لكل سيارة، مع حالات الرفض والصور",
+  "Kilometres and hours per driver for payroll": "الكيلومترات والساعات لكل سائق لأجل الرواتب",
+  "CSV, or a POST to your endpoint. Same fields either way.": "ملف CSV أو طلب POST إلى واجهتك. الحقول نفسها في الحالتين.",
+  "We used to start planning at five in the morning and still push the last van out at nine. The plan lands at ten past six now, and nobody argues about who takes the mountain road.": "كنا نبدأ التخطيط عند الخامسة فجراً وتخرج آخر سيارة عند التاسعة. الآن تنزل الخطة عند السادسة وعشر دقائق، ولا أحد يتجادل على من يأخذ طريق الجبل.",
+  "Dispatch supervisor, Barakat Dairy": "مشرف التوزيع، ألبان بركات",
+  "41 vans across 3 depots": "41 سيارة في 3 مستودعات",
+  "Priced per active van, not per seat": "التسعير على السيارة العاملة، لا على المستخدم",
+  "14 dollars per active van per month, billed monthly. Every desk in the office is included, and so is the driver app. Depots running fewer than six vans pay a flat 69 dollars.": "14 دولاراً لكل سيارة عاملة شهرياً، بفوترة شهرية. كل مقاعد المكتب مشمولة، وتطبيق السائق كذلك. المستودعات التي تشغّل أقل من ست سيارات تدفع 69 دولاراً ثابتة.",
+  "per active van, per month": "لكل سيارة عاملة شهرياً",
+  "Every office seat included": "كل مقاعد المكتب مشمولة",
+  "Driver app included": "تطبيق السائق مشمول",
+  "Stop from the dashboard, no phone call": "الإيقاف من لوحة التحكم، بلا مكالمة",
+  "See the full pricing": "اطّلع على الأسعار كاملة",
+  "Questions from the first call": "أسئلة من أول مكالمة",
+  "Asked by every dispatcher we meet": "يسألها كل موزّع نلتقي به",
+  "Something else? Write to sales@mishwar.app and a person answers.": "سؤال آخر؟ اكتب إلى sales@mishwar.app ويردّ عليك إنسان.",
+  "Do we have to replace our ERP?": "هل علينا استبدال نظام ERP عندنا؟",
+  "No. Mishwar reads a CSV export, or a REST endpoint if you have one, and writes the finished plan back the same way. Three of our largest customers still run the system they bought in 2011.": "لا. يقرأ مشوار ملف CSV مصدَّراً، أو واجهة REST إن وُجدت، ويعيد الخطة النهائية بالطريقة نفسها. ثلاثة من أكبر عملائنا ما زالوا يشغّلون النظام الذي اشتروه عام 2011.",
+  "What happens when a driver leaves the planned sequence?": "ماذا يحدث إذا خرج السائق عن التسلسل المخطط؟",
+  "Nothing breaks. The remaining stops re-sequence on the phone, the office sees the new arrival times within a minute, and the change is written to the day log under the driver name.": "لا شيء ينكسر. تُعاد ترتيب المحطات المتبقية على الهاتف، ويرى المكتب أوقات الوصول الجديدة خلال دقيقة، ويُكتب التغيير في سجل اليوم باسم السائق.",
+  "Can two depots share vans?": "هل يمكن لمستودعين أن يتشاركا السيارات؟",
+  "Yes. A van belongs to a depot but can be lent for a day. The plan, the kilometres and the payroll export follow the van, not the depot.": "نعم. السيارة تتبع مستودعاً لكنها تُعار ليوم. الخطة والكيلومترات وتصدير الرواتب تتبع السيارة لا المستودع.",
+  "Is our customer data ours to take away?": "هل بيانات عملائنا ملكنا لنأخذها؟",
+  "It is. One button exports every stop, address and delivery record as CSV, and account data is deleted thirty days after you ask.": "نعم. زر واحد يصدّر كل محطة وعنوان وسجل تسليم بصيغة CSV، وتُحذف بيانات الحساب بعد ثلاثين يوماً من طلبك.",
+  "Does the driver app work in Arabic?": "هل يعمل تطبيق السائق بالعربية؟",
+  "Yes, right to left, with Arabic addresses and Arabic refusal reasons. Nine depots on Mishwar run the office in English and the phones in Arabic.": "نعم، من اليمين إلى اليسار، بعناوين عربية وأسباب رفض عربية. تسعة مستودعات على مشوار تدير المكتب بالإنجليزية والهواتف بالعربية.",
+  "How long until the first real plan?": "كم يلزم حتى أول خطة حقيقية؟",
+  "A depot with a clean order export is planning the same day. The slow part is agreeing service times per customer; Mishwar starts with a default and learns from the deliveries.": "مستودع لديه تصدير طلبات نظيف يخطط في اليوم نفسه. الجزء البطيء هو الاتفاق على مدة الخدمة لكل عميل؛ يبدأ مشوار بقيمة افتراضية ويتعلم من عمليات التسليم.",
+  "Plan one depot tomorrow morning.": "خطّط مستودعاً واحداً صباح الغد.",
+  "Start with a single depot and one day of orders. If the plan is not better than the one on the whiteboard, stop there — there is nothing to cancel.": "ابدأ بمستودع واحد ويوم واحد من الطلبات. إذا لم تكن الخطة أفضل من التي على اللوح، توقف عندها — لا شيء لتلغيه.",
+  "Setup call included. Your data leaves as CSV whenever you ask.": "مكالمة الإعداد مشمولة. بياناتك تخرج بصيغة CSV متى طلبت.",
+  "Book a 20-minute walkthrough": "احجز جولة 20 دقيقة",
+  "Route planning for wholesale delivery fleets.": "تخطيط خطوط السير لأساطيل توزيع الجملة.",
+  "Product": "المنتج",
+  "Company": "الشركة",
+  "Resources": "المصادر",
+  "Legal": "الشؤون القانونية",
+  "Integrations": "التكاملات",
+  "Changelog": "سجل التغييرات",
+  "About": "عن الشركة",
+  "Careers": "الوظائف",
+  "Contact": "اتصل بنا",
+  "Documentation": "التوثيق الكامل",
+  "Import guide": "دليل الاستيراد",
+  "Service status": "حالة الخدمة",
+  "Support": "الدعم",
+  "Privacy": "الخصوصية",
+  "Terms": "الشروط",
+  "Data processing": "معالجة البيانات",
+  "Security": "الأمان",
+  "Beirut and Amman": "بيروت وعمّان"
+};
+function setLang(lang) {
+  const ar = lang === 'ar';
+  html.setAttribute('dir', ar ? 'rtl' : 'ltr'); html.setAttribute('lang', ar ? 'ar' : 'en');
+  $$('[data-i18n]').forEach(el => { const k = el.dataset.i18n; if (I18N[k]) { const t = ar ? I18N[k] : k;
+    if (el.childNodes.length && el.lastChild.nodeType === 3) el.lastChild.nodeValue = ' ' + t + ' '; else el.textContent = t; } });
+  try { localStorage.setItem('ui.lang', lang); } catch {}
+}
+$('#lang-toggle').onclick = () => setLang(html.getAttribute('dir') === 'rtl' ? 'en' : 'ar');
+try { if (localStorage.getItem('ui.lang') === 'ar') setLang('ar'); } catch {}
+
+// ===== URL presets for screenshots: #dark=1 · #dir=rtl · #theme=theme-slate · #density=density-compact =====
+(function fromUrl() {
+  const q = new URLSearchParams(location.search || location.hash.slice(1));
+  const theme = q.get('theme'); if (THEMES.includes(theme)) { html.classList.remove(...THEMES); html.classList.add(theme); }
+  const density = q.get('density'); if (DENS.includes(density)) { html.classList.remove(...DENS); html.classList.add(density); }
+  if (q.get('dark') !== null) setDark(q.get('dark') === '1');
+  const dir = q.get('dir'), lang = q.get('lang');
+  const wanted = ['en', 'ar'].includes(lang) ? lang : dir === 'rtl' ? 'ar' : dir === 'ltr' ? 'en' : null;
+  if (wanted) setLang(wanted);
+})();
+
+lucide.createIcons();
+</script>
+</body>
+</html>

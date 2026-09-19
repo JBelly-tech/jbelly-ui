@@ -20,7 +20,7 @@
   --background: oklch(100% 0 0); --foreground: oklch(14.5% 0.005 285);
   --card: oklch(100% 0 0); --card-foreground: oklch(14.5% 0.005 285);
   --popover: oklch(100% 0 0); --popover-foreground: oklch(14.5% 0.005 285);
-  --primary: oklch(54% 0.2 258); --primary-foreground: oklch(100% 0 0);
+  --primary: oklch(54% 0.2 258); --primary-accent: var(--primary); --primary-foreground: oklch(100% 0 0);
   --secondary: oklch(96.5% 0.002 285); --secondary-foreground: oklch(21% 0.006 285);
   --muted: oklch(96.5% 0.002 285); --muted-foreground: oklch(55% 0.014 285);
   --accent: oklch(96.5% 0.002 285); --accent-foreground: oklch(21% 0.006 285);
@@ -40,7 +40,7 @@
   --chart-2: var(--info); --chart-3: var(--success); --chart-4: var(--warning);
 }
 @media (max-width: 63.99rem) { :root { --header-height: 60px; } }
-.dark {
+.dark { --primary-accent: oklch(59% 0.21 258);
   color-scheme: dark;
   --background: oklch(14.5% 0.005 285); --foreground: oklch(98.5% 0 0);
   --card: oklch(14.5% 0.005 285); --card-foreground: oklch(98.5% 0 0);
@@ -62,30 +62,30 @@
 .density-compact { --ctl-h: 30px; --ctl-h-sm: 24px; --row-h: 38px; --card-p: 1rem; --page-gap: 1rem; }
 .density-airy    { --ctl-h: 40px; --ctl-h-sm: 32px; --row-h: 56px; --card-p: 1.75rem; --page-gap: 1.75rem; }
 /* ===== personalities (from references/personalities.md) ===== */
-.theme-clinic { --font-display: "Manrope", sans-serif; --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+.theme-clinic { --primary-accent: oklch(50% 0.12 195); --font-display: "Manrope", sans-serif; --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --primary: oklch(50% 0.12 195); --background: oklch(98.5% 0.006 190); --card: oklch(100% 0 0);
   --border: oklch(92% 0.012 190); --input: oklch(90% 0.014 190); --muted: oklch(96% 0.01 190); --accent: oklch(95% 0.012 190); --radius: 0.75rem; }
-.theme-clinic.dark { --background: oklch(15% 0.012 195); --card: oklch(18% 0.012 195); --popover: oklch(18% 0.012 195); --border: oklch(28% 0.015 195); --input: oklch(28% 0.015 195); --muted: oklch(22% 0.012 195); --accent: oklch(24% 0.014 195); --primary: oklch(70% 0.13 195); --primary-foreground: oklch(12% 0.02 195); }
-.theme-graphite { --muted-foreground: oklch(54% 0.014 285); --font-display: "IBM Plex Sans", sans-serif; --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif; --font-mono: "IBM Plex Mono", monospace;
+.theme-clinic.dark { --primary-accent: oklch(70.25% 0.13 195); --background: oklch(15% 0.012 195); --card: oklch(18% 0.012 195); --popover: oklch(18% 0.012 195); --border: oklch(28% 0.015 195); --input: oklch(28% 0.015 195); --muted: oklch(22% 0.012 195); --accent: oklch(24% 0.014 195); --primary: oklch(70% 0.13 195); --primary-foreground: oklch(12% 0.02 195); }
+.theme-graphite { --primary-accent: oklch(52% 0.17 150); --muted-foreground: oklch(54% 0.014 285); --font-display: "IBM Plex Sans", sans-serif; --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif; --font-mono: "IBM Plex Mono", monospace;
   --primary: oklch(65% 0.17 150); --primary-foreground: oklch(14% 0 0); --background: oklch(97% 0.002 260); --card: oklch(100% 0 0); --border: oklch(88% 0.004 260); --input: oklch(86% 0.004 260); --radius: 0.25rem; }
-.theme-graphite.dark { --muted-foreground: oklch(60.0% 0.014 285); --background: oklch(12% 0.004 260); --card: oklch(15% 0.004 260); --popover: oklch(15% 0.004 260); --border: oklch(24% 0.005 260); --input: oklch(26% 0.005 260); }
-.theme-editorial { --font-display: "Fraunces", Georgia, serif; --font-sans: "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
+.theme-graphite.dark { --primary-accent: oklch(59% 0.2 258); --muted-foreground: oklch(60.0% 0.014 285); --background: oklch(12% 0.004 260); --card: oklch(15% 0.004 260); --popover: oklch(15% 0.004 260); --border: oklch(24% 0.005 260); --input: oklch(26% 0.005 260); }
+.theme-editorial { --primary-accent: oklch(48% 0.16 30); --font-display: "Fraunces", Georgia, serif; --font-sans: "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
   --primary: oklch(48% 0.16 30); --primary-foreground: oklch(98% 0.01 60); --background: oklch(97.5% 0.012 75); --card: oklch(99% 0.008 75);
   --foreground: oklch(22% 0.02 50); --mono: oklch(22% 0.02 50); --border: oklch(90% 0.02 70); --input: oklch(88% 0.02 70); --muted: oklch(94% 0.015 75); --accent: oklch(93% 0.018 75); --muted-foreground: oklch(50% 0.03 50);
   --radius: 0.5rem; --shadow-xs: 0 1px 3px rgb(60 30 10 / 0.08); --shadow-md: 0 6px 16px -6px rgb(60 30 10 / 0.18); }
-.theme-editorial.dark { --background: oklch(16% 0.012 60); --card: oklch(19% 0.012 60); --popover: oklch(19% 0.012 60); --foreground: oklch(95% 0.01 75); --mono: oklch(95% 0.01 75); --border: oklch(28% 0.015 60); --input: oklch(28% 0.015 60); --muted: oklch(23% 0.012 60); --accent: oklch(25% 0.014 60); --muted-foreground: oklch(65% 0.02 60); --primary: oklch(70% 0.15 35); --primary-foreground: oklch(14% 0.02 40); }
+.theme-editorial.dark { --primary-accent: oklch(70.25% 0.15 35); --background: oklch(16% 0.012 60); --card: oklch(19% 0.012 60); --popover: oklch(19% 0.012 60); --foreground: oklch(95% 0.01 75); --mono: oklch(95% 0.01 75); --border: oklch(28% 0.015 60); --input: oklch(28% 0.015 60); --muted: oklch(23% 0.012 60); --accent: oklch(25% 0.014 60); --muted-foreground: oklch(65% 0.02 60); --primary: oklch(70% 0.15 35); --primary-foreground: oklch(14% 0.02 40); }
 .theme-neo { --font-display: "Space Grotesk", sans-serif; --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
   --primary: oklch(55% 0.25 290); --background: oklch(99% 0 0); --card: oklch(100% 0 0); --foreground: oklch(10% 0 0); --mono: oklch(10% 0 0);
   --border: oklch(10% 0 0); --input: oklch(10% 0 0); --radius: 0.25rem; --shadow-xs: 3px 3px 0 0 var(--foreground); --shadow-md: 5px 5px 0 0 var(--foreground); }
-.theme-neo.dark { --background: oklch(12% 0 0); --card: oklch(15% 0 0); --popover: oklch(15% 0 0); --foreground: oklch(98% 0 0); --mono: oklch(98% 0 0); --border: oklch(98% 0 0); --input: oklch(98% 0 0); --primary: oklch(75% 0.2 290); --primary-foreground: oklch(10% 0 0); }
+.theme-neo.dark { --primary-accent: oklch(75% 0.2 290); --background: oklch(12% 0 0); --card: oklch(15% 0 0); --popover: oklch(15% 0 0); --foreground: oklch(98% 0 0); --mono: oklch(98% 0 0); --border: oklch(98% 0 0); --input: oklch(98% 0 0); --primary: oklch(75% 0.2 290); --primary-foreground: oklch(10% 0 0); }
 .theme-slate { --muted-foreground: oklch(53% 0.014 285); --font-display: "Inter", sans-serif; --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --primary: oklch(42% 0.12 260); --background: oklch(96.5% 0.004 250); --card: oklch(100% 0 0); --foreground: oklch(18% 0.02 260); --border: oklch(88% 0.008 250); --input: oklch(86% 0.008 250); --radius: 0.375rem;
-  --sidebar: oklch(18% 0.03 260); --sidebar-foreground: oklch(92% 0.01 250); --sidebar-muted: oklch(65% 0.02 250); --sidebar-accent: oklch(24% 0.03 260); --sidebar-accent-foreground: oklch(100% 0 0); --sidebar-primary: oklch(78% 0.12 80); --sidebar-border: oklch(26% 0.03 260); }
-.theme-slate.dark { --muted-foreground: oklch(60.0% 0.014 285); --background: oklch(13% 0.02 260); --card: oklch(17% 0.02 260); --popover: oklch(17% 0.02 260); --foreground: oklch(95% 0.01 250); --border: oklch(26% 0.02 260); --input: oklch(26% 0.02 260); --primary: oklch(72% 0.12 80); --primary-foreground: oklch(15% 0.03 80); --sidebar: oklch(11% 0.02 260); }
-.theme-mint { --font-display: "Plus Jakarta Sans", sans-serif; --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --sidebar: oklch(18% 0.03 260); --sidebar-foreground: oklch(92% 0.01 250); --sidebar-muted: oklch(65% 0. --primary-accent: oklch(42% 0.12 260);02 250); --sidebar-accent: oklch(24% 0.03 260); --sidebar-accent-foreground: oklch(100% 0 0); --sidebar-primary: oklch(78% 0.12 80); --sidebar-border: oklch(26% 0.03 260); }
+.theme-slate.dark { --primary-accent: oklch(72% 0.12 80); --muted-foreground: oklch(60.0% 0.014 285); --background: oklch(13% 0.02 260); --card: oklch(17% 0.02 260); --popover: oklch(17% 0.02 260); --foreground: oklch(95% 0.01 250); --border: oklch(26% 0.02 260); --input: oklch(26% 0.02 260); --primary: oklch(72% 0.12 80); --primary-foreground: oklch(15% 0.03 80); --sidebar: oklch(11% 0.02 260); }
+.theme-mint { --primary-accent: oklch(52% 0.15 165); --font-display: "Plus Jakarta Sans", sans-serif; --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   --primary: oklch(60% 0.15 165); --primary-foreground: oklch(14% 0 0); --background: oklch(98% 0.01 160); --card: oklch(100% 0 0); --border: oklch(93% 0.02 160); --input: oklch(90% 0.02 160); --muted: oklch(96% 0.012 160); --accent: oklch(95% 0.015 160); --radius: 1rem;
   --shadow-xs: 0 1px 2px rgb(20 60 40 / 0.06); --shadow-md: 0 8px 24px -8px rgb(20 60 40 / 0.18); }
-.theme-mint.dark { --background: oklch(14% 0.01 160); --card: oklch(18% 0.012 160); --popover: oklch(18% 0.012 160); --border: oklch(27% 0.015 160); --input: oklch(27% 0.015 160); --muted: oklch(22% 0.012 160); --accent: oklch(24% 0.014 160); --primary: oklch(72% 0.15 165); }
+.theme-mint.dark { --primary-accent: oklch(72.25% 0.15 165); --background: oklch(14% 0.01 160); --card: oklch(18% 0.012 160); --popover: oklch(18% 0.012 160); --border: oklch(27% 0.015 160); --input: oklch(27% 0.015 160); --muted: oklch(22% 0.012 160); --accent: oklch(24% 0.014 160); --primary: oklch(72% 0.15 165); }
 
 @custom-variant dark (&:where(.dark, .dark *));
 @theme inline {
@@ -93,7 +93,7 @@
   --color-background: var(--background); --color-foreground: var(--foreground);
   --color-card: var(--card); --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover); --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary); --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary); --color-primary-accent: var(--primary-accent); --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary); --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted); --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent); --color-accent-foreground: var(--accent-foreground);
@@ -248,7 +248,7 @@
       <div class="flex items-center gap-3">
         <button id="hamburger" class="btn btn-ghost btn-icon lg:hidden" aria-label="Open menu"><i data-lucide="menu"></i></button>
         <nav class="hidden md:flex items-center gap-1.5 text-xs text-secondary-foreground" aria-label="Breadcrumb">
-          <a href="#" class="hover:text-primary" data-i18n="Business">Business</a><i data-lucide="chevron-right" class="size-3.5 text-muted-foreground rtl:rotate-180"></i><span class="text-mono" data-i18n="Dashboard">Dashboard</span>
+          <a href="#" class="hover:text-primary-accent" data-i18n="Business">Business</a><i data-lucide="chevron-right" class="size-3.5 text-muted-foreground rtl:rotate-180"></i><span class="text-mono" data-i18n="Dashboard">Dashboard</span>
         </nav>
       </div>
       <div class="flex items-center gap-1.5">
@@ -256,13 +256,13 @@
         <div class="relative">
           <button id="notif-btn" class="btn btn-ghost btn-icon relative" aria-label="Notifications" aria-haspopup="menu" aria-expanded="false"><i data-lucide="bell"></i><span id="notif-dot" class="absolute top-2 end-2 size-2 rounded-full bg-destructive ring-2 ring-background"></span></button>
           <div id="notif-menu" class="menu absolute end-0 top-full mt-1 w-80 hidden" role="menu">
-            <div class="flex items-center justify-between px-2.5 py-1.5"><span class="text-sm font-semibold" data-i18n="Notifications">Notifications</span><button id="notif-read" class="text-2xs text-primary hover:underline" data-i18n="Mark all read">Mark all read</button></div>
+            <div class="flex items-center justify-between px-2.5 py-1.5"><span class="text-sm font-semibold" data-i18n="Notifications">Notifications</span><button id="notif-read" class="text-2xs text-primary-accent hover:underline" data-i18n="Mark all read">Mark all read</button></div>
             <div class="my-1 h-px bg-border"></div>
             <a class="menu-item items-start" href="#"><span class="mt-0.5 inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-success/10 text-success"><i data-lucide="check" class="size-3.5!"></i></span><span class="flex flex-col gap-0.5 min-w-0"><span class="text-2sm text-foreground">Order #1042 delivered</span><span class="text-2xs text-muted-foreground">Sara Khalil · 5 min ago</span></span></a>
             <a class="menu-item items-start" href="#"><span class="mt-0.5 inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-warning/10 text-warning"><i data-lucide="clock" class="size-3.5!"></i></span><span class="flex flex-col gap-0.5 min-w-0"><span class="text-2sm text-foreground">Payment pending on #1039</span><span class="text-2xs text-muted-foreground">Omar Haddad · 1 h ago</span></span></a>
             <a class="menu-item items-start" href="#"><span class="mt-0.5 inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"><i data-lucide="user-plus" class="size-3.5!"></i></span><span class="flex flex-col gap-0.5 min-w-0"><span class="text-2sm text-foreground">New wholesale account</span><span class="text-2xs text-muted-foreground">Rana Saleh · yesterday</span></span></a>
             <div class="my-1 h-px bg-border"></div>
-            <a class="menu-item justify-center text-primary" href="#" data-i18n="View all">View all</a>
+            <a class="menu-item justify-center text-primary-accent" href="#" data-i18n="View all">View all</a>
           </div>
         </div>
         <button id="lang-toggle" class="btn btn-ghost btn-icon" aria-label="Switch language" title="English / العربية"><i data-lucide="languages"></i></button>
@@ -348,7 +348,7 @@
                 <div class="flex justify-between"><span class="flex items-center gap-2"><span class="size-2 rounded-full bg-warning"></span><span data-i18n="In-store">In-store</span></span><span class="text-mono font-medium tabular-nums">22</span></div>
               </div>
             </div>
-            <div class="card-footer justify-center"><a href="#" class="text-primary hover:underline underline-offset-4 text-2sm font-medium" data-toast="Opening the full report" data-i18n="View report">View report</a></div>
+            <div class="card-footer justify-center"><a href="#" class="text-primary-accent hover:underline underline-offset-4 text-2sm font-medium" data-toast="Opening the full report" data-i18n="View report">View report</a></div>
           </div>
         </div>
 
@@ -395,7 +395,7 @@
             </div>
           </div>
           <div class="card h-full">
-            <div class="card-header"><h3 class="card-title" data-i18n="Activity">Activity</h3><a href="#" class="text-primary hover:underline underline-offset-4 text-2sm font-medium" data-i18n="View all">View all</a></div>
+            <div class="card-header"><h3 class="card-title" data-i18n="Activity">Activity</h3><a href="#" class="text-primary-accent hover:underline underline-offset-4 text-2sm font-medium" data-i18n="View all">View all</a></div>
             <div class="card-content flex flex-col">
               <div class="relative flex gap-3 pb-6 ps-6 before:absolute before:start-2 before:top-6 before:bottom-0 before:w-px before:bg-border"><span class="absolute start-0 top-1 size-4 rounded-full border-2 border-background bg-primary"></span><div class="flex flex-col gap-1"><p class="text-2sm"><span class="font-medium text-mono">Sara K.</span> placed order #1042</p><span class="text-xs text-muted-foreground">12 min ago</span></div></div>
               <div class="relative flex gap-3 pb-6 ps-6 before:absolute before:start-2 before:top-6 before:bottom-0 before:w-px before:bg-border"><span class="absolute start-0 top-1 size-4 rounded-full border-2 border-background bg-muted-foreground"></span><div class="flex flex-col gap-1"><p class="text-2sm"><span class="font-medium text-mono">Omar H.</span> confirmed delivery for Thursday</p><span class="text-xs text-muted-foreground">1 h ago</span></div></div>
@@ -410,7 +410,7 @@
   </main>
 
   <footer class="container-fixed flex flex-wrap items-center justify-between gap-2.5 py-5 text-2sm text-muted-foreground">
-    <span>© 2026 Acme Ops</span><nav class="flex gap-4"><a href="#" class="hover:text-primary" data-i18n="Docs">Docs</a><a href="#" class="hover:text-primary" data-i18n="Support">Support</a><a href="#" class="hover:text-primary" data-i18n="Privacy">Privacy</a></nav>
+    <span>© 2026 Acme Ops</span><nav class="flex gap-4"><a href="#" class="hover:text-primary-accent" data-i18n="Docs">Docs</a><a href="#" class="hover:text-primary-accent" data-i18n="Support">Support</a><a href="#" class="hover:text-primary-accent" data-i18n="Privacy">Privacy</a></nav>
   </footer>
 </div>
 
