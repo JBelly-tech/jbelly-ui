@@ -17,6 +17,10 @@ python evals/run.py --brief evals/briefs/01-dashboard.md --skill none           
 python evals/run.py --brief evals/briefs/01-dashboard.md --skill some-other-skill     # any installed skill
 ```
 
+These runs use the agent CLI you are already signed into, so they cost no money beyond the
+subscription you have. They do consume its usage allowance, and a full matrix can exhaust a
+rate-limit window, which is why `matrix.py` resumes where it stopped.
+
 Each run gets its own directory under `evals/runs/` (git-ignored) holding `timing.json`,
 `stream.jsonl`, `prompt.txt`, `settings.json` and a `workspace/` with whatever the agent produced.
 
@@ -43,6 +47,7 @@ side-by-side visual report use `comparison/tools/`.
 
 ## What is not here yet
 
-- Across models: a wrapper over several model families (one OpenRouter key read from
-  `OPENROUTER_API_KEY`, never committed). See `docs/roadmap.md` item 1.
+- Across models: a wrapper that runs the same briefs on whichever models the agent you already use
+  offers. Everything here runs through that agent's own CLI, on the subscription you already have;
+  no API key, no paid service, and none will be added.
 - Blind preference: two pages of the same brief judged without maker names.

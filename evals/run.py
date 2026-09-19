@@ -154,7 +154,8 @@ def normalize(value: str) -> str:
     return f"{m.group(1)}:/{q[3:]}" if m else q
 
 
-def outside_workspace(stream_path: Path, ws: Path) -> dict:
+def outside_workspace(stream_path: Path, ws: Path, own: Path | None = None,
+                      own_name: str = "") -> dict:
     """Out-of-workspace tool calls, split by what actually happened.
 
     A denied attempt is not contamination: the guard did its job. A call that came back with
@@ -164,6 +165,12 @@ def outside_workspace(stream_path: Path, ws: Path) -> dict:
     string itself and so is parsed out of it.
     """
     ws_s = normalize(ws.as_posix())
+    # The skill under test lives outside the workspace by design, and running its own scripts is
+    # the condition, not a leak. Reading the repository or another skill still is.
+    own_s = normalize(own.as_posix()) if own else None
+    # Agents reach the skill through whichever path their client installed it under, often a link
+    # rather than the folder it resolves to, so the folder name is what identifies it.
+    own_tail = f"/skills/{own_name.lower()}/" if own_name and own_name != "none" else None
     tmp_s = normalize(Path(tempfile.gettempdir()).as_posix())
     path_fields = ("file_path", "path", "pattern", "notebook_path", "url")
     shell_fields = ("command", "script", "code")
@@ -173,6 +180,8 @@ def outside_workspace(stream_path: Path, ws: Path) -> dict:
         q = normalize(value)
         if not re.match(r"^[a-z]:/", q): return False
         if ws_s in q or q.startswith(tmp_s): return False
+        if own_s and own_s in q: return False
+        if own_tail and own_tail in q: return False
         # An unquoted path clips at its first space, leaving a fragment such as c:/users/msi that
         # is only an ancestor of a safe directory; the real target was quoted and is caught above.
         return not (ws_s.startswith(q) or tmp_s.startswith(q))
@@ -293,7 +302,7 @@ def main() -> int:
         # a recorded 0 would enter the comparison table as a run that finished for free.
         for k in TOKEN_KEYS: m[k] = None
         m["is_error"] = True
-    isolation = outside_workspace(stream_path, ws)
+    isolation = outside_workspace(stream_path, ws, skill_src, a.skill)
     leaks = isolation["leaked"]
     produced_page = ws / "out" / "page.html"
     produced = sorted(p.relative_to(ws).as_posix() for p in (ws / "out").rglob("*") if p.is_file())
