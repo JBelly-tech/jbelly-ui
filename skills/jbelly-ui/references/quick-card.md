@@ -1,10 +1,10 @@
 # Quick card — the 90% of every app screen on one page (~2K tokens)
 
 Read this INSTEAD of the full references for a standard app screen. Open a
-full reference only for something this card does not cover. Start from
-`assets/app-shell.html` (copy it — it already contains tokens, shell,
-buttons, inputs, badges, cards, table with states, drawer, ⌘K palette, toasts,
-dark/RTL/density) and edit; do not compose a shell from scratch.
+full reference only for something this card does not cover. Build with
+`build-screen.py` (below) — its three shells already contain tokens, buttons,
+inputs, badges, cards, table with states, drawer, ⌘K palette, toasts, plan
+cards, FAQ, dark/RTL/density. Never compose a shell from scratch.
 
 ## Tokens (roles, never raw palette)
 `bg-background text-foreground` page · `bg-card border-border` cards · `bg-popover` menus/modals ·
@@ -76,7 +76,8 @@ Write it with `python scripts/personality_init.py --product … --kind … --aud
 
 ## Cost rules for the building agent
 Three calls build a screen: `personality_init.py`, `build-screen.py`, `verify_page.py`. Get the spec's shape from `python scripts/build-screen.py --example`, not from the script's source.
+The spec's `kind` picks the template: `"app"` (default) an application screen · `"landing"` hero, logo strip, numbered feature sections, testimonial, FAQ, footer · `"pricing"` plan cards, monthly/yearly toggle, comparison table, FAQ. `--example --kind landing|pricing` prints that kind's spec; `--kind` on a build overrides the spec's own. Hand-written markup costs 1.6x (landing) and 5.9x (pricing) a generated page — use it only for a page none of the three fits.
 Read this card once. Re-reading it, or `cat`-ing a file you already read, pays for it again on every later call.
-Never probe the environment (`python --version`, `pwd`, a shell test) and never read `assets/app-shell.html`: the generator fills it and fails loudly when a spec field does not land.
+Never probe the environment (`python --version`, `pwd`, a shell test) and never read the shells in `assets/`: the generator fills them and fails loudly when a spec field does not land.
 A value came out wrong? Fix the spec and rebuild. Hand-editing the built page is for bespoke markup only, appended through `extra_html`.
 Verify once, with `python scripts/verify_page.py <page>`. No screenshot loop, no second opinion, no subagents. Budget: 5 tool calls for a standard screen, 12 for a complex one.

@@ -1,0 +1,168 @@
+{
+  "kind": "pricing",
+  "product": "Daftar",
+  "title": "Prices",
+  "theme": "theme-slate",
+  "icon": "book-open",
+  "nav": [
+    { "label": "What it does", "href": "#" },
+    { "label": "Prices", "href": "#", "active": true },
+    { "label": "Guides", "href": "#" },
+    { "label": "Release notes", "href": "#" }
+  ],
+  "actions": { "sign_in": "Sign in" },
+  "intro": {
+    "title": "Priced by the books you keep, not the people who open them",
+    "lead": "Every plan carries the whole ledger: bank feeds, receipts, the VAT worksheet and the year-end pack. What changes is how many client files you keep open at once.",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "save": "Two months free",
+    "monthly_note": "Pay by the month and stop when the client list does.",
+    "yearly_note": "A year costs ten months on every plan below.",
+    "period": "a month",
+    "billed_monthly": "Billed monthly, stop any time",
+    "billed_yearly": "Billed once a year"
+  },
+  "plans": [
+    {
+      "name": "Desk",
+      "blurb": "For one bookkeeper and the clients that fit in a morning.",
+      "price": "$24",
+      "price_yearly": "$20",
+      "yearly_total": "$240",
+      "features": [
+        "2 people on the books",
+        "25 open client files",
+        "400 receipts a month",
+        "Bank feeds for 3 accounts",
+        "VAT worksheet and reminders",
+        "Email help, answered in 2 working days"
+      ]
+    },
+    {
+      "name": "Practice",
+      "blurb": "For a practice that closes a month for twenty clients at once.",
+      "price": "$59",
+      "price_yearly": "$49.17",
+      "yearly_total": "$590",
+      "featured": true,
+      "badge": "Most chosen",
+      "inherits": "Everything in Desk, plus",
+      "features": [
+        "8 people on the books",
+        "120 open client files",
+        "3,000 receipts a month",
+        "Payroll journals and approvals",
+        "Year-end pack the auditor accepts",
+        "Email and phone, answered in 6 hours"
+      ]
+    },
+    {
+      "name": "Bureau",
+      "blurb": "For a bureau filing on behalf of other practices.",
+      "price": "$139",
+      "price_yearly": "$115.83",
+      "yearly_total": "$1,390",
+      "inherits": "Everything in Practice, plus",
+      "features": [
+        "People on the books without a limit",
+        "Client files without a limit",
+        "20,000 receipts a month",
+        "Single sign-on and a full change trail",
+        "Filing straight to the tax portal",
+        "A named accountant, answering in 1 hour"
+      ]
+    }
+  ],
+  "note": "Prices in US dollars per practice. Tax is added at checkout. An extra person on Desk or Practice is $9 a month.",
+  "comparison": {
+    "title": "What each plan holds",
+    "lead": "The client column and the plan headings stay put while the table scrolls sideways.",
+    "caption": "The Desk, Practice and Bureau plans compared. The price under each name follows the billing period chosen above the table.",
+    "feature_column": "What you get",
+    "groups": [
+      {
+        "heading": "Books and clients",
+        "rows": [
+          { "label": "Open client files", "cells": ["25", "120", "No limit"] },
+          { "label": "Receipts a month", "cells": ["400", "3,000", "20,000"] },
+          { "label": "Bank feeds", "cells": ["3", "15", "No limit"] },
+          { "label": "Closed years kept open", "cells": ["2 years", "6 years", "10 years"] }
+        ]
+      },
+      {
+        "heading": "The people who log in",
+        "rows": [
+          { "label": "People on the books", "cells": ["2", "8", "No limit"] },
+          { "label": "Approvals before posting", "cells": [false, true, true] },
+          { "label": "Single sign-on", "cells": [false, false, true] },
+          { "label": "Trail of who changed what", "cells": [false, "90 days", "Full history"] }
+        ]
+      },
+      {
+        "heading": "Filing and exports",
+        "rows": [
+          { "label": "VAT worksheet", "cells": [true, true, true] },
+          { "label": "Payroll journal import", "cells": [false, true, true] },
+          { "label": "Year-end pack for the auditor", "cells": [false, true, true] },
+          { "label": "Filing straight to the tax portal", "cells": [false, false, true] }
+        ]
+      },
+      {
+        "heading": "Getting help",
+        "rows": [
+          { "label": "How you reach us", "cells": ["Email", "Email and phone", "Named accountant"] },
+          { "label": "First reply target", "cells": ["2 working days", "6 hours", "1 hour"] },
+          { "label": "Moving your old books over", "cells": ["Guides", "One call", "Done for you"] }
+        ]
+      }
+    ]
+  },
+  "faq": {
+    "title": "Asked before the first month is closed",
+    "items": [
+      {
+        "q": "Is a dormant client still an open file?",
+        "a": "Only if you leave it open. Archiving a client keeps every posting and every document readable for as long as your plan keeps closed years, and it stops counting towards the limit on the day you archive it."
+      },
+      {
+        "q": "What counts as a receipt?",
+        "a": "One document that arrives to be matched against a posting: a supplier invoice, a till slip, a fuel docket. A bank line is not a receipt, and a document you upload twice is counted once."
+      },
+      {
+        "q": "Can we move a plan in the middle of the year?",
+        "a": "Moving up takes effect the moment you confirm it and you pay the difference for the days left. Moving down takes effect on the renewal date, so the month you are closing is never disturbed."
+      },
+      {
+        "q": "What happens to the books if we leave?",
+        "a": "Everything exports as spreadsheets and PDFs, ledger by ledger and client by client, and the export stays available for ninety days after the last billing day. Nothing is held back while an invoice is disputed."
+      },
+      {
+        "q": "Do you take a cut of what we bill our clients?",
+        "a": "No. Daftar charges the practice and nothing else. What you charge a client for keeping their books is between the two of you and never passes through us."
+      }
+    ]
+  },
+  "cta": {
+    "title": "Close one client month and see how it reads",
+    "lead": "Every plan opens with a 30-day trial on the whole ledger. No card to start, nothing charged before the trial ends, and the file you build during it is the file you keep.",
+    "primary": "Start a 30-day trial",
+    "secondary": "Ask for a call back"
+  },
+  "footer": {
+    "legal": "© 2026 Daftar Books",
+    "links": ["Guides", "Service status", "Terms", "Privacy"]
+  },
+  "i18n": {
+    "ar": {
+      "What it does": "ما الذي يفعله",
+      "Prices": "الأسعار",
+      "Guides": "الأدلة",
+      "Release notes": "سجل الإصدارات",
+      "Monthly": "شهري",
+      "Yearly": "سنوي",
+      "Two months free": "شهران مجاناً",
+      "a month": "شهرياً"
+    }
+  }
+}

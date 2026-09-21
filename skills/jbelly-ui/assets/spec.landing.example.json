@@ -1,0 +1,208 @@
+{
+  "kind": "landing",
+  "product": "Rasid",
+  "title": "climate watch for greenhouse growers",
+  "description": "Rasid reads the air in every span of the greenhouse and wakes the grower on duty before the crop feels it.",
+  "theme": "theme-mint",
+  "density": "density-airy",
+  "icon": "leaf",
+  "nav": [
+    { "label": "How it reads", "href": "#sensors" },
+    { "label": "Night rules", "href": "#rules" },
+    { "label": "Grower app", "href": "#grower" },
+    { "label": "Prices", "href": "#pricing" },
+    { "label": "Questions", "href": "#faq" }
+  ],
+  "actions": { "sign_in": "Sign in", "primary": "Start a season" },
+  "hero": {
+    "eyebrow": "Climate watch for protected crops",
+    "headline": "The vent stuck at three in the morning. Nobody was awake to see it.",
+    "lead": "Rasid keeps a live reading of heat, humidity and soil moisture in every span, holds it against the rule you agreed at planting, and rings the grower on duty the moment the two part company.",
+    "primary": "Start a season",
+    "secondary": "Watch one night replayed",
+    "note": "No card needed. One house, one week, your own numbers.",
+    "panel": {
+      "title": "Wadi Seer glasshouse",
+      "meta": "Night of 14 March, 02:40",
+      "badge": "Inside the rule",
+      "tone": "success",
+      "rows": [
+        { "label": "Span A", "meta": "21.4 °C · 68% humidity", "bar": 92 },
+        { "label": "Span B", "meta": "20.9 °C · 71% humidity", "bar": 88 },
+        { "label": "Span C", "meta": "19.2 °C · 80% humidity", "bar": 61, "status": "Vent slow", "tone": "warning" },
+        { "label": "Nursery", "meta": "23.0 °C · 64% humidity", "bar": 95 }
+      ],
+      "note": "Four spans, 41 probes, one vent motor answering twice as slowly as it did last week."
+    }
+  },
+  "logos": {
+    "caption": "Growing under Rasid this season",
+    "names": ["Wadi Seer Farms", "Jubeiha Greens", "Beit Ras Nurseries", "Zarqa Valley Produce", "Salt Hill Herbs", "Deir Alla Tomatoes"],
+    "note": "Tomato, cucumber and cut-flower houses across the Jordan Valley and the northern highlands."
+  },
+  "sections": [
+    {
+      "step": "Sensors",
+      "title": "A probe in every span, not one beside the door",
+      "lead": "Heat sits in layers and the door is the coldest place in the house. Rasid pairs a probe to each span and to the nursery bench, reads all of them on the same minute, and says which one is drifting away from the others.",
+      "ticks": [
+        "Pairing is a QR code and a name; no gateway to configure.",
+        "A probe that stops answering is reported as missing, never averaged away.",
+        "Battery life is quoted per probe, with a warning three weeks out."
+      ],
+      "link": { "label": "Read the install guide", "href": "#faq" },
+      "panel": {
+        "title": "Probes, Wadi Seer",
+        "meta": "last sweep 02:40:12",
+        "rows": [
+          { "label": "P-01", "meta": "Span A, canopy height", "status": "answering", "tone": "success" },
+          { "label": "P-02", "meta": "Span A, soil at 20 cm", "status": "answering", "tone": "success" },
+          { "label": "P-07", "meta": "Span C, canopy height", "status": "answering", "tone": "success" },
+          { "label": "P-08", "meta": "Span C, vent motor", "status": "slow to answer", "tone": "warning" },
+          { "label": "P-12", "meta": "Nursery bench", "status": "answering", "tone": "success" }
+        ],
+        "note": "40 probes answered on the minute, one answered late and is held for the morning round."
+      }
+    },
+    {
+      "step": "Rules",
+      "title": "The rule you agreed at planting is the one that wakes people",
+      "lead": "A night rule is a band, not a number: the temperature you will live with, the humidity above which mould starts, and the minutes you are willing to spend outside either before somebody is called.",
+      "ticks": [
+        "One band per crop stage, copied to every house that grows it.",
+        "Ten minutes outside the band is a note; forty is a phone call.",
+        "A rule changed at midnight is stamped with the name that changed it."
+      ],
+      "panel": {
+        "title": "Night rule, tomato week 9",
+        "meta": "18:00 to 06:00",
+        "badge": "2 notes tonight",
+        "tone": "warning",
+        "rows": [
+          { "label": "Heat", "meta": "hold 19 °C to 22 °C", "bar": 96 },
+          { "label": "Humidity", "meta": "keep under 78%", "bar": 84 },
+          { "label": "Soil", "meta": "keep over 24% at 20 cm", "bar": 91 },
+          { "label": "Patience", "meta": "40 minutes, then call", "bar": 100 }
+        ],
+        "note": "Span C sat at 80% humidity for 26 minutes, which is a note in the log, not a call at 03:00."
+      }
+    },
+    {
+      "step": "Grower",
+      "title": "The person on duty gets one screen and two buttons",
+      "lead": "What is wrong, which house, how long it has been that way, and the two answers that change something: the vent opened by hand, or the call passed to the agronomist. Everything else waits for daylight.",
+      "ticks": [
+        "The phone rings; it does not send a message into a group chat.",
+        "Works on the valley road where there is no signal, and catches up after.",
+        "Arabic and English, in the keyboard the grower already uses."
+      ],
+      "panel": {
+        "title": "On duty tonight",
+        "meta": "Nabil Qutteineh",
+        "rows": [
+          { "label": "03:12", "meta": "Span C humidity 80%, 26 minutes", "status": "noted", "tone": "warning" },
+          { "label": "01:50", "meta": "Span A back inside the band", "status": "closed", "tone": "success" },
+          { "label": "22:40", "meta": "Nursery heater started as planned", "status": "closed", "tone": "success" }
+        ],
+        "ticks": [
+          "Open the Span C vent by hand",
+          "Pass this to the agronomist on call"
+        ]
+      },
+      "stats": [
+        { "value": "2 min", "label": "From a reading outside the band to a phone ringing" },
+        { "value": "96.2%", "label": "Nights closed with no call at all" },
+        { "value": "18,900", "label": "Readings filed per house, per night" }
+      ]
+    },
+    {
+      "step": "Season",
+      "title": "The season keeps its own diary",
+      "lead": "A heater fails in February and the crop is three days late in May. Rasid keeps what the air was doing, who intervened and what they did, so the post-season meeting argues about the decision rather than the memory of it.",
+      "panel": {
+        "title": "Day log, 14 March",
+        "meta": "kept for 5 seasons",
+        "rows": [
+          { "label": "03:12", "meta": "Nabil Q. opened the Span C vent by hand." },
+          { "label": "05:40", "meta": "Vent motor replaced, Span C — 41 minutes of work." },
+          { "label": "09:15", "meta": "Rule for tomato week 9 widened to 79% humidity." },
+          { "label": "18:00", "meta": "Night watch started — four spans, 41 probes." }
+        ],
+        "note": "Exported as a spreadsheet, or posted to the farm system you already run."
+      }
+    }
+  ],
+  "testimonial": {
+    "quote": "We used to walk the houses at midnight and again at four, and we still lost a bench of seedlings to a stuck vent. The phone rings twice a month now, and both times it was worth getting up.",
+    "name": "Huda Barghouti",
+    "role": "Head grower, Wadi Seer Farms",
+    "badge": "Six houses, 4.2 hectares"
+  },
+  "pricing": {
+    "eyebrow": "Prices",
+    "title": "Priced per house, not per probe",
+    "lead": "Thirty-eight dollars per house per month, with the probes, the phone calls and every screen in the office included. A house under 500 square metres pays half.",
+    "price": "$38",
+    "price_note": "per house, per month",
+    "ticks": [
+      "Probes and their batteries included",
+      "Every grower on the farm gets an account",
+      "Stop between seasons and keep the log"
+    ],
+    "cta": "See what a house costs"
+  },
+  "faq": {
+    "eyebrow": "Asked on the first visit",
+    "title": "What growers want settled before the probes go in",
+    "note": "Something else? Write to salam@rasid.farm and a person answers.",
+    "items": [
+      {
+        "q": "Does this replace the climate computer we already have?",
+        "a": "No. Rasid reads the house and tells you when it drifts; the computer keeps doing the opening and closing. Nine of the farms on Rasid run a controller from the nineteen-nineties and have no plan to change it."
+      },
+      {
+        "q": "What happens when the internet in the valley goes down?",
+        "a": "The probes keep reading and the base keeps storing. When the line comes back the night is filled in, and a gap longer than fifteen minutes is marked in the log so nobody reads it as a quiet night."
+      },
+      {
+        "q": "Can two farms share one account?",
+        "a": "Yes. A house belongs to a farm, and a grower can be on duty for both. The log, the rules and the bill follow the house, not the person."
+      },
+      {
+        "q": "Who is woken when nobody answers?",
+        "a": "The duty list is yours to write: a second name after five minutes, a third after ten, and a message to the farm owner if the third does not answer either."
+      },
+      {
+        "q": "How long before the first real night?",
+        "a": "A house with power at the far end is watching the same evening. Agreeing the bands per crop stage is the slow part, so Rasid starts from the band your agronomist already uses on paper."
+      }
+    ]
+  },
+  "cta": {
+    "title": "Watch one house for a week.",
+    "lead": "Put probes in a single house and leave them a week. If the log tells you nothing you did not already know, take them out — there is nothing to cancel.",
+    "note": "Probes posted the same day. Your readings leave as a spreadsheet whenever you ask.",
+    "primary": "Start a season",
+    "secondary": "Ask for a call back"
+  },
+  "footer": {
+    "columns": [
+      { "heading": "Product", "links": ["How it reads", "Night rules", "Grower app", "Day log"] },
+      { "heading": "Farm", "links": ["Crops we know", "Install guide", "Probe range", "Service status"] },
+      { "heading": "Legal", "links": ["Privacy", "Terms", "Data processing"] }
+    ],
+    "legal": "© 2026 Rasid Agritech · Amman and the Jordan Valley",
+    "contact": "salam@rasid.farm"
+  },
+  "i18n": {
+    "ar": {
+      "How it reads": "كيف يقرأ",
+      "Night rules": "قواعد الليل",
+      "Grower app": "تطبيق المزارع",
+      "Prices": "الأسعار",
+      "Questions": "أسئلة",
+      "Start a season": "ابدأ موسماً",
+      "Sign in": "تسجيل الدخول"
+    }
+  }
+}

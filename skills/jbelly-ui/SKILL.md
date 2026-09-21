@@ -47,8 +47,14 @@ python scripts/build-screen.py <spec.json> <out.html>
 python scripts/verify_page.py <out.html>
 ```
 
+The spec's `kind` picks the template: **`"app"`** (the default) an application screen, **`"landing"`**
+a marketing home page, **`"pricing"`** plans with a billing toggle and a comparison table. Writing a
+landing or a pricing page by hand measured 1.6x and 5.9x the cost of a generated dashboard, so the
+spec comes first and hand-written markup only for a page none of the three fits.
+
 Before them, read **one** file: `references/quick-card.md`. Before writing the spec, get its shape
-from `python scripts/build-screen.py --example`, which prints a complete annotated spec.
+from `python scripts/build-screen.py --example`, which prints a complete annotated spec — add
+`--kind landing` or `--kind pricing` for those.
 
 **What not to do, because each one was measured costing calls for nothing:**
 
@@ -56,8 +62,8 @@ from `python scripts/build-screen.py --example`, which prints a complete annotat
   is three calls and three copies of it in context, which every later call re-sends.
 - **Do not probe the environment.** No `python --version`, no `pwd && ls`, no shell test. Run the
   command; if the interpreter is missing you will be told, and the manual fallback below applies.
-- **Do not read the source of the scripts or of `assets/app-shell.html`.** `--example` tells you the
-  spec, `--help` tells you the flags, and the shell's contents are not your concern: the generator
+- **Do not read the source of the scripts or of the shells in `assets/`.** `--example` tells you the
+  spec, `--help` tells you the flags, and the shells' contents are not your concern: the generator
   fills them from the spec and fails loudly when a field does not land.
 - **Do not hand-edit the built page to add what the spec could have said.** If a value came out
   wrong, fix the spec and rebuild: one call instead of a chain of edits. Hand-editing is only for
@@ -70,10 +76,11 @@ Why this is worth obeying: agent cost is the size of the context multiplied by t
 so a file read early is paid for again on every later call. The generator exists to move the whole
 page out of the model's output entirely — nav, toolbar, KPIs with sparklines, chart, donut, table
 with its loading, empty and error states, activity feed and the Arabic dictionary all come from the
-shell at zero model tokens.
+shell at zero model tokens — and, on the other two kinds, a hero, logo strip, numbered feature
+sections, testimonial and FAQ, or plan cards, the billing toggle and a comparison table.
 
-**When the screen is not a dashboard:** `python scripts/new_screen.py` gives a blank shell with the
-personality, density, direction and dark default already set. Everything above still applies.
+**When the screen is none of the three kinds:** `python scripts/new_screen.py` gives a blank shell
+with the personality, density, direction and dark default already set. Everything above still applies.
 
 **When a reference is genuinely needed:** open one, by name, from the table at the end of this file,
 and only for something the quick card does not cover. Reading them all costs about 28K tokens.
@@ -83,8 +90,8 @@ for the personality decision and the final review.
 
 ### When the generator does not apply
 
-A page the generator has no shape for (a marketing site, a bespoke app) is built by hand. The order
-matters, because each step decides the one after it:
+A page none of the three kinds has a shape for (a checkout, a bespoke app screen) is built by hand.
+The order matters, because each step decides the one after it:
 
 1. **Personality first.** Pick a preset from the quick card's table and change at least two dials,
    then write it with `personality_init.py`. Never start on the default look; the default exists so
@@ -185,7 +192,8 @@ region; open the page once in light, dark and RTL.
 Open one, by name, only for what the quick card does not cover. Reading them all costs ~28K tokens.
 
 **Scripts** (`scripts/`, all `--help`):
-`build-screen.py` spec to page · `new_screen.py` blank shell · `verify_page.py` the one verification
+`build-screen.py` spec to page, `--kind app|landing|pricing` · `new_screen.py` blank shell ·
+`verify_page.py` the one verification
 call · `preflight.py` AI-tells, structure, contrast · `lint_tokens.py` raw palette colours ·
 `audit_styles.py` redesign inventory · `personality_init.py` the design read ·
 `export_tokens.py` DTCG tokens · `build_dist.py` the delivery tiers.
@@ -211,8 +219,9 @@ Windows twins: `verify-page.ps1`, `new-screen.ps1`, `lint-tokens.ps1`.
 | plain CSS or React instead of Tailwind | `stacks.md` |
 | where a rule comes from | `sources.md` |
 
-`assets/app-shell.html` is the working demo; `assets/spec.example.json` is the spec the generator
-prints with `--example`.
+`assets/app-shell.html`, `landing-shell.html` and `pricing-shell.html` are the working demos behind
+the three kinds; `assets/spec.example.json`, `spec.landing.example.json` and
+`spec.pricing.example.json` are what `--example` prints for each.
 
 ## Done list
 

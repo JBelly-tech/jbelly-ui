@@ -205,6 +205,7 @@ Tailwind mapping — paste this too (generated from the token file, so no role i
   --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
   --primary: oklch(65% 0.17 150);                        /* signal green */
+  --primary-accent: oklch(52.25% 0.17 150);            /* links: 4.52:1 */
   --primary-foreground: oklch(14% 0 0);
   --background: oklch(97% 0.002 260); --muted-foreground: oklch(54% 0.014 285);
   --card: oklch(100% 0 0);

@@ -81,6 +81,52 @@ if _stale: print("    shell wording left behind: " + ", ".join(_stale))
 if _label == "OK": print(f"    {len(_want)}/{len(_want)} labels applied, no demo wording left")
 ok &= _label == "OK"
 
+# The landing and pricing kinds work the other way round from the app: instead of swapping the
+# shell's words for the spec's, they rebuild each region whole. So the failure that hides is the
+# mirror image -- a region that was never rebuilt keeps the demo page and still looks built -- and
+# both directions have to be asserted. Each kind is built from its own example, which is written to
+# share no wording with its template: every string the spec supplies must be on the page, and no
+# sentence that only the shell says may be left anywhere on it.
+MARKERS = {
+    "landing": ["Mishwar", "مشوار", "Beirut depot", "Barakat Dairy", "orders-2025-10-11.csv",
+                "Tomorrow's routes, planned before the depot opens.", "Dispatch supervisor",
+                "Asked by every dispatcher we meet", "Route planning for wholesale delivery fleets."],
+    "pricing": ["Acme Ops", "الطلبات والمتاجر", "Pricing that follows your order volume", "1,500 orders a month",
+                "For one shop and a team that fits around one table.", "What counts as an order?",
+                "Everything in Starter, plus", "Start on the plan you need this month"],
+}
+# Keys that steer the build rather than reach the page, and the dictionary, which is Arabic by design.
+SPEC_CHROME = {"kind", "theme", "density", "icon", "dir", "lang", "href", "tone", "i18n", "keep_demo_controls"}
+
+def spec_strings(node, key=""):
+    """Every string the spec asks the page to say, at whatever depth it sits."""
+    if isinstance(node, dict):
+        return [x for k, v in node.items() if k not in SPEC_CHROME for x in spec_strings(v, k)]
+    if isinstance(node, list):
+        return [x for v in node for x in spec_strings(v, key)]
+    return [(key, node)] if isinstance(node, str) and node.strip() else []
+
+for _kind, _marks in MARKERS.items():
+    _spec_path = os.path.join(SK, "assets", f"spec.{_kind}.example.json")
+    _built = os.path.join(OUT, _kind + ".html")
+    ok &= run(f"build-screen.py ({_kind} spec -> page)", [os.path.join(SK, "scripts", "build-screen.py"), _spec_path, _built])
+    _page = open(_built, encoding="utf-8").read() if os.path.isfile(_built) else ""
+    _shell = open(os.path.join(SK, "assets", f"{_kind}-shell.html"), encoding="utf-8").read()
+    _want = spec_strings(json.loads(open(_spec_path, encoding="utf-8").read()))
+    _missing = [f"{k}: {v[:44]}" for k, v in _want if v not in _page and _esc(v, quote=True) not in _page]
+    _stale = [m for m in _marks if m in _page]
+    _blunt = [m for m in _marks if m not in _shell]   # a marker its own shell no longer says asserts nothing
+    _thin = len(_want) < 60
+    _label = "OK" if not (_missing or _stale or _blunt or _thin) else "FAIL"
+    print("[" + _label + f"] every {_kind} spec label reaches the page")
+    if _thin: print(f"    only {len(_want)} labels asserted - this check has been gutted")
+    if _missing: print("    missing: " + ", ".join(_missing))
+    if _stale: print("    shell wording left behind: " + ", ".join(_stale))
+    if _blunt: print(f"    {_kind}-shell.html no longer says: " + ", ".join(_blunt))
+    if _label == "OK": print(f"    {len(_want)}/{len(_want)} labels applied, no demo wording left")
+    ok &= _label == "OK"
+    ok &= run(f"preflight.py ({_kind})", [os.path.join(SK, "scripts", "preflight.py"), _built])
+
 ok &= run("new_screen.py (scaffold)", [os.path.join(SK, "scripts", "new_screen.py"), os.path.join(OUT, "blank.html"), "--theme", "theme-graphite", "--dir", "rtl", "--strip-demo-controls"])
 ok &= run("personality_init.py", [os.path.join(SK, "scripts", "personality_init.py"), "--product", "Smoke", "--kind", "dashboard", "--audience", "ops, daily, keyboard", "--vibe", "precise, calm, plain", "--preset", "theme-clinic", "--change", "density compact", "--change", "radius 0.5rem", "--out", os.path.join(OUT, "personality.md")])
 ok &= run("lint_tokens.py", [os.path.join(SK, "scripts", "lint_tokens.py"), OUT])

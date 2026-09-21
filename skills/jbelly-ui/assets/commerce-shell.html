@@ -1,0 +1,1753 @@
+<!doctype html>
+<html lang="en" dir="ltr" class="h-full">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fold &amp; Rule — storefront</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Source+Sans+3:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=DM+Sans:wght@400;500;600&family=Public+Sans:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+<style type="text/tailwindcss">
+/* ===== tokens.css (inlined for the single-file demo) ===== */
+:root {
+  color-scheme: light;
+  --radius: 0.5rem;
+  --font-display: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Arabic", sans-serif;
+  --font-mono: ui-monospace, "JetBrains Mono", Consolas, monospace;
+  --background: oklch(100% 0 0); --foreground: oklch(14.5% 0.005 285);
+  --card: oklch(100% 0 0); --card-foreground: oklch(14.5% 0.005 285);
+  --popover: oklch(100% 0 0); --popover-foreground: oklch(14.5% 0.005 285);
+  --primary: oklch(54% 0.2 258); --primary-accent: oklch(54% 0.2 258); --primary-foreground: oklch(100% 0 0);
+  --secondary: oklch(96.5% 0.002 285); --secondary-foreground: oklch(21% 0.006 285);
+  --muted: oklch(96.5% 0.002 285); --muted-foreground: oklch(55% 0.014 285);
+  --accent: oklch(96.5% 0.002 285); --accent-foreground: oklch(21% 0.006 285);
+  --mono: oklch(14.5% 0.005 285); --mono-foreground: oklch(100% 0 0);
+  --destructive: oklch(57.5% 0.22 27); --destructive-foreground: oklch(100% 0 0);
+  --success: oklch(72% 0.19 150); --success-foreground: oklch(100% 0 0);
+  --warning: oklch(85% 0.17 90); --warning-foreground: oklch(30% 0.05 90);
+  --info: oklch(60% 0.22 293); --info-foreground: oklch(100% 0 0);
+  --border: oklch(94% 0.004 286); --input: oklch(92% 0.004 286); --ring: oklch(71% 0.01 286);
+  --sidebar: var(--card); --sidebar-foreground: var(--foreground); --sidebar-muted: var(--muted-foreground);
+  --sidebar-accent: var(--accent); --sidebar-accent-foreground: var(--accent-foreground);
+  --sidebar-primary: var(--primary); --sidebar-border: var(--border);
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.06);
+  --sidebar-width: 280px; --sidebar-default-width: 280px; --sidebar-width-collapsed: 80px; --header-height: 70px;
+  --ctl-h: 34px; --ctl-h-sm: 28px; --row-h: 46px; --card-p: 1.25rem; --page-gap: 1.25rem;
+  --chart-2: var(--info); --chart-3: var(--success); --chart-4: var(--warning);
+}
+@media (max-width: 63.99rem) { :root { --header-height: 60px; } }
+.dark { --primary-accent: oklch(58.25% 0.21 258);
+  color-scheme: dark;
+  --background: oklch(14.5% 0.005 285); --foreground: oklch(98.5% 0 0);
+  --card: oklch(14.5% 0.005 285); --card-foreground: oklch(98.5% 0 0);
+  --popover: oklch(14.5% 0.005 285); --popover-foreground: oklch(98.5% 0 0);
+  --primary: oklch(55% 0.21 258);
+  --secondary: oklch(27.5% 0.006 286); --secondary-foreground: oklch(98.5% 0 0);
+  --muted: oklch(21% 0.006 285); --muted-foreground: oklch(64% 0.014 285);
+  --accent: oklch(21% 0.006 285); --accent-foreground: oklch(98.5% 0 0);
+  --mono: oklch(87% 0.006 286); --mono-foreground: oklch(0% 0 0);
+  --warning-foreground: oklch(92% 0.12 90);
+  --border: oklch(27.5% 0.006 286); --input: oklch(27.5% 0.006 286); --ring: oklch(44% 0.01 286);
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.4);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.4);
+}
+/* ===== optional dark sidebar on a light page (the popular semi-dark layout) ===== */
+.sidebar-dark { --sidebar: oklch(16% 0.02 262); --sidebar-foreground: oklch(90% 0.01 250); --sidebar-muted: oklch(62% 0.02 250); --sidebar-accent: oklch(22% 0.025 262); --sidebar-accent-foreground: oklch(100% 0 0); --sidebar-primary: oklch(78% 0.13 195); --sidebar-border: oklch(25% 0.025 262); }
+.sidebar-dark.dark { --sidebar: oklch(11% 0.015 262); --sidebar-border: oklch(20% 0.02 262); }
+/* ===== density ===== */
+.density-compact { --ctl-h: 30px; --ctl-h-sm: 24px; --row-h: 38px; --card-p: 1rem; --page-gap: 1rem; }
+.density-airy    { --ctl-h: 40px; --ctl-h-sm: 32px; --row-h: 56px; --card-p: 1.75rem; --page-gap: 1.75rem; }
+/* ===== personalities (from references/personalities.md) ===== */
+.theme-clinic { --primary-accent: oklch(50% 0.12 195); --font-display: "Manrope", sans-serif; --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --primary: oklch(50% 0.12 195); --background: oklch(98.5% 0.006 190); --card: oklch(100% 0 0);
+  --border: oklch(92% 0.012 190); --input: oklch(90% 0.014 190); --muted: oklch(96% 0.01 190); --accent: oklch(95% 0.012 190); --radius: 0.75rem; }
+.theme-clinic.dark { --primary-accent: oklch(70% 0.13 195); --background: oklch(15% 0.012 195); --card: oklch(18% 0.012 195); --popover: oklch(18% 0.012 195); --border: oklch(28% 0.015 195); --input: oklch(28% 0.015 195); --muted: oklch(22% 0.012 195); --accent: oklch(24% 0.014 195); --primary: oklch(70% 0.13 195); --primary-foreground: oklch(12% 0.02 195); }
+.theme-graphite { --primary-accent: oklch(52.25% 0.17 150); --muted-foreground: oklch(54% 0.014 285); --font-display: "IBM Plex Sans", sans-serif; --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif; --font-mono: "IBM Plex Mono", monospace;
+  --primary: oklch(65% 0.17 150); --primary-foreground: oklch(14% 0 0); --background: oklch(97% 0.002 260); --card: oklch(100% 0 0); --border: oklch(88% 0.004 260); --input: oklch(86% 0.004 260); --radius: 0.25rem; }
+.theme-graphite.dark { --primary-accent: oklch(65% 0.17 150); --muted-foreground: oklch(60.0% 0.014 285); --background: oklch(12% 0.004 260); --card: oklch(15% 0.004 260); --popover: oklch(15% 0.004 260); --border: oklch(24% 0.005 260); --input: oklch(26% 0.005 260); }
+.theme-editorial { --primary-accent: oklch(48% 0.16 30); --font-display: "Fraunces", Georgia, serif; --font-sans: "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
+  --primary: oklch(48% 0.16 30); --primary-foreground: oklch(98% 0.01 60); --background: oklch(97.5% 0.012 75); --card: oklch(99% 0.008 75);
+  --foreground: oklch(22% 0.02 50); --mono: oklch(22% 0.02 50); --border: oklch(90% 0.02 70); --input: oklch(88% 0.02 70); --muted: oklch(94% 0.015 75); --accent: oklch(93% 0.018 75); --muted-foreground: oklch(50% 0.03 50);
+  --radius: 0.5rem; --shadow-xs: 0 1px 3px rgb(60 30 10 / 0.08); --shadow-md: 0 6px 16px -6px rgb(60 30 10 / 0.18); }
+.theme-editorial.dark { --primary-accent: oklch(70% 0.15 35); --background: oklch(16% 0.012 60); --card: oklch(19% 0.012 60); --popover: oklch(19% 0.012 60); --foreground: oklch(95% 0.01 75); --mono: oklch(95% 0.01 75); --border: oklch(28% 0.015 60); --input: oklch(28% 0.015 60); --muted: oklch(23% 0.012 60); --accent: oklch(25% 0.014 60); --muted-foreground: oklch(65% 0.02 60); --primary: oklch(70% 0.15 35); --primary-foreground: oklch(14% 0.02 40); }
+.theme-neo { --primary-accent: oklch(55% 0.25 290); --font-display: "Space Grotesk", sans-serif; --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --primary: oklch(55% 0.25 290); --background: oklch(99% 0 0); --card: oklch(100% 0 0); --foreground: oklch(10% 0 0); --mono: oklch(10% 0 0);
+  --border: oklch(10% 0 0); --input: oklch(10% 0 0); --radius: 0.25rem; --shadow-xs: 3px 3px 0 0 var(--foreground); --shadow-md: 5px 5px 0 0 var(--foreground); }
+.theme-neo.dark { --primary-accent: oklch(75% 0.2 290); --background: oklch(12% 0 0); --card: oklch(15% 0 0); --popover: oklch(15% 0 0); --foreground: oklch(98% 0 0); --mono: oklch(98% 0 0); --border: oklch(98% 0 0); --input: oklch(98% 0 0); --primary: oklch(75% 0.2 290); --primary-foreground: oklch(10% 0 0); }
+.theme-slate { --muted-foreground: oklch(53% 0.014 285); --font-display: "Inter", sans-serif; --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --primary: oklch(42% 0.12 260); --background: oklch(96.5% 0.004 250); --card: oklch(100% 0 0); --foreground: oklch(18% 0.02 260); --border: oklch(88% 0.008 250); --input: oklch(86% 0.008 250); --radius: 0.375rem;
+  --sidebar: oklch(18% 0.03 260); --sidebar-foreground: oklch(92% 0.01 250); --sidebar-muted: oklch(65% 0.02 250); --primary-accent: oklch(42% 0.12 260); --sidebar-accent: oklch(24% 0.03 260); --sidebar-accent-foreground: oklch(100% 0 0); --sidebar-primary: oklch(78% 0.12 80); --sidebar-border: oklch(26% 0.03 260); }
+.theme-slate.dark { --primary-accent: oklch(72% 0.12 80); --muted-foreground: oklch(60.0% 0.014 285); --background: oklch(13% 0.02 260); --card: oklch(17% 0.02 260); --popover: oklch(17% 0.02 260); --foreground: oklch(95% 0.01 250); --border: oklch(26% 0.02 260); --input: oklch(26% 0.02 260); --primary: oklch(72% 0.12 80); --primary-foreground: oklch(15% 0.03 80); --sidebar: oklch(11% 0.02 260); }
+.theme-mint { --primary-accent: oklch(52.5% 0.15 165); --font-display: "Plus Jakarta Sans", sans-serif; --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --primary: oklch(60% 0.15 165); --primary-foreground: oklch(14% 0 0); --background: oklch(98% 0.01 160); --card: oklch(100% 0 0); --border: oklch(93% 0.02 160); --input: oklch(90% 0.02 160); --muted: oklch(96% 0.012 160); --accent: oklch(95% 0.015 160); --radius: 1rem;
+  --shadow-xs: 0 1px 2px rgb(20 60 40 / 0.06); --shadow-md: 0 8px 24px -8px rgb(20 60 40 / 0.18); }
+.theme-mint.dark { --primary-accent: oklch(72% 0.15 165); --background: oklch(14% 0.01 160); --card: oklch(18% 0.012 160); --popover: oklch(18% 0.012 160); --border: oklch(27% 0.015 160); --input: oklch(27% 0.015 160); --muted: oklch(22% 0.012 160); --accent: oklch(24% 0.014 160); --primary: oklch(72% 0.15 165); }
+
+@custom-variant dark (&:where(.dark, .dark *));
+@theme inline {
+  --font-sans: var(--font-sans); --font-mono: var(--font-mono); --font-display: var(--font-display);
+  --color-background: var(--background); --color-foreground: var(--foreground);
+  --color-card: var(--card); --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover); --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary); --color-primary-accent: var(--primary-accent); --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary); --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted); --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent); --color-accent-foreground: var(--accent-foreground);
+  --color-mono: var(--mono); --color-mono-foreground: var(--mono-foreground);
+  --color-destructive: var(--destructive); --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success); --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning); --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info); --color-info-foreground: var(--info-foreground);
+  --color-border: var(--border); --color-input: var(--input); --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar); --color-sidebar-foreground: var(--sidebar-foreground); --color-sidebar-muted: var(--sidebar-muted);
+  --color-sidebar-accent: var(--sidebar-accent); --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-primary: var(--sidebar-primary); --color-sidebar-border: var(--sidebar-border);
+  --radius-xl: calc(var(--radius) + 4px); --radius-lg: var(--radius); --radius-md: calc(var(--radius) - 2px); --radius-sm: calc(var(--radius) - 4px);
+  --shadow-xs: var(--shadow-xs); --shadow-md: var(--shadow-md);
+}
+@theme { --text-2sm: 0.8125rem; --text-2sm--line-height: 1.3; --text-2xs: 0.6875rem; --text-2xs--line-height: 1.2; }
+@layer base {
+  * { border-color: var(--border); }
+  html { font-family: var(--font-sans); }
+  body { background: var(--background); color: var(--foreground); -webkit-font-smoothing: antialiased; }
+  :focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+  .scroll-thin { scrollbar-width: thin; scrollbar-color: var(--accent) transparent; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+}
+@layer components {
+  .container-fixed { @apply w-full grow px-6 xl:mx-auto xl:px-7.5 xl:max-w-(--breakpoint-xl); }
+  /* buttons */
+  .btn { @apply inline-flex items-center justify-center gap-1.5 shrink-0 whitespace-nowrap font-medium rounded-md shadow-xs transition-colors cursor-pointer h-(--ctl-h) px-3 text-2sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background disabled:opacity-50 disabled:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0; }
+  .btn-sm { @apply h-(--ctl-h-sm) px-2.5 text-xs gap-1.25; }
+  .btn-icon { @apply p-0 w-(--ctl-h); }
+  .btn-icon.btn-sm { @apply w-(--ctl-h-sm); }
+  .btn-primary { @apply bg-primary text-primary-foreground hover:bg-primary/90; }
+  .btn-outline { @apply border border-input bg-background text-secondary-foreground hover:bg-accent hover:text-accent-foreground; }
+  .btn-ghost { @apply shadow-none bg-transparent text-accent-foreground hover:bg-accent; }
+  .btn-destructive { @apply bg-destructive text-destructive-foreground hover:bg-destructive/90; }
+  /* inputs */
+  .input { @apply flex w-full rounded-md border border-input bg-background text-foreground shadow-xs placeholder:text-muted-foreground transition-colors h-(--ctl-h) px-3 text-2sm focus-visible:outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40; }
+  .input-sm { @apply h-(--ctl-h-sm) px-2.5 text-xs; }
+  .select { @apply appearance-none cursor-pointer pe-8 bg-no-repeat bg-[length:14px_11px] bg-[position:right_0.6rem_center] rtl:bg-[position:left_0.6rem_center]; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%239f9fa9' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3E%3C/svg%3E"); }
+  .checkbox { @apply appearance-none shrink-0 size-4 rounded-sm border border-input bg-background shadow-xs cursor-pointer checked:bg-primary checked:border-primary bg-center bg-no-repeat focus-visible:ring-2 focus-visible:ring-ring/40; }
+  .checkbox:checked { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='white' stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='m3.5 8.5 3 3 6-7'/%3E%3C/svg%3E"); }
+  /* badges */
+  .badge { @apply inline-flex items-center justify-center gap-1.5 whitespace-nowrap font-medium rounded-md h-6 min-w-6 px-[0.45rem] text-xs bg-secondary text-accent-foreground; }
+  .badge-sm { @apply h-5 min-w-5 px-[0.325rem] text-2xs rounded-sm gap-1; }
+  .badge-light-primary { @apply bg-primary/10 text-primary; }
+  .badge-light-success { @apply bg-success/15 text-success; }
+  .badge-light-warning { @apply bg-warning/20 text-warning-foreground; }
+  .badge-light-destructive { @apply bg-destructive/10 text-destructive; }
+  .badge-outline { @apply border border-border bg-muted text-secondary-foreground; }
+  .dot { @apply size-1.5 rounded-full bg-current opacity-75; }
+  /* card */
+  .card { @apply flex flex-col rounded-xl border border-border bg-card text-card-foreground shadow-xs; }
+  .card-header { @apply flex min-h-14 flex-wrap items-center justify-between gap-2.5 border-b border-border px-5; }
+  .card-title { @apply text-base font-semibold tracking-tight leading-none text-mono; }
+  .card-content { @apply grow p-(--card-p); }
+  .card-footer { @apply flex items-center border-t border-border px-5 py-4; }
+  /* table */
+  .table { @apply w-full border-collapse text-sm text-foreground; }
+  .table th { @apply h-11 px-4 text-start align-middle text-xs font-normal text-secondary-foreground border-b border-border whitespace-nowrap; }
+  .table td { @apply px-4 align-middle border-b border-border h-(--row-h); }
+  .table tbody tr:last-child td { @apply border-b-0; }
+  .table tbody tr { @apply hover:bg-muted/40 transition-colors; }
+  .table tbody tr.selected { @apply bg-accent; }
+  /* nav */
+  .nav-heading { @apply px-2.5 pt-4 pb-1 text-xs font-medium uppercase text-sidebar-muted; }
+  .nav-link { @apply flex items-center gap-3.5 rounded-lg px-2.5 py-2 text-sm text-sidebar-foreground hover:bg-sidebar-accent cursor-pointer; }
+  .nav-link.active { @apply bg-sidebar-accent text-sidebar-primary font-medium relative before:absolute before:-start-2 before:top-2 before:bottom-2 before:w-[3px] before:rounded-full before:bg-sidebar-primary; }
+  .nav-link svg { @apply size-5 shrink-0 text-sidebar-muted; }
+  .nav-link.active svg, .nav-link:hover svg { @apply text-sidebar-primary; }
+  .nav-children { @apply hidden flex-col gap-1 ms-[22px] ps-2.5 border-s border-sidebar-border; }
+  .nav-group.open > .nav-children { @apply flex; }
+  .nav-group.open > .nav-link .nav-arrow { @apply rotate-90 rtl:-rotate-90; }
+  .nav-child { @apply relative flex items-center gap-3.5 rounded-lg px-2.5 py-1.5 text-2sm text-sidebar-foreground hover:bg-sidebar-accent before:absolute before:-start-[15px] before:top-1/2 before:size-1.5 before:-translate-y-1/2 before:rounded-full; }
+  .nav-child.active { @apply text-sidebar-primary before:bg-sidebar-primary; }
+  /* menu */
+  .menu { @apply min-w-44 rounded-md border border-border bg-popover text-popover-foreground shadow-md p-2 flex flex-col gap-0.5 z-50; }
+  .menu-item { @apply flex items-center gap-2.5 rounded-md px-2 py-2 text-2sm text-foreground cursor-pointer hover:bg-accent [&_svg]:size-4 [&_svg]:text-muted-foreground; }
+  .kbd { @apply inline-flex h-5 items-center rounded-sm border border-border bg-muted px-1.5 font-mono text-2xs text-secondary-foreground; }
+  .skeleton { @apply animate-pulse rounded-md bg-accent; }
+}
+
+/* ===== storefront additions (same token vocabulary, no new colours) ===== */
+@media (width < 48rem) { :root { --ctl-h: 40px; --ctl-h-sm: 34px; } }   /* touch targets on small screens */
+@layer components {
+  .chip { @apply inline-flex items-center gap-1 h-10 md:h-7 ps-2.5 pe-0 md:pe-1 rounded-md border border-border bg-muted text-xs text-secondary-foreground; }
+  .chip-x { @apply inline-flex items-center justify-center size-10 md:size-5 rounded-md md:rounded-sm text-muted-foreground hover:bg-accent hover:text-foreground cursor-pointer [&_svg]:size-3.5; }
+  .opt { @apply inline-flex items-center justify-center min-h-10 px-3 rounded-md border border-input bg-background text-2sm text-secondary-foreground cursor-pointer transition-colors hover:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background; }
+  .opt[aria-pressed="true"] { @apply border-primary bg-primary/10 text-primary-accent font-medium; }
+  .opt[disabled] { @apply opacity-40 cursor-not-allowed line-through hover:border-input; }
+  .swatch { @apply relative inline-flex size-9 items-center justify-center rounded-full border border-border cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background; }
+  .swatch[aria-pressed="true"] { @apply ring-2 ring-ring ring-offset-2; }
+  .swatch[disabled] { @apply opacity-40 cursor-not-allowed; }
+  .tab { @apply -mb-px pb-3 pt-1 px-0.5 text-sm text-secondary-foreground border-b-2 border-transparent cursor-pointer whitespace-nowrap hover:text-foreground; }
+  .tab[aria-selected="true"] { @apply text-primary-accent border-primary font-medium; }
+  .qty { @apply inline-flex items-center rounded-md border border-input bg-background h-(--ctl-h) shadow-xs; }
+  .qty button { @apply inline-flex items-center justify-center w-9 h-full text-secondary-foreground hover:bg-accent disabled:opacity-40 disabled:pointer-events-none cursor-pointer [&_svg]:size-3.5 first:rounded-s-md last:rounded-e-md; }
+  .qty input { @apply w-10 h-full bg-transparent text-center text-2sm tabular-nums text-mono border-0 outline-none; }
+  .field { @apply flex flex-col gap-1.5; }
+  .field > label { @apply text-xs font-medium text-secondary-foreground; }
+  .err-text { @apply flex items-start gap-1 rounded-md bg-destructive/10 px-2 py-1 text-xs text-destructive; }
+  .input[aria-invalid="true"] { @apply border-destructive ring-2 ring-destructive/25; }
+  .link { @apply text-primary-accent hover:underline underline-offset-4 cursor-pointer; }
+  .thumb[aria-selected="true"] { @apply border-primary ring-1 ring-primary; }
+  .rail-link { @apply flex items-center gap-2 rounded-md px-2.5 py-2 text-2sm text-secondary-foreground hover:bg-accent cursor-pointer; }
+  .rail-link[aria-current="true"] { @apply bg-accent text-mono font-medium; }
+}
+[hidden] { display: none !important; }
+@media (width < 64rem) { footer .link, footer button.cursor-pointer { display: inline-flex; align-items: center; min-height: 40px; } }
+input[type="range"] { -webkit-appearance: none; appearance: none; height: 20px; background: transparent; cursor: pointer; }
+input[type="range"]::-webkit-slider-runnable-track { height: 4px; border-radius: 999px; background: var(--input); }
+input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; height: 16px; width: 16px; margin-top: -6px; border-radius: 999px; background: var(--primary); border: 2px solid var(--background); }
+input[type="range"]::-moz-range-track { height: 4px; border-radius: 999px; background: var(--input); }
+input[type="range"]::-moz-range-thumb { height: 14px; width: 14px; border-radius: 999px; background: var(--primary); border: 2px solid var(--background); }
+input[type="radio"].checkbox { border-radius: 999px; }
+input[type="radio"].checkbox:checked { background-image: none; box-shadow: inset 0 0 0 3px var(--background); }
+.acc-body { display: none; }
+.acc.open > .acc-body { display: flex; }
+.acc.open .acc-arrow { transform: rotate(180deg); }
+@media (width >= 64rem) { .acc-body { display: flex; } .acc-head { pointer-events: none; } }
+.slide-in { animation: slide-in .22s cubic-bezier(.2,.8,.2,1); }
+.fade-in { animation: fade-in .18s ease-out; }
+.pop-in { animation: pop-in .2s cubic-bezier(.2,.8,.2,1); }
+@keyframes slide-in { from { transform: translateX(var(--slide-from, 18px)); opacity: 0 } to { transform: none; opacity: 1 } }
+@keyframes fade-in { from { opacity: 0 } to { opacity: 1 } }
+@keyframes pop-in { from { transform: translateY(6px) scale(.985); opacity: 0 } to { transform: none; opacity: 1 } }
+[dir="rtl"] .slide-in { --slide-from: -18px; }
+@media (prefers-reduced-motion: reduce) { .slide-in, .fade-in, .pop-in { animation: none } }
+</style>
+</head>
+<body class="min-h-full flex flex-col bg-background text-2sm">
+<a href="#content" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:start-2 focus:z-50 btn btn-primary btn-sm">Skip to content</a>
+
+<!-- ===== Announcement bar ===== -->
+<div id="announce" class="relative bg-mono text-mono-foreground">
+  <div class="container-fixed flex items-center justify-center gap-2 py-2 pe-8 text-center text-xs">
+    <i data-lucide="truck" class="size-3.5 shrink-0"></i>
+    <span data-i18n="Free shipping over $75 — every order leaves the bindery within 24 hours">Free shipping over $75 — every order leaves the bindery within 24 hours</span>
+  </div>
+  <button id="announce-x" class="absolute end-2 top-1/2 -translate-y-1/2 inline-flex items-center justify-center size-7 rounded-md hover:bg-mono-foreground/20 cursor-pointer" aria-label="Dismiss announcement"><i data-lucide="x" class="size-3.5"></i></button>
+</div>
+
+<!-- ===== Header ===== -->
+<header class="sticky top-0 z-30 bg-background/95 backdrop-blur-sm border-b border-border">
+  <div class="container-fixed flex items-center gap-1.5 sm:gap-3 h-(--header-height)">
+    <button id="menu-btn" class="btn btn-ghost btn-icon lg:hidden" aria-label="Open menu" aria-expanded="false"><i data-lucide="menu"></i></button>
+    <a href="#" data-go="catalog" data-cat="all" class="flex items-center gap-2.5 shrink-0 font-semibold text-mono">
+      <span class="inline-flex size-8 items-center justify-center rounded-md bg-primary text-primary-foreground font-bold text-xs font-display">FR</span>
+      <span class="font-display text-base tracking-tight hidden sm:inline">Fold &amp; Rule</span>
+    </a>
+    <nav class="hidden lg:flex items-center gap-0.5 ms-4" aria-label="Categories">
+      <a href="#" class="px-2.5 py-2 rounded-md text-2sm text-secondary-foreground hover:bg-accent hover:text-foreground" data-go="catalog" data-cat="all" data-i18n="Shop all">Shop all</a>
+      <a href="#" class="px-2.5 py-2 rounded-md text-2sm text-secondary-foreground hover:bg-accent hover:text-foreground" data-go="catalog" data-cat="notebooks" data-i18n="Notebooks">Notebooks</a>
+      <a href="#" class="px-2.5 py-2 rounded-md text-2sm text-secondary-foreground hover:bg-accent hover:text-foreground" data-go="catalog" data-cat="pens" data-i18n="Pens">Pens</a>
+      <a href="#" class="px-2.5 py-2 rounded-md text-2sm text-secondary-foreground hover:bg-accent hover:text-foreground" data-go="catalog" data-cat="inks" data-i18n="Inks">Inks</a>
+      <a href="#" class="px-2.5 py-2 rounded-md text-2sm text-secondary-foreground hover:bg-accent hover:text-foreground" data-go="catalog" data-cat="desk" data-i18n="Desk">Desk</a>
+      <a href="#" class="px-2.5 py-2 rounded-md text-2sm text-secondary-foreground hover:bg-accent hover:text-foreground" data-go="catalog" data-cat="paper" data-i18n="Paper">Paper</a>
+    </nav>
+    <div class="grow"></div>
+    <div class="relative hidden md:block">
+      <i data-lucide="search" class="absolute start-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none"></i>
+      <input id="search" type="search" class="input ps-9 w-52 xl:w-72" placeholder="Search the shop" aria-label="Search products" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="suggest" data-i18n-placeholder="Search the shop">
+      <div id="suggest" role="listbox" aria-label="Search suggestions" class="menu absolute end-0 top-full mt-1.5 w-80" hidden></div>
+    </div>
+    <button id="search-m" class="btn btn-ghost btn-icon md:hidden" aria-label="Search"><i data-lucide="search"></i></button>
+    <div class="relative hidden sm:block">
+      <button id="account-btn" class="btn btn-ghost btn-icon" aria-label="Account" aria-haspopup="menu" aria-expanded="false"><i data-lucide="user-round"></i></button>
+      <div id="account-menu" class="menu absolute end-0 top-full mt-1.5 w-60" hidden role="menu">
+        <div class="px-2 py-1.5 flex flex-col"><span class="text-2sm font-medium text-mono">Nadia Freij</span><span class="text-xs text-muted-foreground">nadia@foldandrule.example</span></div>
+        <div class="my-1 h-px bg-border"></div>
+        <button class="menu-item" role="menuitem" data-toast="Your orders live in the account area"><i data-lucide="package"></i><span data-i18n="My orders">My orders</span></button>
+        <button class="menu-item" role="menuitem" data-open-wish><i data-lucide="heart"></i><span data-i18n="Wishlist">Wishlist</span><span class="ms-auto badge badge-sm badge-outline wish-count tabular-nums">0</span></button>
+        <button class="menu-item" role="menuitem" data-toast="Addresses live in the account area"><i data-lucide="map-pin"></i><span data-i18n="Addresses">Addresses</span></button>
+        <div class="my-1 h-px bg-border"></div>
+        <button class="menu-item text-destructive hover:bg-destructive/10" role="menuitem" data-toast="Signed out of this demo"><i data-lucide="log-out" class="text-destructive!"></i><span data-i18n="Sign out">Sign out</span></button>
+      </div>
+    </div>
+    <button id="wish-btn" class="btn btn-ghost btn-icon relative hidden sm:inline-flex" aria-label="Wishlist"><i data-lucide="heart"></i><span class="wish-dot absolute top-1.5 end-1.5 size-2 rounded-full bg-primary" hidden></span></button>
+    <button id="cart-btn" class="btn btn-outline gap-2 relative ps-2.5 pe-2.5" aria-label="Open cart" aria-expanded="false">
+      <i data-lucide="shopping-bag"></i>
+      <span class="badge badge-sm badge-light-primary cart-count tabular-nums">0</span>
+    </button>
+  </div>
+</header>
+
+<main id="content" class="grow pb-24 lg:pb-14">
+
+<!-- ===== View: catalogue ===== -->
+<section id="view-catalog" data-view="catalog">
+  <div class="border-b border-border bg-card">
+    <div class="container-fixed py-8 lg:py-11 flex flex-col gap-4">
+      <p class="text-xs font-medium uppercase tracking-wider text-primary-accent" data-i18n="Bindery-direct since 2014">Bindery-direct since 2014</p>
+      <h1 class="font-display text-2xl lg:text-4xl font-semibold tracking-tight text-mono max-w-2xl leading-tight" data-i18n="Paper, ink and the few tools that make writing a habit">Paper, ink and the few tools that make writing a habit</h1>
+      <p class="text-sm text-secondary-foreground max-w-xl" data-i18n="Sixteen things we make or import, kept in stock all year. No seasonal collections, no drops.">Sixteen things we make or import, kept in stock all year. No seasonal collections, no drops.</p>
+      <ul class="flex flex-wrap gap-x-6 gap-y-2 pt-1 text-xs text-secondary-foreground">
+        <li class="flex items-center gap-1.5"><i data-lucide="truck" class="size-3.5 text-primary-accent"></i><span data-i18n="Free over $75">Free over $75</span></li>
+        <li class="flex items-center gap-1.5"><i data-lucide="undo-2" class="size-3.5 text-primary-accent"></i><span data-i18n="30-day returns, unused">30-day returns, unused</span></li>
+        <li class="flex items-center gap-1.5"><i data-lucide="pen-line" class="size-3.5 text-primary-accent"></i><span data-i18n="Nibs tuned before dispatch">Nibs tuned before dispatch</span></li>
+        <li class="flex items-center gap-1.5"><i data-lucide="lock" class="size-3.5 text-primary-accent"></i><span data-i18n="Checkout runs in your browser">Checkout runs in your browser</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="container-fixed pt-6 grid gap-6 lg:gap-8 lg:grid-cols-[15rem_minmax(0,1fr)] xl:grid-cols-[16rem_minmax(0,1fr)]">
+    <aside class="hidden lg:block" aria-label="Filters">
+      <div class="sticky top-[calc(var(--header-height)+1rem)] flex flex-col gap-5 max-h-[calc(100dvh-var(--header-height)-3rem)] overflow-y-auto scroll-thin pe-1">
+        <div id="rail"></div>
+      </div>
+    </aside>
+
+    <div class="min-w-0 flex flex-col gap-4">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-2 min-w-0">
+          <h2 id="cat-title" class="text-lg font-medium text-mono font-display truncate">Shop all</h2>
+          <span id="count" class="text-2sm text-muted-foreground tabular-nums whitespace-nowrap">&nbsp;</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="filters-m" class="btn btn-outline lg:hidden gap-1.5"><i data-lucide="sliders-horizontal"></i><span data-i18n="Filters">Filters</span><span id="filters-m-count" hidden class="badge badge-sm badge-light-primary tabular-nums">0</span></button>
+          <label class="sr-only" for="sort" data-i18n="Sort by">Sort by</label>
+          <select id="sort" class="input select w-44">
+            <option value="featured" data-i18n="Featured">Featured</option>
+            <option value="price-asc" data-i18n="Price: low to high">Price: low to high</option>
+            <option value="price-desc" data-i18n="Price: high to low">Price: high to low</option>
+            <option value="newest" data-i18n="Newest">Newest</option>
+            <option value="best" data-i18n="Best selling">Best selling</option>
+            <option value="rating" data-i18n="Top rated">Top rated</option>
+          </select>
+        </div>
+      </div>
+      <div id="chips" class="flex flex-wrap items-center gap-2 empty:hidden"></div>
+      <div id="grid" class="grid gap-5 sm:grid-cols-2 xl:grid-cols-3" aria-busy="false"></div>
+      <div id="grid-foot" class="flex flex-col items-center gap-3 pt-4"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== View: product ===== -->
+<section id="view-product" data-view="product" hidden>
+  <div class="container-fixed pt-5 flex flex-col gap-5">
+    <nav class="flex items-center gap-1.5 text-xs text-secondary-foreground" aria-label="Breadcrumb">
+      <button class="hover:text-primary-accent cursor-pointer" data-go="catalog" data-cat="all" data-i18n="Shop all">Shop all</button>
+      <i data-lucide="chevron-right" class="size-3.5 text-muted-foreground rtl:rotate-180"></i>
+      <button id="pd-crumb-cat" class="hover:text-primary-accent cursor-pointer" aria-label="Category"></button>
+      <i data-lucide="chevron-right" class="size-3.5 text-muted-foreground rtl:rotate-180"></i>
+      <span id="pd-crumb" class="text-mono truncate max-w-[12rem] sm:max-w-none"></span>
+    </nav>
+    <div id="pd"></div>
+  </div>
+</section>
+
+<!-- ===== View: checkout ===== -->
+<section id="view-checkout" data-view="checkout" hidden>
+  <div class="container-fixed pt-6 flex flex-col gap-6">
+    <div class="flex items-center justify-between gap-4">
+      <h2 role="heading" aria-level="1" class="text-xl font-medium text-mono font-display" data-i18n="Checkout">Checkout</h2>
+      <button class="btn btn-ghost btn-sm gap-1.5" data-go="catalog"><i data-lucide="arrow-left" class="rtl:rotate-180"></i><span data-i18n="Keep shopping">Keep shopping</span></button>
+    </div>
+
+    <ol id="stepper" class="flex items-center gap-1 sm:gap-2 overflow-x-auto scroll-thin pb-1" aria-label="Checkout steps"></ol>
+
+    <div class="grid gap-6 lg:gap-8 lg:grid-cols-[minmax(0,1fr)_21rem] items-start">
+      <form id="co-form" novalidate class="card">
+        <div id="co-alert" hidden class="mx-5 mt-5 rounded-lg border border-destructive/40 bg-destructive/10 p-3.5 text-2sm text-destructive" role="alert"></div>
+
+        <!-- step 1: contact -->
+        <div class="co-step card-content flex flex-col gap-5" data-step="1">
+          <div class="flex flex-col gap-1">
+            <h3 class="card-title" data-i18n="Contact">Contact</h3>
+            <p class="text-xs text-muted-foreground" data-i18n="We send one order email and nothing else.">We send one order email and nothing else.</p>
+          </div>
+          <div class="grid gap-4 sm:grid-cols-2">
+            <div class="field"><label for="f-first" data-i18n="First name">First name</label><input id="f-first" name="first" class="input" autocomplete="given-name" data-rule="name"><p class="err-text" hidden id="e-f-first"></p></div>
+            <div class="field"><label for="f-last" data-i18n="Last name">Last name</label><input id="f-last" name="last" class="input" autocomplete="family-name" data-rule="name"><p class="err-text" hidden id="e-f-last"></p></div>
+          </div>
+          <div class="field"><label for="f-email" data-i18n="Email">Email</label><input id="f-email" name="email" type="email" class="input" autocomplete="email" placeholder="you@example.com" data-rule="email"><p class="err-text" hidden id="e-f-email"></p></div>
+          <div class="field"><label for="f-phone" data-i18n="Phone">Phone</label><input id="f-phone" name="phone" type="tel" class="input" autocomplete="tel" placeholder="+962 7 9000 0000" data-rule="phone"><p class="err-text" hidden id="e-f-phone"></p><p class="text-xs text-muted-foreground" data-i18n="Used by the courier only.">Used by the courier only.</p></div>
+          <label class="flex items-start gap-2.5 cursor-pointer"><input type="checkbox" id="f-news" class="checkbox mt-0.5"><span class="text-2sm text-secondary-foreground" data-i18n="Email me when a paper we sold out of is back">Email me when a paper we sold out of is back</span></label>
+        </div>
+
+        <!-- step 2: shipping -->
+        <div class="co-step card-content flex flex-col gap-5" hidden data-step="2">
+          <h3 class="card-title" data-i18n="Shipping address">Shipping address</h3>
+          <div class="field"><label for="f-addr" data-i18n="Street address">Street address</label><input id="f-addr" name="addr" class="input" autocomplete="street-address" data-rule="req"><p class="err-text" hidden id="e-f-addr"></p></div>
+          <div class="field"><label for="f-addr2" data-i18n="Apartment, floor (optional)">Apartment, floor (optional)</label><input id="f-addr2" name="addr2" class="input" autocomplete="address-line2"></div>
+          <div class="grid gap-4 sm:grid-cols-3">
+            <div class="field sm:col-span-1"><label for="f-city" data-i18n="City">City</label><input id="f-city" name="city" class="input" autocomplete="address-level2" data-rule="req"><p class="err-text" hidden id="e-f-city"></p></div>
+            <div class="field"><label for="f-country" data-i18n="Country">Country</label>
+              <select id="f-country" name="country" class="input select" autocomplete="country">
+                <option value="JO">Jordan</option><option value="US">United States</option><option value="CA">Canada</option><option value="GB">United Kingdom</option>
+              </select></div>
+            <div class="field"><label for="f-zip" data-i18n="Postal code">Postal code</label><input id="f-zip" name="zip" class="input" autocomplete="postal-code" inputmode="text" data-rule="zip"><p class="err-text" hidden id="e-f-zip"></p></div>
+          </div>
+          <div class="flex flex-col gap-2.5 pt-1">
+            <span class="text-xs font-medium text-secondary-foreground" data-i18n="Delivery method">Delivery method</span>
+            <div id="ship-methods" class="flex flex-col gap-2.5" role="radiogroup" aria-label="Delivery method"></div>
+          </div>
+        </div>
+
+        <!-- step 3: payment -->
+        <div class="co-step card-content flex flex-col gap-5" hidden data-step="3">
+          <div class="flex items-center justify-between gap-3">
+            <h3 class="card-title" data-i18n="Payment">Payment</h3>
+            <span class="badge badge-sm badge-outline gap-1"><i data-lucide="lock" class="size-3"></i><span data-i18n="Demo only">Demo only</span></span>
+          </div>
+          <p class="text-xs text-muted-foreground" data-i18n="Nothing is transmitted. The card is checked with the Luhn formula in this page.">Nothing is transmitted. The card is checked with the Luhn formula in this page.</p>
+          <div class="field"><label for="f-card" data-i18n="Card number">Card number</label>
+            <div class="relative"><input id="f-card" name="card" class="input pe-16 tabular-nums" inputmode="numeric" autocomplete="cc-number" placeholder="4242 4242 4242 4242" data-rule="card"><span id="card-brand" class="absolute end-3 top-1/2 -translate-y-1/2 text-2xs font-medium text-muted-foreground"></span></div>
+            <p class="err-text" hidden id="e-f-card"></p></div>
+          <div class="field"><label for="f-holder" data-i18n="Name on card">Name on card</label><input id="f-holder" name="holder" class="input" autocomplete="cc-name" data-rule="name"><p class="err-text" hidden id="e-f-holder"></p></div>
+          <div class="grid gap-4 sm:grid-cols-2">
+            <div class="field"><label for="f-exp" data-i18n="Expiry (MM/YY)">Expiry (MM/YY)</label><input id="f-exp" name="exp" class="input tabular-nums" inputmode="numeric" autocomplete="cc-exp" placeholder="09/29" data-rule="exp"><p class="err-text" hidden id="e-f-exp"></p></div>
+            <div class="field"><label for="f-cvc" data-i18n="Security code">Security code</label><input id="f-cvc" name="cvc" class="input tabular-nums" inputmode="numeric" autocomplete="cc-csc" placeholder="123" data-rule="cvc"><p class="err-text" hidden id="e-f-cvc"></p></div>
+          </div>
+          <label class="flex items-center gap-2.5 cursor-pointer pt-1"><input type="checkbox" id="f-same" class="checkbox" checked><span class="text-2sm text-secondary-foreground" data-i18n="Billing address is the same as shipping">Billing address is the same as shipping</span></label>
+          <div id="billing" hidden class="flex flex-col gap-4 rounded-lg border border-border bg-muted/40 p-4">
+            <span class="text-xs font-medium text-secondary-foreground" data-i18n="Billing address">Billing address</span>
+            <div class="field"><label for="f-baddr" data-i18n="Street address">Street address</label><input id="f-baddr" name="baddr" class="input" data-rule="req"><p class="err-text" hidden id="e-f-baddr"></p></div>
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div class="field"><label for="f-bcity" data-i18n="City">City</label><input id="f-bcity" name="bcity" class="input" data-rule="req"><p class="err-text" hidden id="e-f-bcity"></p></div>
+              <div class="field"><label for="f-bzip" data-i18n="Postal code">Postal code</label><input id="f-bzip" name="bzip" class="input" data-rule="zip"><p class="err-text" hidden id="e-f-bzip"></p></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- step 4: review -->
+        <div class="co-step card-content flex flex-col gap-5" hidden data-step="4">
+          <h3 class="card-title" data-i18n="Review your order">Review your order</h3>
+          <div id="review" class="flex flex-col gap-4"></div>
+        </div>
+
+        <div class="card-footer justify-between gap-3">
+          <button type="button" id="co-back" class="btn btn-outline gap-1.5"><i data-lucide="arrow-left" class="rtl:rotate-180"></i><span data-i18n="Back">Back</span></button>
+          <button type="submit" id="co-next" class="btn btn-primary gap-1.5"><span id="co-next-label" data-i18n="Continue to shipping">Continue to shipping</span><i data-lucide="arrow-right" class="rtl:rotate-180"></i></button>
+        </div>
+      </form>
+
+      <aside id="co-summary" class="card lg:sticky lg:top-[calc(var(--header-height)+1rem)]" aria-label="Order summary"></aside>
+    </div>
+  </div>
+</section>
+
+<!-- ===== View: confirmation ===== -->
+<section id="view-done" data-view="done" hidden>
+  <div class="container-fixed pt-10 pb-6 max-w-2xl flex flex-col gap-6" id="done-body"></div>
+</section>
+</main>
+
+<!-- ===== Footer ===== -->
+<footer class="mt-auto border-t border-border bg-card pb-14 lg:pb-12">
+  <div class="container-fixed py-9 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+    <div class="flex flex-col gap-3">
+      <div class="flex items-center gap-2.5 font-semibold text-mono">
+        <span class="inline-flex size-8 items-center justify-center rounded-md bg-primary text-primary-foreground font-bold text-xs font-display">FR</span>
+        <span class="font-display">Fold &amp; Rule</span>
+      </div>
+      <p class="text-2sm text-secondary-foreground max-w-xs" data-i18n="A bindery and a small shop on Rainbow Street. We fold, rule and stitch most of what we sell.">A bindery and a small shop on Rainbow Street. We fold, rule and stitch most of what we sell.</p>
+      <p class="text-xs text-muted-foreground" data-i18n="Open Sun–Thu, 10:00–19:00">Open Sun–Thu, 10:00–19:00</p>
+    </div>
+    <div class="acc border-t border-border pt-4 sm:border-0 sm:pt-0">
+      <button type="button" class="acc-head w-full flex items-center justify-between gap-2 text-2sm font-semibold text-mono min-h-10 lg:min-h-0 lg:cursor-default" aria-expanded="false"><span data-i18n="Shop">Shop</span><i data-lucide="chevron-down" class="acc-arrow size-4 text-muted-foreground lg:hidden"></i></button>
+      <ul class="acc-body flex-col gap-2 pt-3 text-2sm text-secondary-foreground">
+        <li><button class="link" data-go="catalog" data-cat="notebooks" data-i18n="Notebooks">Notebooks</button></li>
+        <li><button class="link" data-go="catalog" data-cat="pens" data-i18n="Pens">Pens</button></li>
+        <li><button class="link" data-go="catalog" data-cat="inks" data-i18n="Inks">Inks</button></li>
+        <li><button class="link" data-go="catalog" data-cat="paper" data-i18n="Paper">Paper</button></li>
+      </ul>
+    </div>
+    <div class="acc border-t border-border pt-4 sm:border-0 sm:pt-0">
+      <button type="button" class="acc-head w-full flex items-center justify-between gap-2 text-2sm font-semibold text-mono min-h-10 lg:min-h-0 lg:cursor-default" aria-expanded="false"><span data-i18n="Help">Help</span><i data-lucide="chevron-down" class="acc-arrow size-4 text-muted-foreground lg:hidden"></i></button>
+      <ul class="acc-body flex-col gap-2 pt-3 text-2sm text-secondary-foreground">
+        <li><button class="link" data-toast="Shipping rates are listed at checkout" data-i18n="Shipping & delivery">Shipping &amp; delivery</button></li>
+        <li><button class="link" data-toast="Returns accepted within 30 days, unused" data-i18n="Returns">Returns</button></li>
+        <li><button class="link" data-toast="Nib grinding is booked in the shop" data-i18n="Nib service">Nib service</button></li>
+        <li><button class="link" data-toast="Write to hello@foldandrule.example" data-i18n="Contact">Contact</button></li>
+      </ul>
+    </div>
+    <div class="acc border-t border-border pt-4 sm:border-0 sm:pt-0">
+      <button type="button" class="acc-head w-full flex items-center justify-between gap-2 text-2sm font-semibold text-mono min-h-10 lg:min-h-0 lg:cursor-default" aria-expanded="false"><span data-i18n="Letters from the bindery">Letters from the bindery</span><i data-lucide="chevron-down" class="acc-arrow size-4 text-muted-foreground lg:hidden"></i></button>
+      <div class="acc-body flex-col gap-2.5 pt-3">
+        <p class="text-2sm text-secondary-foreground" data-i18n="One note a month: what we bound, what came back in stock.">One note a month: what we bound, what came back in stock.</p>
+        <form id="news-form" novalidate class="flex flex-col gap-2">
+          <label class="sr-only" for="f-news-email" data-i18n="Email">Email</label>
+          <div class="flex gap-2">
+            <input id="f-news-email" class="input" type="email" placeholder="you@example.com" autocomplete="email" aria-describedby="e-news">
+            <button class="btn btn-outline shrink-0" type="submit" data-i18n="Join">Join</button>
+          </div>
+          <p id="e-news" class="err-text" hidden></p>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="border-t border-border">
+    <div class="container-fixed py-4 flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
+      <span>© 2026 Fold &amp; Rule · <span data-i18n="Amman, Jordan">Amman, Jordan</span></span>
+      <div class="flex items-center gap-4">
+        <button class="hover:text-primary-accent cursor-pointer" data-toast="Privacy notice opens in the help centre" data-i18n="Privacy">Privacy</button>
+        <button class="hover:text-primary-accent cursor-pointer" data-toast="Terms open in the help centre" data-i18n="Terms">Terms</button>
+        <span class="flex items-center gap-1.5"><i data-lucide="credit-card" class="size-3.5"></i><span data-i18n="Visa · Mastercard · Cash on delivery">Visa · Mastercard · Cash on delivery</span></span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ===== Mobile bottom bar ===== -->
+<nav id="bottombar" class="lg:hidden fixed bottom-0 inset-x-0 z-30 border-t border-border bg-background/95 backdrop-blur-sm" aria-label="Quick actions">
+  <div class="grid grid-cols-4">
+    <button class="flex flex-col items-center justify-center gap-1 min-h-14 text-2xs text-secondary-foreground cursor-pointer" data-go="catalog" data-cat="all"><i data-lucide="store" class="size-5"></i><span data-i18n="Shop">Shop</span></button>
+    <button id="bb-search" class="flex flex-col items-center justify-center gap-1 min-h-14 text-2xs text-secondary-foreground cursor-pointer"><i data-lucide="search" class="size-5"></i><span data-i18n="Search">Search</span></button>
+    <button id="bb-wish" class="relative flex flex-col items-center justify-center gap-1 min-h-14 text-2xs text-secondary-foreground cursor-pointer"><i data-lucide="heart" class="size-5"></i><span data-i18n="Wishlist">Wishlist</span><span class="wish-dot absolute top-2 end-[28%] size-2 rounded-full bg-primary" hidden></span></button>
+    <button id="bb-cart" class="relative flex flex-col items-center justify-center gap-1 min-h-14 text-2xs text-secondary-foreground cursor-pointer"><i data-lucide="shopping-bag" class="size-5"></i><span data-i18n="Cart">Cart</span><span class="cart-count-bubble absolute top-1.5 end-[26%] badge badge-sm badge-light-primary tabular-nums" hidden>0</span></button>
+  </div>
+</nav>
+
+<!-- ===== Overlays ===== -->
+<div id="scrim" class="fixed inset-0 z-40 bg-black/40 fade-in" hidden></div>
+
+<!-- cart drawer -->
+<aside id="cart" class="fixed z-50 inset-y-0 end-0 w-[27rem] max-w-[94%] bg-card border-s border-border shadow-md flex flex-col slide-in" role="dialog" aria-modal="true" aria-labelledby="cart-title" hidden>
+  <div class="flex items-center justify-between gap-2 px-5 h-16 border-b border-border shrink-0">
+    <h2 id="cart-title" class="text-base font-semibold text-mono flex items-center gap-2"><span data-i18n="Your bag">Your bag</span><span class="badge badge-sm badge-outline cart-count tabular-nums">0</span></h2>
+    <button class="btn btn-ghost btn-icon" data-close="cart" aria-label="Close cart"><i data-lucide="x"></i></button>
+  </div>
+  <div id="cart-body" class="grow overflow-y-auto scroll-thin"></div>
+  <div id="cart-foot" class="shrink-0 border-t border-border"></div>
+</aside>
+
+<!-- quick view -->
+<div id="quick" class="fixed z-50 inset-0 flex items-end sm:items-center justify-center p-0 sm:p-4 pointer-events-none" hidden>
+  <div class="pointer-events-auto w-full sm:max-w-3xl max-h-[92dvh] overflow-y-auto scroll-thin rounded-t-xl sm:rounded-xl border border-border bg-popover shadow-md pop-in" role="dialog" aria-modal="true" aria-labelledby="quick-title">
+    <div class="flex items-center justify-between gap-2 px-5 h-14 border-b border-border sticky top-0 bg-popover z-10">
+      <h2 id="quick-title" class="text-sm font-semibold text-mono truncate" data-i18n="Quick view">Quick view</h2>
+      <button class="btn btn-ghost btn-icon" data-close="quick" aria-label="Close quick view"><i data-lucide="x"></i></button>
+    </div>
+    <div id="quick-body" class="p-5"></div>
+  </div>
+</div>
+
+<!-- mobile menu -->
+<aside id="mmenu" class="fixed z-50 inset-y-0 start-0 w-80 max-w-[88%] bg-card border-e border-border shadow-md flex flex-col slide-in" role="dialog" aria-modal="true" aria-labelledby="mmenu-title" hidden>
+  <div class="flex items-center justify-between gap-2 px-5 h-16 border-b border-border">
+    <h2 id="mmenu-title" class="text-base font-semibold text-mono" data-i18n="Browse">Browse</h2>
+    <button class="btn btn-ghost btn-icon" data-close="mmenu" aria-label="Close menu"><i data-lucide="x"></i></button>
+  </div>
+  <nav class="grow overflow-y-auto scroll-thin p-3 flex flex-col gap-1" aria-label="Mobile categories">
+    <button class="rail-link min-h-11" data-go="catalog" data-cat="all"><i data-lucide="store" class="size-4 text-muted-foreground"></i><span data-i18n="Shop all">Shop all</span></button>
+    <button class="rail-link min-h-11" data-go="catalog" data-cat="notebooks"><i data-lucide="notebook" class="size-4 text-muted-foreground"></i><span data-i18n="Notebooks">Notebooks</span></button>
+    <button class="rail-link min-h-11" data-go="catalog" data-cat="pens"><i data-lucide="pen-line" class="size-4 text-muted-foreground"></i><span data-i18n="Pens">Pens</span></button>
+    <button class="rail-link min-h-11" data-go="catalog" data-cat="inks"><i data-lucide="droplet" class="size-4 text-muted-foreground"></i><span data-i18n="Inks">Inks</span></button>
+    <button class="rail-link min-h-11" data-go="catalog" data-cat="desk"><i data-lucide="ruler" class="size-4 text-muted-foreground"></i><span data-i18n="Desk">Desk</span></button>
+    <button class="rail-link min-h-11" data-go="catalog" data-cat="paper"><i data-lucide="mail" class="size-4 text-muted-foreground"></i><span data-i18n="Paper">Paper</span></button>
+    <div class="my-2 h-px bg-border"></div>
+    <button class="rail-link min-h-11" data-open-wish><i data-lucide="heart" class="size-4 text-muted-foreground"></i><span data-i18n="Wishlist">Wishlist</span><span class="ms-auto badge badge-sm badge-outline wish-count tabular-nums">0</span></button>
+    <button class="rail-link min-h-11" data-toast="Your orders live in the account area"><i data-lucide="package" class="size-4 text-muted-foreground"></i><span data-i18n="My orders">My orders</span></button>
+  </nav>
+</aside>
+
+<!-- mobile filters -->
+<aside id="mfilters" class="fixed z-50 inset-y-0 end-0 w-88 max-w-[92%] bg-card border-s border-border shadow-md flex flex-col slide-in" role="dialog" aria-modal="true" aria-labelledby="mf-title" hidden>
+  <div class="flex items-center justify-between gap-2 px-5 h-16 border-b border-border">
+    <h2 id="mf-title" class="text-base font-semibold text-mono" data-i18n="Filters">Filters</h2>
+    <button class="btn btn-ghost btn-icon" data-close="mfilters" aria-label="Close filters"><i data-lucide="x"></i></button>
+  </div>
+  <div id="mrail" class="grow overflow-y-auto scroll-thin p-5"></div>
+  <div class="shrink-0 border-t border-border p-4 flex gap-2.5">
+    <button class="btn btn-outline grow" data-clear-all data-i18n="Clear all">Clear all</button>
+    <button class="btn btn-primary grow" data-close="mfilters"><span id="mf-apply" data-i18n="Show results">Show results</span></button>
+  </div>
+</aside>
+
+<!-- mobile search sheet -->
+<div id="msearch" class="fixed z-50 inset-0 flex flex-col bg-background" role="dialog" aria-modal="true" aria-labelledby="ms-title" hidden>
+  <div class="flex items-center gap-2 px-4 h-16 border-b border-border shrink-0">
+    <h2 id="ms-title" class="sr-only" data-i18n="Search the shop">Search the shop</h2>
+    <div class="relative grow">
+      <i data-lucide="search" class="absolute start-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none"></i>
+      <input id="msearch-input" type="search" class="input ps-9" placeholder="Search the shop" aria-label="Search products" autocomplete="off" data-i18n-placeholder="Search the shop">
+    </div>
+    <button class="btn btn-ghost btn-sm" data-close="msearch" data-i18n="Cancel">Cancel</button>
+  </div>
+  <div id="msearch-body" class="grow overflow-y-auto scroll-thin p-4"></div>
+</div>
+
+<!-- ===== Toasts + live region ===== -->
+<div id="toasts" aria-live="polite" aria-relevant="additions" class="fixed bottom-32 end-4 lg:bottom-24 lg:start-5 lg:end-auto z-50 flex flex-col gap-2.5 w-[22rem] max-w-[calc(100%-2.5rem)]"></div>
+<p id="live" class="sr-only" aria-live="polite"></p>
+
+<!-- ===== Demo controls (not part of the shop) ===== -->
+<details id="demo" class="fixed bottom-32 lg:bottom-5 start-4 lg:start-5 z-40 rounded-lg border border-border bg-popover shadow-md text-2sm w-64 open:pb-3">
+  <summary class="cursor-pointer select-none px-3 py-2 font-medium text-mono flex items-center gap-2"><i data-lucide="sliders-horizontal" class="size-4 text-muted-foreground"></i>Demo controls</summary>
+  <div class="px-3 flex flex-col gap-2.5">
+    <label class="flex flex-col gap-1"><span class="text-xs text-muted-foreground">Personality</span>
+      <select id="ctl-theme" class="input select input-sm"><option value="">Default (demo only — never ship)</option><option value="theme-clinic">Calm — teal, Manrope display</option><option value="theme-graphite">Graphite — dense, Plex</option><option value="theme-editorial">Editorial — warm serif</option><option value="theme-neo">Neo — bold, offset shadows</option><option value="theme-slate">Slate — navy, gold accent</option><option value="theme-mint">Mint — pills, Jakarta</option></select></label>
+    <label class="flex flex-col gap-1"><span class="text-xs text-muted-foreground">Density</span>
+      <select id="ctl-density" class="input select input-sm"><option value="">Standard</option><option value="density-compact">Compact</option><option value="density-airy">Airy</option></select></label>
+    <div class="flex items-center gap-2"><button id="ctl-rtl" class="btn btn-outline btn-sm grow" aria-label="Toggle language and direction">AR / EN</button><button id="ctl-dark" class="btn btn-outline btn-sm grow">Dark</button></div>
+    <label class="flex items-center justify-between gap-2 pt-1"><span class="text-xs text-muted-foreground">Force load error</span>
+      <input id="ctl-error" type="checkbox" class="checkbox" role="switch"></label>
+  </div>
+</details>
+
+<script>
+"use strict";
+const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const html = document.documentElement;
+const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const fmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+const money = n => fmt.format(Math.round(n * 100) / 100);
+
+/* ===== translations (Arabic is the second language of the shop, not a transliteration) ===== */
+const I18N = {
+  "Free shipping over $75 — every order leaves the bindery within 24 hours": "شحن مجاني للطلبات فوق 75 دولاراً — كل طلب يغادر المشغل خلال 24 ساعة",
+  "Shop all": "كل المنتجات", "Notebooks": "دفاتر", "Pens": "أقلام", "Inks": "أحبار", "Desk": "المكتب", "Paper": "ورق",
+  "Search the shop": "ابحث في المتجر", "My orders": "طلباتي", "Wishlist": "المفضلة", "Addresses": "العناوين", "Sign out": "تسجيل الخروج",
+  "Bindery-direct since 2014": "من المشغل مباشرة منذ 2014",
+  "Paper, ink and the few tools that make writing a habit": "ورق وحبر وأدوات قليلة تجعل الكتابة عادة",
+  "Sixteen things we make or import, kept in stock all year. No seasonal collections, no drops.": "ستة عشر صنفاً نصنعها أو نستوردها، متوفرة طوال السنة. لا مجموعات موسمية ولا إصدارات محدودة.",
+  "Free over $75": "مجاني فوق 75 دولاراً", "30-day returns, unused": "إرجاع خلال 30 يوماً إن لم تُستخدم",
+  "Nibs tuned before dispatch": "نضبط الريشة قبل الشحن", "Checkout runs in your browser": "الدفع يتم داخل متصفحك",
+  "Filters": "التصفية", "Sort by": "الترتيب", "Featured": "المختارة", "Price: low to high": "السعر: من الأقل", "Price: high to low": "السعر: من الأعلى",
+  "Newest": "الأحدث", "Best selling": "الأكثر مبيعاً", "Top rated": "الأعلى تقييماً",
+  "Category": "الفئة", "Price": "السعر", "Colour": "اللون", "Availability": "التوفر", "In stock only": "المتوفر فقط",
+  "Clear all": "مسح الكل", "Show results": "عرض النتائج", "Add to bag": "أضف إلى الحقيبة", "Quick view": "عرض سريع",
+  "Your bag": "حقيبتك", "Subtotal": "المجموع الفرعي", "Shipping": "الشحن", "Tax": "الضريبة", "Total": "الإجمالي",
+  "Discount": "الخصم", "Promo code": "رمز الخصم", "Apply": "تطبيق", "Checkout": "إتمام الشراء", "Keep shopping": "متابعة التسوق",
+  "Contact": "بيانات التواصل", "First name": "الاسم الأول", "Last name": "اسم العائلة", "Email": "البريد الإلكتروني", "Phone": "الهاتف",
+  "We send one order email and nothing else.": "نرسل رسالة واحدة عن الطلب فقط.", "Used by the courier only.": "يُستخدم من قبل المندوب فقط.",
+  "Email me when a paper we sold out of is back": "أعلمني عند توفر الورق الذي نفد",
+  "Shipping address": "عنوان الشحن", "Street address": "الشارع", "Apartment, floor (optional)": "الشقة والطابق (اختياري)",
+  "City": "المدينة", "Country": "الدولة", "Postal code": "الرمز البريدي", "Delivery method": "طريقة التوصيل",
+  "Payment": "الدفع", "Demo only": "عرض توضيحي",
+  "Nothing is transmitted. The card is checked with the Luhn formula in this page.": "لا تُرسل أي بيانات. تُفحص البطاقة بمعادلة لون داخل هذه الصفحة.",
+  "Card number": "رقم البطاقة", "Name on card": "الاسم على البطاقة", "Expiry (MM/YY)": "تاريخ الانتهاء (شهر/سنة)", "Security code": "رمز الأمان",
+  "Billing address is the same as shipping": "عنوان الفوترة هو نفسه عنوان الشحن", "Billing address": "عنوان الفوترة",
+  "Review your order": "مراجعة الطلب", "Back": "رجوع", "Continue to shipping": "متابعة إلى الشحن", "Continue to payment": "متابعة إلى الدفع",
+  "Continue to review": "متابعة إلى المراجعة", "Place order": "تأكيد الطلب",
+  "Shop": "المتجر", "Search": "بحث", "Cart": "الحقيبة", "Browse": "تصفّح", "Cancel": "إلغاء", "Help": "المساعدة",
+  "Shipping & delivery": "الشحن والتوصيل", "Returns": "الإرجاع", "Nib service": "خدمة الريشة", "Privacy": "الخصوصية", "Terms": "الشروط",
+  "Letters from the bindery": "رسائل من المشغل", "One note a month: what we bound, what came back in stock.": "رسالة شهرية واحدة: ماذا جلّدنا وماذا عاد للتوفر.",
+  "Join": "اشترك", "Amman, Jordan": "عمّان، الأردن", "Visa · Mastercard · Cash on delivery": "فيزا · ماستركارد · الدفع عند الاستلام",
+  "A bindery and a small shop on Rainbow Street. We fold, rule and stitch most of what we sell.": "مشغل تجليد ومتجر صغير في شارع الرينبو. نطوي ونسطّر ونخيط معظم ما نبيعه.",
+  "Open Sun–Thu, 10:00–19:00": "مفتوح الأحد – الخميس، 10:00–19:00",
+  "Description": "الوصف", "Specification": "المواصفات", "Reviews": "التقييمات", "Quantity": "الكمية",
+  "In stock": "متوفر", "Out of stock": "غير متوفر", "Low stock": "كمية محدودة", "Sale": "خصم", "New": "جديد",
+  "Save for later": "احفظ للاحقاً", "Saved": "محفوظ", "Remove": "إزالة", "Undo": "تراجع",
+  "No results": "لا توجد نتائج", "Load more": "عرض المزيد", "Pairs well with": "يناسبه",
+  "Your bag is empty": "حقيبتك فارغة", "Order confirmed": "تم تأكيد الطلب",
+  "Something went wrong": "حدث خطأ", "Try again": "حاول مرة أخرى"
+};
+let LANG = 'en';
+const t = k => (LANG === 'ar' && I18N[k]) ? I18N[k] : k;
+
+/* ===== product art: every picture is drawn here, nothing is fetched ===== */
+const TONES = {
+  Slate:   { f: 'fill-mono',        s: 'fill-mono/15',        bg: 'bg-mono',        ar: 'رمادي داكن' },
+  Moss:    { f: 'fill-success',     s: 'fill-success/20',     bg: 'bg-success',     ar: 'أخضر طحلبي' },
+  Clay:    { f: 'fill-warning',     s: 'fill-warning/25',     bg: 'bg-warning',     ar: 'طيني' },
+  Iris:    { f: 'fill-info',        s: 'fill-info/20',        bg: 'bg-info',        ar: 'بنفسجي' },
+  Oxblood: { f: 'fill-destructive', s: 'fill-destructive/20', bg: 'bg-destructive', ar: 'أحمر داكن' },
+  Ink:     { f: 'fill-primary',     s: 'fill-primary/20',     bg: 'bg-primary',     ar: 'حبري' }
+};
+const ART = {
+  notebook: c => `<rect x="54" y="28" width="94" height="144" rx="8" class="${c.f}"/><rect x="54" y="28" width="15" height="144" rx="7" class="fill-mono/25"/><rect x="141" y="34" width="11" height="132" rx="3" class="fill-card"/><rect x="80" y="68" width="48" height="36" rx="3" class="fill-card/90"/><rect x="88" y="80" width="32" height="3" rx="1.5" class="fill-mono/40"/><rect x="88" y="90" width="20" height="3" rx="1.5" class="fill-mono/25"/><rect x="128" y="22" width="5" height="156" rx="2.5" class="fill-mono/55"/>`,
+  notebooks3: c => `<rect x="34" y="54" width="70" height="104" rx="6" class="fill-mono/25"/><rect x="52" y="44" width="70" height="114" rx="6" class="${c.s}"/><rect x="70" y="34" width="72" height="124" rx="6" class="${c.f}"/><rect x="70" y="34" width="11" height="124" rx="5" class="fill-mono/20"/><rect x="92" y="78" width="34" height="26" rx="2" class="fill-card/90"/><rect x="99" y="88" width="20" height="3" rx="1.5" class="fill-mono/35"/>`,
+  journal: c => `<rect x="52" y="30" width="96" height="140" rx="4" class="${c.f}"/><rect x="52" y="30" width="8" height="140" rx="2" class="fill-card"/><g class="fill-card/80"><rect x="53" y="48" width="6" height="10" rx="3"/><rect x="53" y="76" width="6" height="10" rx="3"/><rect x="53" y="104" width="6" height="10" rx="3"/><rect x="53" y="132" width="6" height="10" rx="3"/></g><rect x="78" y="74" width="44" height="2.5" rx="1.25" class="fill-card/70"/><rect x="78" y="86" width="60" height="2.5" rx="1.25" class="fill-card/50"/><rect x="78" y="98" width="34" height="2.5" rx="1.25" class="fill-card/40"/>`,
+  field: c => `<rect x="62" y="44" width="80" height="112" rx="10" class="${c.f}"/><rect x="62" y="88" width="80" height="20" class="fill-card/85"/><rect x="82" y="94" width="40" height="3" rx="1.5" class="fill-mono/40"/><rect x="82" y="118" width="26" height="3" rx="1.5" class="fill-card/60"/><rect x="82" y="128" width="40" height="3" rx="1.5" class="fill-card/40"/><circle cx="102" cy="66" r="9" class="fill-card/70"/>`,
+  pen: c => `<g transform="rotate(-24 100 100)"><rect x="92" y="26" width="18" height="118" rx="5" class="${c.f}"/><rect x="92" y="26" width="6" height="118" class="fill-card/25"/><path d="M92 144h18l-9 26z" class="fill-mono/60"/><rect x="104" y="36" width="5" height="44" rx="2.5" class="fill-card/80"/><rect x="92" y="96" width="18" height="4" class="fill-mono/35"/><rect x="92" y="104" width="18" height="4" class="fill-mono/35"/></g>`,
+  fountain: c => `<g transform="rotate(-24 100 100)"><rect x="90" y="24" width="22" height="66" rx="8" class="${c.f}"/><rect x="108" y="34" width="5" height="40" rx="2.5" class="fill-card/80"/><rect x="92" y="90" width="18" height="40" class="fill-mono/70"/><path d="M92 130h18l-9 40z" class="${c.f}"/><path d="M101 148v22" class="stroke-card" stroke-width="2.5"/><circle cx="101" cy="146" r="3.5" class="fill-card"/><rect x="90" y="86" width="22" height="5" rx="2.5" class="fill-card/60"/></g>`,
+  refills: c => `<g><rect x="58" y="70" width="84" height="60" rx="6" class="fill-mono/12"/><g class="${c.f}"><rect x="70" y="80" width="10" height="40" rx="5"/><rect x="95" y="80" width="10" height="40" rx="5"/><rect x="120" y="80" width="10" height="40" rx="5"/></g><g class="fill-mono/55"><path d="M70 120h10l-5 12z"/><path d="M95 120h10l-5 12z"/><path d="M120 120h10l-5 12z"/></g></g>`,
+  ink: c => `<path d="M78 74h44v6a10 10 0 0 1 4 8v58a14 14 0 0 1-14 14H88a14 14 0 0 1-14-14V88a10 10 0 0 1 4-8z" class="fill-card"/><path d="M76 116h48v30a14 14 0 0 1-14 14H90a14 14 0 0 1-14-14z" class="${c.f}"/><rect x="84" y="46" width="32" height="30" rx="4" class="fill-mono/70"/><rect x="88" y="40" width="24" height="8" rx="3" class="fill-mono/45"/><rect x="86" y="124" width="28" height="18" rx="2" class="fill-card/85"/><rect x="92" y="131" width="16" height="3" rx="1.5" class="fill-mono/40"/>`,
+  inkset: c => `<g><rect x="42" y="96" width="116" height="52" rx="8" class="fill-mono/12"/><g><rect x="52" y="60" width="16" height="72" rx="6" class="fill-card"/><rect x="52" y="94" width="16" height="38" rx="6" class="${c.f}"/><rect x="54" y="52" width="12" height="10" rx="3" class="fill-mono/60"/></g><g><rect x="76" y="60" width="16" height="72" rx="6" class="fill-card"/><rect x="76" y="86" width="16" height="46" rx="6" class="fill-info/70"/><rect x="78" y="52" width="12" height="10" rx="3" class="fill-mono/60"/></g><g><rect x="100" y="60" width="16" height="72" rx="6" class="fill-card"/><rect x="100" y="100" width="16" height="32" rx="6" class="fill-destructive/70"/><rect x="102" y="52" width="12" height="10" rx="3" class="fill-mono/60"/></g><g><rect x="124" y="60" width="16" height="72" rx="6" class="fill-card"/><rect x="124" y="90" width="16" height="42" rx="6" class="fill-success/70"/><rect x="126" y="52" width="12" height="10" rx="3" class="fill-mono/60"/></g></g>`,
+  ruler: c => `<g transform="rotate(-18 100 100)"><rect x="24" y="86" width="152" height="28" rx="4" class="${c.f}"/><g class="fill-card/85"><rect x="36" y="86" width="2.5" height="14"/><rect x="52" y="86" width="2.5" height="9"/><rect x="68" y="86" width="2.5" height="14"/><rect x="84" y="86" width="2.5" height="9"/><rect x="100" y="86" width="2.5" height="14"/><rect x="116" y="86" width="2.5" height="9"/><rect x="132" y="86" width="2.5" height="14"/><rect x="148" y="86" width="2.5" height="9"/><rect x="164" y="86" width="2.5" height="14"/></g><rect x="24" y="108" width="152" height="6" rx="3" class="fill-mono/25"/></g>`,
+  rest: c => `<path d="M58 132h84a10 10 0 0 1 0 20H58a10 10 0 0 1 0-20z" class="${c.f}"/><path d="M68 132c0-26 18-42 32-42s32 16 32 42" class="stroke-mono/25" stroke-width="10" fill="none" stroke-linecap="round"/><g transform="rotate(-12 100 100)"><rect x="56" y="98" width="92" height="12" rx="6" class="fill-mono/75"/><path d="M148 98h6l10 6-10 6h-6z" class="fill-mono/45"/></g>`,
+  mat: c => `<rect x="26" y="58" width="148" height="92" rx="10" class="${c.f}"/><rect x="34" y="66" width="132" height="76" rx="6" class="fill-card/25" stroke-dasharray="4 4"/><g transform="rotate(-14 104 112)"><rect x="66" y="108" width="76" height="9" rx="4.5" class="fill-mono/70"/></g><rect x="104" y="76" width="50" height="30" rx="3" class="fill-card/85"/><rect x="112" y="86" width="30" height="3" rx="1.5" class="fill-mono/35"/><rect x="112" y="94" width="18" height="3" rx="1.5" class="fill-mono/20"/>`,
+  cards: c => `<g transform="rotate(-8 100 100)"><rect x="46" y="66" width="108" height="72" rx="4" class="fill-mono/20"/></g><g transform="rotate(4 100 100)"><rect x="50" y="60" width="108" height="72" rx="4" class="fill-card"/><rect x="50" y="60" width="108" height="72" rx="4" class="${c.s}"/><rect x="72" y="84" width="64" height="4" rx="2" class="${c.f}"/><rect x="72" y="96" width="44" height="3" rx="1.5" class="fill-mono/35"/><rect x="72" y="106" width="52" height="3" rx="1.5" class="fill-mono/20"/></g>`,
+  envelopes: c => `<rect x="38" y="70" width="106" height="72" rx="5" class="fill-mono/15"/><rect x="56" y="62" width="106" height="76" rx="5" class="${c.f}"/><path d="M56 68l53 38 53-38v6l-53 38-53-38z" class="fill-card/85"/><rect x="56" y="62" width="106" height="76" rx="5" class="fill-card/0" stroke-width="1.5"/>`,
+  sheets: c => `<g transform="rotate(-6 100 100)"><rect x="52" y="40" width="96" height="124" rx="3" class="fill-mono/15"/></g><rect x="56" y="36" width="96" height="124" rx="3" class="fill-card"/><rect x="56" y="36" width="96" height="124" rx="3" class="${c.s}"/><g class="${c.f}"><rect x="70" y="60" width="68" height="2.5" rx="1.25"/><rect x="70" y="76" width="68" height="2.5" rx="1.25"/><rect x="70" y="92" width="68" height="2.5" rx="1.25"/><rect x="70" y="108" width="68" height="2.5" rx="1.25"/><rect x="70" y="124" width="46" height="2.5" rx="1.25"/></g><rect x="64" y="36" width="2.5" height="124" class="fill-destructive/40"/>`
+};
+/* four camera angles from one drawing, so a gallery has real frames instead of four copies */
+const FRAME = [
+  inner => inner,
+  inner => `<g transform="rotate(-9 100 100) translate(0 -4)"><g opacity="0.25" transform="translate(-16 10)">${inner}</g>${inner}</g>`,
+  inner => `<g transform="translate(-26 8) scale(0.72)">${inner}</g><g transform="translate(58 26) scale(0.62)" opacity="0.55">${inner}</g>`,
+  inner => `<g transform="scale(1.4) translate(-32 -30)">${inner}</g>`
+];
+function art(p, tone, frame = 0, extra = '') {
+  const c = TONES[tone] || TONES.Slate;
+  const inner = ART[p.art](c);
+  return `<svg viewBox="0 0 200 200" class="w-full h-full ${extra}" role="img" aria-label="${esc(pname(p))}" preserveAspectRatio="xMidYMid slice">
+    <rect width="200" height="200" class="fill-muted"/><circle cx="100" cy="96" r="76" class="${c.s}"/>
+    ${FRAME[frame](inner)}</svg>`;
+}
+
+/* ===== the catalogue ===== */
+const CATS = [
+  { id: 'notebooks', en: 'Notebooks', ar: 'دفاتر' }, { id: 'pens', en: 'Pens', ar: 'أقلام' },
+  { id: 'inks', en: 'Inks', ar: 'أحبار' }, { id: 'desk', en: 'Desk', ar: 'المكتب' }, { id: 'paper', en: 'Paper', ar: 'ورق' }
+];
+const P = (o) => o;
+const PRODUCTS = [
+  P({ id: 'hp-a5', art: 'notebook', cat: 'notebooks', maker: 'Hallow Press', en: 'A5 Bindery Notebook', ar: 'دفتر المشغل A5', price: 26, rating: 4.8, count: 412, sold: 1840, added: 9, stock: 24,
+    blurb: { en: '192 pages of 52 gsm cream paper, sewn in eight signatures so it lies flat from page one.', ar: '192 صفحة من ورق كريمي بوزن 52 غ، مخيط على ثماني ملازم ليبقى مفتوحاً من الصفحة الأولى.' },
+    tones: ['Slate', 'Moss', 'Clay'],
+    opts: [{ k: 'size', en: 'Size', ar: 'الحجم', v: [{ v: 'A5', d: 0 }, { v: 'B6', d: -5 }] }, { k: 'ruling', en: 'Ruling', ar: 'التسطير', v: [{ v: 'Dot grid', d: 0 }, { v: 'Ruled', d: 0 }, { v: 'Blank', d: 0 }] }],
+    oos: ['Clay|B6|Blank', 'Moss|B6|Blank', 'Slate|B6|Blank'],
+    specs: [['Paper', '52 gsm cream, fountain-pen friendly'], ['Pages', '192 (96 leaves)'], ['Binding', 'Sewn, eight signatures'], ['Cover', '2 mm board, book cloth'], ['Made in', 'Amman']] }),
+  P({ id: 'hp-pocket', art: 'notebooks3', cat: 'notebooks', maker: 'Hallow Press', en: 'Pocket Notebook, set of three', ar: 'دفتر جيب، ثلاث قطع', price: 17, was: 22, rating: 4.6, count: 288, sold: 2310, added: 26, stock: 40,
+    blurb: { en: 'Three stapled 48-page books that survive a back pocket for a month. Sold as a mixed set.', ar: 'ثلاثة دفاتر مدبّسة من 48 صفحة تتحمل جيب البنطال لشهر كامل. تُباع كطقم متنوع.' },
+    tones: ['Clay', 'Iris', 'Moss'],
+    opts: [{ k: 'ruling', en: 'Ruling', ar: 'التسطير', v: [{ v: 'Dot grid', d: 0 }, { v: 'Ruled', d: 0 }] }],
+    oos: [],
+    specs: [['Paper', '70 gsm, lightly toothed'], ['Pages', '48 per book'], ['Size', '90 × 140 mm'], ['Binding', 'Saddle stitch']] }),
+  P({ id: 'kz-journal', art: 'journal', cat: 'notebooks', maker: 'Kōzo Mill', en: 'Thread-Bound Journal', ar: 'مفكرة مخيطة بالخيط', price: 42, rating: 4.9, count: 156, sold: 640, added: 41, stock: 9,
+    blurb: { en: 'Exposed four-station stitch in waxed linen thread. Opens completely flat, no glue anywhere.', ar: 'خياطة ظاهرة بأربع محطات بخيط كتّان مشمّع. يفتح بالكامل دون أي غراء.' },
+    tones: ['Slate', 'Oxblood'],
+    opts: [{ k: 'size', en: 'Size', ar: 'الحجم', v: [{ v: 'A5', d: 0 }, { v: 'B6', d: -8 }] }],
+    oos: ['Oxblood|B6'],
+    specs: [['Paper', '90 gsm mould-made'], ['Pages', '144'], ['Thread', 'Waxed linen, 18/3'], ['Binding', 'Four-station coptic']] }),
+  P({ id: 'fr-field', art: 'field', cat: 'notebooks', maker: 'Fold & Rule', en: 'Field Notebook, weatherproof', ar: 'دفتر ميداني مقاوم للماء', price: 21, rating: 4.4, count: 97, sold: 520, added: 14, stock: 33,
+    blurb: { en: 'Stone paper that takes pencil and ballpoint in the rain. Rounded corners, elastic band.', ar: 'ورق حجري يقبل الرصاص وقلم الحبر الجاف تحت المطر. زوايا دائرية وشريط مطاطي.' },
+    tones: ['Moss', 'Slate'],
+    opts: [{ k: 'ruling', en: 'Ruling', ar: 'التسطير', v: [{ v: 'Ruled', d: 0 }, { v: 'Blank', d: 0 }] }],
+    oos: [],
+    specs: [['Paper', 'Stone paper, 120 gsm'], ['Pages', '64'], ['Size', '95 × 150 mm'], ['Extras', 'Elastic closure']] }),
+  P({ id: 'nd-pen', art: 'pen', cat: 'pens', maker: 'Norden', en: 'Machined Pocket Pen', ar: 'قلم جيب مخرّط', price: 74, was: 86, rating: 4.7, count: 203, sold: 810, added: 22, stock: 12,
+    blurb: { en: 'Turned from a single bar, knurled grip, takes a standard D1 refill. It has weight and no clip.', ar: 'مخرّط من قضيب واحد بمقبض محزز، يقبل عبوة D1 القياسية. له ثقل ولا يحمل مشبكاً.' },
+    tones: ['Slate', 'Ink'],
+    opts: [{ k: 'finish', en: 'Finish', ar: 'التشطيب', v: [{ v: 'Bead-blasted', d: 0 }, { v: 'Polished', d: 6 }] }],
+    oos: ['Ink|Polished'],
+    specs: [['Body', 'Solid brass, 42 g'], ['Length', '108 mm capped'], ['Refill', 'D1, 0.5 mm'], ['Grip', 'Diamond knurl']] }),
+  P({ id: 'ss-fountain', art: 'fountain', cat: 'pens', maker: 'Sable & Stem', en: 'Fountain Pen No. 4', ar: 'قلم حبر رقم 4', price: 124, rating: 4.9, count: 341, sold: 470, added: 5, stock: 7,
+    blurb: { en: 'Steel nib tuned by hand before it ships. Converter and one ink cartridge in the box.', ar: 'ريشة فولاذية تُضبط يدوياً قبل الشحن. تتضمن العلبة محوّلاً وخرطوشة حبر.' },
+    tones: ['Oxblood', 'Slate', 'Iris'],
+    opts: [{ k: 'nib', en: 'Nib', ar: 'الريشة', v: [{ v: 'EF', d: 0 }, { v: 'F', d: 0 }, { v: 'M', d: 0 }, { v: 'B', d: 8 }] }],
+    oos: ['Iris|EF', 'Iris|B', 'Oxblood|B'],
+    specs: [['Nib', 'Steel, hand-tuned'], ['Filling', 'Converter or cartridge'], ['Length', '138 mm capped'], ['Weight', '24 g']] }),
+  P({ id: 'nd-refill', art: 'refills', cat: 'pens', maker: 'Norden', en: 'Rollerball Refills, three', ar: 'عبوات حبر، ثلاث قطع', price: 12, rating: 4.3, count: 88, sold: 3120, added: 60, stock: 120,
+    blurb: { en: 'The refill our pocket pen ships with. Dries in under two seconds on our own paper.', ar: 'العبوة التي يأتي بها قلم الجيب. تجف في أقل من ثانيتين على ورقنا.' },
+    tones: ['Slate'],
+    opts: [{ k: 'width', en: 'Width', ar: 'السماكة', v: [{ v: '0.5 mm', d: 0 }, { v: '0.7 mm', d: 0 }] }],
+    oos: [],
+    specs: [['Type', 'D1 rollerball'], ['Ink', 'Pigment, water-resistant'], ['Pack', 'Three refills']] }),
+  P({ id: 'ti-ox', art: 'ink', cat: 'inks', maker: 'Terrace Ink', en: 'Bottled Ink — Oxblood, 50 ml', ar: 'حبر معبأ — أحمر داكن، 50 مل', price: 19, rating: 4.8, count: 264, sold: 1490, added: 30, stock: 26,
+    blurb: { en: 'A dark red that shades to brown on absorbent paper. Mixed and bottled in batches of forty.', ar: 'أحمر داكن يميل إلى البني على الورق الماص. يُمزج ويُعبأ على دفعات من أربعين زجاجة.' },
+    tones: ['Oxblood'],
+    opts: [{ k: 'size', en: 'Bottle', ar: 'الزجاجة', v: [{ v: '50 ml', d: 0 }, { v: '15 ml', d: -9 }] }],
+    oos: [],
+    specs: [['Volume', '50 ml'], ['Type', 'Dye-based, fountain-pen safe'], ['Drying', '~8 s on 52 gsm'], ['Bottle', 'Glass, wide mouth']] }),
+  P({ id: 'ti-har', art: 'ink', cat: 'inks', maker: 'Terrace Ink', en: 'Bottled Ink — Harbour, 50 ml', ar: 'حبر معبأ — أزرق الميناء، 50 مل', price: 19, rating: 4.7, count: 197, sold: 1260, added: 30, stock: 0,
+    blurb: { en: 'A blue-grey with a cold edge. Behaves on cheap office paper, which is the whole point.', ar: 'أزرق رمادي ببرودة واضحة. يتصرف جيداً على ورق المكاتب الرخيص، وهذا هو المقصود.' },
+    tones: ['Iris'],
+    opts: [{ k: 'size', en: 'Bottle', ar: 'الزجاجة', v: [{ v: '50 ml', d: 0 }, { v: '15 ml', d: -9 }] }],
+    oos: [],
+    specs: [['Volume', '50 ml'], ['Type', 'Dye-based'], ['Drying', '~6 s on 52 gsm'], ['Bottle', 'Glass, wide mouth']] }),
+  P({ id: 'ti-set', art: 'inkset', cat: 'inks', maker: 'Terrace Ink', en: 'Ink Sampler, five vials', ar: 'عينات حبر، خمس قوارير', price: 26, rating: 4.6, count: 142, sold: 980, added: 11, stock: 18,
+    blurb: { en: 'Five 5 ml vials of the colours we keep in stock, enough to fill a converter twice each.', ar: 'خمس قوارير سعة 5 مل من الألوان المتوفرة لدينا، تكفي لتعبئة المحوّل مرتين لكل لون.' },
+    tones: ['Ink'],
+    opts: [{ k: 'family', en: 'Family', ar: 'المجموعة', v: [{ v: 'Cool', d: 0 }, { v: 'Warm', d: 0 }, { v: 'Mixed', d: 2 }] }],
+    oos: [],
+    specs: [['Vials', 'Five × 5 ml'], ['Labels', 'Letterpressed'], ['Box', 'Folded board']] }),
+  P({ id: 'fr-ruler', art: 'ruler', cat: 'desk', maker: 'Fold & Rule', en: 'Machined Ruler, 20 cm', ar: 'مسطرة مخرّطة، 20 سم', price: 28, rating: 4.5, count: 76, sold: 430, added: 18, stock: 21,
+    blurb: { en: 'Etched brass with a lifted edge so ink does not creep under it. Millimetres on one side.', ar: 'نحاس محفور بحافة مرفوعة تمنع الحبر من التسرب تحتها. تدريج بالمليمتر على وجه واحد.' },
+    tones: ['Slate', 'Ink'],
+    opts: [{ k: 'edge', en: 'Edge', ar: 'الحافة', v: [{ v: 'Straight', d: 0 }, { v: 'Bevelled', d: 4 }] }],
+    oos: [],
+    specs: [['Material', 'Brass, 2 mm'], ['Length', '200 mm'], ['Scale', 'mm and inches'], ['Edge', 'Lifted 0.8 mm']] }),
+  P({ id: 'fr-rest', art: 'rest', cat: 'desk', maker: 'Fold & Rule', en: 'Ceramic Pen Rest', ar: 'مسند قلم خزفي', price: 22, rating: 4.2, count: 54, sold: 360, added: 47, stock: 30,
+    blurb: { en: 'Thrown and glazed in Madaba. Holds a capped fountain pen without letting it roll away.', ar: 'مشكّل ومزجّج في مادبا. يحمل قلم الحبر مغلقاً ويمنعه من التدحرج.' },
+    tones: ['Clay', 'Moss'],
+    opts: [{ k: 'glaze', en: 'Glaze', ar: 'الزجاج', v: [{ v: 'Matte', d: 0 }, { v: 'Gloss', d: 0 }] }],
+    oos: ['Moss|Gloss'],
+    specs: [['Material', 'Stoneware'], ['Size', '95 × 40 mm'], ['Made in', 'Madaba']] }),
+  P({ id: 'fr-mat', art: 'mat', cat: 'desk', maker: 'Fold & Rule', en: 'Linen Desk Mat', ar: 'سجادة مكتب كتّانية', price: 68, was: 79, rating: 4.6, count: 119, sold: 290, added: 8, stock: 11,
+    blurb: { en: 'Two layers of heavy linen over wool felt, edge-stitched. A blotter that outlives the desk.', ar: 'طبقتان من الكتّان الثقيل فوق لبّاد صوفي، مخيطة الحواف. نشّافة تعمّر أكثر من المكتب.' },
+    tones: ['Moss', 'Slate', 'Clay'],
+    opts: [{ k: 'size', en: 'Size', ar: 'الحجم', v: [{ v: '60 × 40 cm', d: 0 }, { v: '80 × 45 cm', d: 16 }] }],
+    oos: ['Clay|80 × 45 cm'],
+    specs: [['Top', 'Washed linen, 340 gsm'], ['Core', 'Wool felt, 3 mm'], ['Edge', 'Stitched, colour-matched']] }),
+  P({ id: 'fr-cards', art: 'cards', cat: 'paper', maker: 'Fold & Rule', en: 'Letterpress Cards, box of 20', ar: 'بطاقات مطبوعة، علبة 20', price: 32, rating: 4.7, count: 131, sold: 720, added: 16, stock: 19,
+    blurb: { en: 'Printed one colour on a 1962 platen press, deep enough to read with a fingertip.', ar: 'مطبوعة بلون واحد على مكبس من عام 1962، بعمق يمكن تحسسه بطرف الإصبع.' },
+    tones: ['Clay', 'Ink'],
+    opts: [{ k: 'finish', en: 'Printing', ar: 'الطباعة', v: [{ v: 'Blind', d: 0 }, { v: 'One colour', d: 0 }, { v: 'Two colour', d: 9 }] }],
+    oos: ['Ink|Two colour'],
+    specs: [['Stock', '300 gsm cotton'], ['Size', 'A6 folded'], ['Envelopes', '20 included'], ['Press', 'Platen, 1962']] }),
+  P({ id: 'fr-env', art: 'envelopes', cat: 'paper', maker: 'Fold & Rule', en: 'Cotton Envelopes C6, 25', ar: 'مغلفات قطنية C6، 25 قطعة', price: 14, rating: 4.4, count: 63, sold: 1100, added: 35, stock: 64,
+    blurb: { en: 'Gummed, not self-seal, because a licked flap keeps better and does not curl in a drawer.', ar: 'بصمغ يُبلل، لا لاصق ذاتي، لأن الطية الملعوقة تبقى أفضل ولا تتجعد في الدرج.' },
+    tones: ['Slate', 'Clay'],
+    opts: [{ k: 'lining', en: 'Lining', ar: 'البطانة', v: [{ v: 'Plain', d: 0 }, { v: 'Tissue-lined', d: 5 }] }],
+    oos: [],
+    specs: [['Stock', '120 gsm cotton'], ['Size', 'C6, 114 × 162 mm'], ['Pack', '25 envelopes'], ['Seal', 'Gummed flap']] }),
+  P({ id: 'fr-leaf', art: 'sheets', cat: 'paper', maker: 'Fold & Rule', en: 'Loose Leaf Refill A5, 100', ar: 'أوراق سائبة A5، 100 ورقة', price: 18, rating: 4.5, count: 108, sold: 1580, added: 20, stock: 48,
+    blurb: { en: 'The same 52 gsm sheet as our notebooks, punched for a six-ring binder or left whole.', ar: 'نفس ورق دفاترنا بوزن 52 غ، مثقوب لملف ذي ست حلقات أو يُترك كاملاً.' },
+    tones: ['Ink'],
+    opts: [{ k: 'ruling', en: 'Ruling', ar: 'التسطير', v: [{ v: 'Dot grid', d: 0 }, { v: 'Ruled', d: 0 }, { v: 'Blank', d: 0 }] }, { k: 'punch', en: 'Punch', ar: 'التثقيب', v: [{ v: 'Six-ring', d: 0 }, { v: 'Unpunched', d: -2 }] }],
+    oos: ['Ink|Blank|Six-ring'],
+    specs: [['Paper', '52 gsm cream'], ['Sheets', '100'], ['Size', 'A5'], ['Punch', 'Six-ring or none']] })
+];
+PRODUCTS.forEach(p => {
+  p.opts = [{ k: 'colour', en: 'Colour', ar: 'اللون', swatch: true, v: p.tones.map(v => ({ v, d: 0 })) }, ...p.opts];
+  p.minPrice = p.price + p.opts.reduce((a, o) => a + Math.min(...o.v.map(x => x.d)), 0);
+});
+const byId = id => PRODUCTS.find(p => p.id === id);
+const pname = p => LANG === 'ar' ? p.ar : p.en;
+const catName = id => { const c = CATS.find(x => x.id === id); return c ? (LANG === 'ar' ? c.ar : c.en) : t('Shop all'); };
+const optLabel = o => LANG === 'ar' ? o.ar : o.en;
+const valLabel = (o, v) => (o.swatch && LANG === 'ar' && TONES[v]) ? TONES[v].ar : v;
+function defaultSel(p) {
+  const sel = p.opts.map(o => o.v[0].v);
+  p.opts.forEach((o, i) => {
+    if (!p.oos.includes(comboKey(sel))) return;
+    const alt = o.v.find(x => { const tr = sel.slice(); tr[i] = x.v; return !p.oos.includes(comboKey(tr)); });
+    if (alt) sel[i] = alt.v;
+  });
+  return sel;
+}
+const comboKey = sel => sel.join('|');
+function isAvail(p, opt, val, sel) {
+  const i = p.opts.indexOf(opt), trial = sel.slice(); trial[i] = val;
+  return !p.oos.includes(comboKey(trial));
+}
+const priceOf = (p, sel) => p.price + sel.reduce((a, v, i) => a + (p.opts[i].v.find(x => x.v === v)?.d || 0), 0);
+const stockOf = (p, sel) => p.oos.includes(comboKey(sel)) ? 0 : p.stock;
+const variantText = (p, sel) => p.opts.map((o, i) => `${optLabel(o)}: ${valLabel(o, sel[i])}`).join(' · ');
+</script>
+
+<script>
+Object.assign(I18N, {
+  "This field is required": "هذا الحقل مطلوب",
+  "Enter at least two characters": "أدخل حرفين على الأقل",
+  "Enter an email like name@example.com": "أدخل بريداً مثل name@example.com",
+  "Enter a phone number with 7 to 15 digits": "أدخل رقم هاتف من 7 إلى 15 رقماً",
+  "Enter a postal code that matches the selected country": "أدخل رمزاً بريدياً يطابق الدولة المختارة",
+  "Card numbers are 13 to 19 digits": "رقم البطاقة من 13 إلى 19 رقماً",
+  "That card number fails the check digit": "رقم البطاقة لا يجتاز رقم التحقق",
+  "Use the MM/YY form, for example 09/29": "استخدم صيغة شهر/سنة، مثل 09/29",
+  "That expiry date has passed": "تاريخ الانتهاء قد مضى",
+  "The security code is 3 digits (4 on Amex)": "رمز الأمان من 3 أرقام (4 على أمريكان إكسبريس)",
+  "field needs attention": "حقل يحتاج مراجعة", "fields need attention": "حقول تحتاج مراجعة",
+  "Added to your bag": "أُضيف إلى حقيبتك", "Removed from your bag": "أُزيل من حقيبتك",
+  "Promo code applied": "تم تطبيق رمز الخصم", "Saved to your wishlist": "حُفظ في المفضلة", "Removed from your wishlist": "أُزيل من المفضلة",
+  "left": "متبقٍ", "Free": "مجاني", "You are": "تبقّى", "away from free shipping": "للحصول على شحن مجاني",
+  "items": "قطعة", "item": "قطعة", "Order summary": "ملخص الطلب", "Edit": "تعديل",
+  "We could not load the shop": "تعذّر تحميل المتجر", "Nothing was added to your bag.": "لم يُضف شيء إلى حقيبتك.",
+  "Nothing matches those filters": "لا شيء يطابق هذه الخيارات", "Clear the filters and start again.": "امسح الخيارات وابدأ من جديد.",
+  "of": "من", "products": "منتج", "Showing": "يعرض", "Apply": "تطبيق",
+  "Lowest": "الأدنى", "Highest": "الأعلى", "from": "من"
+});
+const SHIP = [
+  { id: 'standard', en: 'Standard', ar: 'عادي', note: { en: '3–5 working days', ar: '3 إلى 5 أيام عمل' }, price: 6.9 },
+  { id: 'express', en: 'Express', ar: 'سريع', note: { en: 'Next working day', ar: 'يوم العمل التالي' }, price: 14.5 },
+  { id: 'pickup', en: 'Collect in store', ar: 'استلام من المتجر', note: { en: 'Rainbow Street, same day', ar: 'شارع الرينبو، اليوم نفسه' }, price: 0 }
+];
+const FREE_OVER = 75, TAX_RATE = 0.0825;
+const PROMOS = {
+  FOLD10: { kind: 'pct', value: 0.10, label: { en: '10% off your order', ar: 'خصم 10% على طلبك' } },
+  INKDROP8: { kind: 'flat', value: 8, min: 40, label: { en: '$8 off orders over $40', ar: 'خصم 8 دولارات فوق 40 دولاراً' } },
+  SPRING24: { expired: '31 May 2026' }
+};
+const PRICE_MAX = 130;
+const STATE = {
+  view: 'catalog', cat: 'all', q: '', colours: new Set(), inStock: false, wishOnly: false,
+  min: 0, max: PRICE_MAX, sort: 'featured', page: 1, per: 9, error: false,
+  cart: [], wish: new Set(), promo: null, promoMsg: null, ship: 'standard',
+  pd: null, step: 1, order: null
+};
+
+/* ===== small shared pieces ===== */
+const icons = () => { try { if (window.lucide) lucide.createIcons(); } catch (e) { } };
+const STAR_PATH = '<path d="m12 2.8 2.85 5.78 6.38.93-4.62 4.5 1.09 6.35L12 17.36l-5.7 3-1.09-6.35L.59 9.51l6.38-.93z"/>';
+const STAR_ON = '<svg viewBox="0 0 24 24" class="size-3.5 shrink-0 fill-warning" aria-hidden="true">' + STAR_PATH + '</svg>';
+const STAR_OFF = '<svg viewBox="0 0 24 24" class="size-3.5 shrink-0 fill-muted-foreground/30" aria-hidden="true">' + STAR_PATH + '</svg>';
+function stars(r) {
+  const pct = Math.max(0, Math.min(100, (r / 5) * 100));
+  return `<span class="relative inline-flex shrink-0" aria-hidden="true"><span class="flex gap-0.5">${STAR_OFF.repeat(5)}</span>
+    <span class="absolute inset-0 overflow-hidden flex gap-0.5" style="width:${pct}%">${STAR_ON.repeat(5)}</span></span>`;
+}
+function toast(msg, action) {
+  const el = document.createElement('div');
+  el.className = 'flex items-start gap-2.5 rounded-lg border border-border bg-popover text-popover-foreground shadow-md p-3.5 text-sm pop-in';
+  el.innerHTML = `<i data-lucide="${action ? 'undo-2' : 'check'}" class="size-4 mt-0.5 ${action ? 'text-secondary-foreground' : 'text-success'} shrink-0"></i>
+    <div class="grow min-w-0"><div class="font-medium text-mono">${esc(msg)}</div></div>
+    ${action ? `<button type="button" class="btn btn-outline btn-sm shrink-0" data-toast-action>${esc(t('Undo'))}</button>` : ''}
+    <button type="button" class="btn btn-ghost btn-icon btn-sm shrink-0" aria-label="${esc(t('Remove'))}"><i data-lucide="x"></i></button>`;
+  $('#toasts').appendChild(el); icons();
+  let timer = setTimeout(() => el.remove(), action ? 6000 : 3600);
+  el.addEventListener('mouseenter', () => clearTimeout(timer));
+  el.addEventListener('mouseleave', () => { timer = setTimeout(() => el.remove(), 2000); });
+  $$('button', el).forEach(b => b.addEventListener('click', () => {
+    if (b.hasAttribute('data-toast-action') && action) action();
+    clearTimeout(timer); el.remove();
+  }));
+  while ($('#toasts').children.length > 3) $('#toasts').firstChild.remove();
+}
+const say = m => { $('#live').textContent = m; };
+
+/* ===== overlays: one at a time, focus trapped, Escape closes, focus restored ===== */
+let openId = null, lastFocus = null;
+const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+function openOverlay(id, focusSel) {
+  if (openId) closeOverlay(true);
+  lastFocus = document.activeElement;
+  const el = $('#' + id); if (!el) return;
+  $('#scrim').hidden = false; el.hidden = false; openId = id;
+  document.body.style.overflow = 'hidden';
+  const first = (focusSel && $(focusSel, el)) || $(FOCUSABLE, el);
+  requestAnimationFrame(() => first && first.focus());
+  if (id === 'cart') $('#cart-btn').setAttribute('aria-expanded', 'true');
+  if (id === 'mmenu') $('#menu-btn').setAttribute('aria-expanded', 'true');
+}
+function closeOverlay(quiet) {
+  if (!openId) return;
+  const el = $('#' + openId); if (el) el.hidden = true;
+  if (openId === 'cart') $('#cart-btn').setAttribute('aria-expanded', 'false');
+  if (openId === 'mmenu') $('#menu-btn').setAttribute('aria-expanded', 'false');
+  openId = null; $('#scrim').hidden = true; document.body.style.overflow = '';
+  if (!quiet && lastFocus && document.contains(lastFocus)) lastFocus.focus();
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if (!$('#suggest').hidden) { closeSuggest(); return; }
+    if (!$('#account-menu').hidden) { closeAccount(); return; }
+    if (openId) { e.preventDefault(); closeOverlay(); }
+    return;
+  }
+  if (e.key !== 'Tab' || !openId) return;
+  const el = $('#' + openId), f = $$(FOCUSABLE, el).filter(x => x.offsetParent !== null || x === document.activeElement);
+  if (!f.length) return;
+  const first = f[0], last = f[f.length - 1];
+  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+});
+$('#scrim').addEventListener('click', () => closeOverlay());
+document.addEventListener('click', e => { const b = e.target.closest('[data-close]'); if (b) { e.preventDefault(); closeOverlay(); } });
+
+/* ===== filter rail ===== */
+function railHTML() {
+  const counts = {}; PRODUCTS.forEach(p => counts[p.cat] = (counts[p.cat] || 0) + 1);
+  const cat = (id, label, n) => `<button type="button" class="rail-link w-full text-start" data-cat="${id}" aria-current="${STATE.cat === id}">
+      <span class="grow">${esc(label)}</span><span class="text-xs text-muted-foreground tabular-nums">${n}</span></button>`;
+  return `<div class="flex flex-col gap-6">
+    <section class="flex flex-col gap-1.5">
+      <h3 class="text-xs font-semibold text-muted-foreground px-2.5 pb-1">${esc(t('Category'))}</h3>
+      ${cat('all', t('Shop all'), PRODUCTS.length)}${CATS.map(c => cat(c.id, LANG === 'ar' ? c.ar : c.en, counts[c.id] || 0)).join('')}
+    </section>
+    <section class="flex flex-col gap-3 px-2.5">
+      <h3 class="text-xs font-semibold text-muted-foreground">${esc(t('Price'))}</h3>
+      <p class="text-2sm text-mono tabular-nums" id="price-label"><bdi>${money(STATE.min)} – ${money(STATE.max)}${STATE.max >= PRICE_MAX ? '+' : ''}</bdi></p>
+      <label class="flex items-center gap-2 text-xs text-muted-foreground"><span class="w-10 shrink-0">${esc(t('Lowest'))}</span>
+        <input type="range" class="grow" min="0" max="${PRICE_MAX}" step="5" value="${STATE.min}" data-price="min" aria-label="${esc(t('Lowest'))}"></label>
+      <label class="flex items-center gap-2 text-xs text-muted-foreground"><span class="w-10 shrink-0">${esc(t('Highest'))}</span>
+        <input type="range" class="grow" min="0" max="${PRICE_MAX}" step="5" value="${STATE.max}" data-price="max" aria-label="${esc(t('Highest'))}"></label>
+    </section>
+    <section class="flex flex-col gap-3 px-2.5">
+      <h3 class="text-xs font-semibold text-muted-foreground">${esc(t('Colour'))}</h3>
+      <div class="flex flex-wrap gap-1.5">${Object.keys(TONES).map(k => `
+        <button type="button" class="swatch size-8 ${TONES[k].bg}" data-colour="${k}" aria-pressed="${STATE.colours.has(k)}" title="${esc(LANG === 'ar' ? TONES[k].ar : k)}" aria-label="${esc(LANG === 'ar' ? TONES[k].ar : k)}">
+          ${STATE.colours.has(k) ? '<i data-lucide="check" class="size-4 text-primary-foreground"></i>' : ''}</button>`).join('')}</div>
+    </section>
+    <section class="flex flex-col gap-3 px-2.5">
+      <h3 class="text-xs font-semibold text-muted-foreground">${esc(t('Availability'))}</h3>
+      <label class="flex items-center gap-2.5 cursor-pointer text-2sm text-secondary-foreground min-h-10">
+        <input type="checkbox" class="checkbox" data-instock ${STATE.inStock ? 'checked' : ''}><span>${esc(t('In stock only'))}</span></label>
+    </section>
+    <div class="px-2.5 hidden lg:block"><button type="button" class="btn btn-outline w-full" data-clear-all>${esc(t('Clear all'))}</button></div>
+  </div>`;
+}
+function renderRail() { const h = railHTML(); $('#rail').innerHTML = h; $('#mrail').innerHTML = h; icons(); }
+
+function activeChips() {
+  const out = [];
+  if (STATE.wishOnly) out.push({ k: 'wish', label: t('Wishlist') });
+  if (STATE.cat !== 'all') out.push({ k: 'cat', label: catName(STATE.cat) });
+  STATE.colours.forEach(c => out.push({ k: 'colour:' + c, label: LANG === 'ar' ? TONES[c].ar : c }));
+  if (STATE.min > 0 || STATE.max < PRICE_MAX) out.push({ k: 'price', label: `${money(STATE.min)} – ${money(STATE.max)}` });
+  if (STATE.inStock) out.push({ k: 'instock', label: t('In stock only') });
+  if (STATE.q.trim()) out.push({ k: 'q', label: `“${STATE.q.trim()}”` });
+  return out;
+}
+function renderChips() {
+  const chips = activeChips();
+  $('#chips').innerHTML = chips.length ? chips.map(c => `<span class="chip">${esc(c.label)}
+      <button type="button" class="chip-x" data-chip="${esc(c.k)}" aria-label="${esc(t('Remove'))} ${esc(c.label)}"><i data-lucide="x"></i></button></span>`).join('')
+    + `<button type="button" class="inline-flex items-center min-h-10 md:min-h-0 px-1 text-xs link ms-1" data-clear-all>${esc(t('Clear all'))}</button>` : '';
+  const n = chips.length;
+  $('#filters-m-count').textContent = n; $('#filters-m-count').hidden = n === 0;
+  icons();
+}
+
+/* ===== grid ===== */
+function filtered() {
+  const q = STATE.q.trim().toLowerCase();
+  let list = PRODUCTS.filter(p => {
+    if (STATE.wishOnly && !STATE.wish.has(p.id)) return false;
+    if (STATE.cat !== 'all' && p.cat !== STATE.cat) return false;
+    if (STATE.colours.size && !p.tones.some(x => STATE.colours.has(x))) return false;
+    if (STATE.inStock && p.stock === 0) return false;
+    if (p.minPrice < STATE.min || p.minPrice > STATE.max) return false;
+    if (q) {
+      const hay = [p.en, p.ar, p.maker, catName(p.cat), p.blurb.en, p.blurb.ar, ...p.tones].join(' ').toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+  const by = { 'price-asc': (a, b) => a.minPrice - b.minPrice, 'price-desc': (a, b) => b.minPrice - a.minPrice, newest: (a, b) => a.added - b.added, best: (a, b) => b.sold - a.sold, rating: (a, b) => b.rating - a.rating, featured: (a, b) => (b.rating * Math.log(b.sold)) - (a.rating * Math.log(a.sold)) };
+  return list.sort(by[STATE.sort] || by.featured);
+}
+const skelCard = () => `<div class="card overflow-hidden"><div class="aspect-[4/3] skeleton rounded-none"></div>
+  <div class="p-4 flex flex-col gap-2.5"><span class="skeleton h-2.5 w-20"></span><span class="skeleton h-3.5 w-40"></span><span class="skeleton h-3 w-24"></span><span class="skeleton h-4 w-16"></span></div>
+  <div class="px-4 pb-4"><span class="skeleton block h-(--ctl-h) w-full"></span></div></div>`;
+function cardHTML(p) {
+  const sel = defaultSel(p), out = p.stock === 0, liked = STATE.wish.has(p.id);
+  const from = p.opts.some(o => o.v.some(x => x.d)), price = p.minPrice;
+  const off = p.was ? Math.round((1 - p.price / p.was) * 100) : 0;
+  return `<article class="card overflow-hidden relative group h-full" data-card="${p.id}">
+    <div class="relative">
+      <button type="button" class="block w-full cursor-pointer" data-open="${p.id}" aria-label="${esc(pname(p))}">
+        <span class="block aspect-[4/3] overflow-hidden" data-art="${p.id}">${art(p, sel[0], 0, 'duration-500 group-hover:scale-105 transition-transform')}</span>
+      </button>
+      <div class="absolute top-2.5 start-2.5 flex flex-col items-start gap-1.5 pointer-events-none">
+        ${out ? `<span class="badge badge-sm badge-outline">${esc(t('Out of stock'))}</span>` : p.stock <= 12 ? `<span class="badge badge-sm badge-light-warning">${esc(t('Low stock'))}</span>` : ''}
+        ${off ? `<span class="badge badge-sm badge-light-destructive">${esc(t('Sale'))} −${off}%</span>` : ''}
+        ${p.added <= 10 ? `<span class="badge badge-sm badge-light-primary">${esc(t('New'))}</span>` : ''}
+      </div>
+      <button type="button" class="absolute top-2 end-2 btn btn-ghost btn-icon bg-card/80 hover:bg-card" data-wish="${p.id}" aria-pressed="${liked}" aria-label="${esc(liked ? t('Saved') : t('Save for later'))}: ${esc(pname(p))}"><i data-lucide="heart" class="${liked ? 'fill-primary text-primary' : ''}"></i></button>
+      <button type="button" class="absolute inset-x-3 bottom-3 btn btn-outline bg-card/95 gap-1.5 lg:opacity-0 lg:group-hover:opacity-100 lg:group-focus-within:opacity-100 transition-opacity" data-quick="${p.id}"><i data-lucide="eye"></i>${esc(t('Quick view'))}</button>
+    </div>
+    <div class="p-4 flex flex-col gap-1.5 grow">
+      <span class="text-xs text-muted-foreground">${esc(p.maker)}</span>
+      <button type="button" class="text-2sm font-medium text-mono text-start hover:text-primary-accent cursor-pointer" data-open="${p.id}">${esc(pname(p))}</button>
+      <span class="flex items-center gap-1.5 text-xs text-muted-foreground">${stars(p.rating)}<span class="tabular-nums">${p.rating.toFixed(1)}</span><span>(${p.count})</span></span>
+      <span class="flex items-baseline gap-2 pt-0.5">${from ? `<span class="text-xs text-muted-foreground">${esc(LANG === 'ar' ? 'من' : 'from')}</span>` : ''}<span class="text-base font-semibold text-mono tabular-nums font-display">${money(price)}</span>
+        ${p.was ? `<span class="text-xs text-muted-foreground line-through tabular-nums">${money(p.was)}</span>` : ''}</span>
+      <span class="flex gap-0 md:gap-1.5 pt-1.5 -ms-2.5 md:ms-0">${p.tones.map(tn => `<button type="button" class="inline-flex size-10 md:size-4 items-center justify-center rounded-full cursor-pointer" data-tone="${p.id}|${tn}" aria-label="${esc(LANG === 'ar' ? TONES[tn].ar : tn)}" title="${esc(LANG === 'ar' ? TONES[tn].ar : tn)}"><span class="size-4 rounded-full border border-border ${TONES[tn].bg}"></span></button>`).join('')}</span>
+    </div>
+    <div class="px-4 pb-4">${out
+      ? `<button type="button" class="btn btn-outline w-full" disabled>${esc(t('Out of stock'))}</button>`
+      : `<button type="button" class="btn btn-primary w-full gap-1.5" data-add="${p.id}"><i data-lucide="plus"></i>${esc(t('Add to bag'))}</button>`}</div>
+  </article>`;
+}
+const panel = (icon, tint, role, title, body, action) => `<div role="${role}" class="col-span-full flex flex-col items-center justify-center text-center gap-3 py-16">
+  <span class="inline-flex size-12 items-center justify-center rounded-full ${tint}"><i data-lucide="${icon}" class="size-5"></i></span>
+  <span class="text-sm font-semibold text-mono">${esc(title)}</span><span class="text-2sm text-secondary-foreground max-w-xs">${esc(body)}</span>${action}</div>`;
+let gridTimer = null;
+function renderGrid() {
+  const g = $('#grid');
+  clearTimeout(gridTimer);
+  g.setAttribute('aria-busy', 'true');
+  g.innerHTML = Array.from({ length: 6 }, skelCard).join('');
+  $('#grid-foot').innerHTML = '';
+  $('#count').textContent = ' ';
+  gridTimer = setTimeout(paintGrid, 380);
+}
+function paintGrid() {
+  const g = $('#grid'), foot = $('#grid-foot');
+  g.setAttribute('aria-busy', 'false');
+  $('#cat-title').textContent = STATE.wishOnly ? t('Wishlist') : catName(STATE.cat);
+  if (STATE.error) {
+    g.innerHTML = panel('circle-alert', 'bg-destructive/10 text-destructive', 'alert', t('We could not load the shop'), t('Nothing was added to your bag.'),
+      `<button type="button" class="btn btn-outline gap-1.5" data-retry><i data-lucide="rotate-ccw"></i>${esc(t('Try again'))}</button>`);
+    $('#count').textContent = ''; foot.innerHTML = ''; icons(); return;
+  }
+  const list = filtered(), shown = list.slice(0, STATE.page * STATE.per);
+  if (!list.length) {
+    g.innerHTML = panel('search-x', 'bg-muted text-muted-foreground', 'status', t('Nothing matches those filters'), t('Clear the filters and start again.'),
+      `<button type="button" class="btn btn-outline" data-clear-all>${esc(t('Clear all'))}</button>`);
+    $('#count').textContent = `0 ${t('products')}`; foot.innerHTML = ''; icons(); return;
+  }
+  g.innerHTML = shown.map(cardHTML).join('');
+  $('#count').textContent = `${shown.length} ${t('of')} ${list.length} ${t('products')}`;
+  $('#mf-apply').textContent = `${t('Show results')} (${list.length})`;
+  foot.innerHTML = shown.length < list.length
+    ? `<button type="button" class="btn btn-outline gap-1.5" data-more><i data-lucide="chevron-down"></i>${esc(t('Load more'))}</button>
+       <span class="text-xs text-muted-foreground tabular-nums">${t('Showing')} ${shown.length} ${t('of')} ${list.length}</span>`
+    : `<span class="text-xs text-muted-foreground">${t('Showing')} ${shown.length} ${t('of')} ${list.length} ${t('products')}</span>`;
+  icons();
+}
+function resetFilters() {
+  STATE.cat = 'all'; STATE.q = ''; STATE.colours.clear(); STATE.inStock = false; STATE.wishOnly = false;
+  STATE.min = 0; STATE.max = PRICE_MAX; STATE.page = 1;
+  $('#search').value = ''; $('#msearch-input').value = '';
+  renderRail(); renderChips(); renderGrid();
+}
+</script>
+
+<script>
+/* ===== reviews (written once, shown on the product view) ===== */
+const REVIEWS = {
+  default: [
+    { n: 'Rania Q.', d: '2026-08-14', r: 5, en: 'Ordered on Sunday, on my desk Tuesday. The stitching is even all the way down the spine.', ar: 'طلبته الأحد ووصلني الثلاثاء. الخياطة منتظمة على طول الكعب.' },
+    { n: 'Bashar T.', d: '2026-07-29', r: 4, en: 'Does what it says. I would have paid a little more for a second colour option.', ar: 'يفي بالغرض. كنت سأدفع أكثر قليلاً مقابل لون ثانٍ.' },
+    { n: 'Mays A.', d: '2026-06-03', r: 5, en: 'Third one I have bought. Nothing has come apart on the first two.', ar: 'الثالث الذي أشتريه. لم يتفكك أي من الاثنين السابقين.' }
+  ]
+};
+const RBREAK = [68, 22, 6, 3, 1];
+
+/* ===== product detail ===== */
+function pdInit(id) {
+  const p = byId(id);
+  STATE.pd = { id, sel: defaultSel(p), qty: 1, frame: 0, tab: 'desc' };
+}
+function optionsHTML(p, sel, idPrefix) {
+  return p.opts.map((o, i) => {
+    const vals = o.v.map(x => {
+      const ok = isAvail(p, o, x.v, sel), on = sel[i] === x.v;
+      const label = esc(valLabel(o, x.v));
+      if (o.swatch) return `<button type="button" class="swatch ${TONES[x.v].bg}" data-opt="${idPrefix}|${i}|${esc(x.v)}" aria-pressed="${on}" ${ok ? '' : 'disabled'} aria-label="${label}" title="${label}">${on ? '<i data-lucide="check" class="size-4 text-primary-foreground"></i>' : ''}</button>`;
+      return `<button type="button" class="opt" data-opt="${idPrefix}|${i}|${esc(x.v)}" aria-pressed="${on}" ${ok ? '' : 'disabled'}>${label}${x.d ? `<span class="ms-1.5 text-xs text-muted-foreground tabular-nums">${x.d > 0 ? '+' : '−'}${money(Math.abs(x.d)).replace('$', '$')}</span>` : ''}</button>`;
+    }).join('');
+    return `<div class="flex flex-col gap-2">
+      <span class="text-xs font-medium text-secondary-foreground">${esc(optLabel(o))}: <span class="text-mono">${esc(valLabel(o, sel[i]))}</span></span>
+      <div class="flex flex-wrap gap-2">${vals}</div></div>`;
+  }).join('');
+}
+function stockLine(p, sel) {
+  const s = stockOf(p, sel);
+  if (s === 0) return `<span class="inline-flex w-fit items-center gap-1.5 rounded-md bg-destructive/10 px-2 py-1 text-2sm text-destructive"><i data-lucide="circle-slash" class="size-4"></i>${esc(t('Out of stock'))}</span>`;
+  if (s <= 12) return `<span class="inline-flex w-fit items-center gap-1.5 rounded-md bg-warning/20 px-2 py-1 text-2sm text-warning-foreground"><i data-lucide="circle-alert" class="size-4"></i>${esc(t('Low stock'))} — ${s} ${esc(t('left'))}</span>`;
+  return `<span class="inline-flex w-fit items-center gap-1.5 rounded-md bg-success/15 px-2 py-1 text-2sm text-success"><i data-lucide="circle-check" class="size-4"></i>${esc(t('In stock'))} — ${s} ${esc(t('left'))}</span>`;
+}
+function qtyHTML(p, sel, qty, target) {
+  const max = Math.max(1, stockOf(p, sel));
+  return `<span class="qty" role="group" aria-label="${esc(t('Quantity'))}">
+    <button type="button" data-qtystep="${target}" data-d="-1" aria-label="−1" ${qty <= 1 ? 'disabled' : ''}><i data-lucide="minus"></i></button>
+    <input value="${qty}" inputmode="numeric" aria-label="${esc(t('Quantity'))}" data-qtyinput="${target}" size="2">
+    <button type="button" data-qtystep="${target}" data-d="1" aria-label="+1" ${qty >= max ? 'disabled' : ''}><i data-lucide="plus"></i></button></span>`;
+}
+function renderPD() {
+  const st = STATE.pd; if (!st) return;
+  const p = byId(st.id), sel = st.sel, price = priceOf(p, sel), out = stockOf(p, sel) === 0, liked = STATE.wish.has(p.id);
+  const revs = REVIEWS[p.id] || REVIEWS.default;
+  const related = PRODUCTS.filter(x => x.id !== p.id && (x.cat === p.cat || x.maker === p.maker)).slice(0, 3);
+  $('#pd-crumb').textContent = pname(p);
+  $('#pd-crumb-cat').textContent = catName(p.cat);
+  $('#pd-crumb-cat').dataset.cat = p.cat; $('#pd-crumb-cat').dataset.go = 'catalog';
+  $('#pd').innerHTML = `
+  <div class="grid gap-7 lg:grid-cols-2 lg:gap-10 items-start">
+    <div class="flex flex-col gap-3">
+      <div class="rounded-xl border border-border overflow-hidden bg-card"><div class="aspect-square" id="pd-hero">${art(p, sel[0], st.frame)}</div></div>
+      <div class="grid grid-cols-4 gap-2.5" role="tablist" aria-label="Gallery">
+        ${[0, 1, 2, 3].map(f => `<button type="button" role="tab" class="thumb rounded-lg border border-border overflow-hidden cursor-pointer aspect-square" data-frame="${f}" aria-selected="${st.frame === f}" aria-label="View ${f + 1}">${art(p, sel[0], f)}</button>`).join('')}
+      </div>
+    </div>
+    <div class="flex flex-col gap-5">
+      <div class="flex flex-col gap-2">
+        <span class="text-xs text-muted-foreground">${esc(p.maker)} · ${esc(catName(p.cat))}</span>
+        <h2 role="heading" aria-level="1" class="font-display text-2xl font-semibold tracking-tight text-mono">${esc(pname(p))}</h2>
+        <button type="button" class="flex items-center gap-2 text-2sm text-secondary-foreground w-fit cursor-pointer hover:text-foreground" data-tab="rev">
+          ${stars(p.rating)}<span class="tabular-nums font-medium text-mono">${p.rating.toFixed(1)}</span><span class="underline underline-offset-4">${p.count} ${esc(t('Reviews'))}</span></button>
+      </div>
+      <div class="flex items-baseline gap-3">
+        <span class="text-3xl font-semibold text-mono tabular-nums font-display">${money(price)}</span>
+        ${p.was ? `<span class="text-sm text-muted-foreground line-through tabular-nums">${money(p.was)}</span><span class="badge badge-sm badge-light-destructive">${esc(t('Sale'))}</span>` : ''}
+      </div>
+      <p class="text-2sm text-secondary-foreground leading-relaxed">${esc(LANG === 'ar' ? p.blurb.ar : p.blurb.en)}</p>
+      <div class="flex flex-col gap-4">${optionsHTML(p, sel, 'pd')}</div>
+      ${stockLine(p, sel)}
+      <div class="flex flex-wrap items-center gap-2.5">
+        ${qtyHTML(p, sel, st.qty, 'pd')}
+        <button type="button" class="btn btn-primary grow gap-1.5 min-w-40" data-add-pd ${out ? 'disabled' : ''}><i data-lucide="shopping-bag"></i>${esc(out ? t('Out of stock') : t('Add to bag'))}</button>
+        <button type="button" class="btn btn-outline btn-icon" data-wish="${p.id}" aria-pressed="${liked}" aria-label="${esc(liked ? t('Saved') : t('Save for later'))}"><i data-lucide="heart" class="${liked ? 'fill-primary text-primary' : ''}"></i></button>
+      </div>
+      <ul class="flex flex-col gap-2.5 rounded-lg border border-border bg-muted/40 p-4 text-2sm text-secondary-foreground">
+        <li class="flex items-center gap-2.5"><i data-lucide="truck" class="size-4 text-primary-accent shrink-0"></i>${esc(t('Free over $75'))} · ${esc(LANG === 'ar' ? 'يصل خلال 3 إلى 5 أيام عمل' : 'arrives in 3–5 working days')}</li>
+        <li class="flex items-center gap-2.5"><i data-lucide="undo-2" class="size-4 text-primary-accent shrink-0"></i>${esc(t('30-day returns, unused'))}</li>
+        <li class="flex items-center gap-2.5"><i data-lucide="store" class="size-4 text-primary-accent shrink-0"></i>${esc(LANG === 'ar' ? 'متوفر للاستلام من شارع الرينبو' : 'Ready to collect on Rainbow Street')}</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="pt-9">
+    <div class="flex gap-6 border-b border-border overflow-x-auto scroll-thin" role="tablist" aria-label="${esc(t('Description'))}">
+      <button type="button" class="tab" role="tab" data-tab="desc" aria-selected="${st.tab === 'desc'}">${esc(t('Description'))}</button>
+      <button type="button" class="tab" role="tab" data-tab="spec" aria-selected="${st.tab === 'spec'}">${esc(t('Specification'))}</button>
+      <button type="button" class="tab" role="tab" data-tab="rev" aria-selected="${st.tab === 'rev'}">${esc(t('Reviews'))} (${p.count})</button>
+    </div>
+    <div class="pt-5 text-2sm text-secondary-foreground leading-relaxed max-w-3xl">
+      ${st.tab === 'desc' ? `<div class="flex flex-col gap-3"><p>${esc(LANG === 'ar' ? p.blurb.ar : p.blurb.en)}</p>
+        <p>${esc(LANG === 'ar' ? 'نصنع دفعة كل أسبوعين ونوقف البيع عند نفاد الكمية بدل تخفيض المواصفات. إن وصلك الصنف بعيب في التجليد نستبدله دون أسئلة.' : 'We run a batch every fortnight and stop selling when it runs out rather than thinning the specification. If the binding fails, we replace it without questions.')}</p></div>`
+      : st.tab === 'spec' ? `<dl class="divide-y divide-border rounded-lg border border-border overflow-hidden">${p.specs.map(([k, v]) => `<div class="flex flex-wrap gap-2 px-4 py-3"><dt class="w-40 shrink-0 text-xs text-muted-foreground">${esc(k)}</dt><dd class="text-2sm text-mono">${esc(v)}</dd></div>`).join('')}</dl>`
+      : `<div class="grid gap-7 md:grid-cols-[14rem_minmax(0,1fr)]">
+          <div class="flex flex-col gap-3">
+            <div class="flex items-end gap-2"><span class="text-4xl font-semibold text-mono tabular-nums font-display">${p.rating.toFixed(1)}</span><span class="text-xs text-muted-foreground pb-1.5">/ 5</span></div>
+            ${stars(p.rating)}<span class="text-xs text-muted-foreground">${p.count} ${esc(t('Reviews'))}</span>
+            <div class="flex flex-col gap-1.5 pt-2">${RBREAK.map((v, i) => `<div class="flex items-center gap-2"><span class="w-3 text-xs text-muted-foreground tabular-nums">${5 - i}</span>
+              <span class="h-1.5 grow rounded-full bg-muted overflow-hidden"><span class="block h-full rounded-full bg-warning" style="width:${v}%"></span></span>
+              <span class="w-8 text-end text-xs text-muted-foreground tabular-nums">${v}%</span></div>`).join('')}</div>
+          </div>
+          <ul class="flex flex-col divide-y divide-border">${revs.map(r => `<li class="flex flex-col gap-1.5 py-4 first:pt-0">
+            <div class="flex items-center gap-2.5"><span class="inline-flex size-8 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold text-2xs">${esc(r.n.slice(0, 1))}${esc(r.n.split(' ')[1] ? r.n.split(' ')[1].slice(0, 1) : '')}</span>
+              <span class="text-2sm font-medium text-mono">${esc(r.n)}</span><span class="text-xs text-muted-foreground">${esc(r.d)}</span><span class="ms-auto">${stars(r.r)}</span></div>
+            <p>${esc(LANG === 'ar' ? r.ar : r.en)}</p></li>`).join('')}</ul>
+        </div>`}
+    </div>
+  </div>
+
+  <div class="pt-10">
+    <h3 class="text-base font-semibold text-mono font-display pb-4">${esc(t('Pairs well with'))}</h3>
+    <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">${related.map(cardHTML).join('')}</div>
+  </div>
+
+  <div class="lg:hidden fixed bottom-14 inset-x-0 z-20 border-t border-border bg-background/95 backdrop-blur-sm px-4 py-2.5 flex items-center gap-3">
+    <span class="flex flex-col"><span class="text-xs text-muted-foreground">${esc(pname(p))}</span><span class="text-sm font-semibold text-mono tabular-nums">${money(price)}</span></span>
+    <button type="button" class="btn btn-primary grow gap-1.5" data-add-pd ${out ? 'disabled' : ''}><i data-lucide="shopping-bag"></i>${esc(out ? t('Out of stock') : t('Add to bag'))}</button>
+  </div>`;
+  icons();
+}
+
+/* ===== quick view ===== */
+let QV = null;
+function renderQuick(id) {
+  if (!QV || QV.id !== id) QV = { id, sel: defaultSel(byId(id)), qty: 1 };
+  const p = byId(QV.id), sel = QV.sel, price = priceOf(p, sel), out = stockOf(p, sel) === 0;
+  $('#quick-title').textContent = pname(p);
+  $('#quick-body').innerHTML = `<div class="grid gap-6 sm:grid-cols-2 items-start">
+    <div class="rounded-lg border border-border overflow-hidden bg-card"><div class="aspect-square">${art(p, sel[0], 0)}</div></div>
+    <div class="flex flex-col gap-4">
+      <div class="flex flex-col gap-1.5">
+        <span class="text-xs text-muted-foreground">${esc(p.maker)}</span>
+        <span class="font-display text-lg font-semibold text-mono">${esc(pname(p))}</span>
+        <span class="flex items-center gap-1.5 text-xs text-muted-foreground">${stars(p.rating)}<span class="tabular-nums">${p.rating.toFixed(1)}</span><span>(${p.count})</span></span>
+      </div>
+      <span class="text-2xl font-semibold text-mono tabular-nums font-display">${money(price)}</span>
+      <p class="text-2sm text-secondary-foreground">${esc(LANG === 'ar' ? p.blurb.ar : p.blurb.en)}</p>
+      <div class="flex flex-col gap-4">${optionsHTML(p, sel, 'qv')}</div>
+      ${stockLine(p, sel)}
+      <div class="flex flex-wrap items-center gap-2.5">
+        ${qtyHTML(p, sel, QV.qty, 'qv')}
+        <button type="button" class="btn btn-primary grow gap-1.5" data-add-qv ${out ? 'disabled' : ''}><i data-lucide="shopping-bag"></i>${esc(out ? t('Out of stock') : t('Add to bag'))}</button>
+      </div>
+      <button type="button" class="btn btn-ghost btn-sm w-fit gap-1.5" data-open="${p.id}"><i data-lucide="arrow-right" class="rtl:rotate-180"></i>${esc(LANG === 'ar' ? 'كل التفاصيل' : 'See full details')}</button>
+    </div></div>`;
+  icons();
+}
+
+/* ===== cart ===== */
+const lineKey = (id, sel) => id + '::' + comboKey(sel);
+function totals() {
+  const sub = STATE.cart.reduce((a, l) => a + l.price * l.qty, 0);
+  let disc = 0;
+  if (STATE.promo) disc = STATE.promo.kind === 'pct' ? sub * STATE.promo.value : Math.min(STATE.promo.value, sub);
+  const after = Math.max(0, sub - disc);
+  const m = SHIP.find(s => s.id === STATE.ship) || SHIP[0];
+  let ship = STATE.cart.length ? m.price : 0;
+  if (m.id === 'standard' && after >= FREE_OVER) ship = 0;
+  const tax = after * TAX_RATE;
+  return { sub, disc, after, ship, tax, total: after + ship + tax, toFree: Math.max(0, FREE_OVER - after), count: STATE.cart.reduce((a, l) => a + l.qty, 0) };
+}
+function addToCart(id, sel, qty) {
+  const p = byId(id), max = stockOf(p, sel);
+  if (max <= 0) return;
+  const key = lineKey(id, sel), line = STATE.cart.find(l => l.key === key);
+  const next = Math.min(max, (line ? line.qty : 0) + qty);
+  if (line) line.qty = next; else STATE.cart.push({ key, id, sel: sel.slice(), price: priceOf(p, sel), qty: next });
+  syncCart();
+  toast(`${pname(p)} — ${t('Added to your bag')}`);
+  say(`${pname(p)}, ${t('Added to your bag')}. ${totals().count} ${totals().count === 1 ? t('item') : t('items')}.`);
+  openOverlay('cart');
+}
+function removeLine(key) {
+  const i = STATE.cart.findIndex(l => l.key === key); if (i < 0) return;
+  const line = STATE.cart[i];
+  STATE.cart.splice(i, 1);
+  syncCart();
+  say(`${pname(byId(line.id))} ${t('Removed from your bag')}.`);
+  toast(`${pname(byId(line.id))} — ${t('Removed from your bag')}`, () => { STATE.cart.splice(i, 0, line); syncCart(); say(`${pname(byId(line.id))} restored.`); });
+}
+function setQty(key, n) {
+  const l = STATE.cart.find(x => x.key === key); if (!l) return;
+  const max = stockOf(byId(l.id), l.sel);
+  if (n <= 0) { removeLine(key); return; }
+  l.qty = Math.min(max, n); syncCart();
+}
+function cartBody() {
+  if (!STATE.cart.length) return `<div class="flex flex-col items-center justify-center text-center gap-3 py-20 px-6" role="status">
+    <span class="inline-flex size-12 items-center justify-center rounded-full bg-muted text-muted-foreground"><i data-lucide="shopping-bag" class="size-5"></i></span>
+    <span class="text-sm font-semibold text-mono">${esc(t('Your bag is empty'))}</span>
+    <span class="text-2sm text-secondary-foreground max-w-xs">${esc(LANG === 'ar' ? 'ابدأ بدفتر A5 أو بزجاجة حبر — كل شيء متوفر اليوم.' : 'Start with an A5 notebook or a bottle of ink. Everything here is in stock today.')}</span>
+    <button type="button" class="btn btn-outline" data-go="catalog" data-cat="notebooks">${esc(t('Notebooks'))}</button></div>`;
+  return STATE.cart.map(l => {
+    const p = byId(l.id), max = stockOf(p, l.sel);
+    return `<div class="flex gap-3 p-4 border-b border-border">
+      <span class="size-20 shrink-0 rounded-lg overflow-hidden border border-border">${art(p, l.sel[0], 0)}</span>
+      <div class="grow min-w-0 flex flex-col gap-1">
+        <div class="flex items-start justify-between gap-2">
+          <button type="button" class="text-2sm font-medium text-mono text-start hover:text-primary-accent cursor-pointer" data-open="${p.id}">${esc(pname(p))}</button>
+          <span class="text-2sm font-semibold text-mono tabular-nums shrink-0">${money(l.price * l.qty)}</span>
+        </div>
+        <span class="text-xs text-muted-foreground line-clamp-2">${esc(variantText(p, l.sel))}</span>
+        <div class="flex items-center justify-between gap-2 pt-1.5">
+          <span class="qty" role="group" aria-label="${esc(t('Quantity'))}">
+            <button type="button" data-cartstep="${l.key}" data-d="-1" aria-label="−1"><i data-lucide="${l.qty === 1 ? 'trash-2' : 'minus'}"></i></button>
+            <input value="${l.qty}" inputmode="numeric" aria-label="${esc(t('Quantity'))}: ${esc(pname(p))}" data-cartinput="${l.key}" size="2">
+            <button type="button" data-cartstep="${l.key}" data-d="1" aria-label="+1" ${l.qty >= max ? 'disabled' : ''}><i data-lucide="plus"></i></button></span>
+          <button type="button" class="btn btn-ghost btn-sm text-destructive hover:bg-destructive/10 gap-1" data-del="${l.key}"><i data-lucide="x" class="text-destructive!"></i>${esc(t('Remove'))}</button>
+        </div>
+      </div></div>`;
+  }).join('');
+}
+function promoRow() {
+  const m = STATE.promoMsg;
+  const tone = { good: 'text-success', bad: 'text-destructive', warn: 'text-warning-foreground' }[m && m.kind] || 'text-muted-foreground';
+  return `<div class="flex flex-col gap-1.5">
+    <label class="text-xs font-medium text-secondary-foreground" for="promo">${esc(t('Promo code'))}</label>
+    <div class="flex gap-2">
+      <input id="promo" class="input grow" placeholder="FOLD10" autocomplete="off" aria-describedby="promo-msg" value="${esc(STATE.promo ? STATE.promo.code : '')}">
+      <button type="button" class="btn btn-outline shrink-0" data-promo>${esc(t('Apply'))}</button>
+    </div>
+    <p id="promo-msg" class="text-xs ${tone}" aria-live="polite">${m ? esc(m.text) : ''}</p></div>`;
+}
+function cartFoot() {
+  if (!STATE.cart.length) return '';
+  const T = totals();
+  const pct = Math.min(100, (T.after / FREE_OVER) * 100);
+  return `<div class="p-4 flex flex-col gap-4">
+    <div class="flex flex-col gap-1.5">
+      <span class="h-1.5 rounded-full bg-muted overflow-hidden"><span class="block h-full rounded-full bg-primary" style="width:${pct}%"></span></span>
+      <span class="text-xs text-secondary-foreground">${T.toFree > 0 ? `${esc(t('You are'))} <span class="text-mono font-medium tabular-nums">${money(T.toFree)}</span> ${esc(t('away from free shipping'))}` : `<span class="badge badge-sm badge-light-success">${esc(LANG === 'ar' ? 'حصلت على الشحن المجاني' : 'Free shipping unlocked')}</span>`}</span>
+    </div>
+    ${promoRow()}
+    <dl class="flex flex-col gap-1.5 text-2sm border-t border-border pt-3">
+      <div class="flex justify-between"><dt class="text-secondary-foreground">${esc(t('Subtotal'))}</dt><dd class="text-mono tabular-nums">${money(T.sub)}</dd></div>
+      ${T.disc ? `<div class="flex justify-between rounded-md bg-success/10 -mx-1.5 px-1.5 py-0.5 text-success"><dt>${esc(t('Discount'))} · ${esc(STATE.promo.code)}</dt><dd class="tabular-nums">−${money(T.disc)}</dd></div>` : ''}
+      <div class="flex justify-between"><dt class="text-secondary-foreground">${esc(t('Shipping'))}</dt><dd class="text-mono tabular-nums">${T.ship ? money(T.ship) : esc(t('Free'))}</dd></div>
+      <div class="flex justify-between"><dt class="text-secondary-foreground">${esc(t('Tax'))} (8.25%)</dt><dd class="text-mono tabular-nums">${money(T.tax)}</dd></div>
+      <div class="flex justify-between border-t border-border pt-2 mt-1"><dt class="font-semibold text-mono">${esc(t('Total'))}</dt><dd class="font-semibold text-mono tabular-nums text-base">${money(T.total)}</dd></div>
+    </dl>
+    <button type="button" class="btn btn-primary w-full gap-1.5" data-checkout><i data-lucide="lock"></i>${esc(t('Checkout'))}</button>
+    <button type="button" class="btn btn-ghost btn-sm w-full" data-close="cart">${esc(t('Keep shopping'))}</button>
+  </div>`;
+}
+function syncCart() {
+  const T = totals();
+  $$('.cart-count').forEach(e => e.textContent = T.count);
+  const bub = $('.cart-count-bubble'); if (bub) { bub.textContent = T.count; bub.hidden = T.count === 0; }
+  $$('.wish-count').forEach(e => e.textContent = STATE.wish.size);
+  $$('.wish-dot').forEach(e => e.hidden = STATE.wish.size === 0);
+  $('#cart-body').innerHTML = cartBody();
+  $('#cart-foot').innerHTML = cartFoot();
+  if (STATE.view === 'checkout') renderSummary();
+  icons();
+  try { localStorage.setItem('fr.cart', JSON.stringify(STATE.cart)); localStorage.setItem('fr.wish', JSON.stringify([...STATE.wish])); } catch (e) { }
+}
+function applyPromo(raw) {
+  const code = (raw || '').trim().toUpperCase();
+  const T = totals();
+  if (!code) { STATE.promo = null; STATE.promoMsg = { kind: 'muted', text: LANG === 'ar' ? 'أدخل رمزاً' : 'Enter a code first' }; syncCart(); return; }
+  const def = PROMOS[code];
+  if (!def) { STATE.promo = null; STATE.promoMsg = { kind: 'bad', text: LANG === 'ar' ? `الرمز ${code} غير معروف` : `We do not recognise ${code}` }; }
+  else if (def.expired) { STATE.promo = null; STATE.promoMsg = { kind: 'bad', text: LANG === 'ar' ? `انتهى الرمز ${code} في ${def.expired}` : `${code} expired on ${def.expired}` }; }
+  else if (def.min && T.sub < def.min) { STATE.promo = null; STATE.promoMsg = { kind: 'warn', text: LANG === 'ar' ? `${code} يحتاج مجموعاً فرعياً من ${money(def.min)}` : `${code} needs a subtotal of ${money(def.min)} — you are at ${money(T.sub)}` }; }
+  else {
+    STATE.promo = { code, kind: def.kind, value: def.value };
+    STATE.promoMsg = { kind: 'good', text: LANG === 'ar' ? def.label.ar : def.label.en };
+    toast(t('Promo code applied'));
+  }
+  syncCart();
+}
+function toggleWish(id) {
+  const on = STATE.wish.has(id);
+  if (on) STATE.wish.delete(id); else STATE.wish.add(id);
+  toast(`${pname(byId(id))} — ${t(on ? 'Removed from your wishlist' : 'Saved to your wishlist')}`);
+  syncCart();
+  if (STATE.view === 'product') renderPD();
+  if (STATE.view === 'catalog') paintGrid();
+  if (STATE.wishOnly) { renderChips(); renderGrid(); }
+}
+</script>
+
+<script>
+/* ===== checkout ===== */
+const STEPS = [{ en: 'Contact', ar: 'التواصل' }, { en: 'Shipping', ar: 'الشحن' }, { en: 'Payment', ar: 'الدفع' }, { en: 'Review', ar: 'المراجعة' }];
+const NEXT_LABEL = ['Continue to shipping', 'Continue to payment', 'Continue to review', 'Place order'];
+function luhn(d) { let s = 0, alt = false; for (let i = d.length - 1; i >= 0; i--) { let n = +d[i]; if (alt) { n *= 2; if (n > 9) n -= 9; } s += n; alt = !alt; } return s % 10 === 0; }
+const ZIP = { US: /^\d{5}(-\d{4})?$/, CA: /^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$/, GB: /^[A-Za-z]{1,2}\d[A-Za-z\d]?\s?\d[A-Za-z]{2}$/, JO: /^\d{5}$/ };
+const brandOf = d => /^4/.test(d) ? 'Visa' : /^(5[1-5]|2[2-7])/.test(d) ? 'Mastercard' : /^3[47]/.test(d) ? 'Amex' : '';
+const RULES = {
+  req: v => v.trim() ? '' : 'This field is required',
+  name: v => v.trim().length >= 2 ? '' : 'Enter at least two characters',
+  email: v => /^[^\s@]+@[^\s@]+\.[A-Za-z]{2,}$/.test(v.trim()) ? '' : 'Enter an email like name@example.com',
+  phone: v => { const d = v.replace(/\D/g, ''); return d.length >= 7 && d.length <= 15 ? '' : 'Enter a phone number with 7 to 15 digits'; },
+  zip: v => { const c = $('#f-country').value, re = ZIP[c] || ZIP.JO; return re.test(v.trim()) ? '' : 'Enter a postal code that matches the selected country'; },
+  card: v => { const d = v.replace(/\D/g, ''); if (!/^\d{13,19}$/.test(d)) return 'Card numbers are 13 to 19 digits'; return luhn(d) ? '' : 'That card number fails the check digit'; },
+  exp: v => {
+    const m = v.trim().match(/^(\d{2})\s*\/\s*(\d{2})$/); if (!m) return 'Use the MM/YY form, for example 09/29';
+    const mm = +m[1], yy = 2000 + +m[2]; if (mm < 1 || mm > 12) return 'Use the MM/YY form, for example 09/29';
+    const now = new Date(); const end = new Date(yy, mm, 1);
+    return end > now ? '' : 'That expiry date has passed';
+  },
+  cvc: v => { const need = brandOf(($('#f-card').value || '').replace(/\D/g, '')) === 'Amex' ? 4 : 3; return new RegExp('^\\d{' + need + '}$').test(v.trim()) ? '' : 'The security code is 3 digits (4 on Amex)'; }
+};
+function validateField(inp) {
+  const rule = inp.dataset.rule; if (!rule) return '';
+  const msg = RULES[rule](inp.value, inp), err = $('#e-' + inp.id);
+  if (msg) {
+    inp.setAttribute('aria-invalid', 'true'); inp.setAttribute('aria-describedby', 'e-' + inp.id);
+    err.innerHTML = `<i data-lucide="circle-alert" class="size-3.5 shrink-0"></i><span>${esc(t(msg))}</span>`; err.hidden = false; icons();
+  } else {
+    inp.removeAttribute('aria-invalid'); inp.removeAttribute('aria-describedby');
+    err.hidden = true; err.textContent = '';
+  }
+  return msg;
+}
+const stepFields = n => $$(`.co-step[data-step="${n}"] [data-rule]`).filter(f => !(f.closest('#billing') && $('#billing').hidden));
+function renderStepper() {
+  $('#stepper').innerHTML = STEPS.map((s, i) => {
+    const n = i + 1, done = n < STATE.step, on = n === STATE.step;
+    return `<li class="flex items-center gap-1 sm:gap-2 shrink-0">
+      <button type="button" class="flex items-center gap-2 rounded-md px-1.5 py-1 ${done ? 'cursor-pointer hover:bg-accent' : 'cursor-default'}" ${done ? `data-step-to="${n}"` : 'disabled'} aria-current="${on ? 'step' : 'false'}" aria-label="${esc(LANG === 'ar' ? s.ar : s.en)}">
+        <span class="inline-flex size-6 items-center justify-center rounded-full text-2xs font-semibold ${on ? 'bg-primary text-primary-foreground' : done ? 'bg-success/15 text-success' : 'bg-muted text-muted-foreground'}">${done ? '<i data-lucide="check" class="size-3.5"></i>' : n}</span>
+        <span class="text-2sm ${on ? 'text-mono font-medium' : 'text-secondary-foreground'} hidden sm:inline">${esc(LANG === 'ar' ? s.ar : s.en)}</span></button>
+      ${n < STEPS.length ? '<span class="h-px w-4 sm:w-8 bg-border"></span>' : ''}</li>`;
+  }).join('');
+  icons();
+}
+function renderShip() {
+  $('#ship-methods').innerHTML = SHIP.map(s => `<label class="flex items-center gap-3 rounded-lg border ${STATE.ship === s.id ? 'border-primary bg-primary/5' : 'border-input'} p-3 cursor-pointer min-h-12">
+    <input type="radio" name="ship" value="${s.id}" class="checkbox rounded-full" ${STATE.ship === s.id ? 'checked' : ''}>
+    <span class="grow flex flex-col"><span class="text-2sm font-medium text-mono">${esc(LANG === 'ar' ? s.ar : s.en)}</span><span class="text-xs text-muted-foreground">${esc(LANG === 'ar' ? s.note.ar : s.note.en)}</span></span>
+    <span class="text-2sm text-mono tabular-nums">${s.price ? money(s.price) : esc(t('Free'))}</span></label>`).join('');
+}
+function renderSummary() {
+  const T = totals();
+  $('#co-summary').innerHTML = `<div class="card-header"><h3 class="card-title">${esc(t('Order summary'))}</h3>
+      <button type="button" class="btn btn-ghost btn-sm gap-1" data-open-cart><i data-lucide="pencil"></i>${esc(t('Edit'))}</button></div>
+    <div class="card-content flex flex-col gap-3 max-h-64 overflow-y-auto scroll-thin">
+      ${STATE.cart.map(l => { const p = byId(l.id); return `<div class="flex gap-2.5 items-start">
+        <span class="size-11 shrink-0 rounded-md overflow-hidden border border-border">${art(p, l.sel[0], 0)}</span>
+        <span class="grow min-w-0 flex flex-col"><span class="text-2sm text-mono truncate">${esc(pname(p))}</span><span class="text-xs text-muted-foreground truncate">${esc(variantText(p, l.sel))}</span></span>
+        <span class="text-2sm text-mono tabular-nums shrink-0">${l.qty} × ${money(l.price)}</span></div>`; }).join('') || `<p class="text-2sm text-muted-foreground">${esc(t('Your bag is empty'))}</p>`}
+    </div>
+    <div class="card-footer flex-col items-stretch gap-1.5 text-2sm">
+      <div class="flex justify-between"><span class="text-secondary-foreground">${esc(t('Subtotal'))}</span><span class="text-mono tabular-nums">${money(T.sub)}</span></div>
+      ${T.disc ? `<div class="flex justify-between rounded-md bg-success/10 -mx-1.5 px-1.5 py-0.5 text-success"><span>${esc(t('Discount'))} · ${esc(STATE.promo.code)}</span><span class="tabular-nums">−${money(T.disc)}</span></div>` : ''}
+      <div class="flex justify-between"><span class="text-secondary-foreground">${esc(t('Shipping'))}</span><span class="text-mono tabular-nums">${T.ship ? money(T.ship) : esc(t('Free'))}</span></div>
+      <div class="flex justify-between"><span class="text-secondary-foreground">${esc(t('Tax'))} (8.25%)</span><span class="text-mono tabular-nums">${money(T.tax)}</span></div>
+      <div class="flex justify-between border-t border-border pt-2 mt-1"><span class="font-semibold text-mono">${esc(t('Total'))}</span><span class="font-semibold text-mono tabular-nums text-base">${money(T.total)}</span></div>
+    </div>`;
+  icons();
+}
+const val = id => ($('#' + id).value || '').trim();
+function renderReview() {
+  const T = totals(), c = $('#f-country'), country = c.options[c.selectedIndex].textContent;
+  const m = SHIP.find(s => s.id === STATE.ship);
+  const row = (k, v) => `<div class="flex flex-wrap justify-between gap-2 py-2.5 border-b border-border last:border-0"><span class="text-xs text-muted-foreground">${esc(k)}</span><span class="text-2sm text-mono text-end">${esc(v)}</span></div>`;
+  const card = val('f-card').replace(/\D/g, '');
+  $('#review').innerHTML = `
+    <div class="rounded-lg border border-border overflow-hidden">
+      <div class="flex items-center justify-between gap-2 px-4 py-2.5 bg-muted/50 border-b border-border"><span class="text-xs font-semibold text-muted-foreground">${esc(t('Contact'))}</span>
+        <button type="button" class="text-xs link" data-step-to="1">${esc(t('Edit'))}</button></div>
+      <div class="px-4">${row(t('First name') + ' / ' + t('Last name'), val('f-first') + ' ' + val('f-last'))}${row(t('Email'), val('f-email'))}${row(t('Phone'), val('f-phone'))}</div>
+    </div>
+    <div class="rounded-lg border border-border overflow-hidden">
+      <div class="flex items-center justify-between gap-2 px-4 py-2.5 bg-muted/50 border-b border-border"><span class="text-xs font-semibold text-muted-foreground">${esc(t('Shipping address'))}</span>
+        <button type="button" class="text-xs link" data-step-to="2">${esc(t('Edit'))}</button></div>
+      <div class="px-4">${row(t('Street address'), [val('f-addr'), val('f-addr2')].filter(Boolean).join(', '))}${row(t('City'), val('f-city'))}${row(t('Postal code'), val('f-zip'))}${row(t('Country'), country)}${row(t('Delivery method'), (LANG === 'ar' ? m.ar : m.en) + ' — ' + (m.price ? money(m.price) : t('Free')))}</div>
+    </div>
+    <div class="rounded-lg border border-border overflow-hidden">
+      <div class="flex items-center justify-between gap-2 px-4 py-2.5 bg-muted/50 border-b border-border"><span class="text-xs font-semibold text-muted-foreground">${esc(t('Payment'))}</span>
+        <button type="button" class="text-xs link" data-step-to="3">${esc(t('Edit'))}</button></div>
+      <div class="px-4">${row(t('Card number'), (brandOf(card) || 'Card') + ' •••• ' + card.slice(-4))}${row(t('Name on card'), val('f-holder'))}${row(t('Expiry (MM/YY)'), val('f-exp'))}${row(t('Billing address'), $('#f-same').checked ? (LANG === 'ar' ? 'نفس عنوان الشحن' : 'Same as shipping') : [val('f-baddr'), val('f-bcity'), val('f-bzip')].filter(Boolean).join(', '))}</div>
+    </div>
+    <div class="rounded-lg border border-border overflow-hidden">
+      <div class="flex items-center justify-between gap-2 px-4 py-2.5 bg-muted/50 border-b border-border"><span class="text-xs font-semibold text-muted-foreground">${esc(t('Your bag'))}</span>
+        <button type="button" class="text-xs link" data-open-cart>${esc(t('Edit'))}</button></div>
+      <div class="px-4">${STATE.cart.map(l => row(`${l.qty} × ${pname(byId(l.id))}`, money(l.price * l.qty))).join('')}${row(t('Total'), money(T.total))}</div>
+    </div>`;
+}
+function renderCheckout() {
+  $$('.co-step').forEach(s => s.hidden = +s.dataset.step !== STATE.step);
+  $('#co-back').hidden = STATE.step === 1;
+  $('#co-next-label').textContent = t(NEXT_LABEL[STATE.step - 1]);
+  renderStepper(); renderShip(); renderSummary();
+  if (STATE.step === 4) renderReview();
+  icons();
+}
+function showAlert(n) {
+  const a = $('#co-alert');
+  a.innerHTML = `<span class="flex items-center gap-2"><i data-lucide="circle-alert" class="size-4 shrink-0"></i>${n} ${esc(t(n === 1 ? 'field needs attention' : 'fields need attention'))}</span>`;
+  a.hidden = false; icons();
+}
+function placeOrder() {
+  const T = totals();
+  const n = 'FR-2026-' + String(1000 + Math.floor(Math.random() * 8999));
+  STATE.order = { n, T, name: val('f-first') + ' ' + val('f-last'), email: val('f-email'), addr: [val('f-addr'), val('f-city'), val('f-zip')].filter(Boolean).join(', '), ship: STATE.ship, lines: STATE.cart.slice() };
+  STATE.cart = []; STATE.promo = null; STATE.promoMsg = null;
+  syncCart();
+  go('done');
+}
+function renderDone() {
+  const o = STATE.order; if (!o) return;
+  const m = SHIP.find(s => s.id === o.ship);
+  $('#done-body').innerHTML = `
+    <div class="flex flex-col items-center text-center gap-3">
+      <span class="inline-flex size-14 items-center justify-center rounded-full bg-success/15 text-success"><i data-lucide="check" class="size-7"></i></span>
+      <h2 role="heading" aria-level="1" class="font-display text-2xl font-semibold text-mono">${esc(t('Order confirmed'))}</h2>
+      <p class="text-2sm text-secondary-foreground max-w-md">${esc(LANG === 'ar' ? `شكراً ${o.name}. أرسلنا تأكيداً إلى ${o.email} — لا شيء غادر متصفحك في هذا العرض.` : `Thank you, ${o.name}. A confirmation is on its way to ${o.email} — in this demo nothing left your browser.`)}</p>
+      <span class="badge badge-outline font-mono">${esc(o.n)}</span>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3 class="card-title">${esc(t('Order summary'))}</h3><span class="text-2sm text-muted-foreground tabular-nums">${o.lines.reduce((a, l) => a + l.qty, 0)} ${esc(t('items'))}</span></div>
+      <div class="card-content flex flex-col gap-3">
+        ${o.lines.map(l => { const p = byId(l.id); return `<div class="flex gap-3 items-center">
+          <span class="size-12 shrink-0 rounded-md overflow-hidden border border-border">${art(p, l.sel[0], 0)}</span>
+          <span class="grow min-w-0 flex flex-col"><span class="text-2sm text-mono truncate">${esc(pname(p))}</span><span class="text-xs text-muted-foreground truncate">${esc(variantText(p, l.sel))}</span></span>
+          <span class="text-2sm text-mono tabular-nums">${l.qty} × ${money(l.price)}</span></div>`; }).join('')}
+      </div>
+      <div class="card-footer flex-col items-stretch gap-1.5 text-2sm">
+        <div class="flex justify-between"><span class="text-secondary-foreground">${esc(t('Shipping'))}</span><span class="text-mono">${esc(LANG === 'ar' ? m.ar : m.en)} — ${o.T.ship ? money(o.T.ship) : esc(t('Free'))}</span></div>
+        <div class="flex justify-between"><span class="text-secondary-foreground">${esc(t('Delivery method'))}</span><span class="text-mono text-end">${esc(o.addr)}</span></div>
+        <div class="flex justify-between border-t border-border pt-2 mt-1"><span class="font-semibold text-mono">${esc(t('Total'))}</span><span class="font-semibold text-mono tabular-nums text-base">${money(o.T.total)}</span></div>
+      </div>
+    </div>
+    <ol class="flex flex-col gap-3">
+      ${[[1, LANG === 'ar' ? 'نجهز الطلب في المشغل ونضبط الريشة إن وُجدت.' : 'We pick the order in the bindery and tune any nib in it.'],
+       [2, LANG === 'ar' ? 'يغادر الطرد خلال 24 ساعة مع رقم تتبع.' : 'The parcel leaves within 24 hours with a tracking number.'],
+       [3, LANG === 'ar' ? 'يصلك خلال المدة المختارة، ولديك 30 يوماً للإرجاع.' : 'It arrives within the window you chose, and you have 30 days to return it.']]
+      .map(([n, txt]) => `<li class="flex gap-3 items-start"><span class="inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-muted text-2xs font-semibold text-mono">${n}</span><span class="text-2sm text-secondary-foreground">${esc(txt)}</span></li>`).join('')}
+    </ol>
+    <div class="flex flex-wrap gap-2.5">
+      <button type="button" class="btn btn-primary" data-go="catalog" data-cat="all">${esc(t('Keep shopping'))}</button>
+      <button type="button" class="btn btn-outline" data-toast="Tracking opens in the account area">${esc(LANG === 'ar' ? 'تتبع الطلب' : 'Track this order')}</button>
+    </div>`;
+  icons();
+}
+
+/* ===== navigation between views ===== */
+function go(view, cat) {
+  STATE.view = view;
+  $$('[data-view]').forEach(s => s.hidden = s.dataset.view !== view);
+  if (view === 'catalog' && cat !== undefined) { STATE.cat = cat; STATE.wishOnly = false; STATE.page = 1; renderRail(); renderChips(); renderGrid(); }
+  if (view === 'product') renderPD();
+  if (view === 'checkout') { STATE.step = 1; renderCheckout(); }
+  if (view === 'done') renderDone();
+  closeOverlay(true);
+  window.scrollTo(0, 0);
+}
+function openProduct(id) { pdInit(id); go('product'); }
+
+/* ===== search ===== */
+function matches(q) {
+  const s = q.trim().toLowerCase(); if (!s) return [];
+  return PRODUCTS.filter(p => [p.en, p.ar, p.maker, catName(p.cat), ...p.tones].join(' ').toLowerCase().includes(s)).slice(0, 5);
+}
+function closeSuggest() { $('#suggest').hidden = true; $('#search').setAttribute('aria-expanded', 'false'); }
+function renderSuggest(q) {
+  const list = matches(q);
+  if (!q.trim()) { closeSuggest(); return; }
+  $('#suggest').innerHTML = list.length
+    ? list.map(p => `<button type="button" class="menu-item" role="option" data-open="${p.id}">
+        <span class="size-8 shrink-0 rounded-md overflow-hidden border border-border">${art(p, p.tones[0], 0)}</span>
+        <span class="grow min-w-0 flex flex-col text-start"><span class="text-2sm text-mono truncate">${esc(pname(p))}</span><span class="text-xs text-muted-foreground">${esc(p.maker)}</span></span>
+        <span class="text-2sm tabular-nums text-mono">${money(p.minPrice)}</span></button>`).join('')
+    : `<p class="px-2 py-4 text-center text-2sm text-muted-foreground">${esc(t('No results'))}</p>`;
+  $('#suggest').hidden = false; $('#search').setAttribute('aria-expanded', 'true'); icons();
+}
+function renderMSearch(q) {
+  const list = matches(q);
+  $('#msearch-body').innerHTML = !q.trim()
+    ? `<p class="text-2sm text-muted-foreground text-center py-8">${esc(LANG === 'ar' ? 'اكتب اسم منتج أو لوناً أو فئة.' : 'Type a product, a colour or a category.')}</p>`
+    : list.length ? `<div class="flex flex-col gap-1">${list.map(p => `<button type="button" class="menu-item min-h-14" data-open="${p.id}">
+        <span class="size-10 shrink-0 rounded-md overflow-hidden border border-border">${art(p, p.tones[0], 0)}</span>
+        <span class="grow min-w-0 flex flex-col text-start"><span class="text-2sm text-mono truncate">${esc(pname(p))}</span><span class="text-xs text-muted-foreground">${esc(p.maker)}</span></span>
+        <span class="text-2sm tabular-nums text-mono">${money(p.minPrice)}</span></button>`).join('')}</div>`
+      : `<div class="flex flex-col items-center gap-3 py-10 text-center" role="status">
+        <span class="inline-flex size-12 items-center justify-center rounded-full bg-muted text-muted-foreground"><i data-lucide="search-x" class="size-5"></i></span>
+        <span class="text-sm font-semibold text-mono">${esc(t('No results'))}</span>
+        <button type="button" class="btn btn-outline" data-go="catalog" data-cat="all">${esc(t('Shop all'))}</button></div>`;
+  icons();
+}
+function closeAccount() { $('#account-menu').hidden = true; $('#account-btn').setAttribute('aria-expanded', 'false'); }
+
+/* ===== one delegated click handler ===== */
+document.addEventListener('click', e => {
+  const el = t2 => e.target.closest(t2);
+  let b;
+  if (!e.target.closest('#account-btn, #account-menu')) closeAccount();
+  if (!e.target.closest('#search, #suggest')) closeSuggest();
+
+  if ((b = el('[data-go]'))) { e.preventDefault(); go(b.dataset.go, b.dataset.cat); return; }
+  if ((b = el('[data-open]'))) { e.preventDefault(); openProduct(b.dataset.open); return; }
+  if ((b = el('[data-quick]'))) { renderQuick(b.dataset.quick); openOverlay('quick'); return; }
+  if ((b = el('[data-add]'))) { const p = byId(b.dataset.add); addToCart(p.id, defaultSel(p), 1); return; }
+  if (el('[data-add-pd]')) { addToCart(STATE.pd.id, STATE.pd.sel, STATE.pd.qty); return; }
+  if (el('[data-add-qv]')) { addToCart(QV.id, QV.sel, QV.qty); return; }
+  if ((b = el('[data-wish]'))) { toggleWish(b.dataset.wish); return; }
+  if ((b = el('[data-tone]'))) {
+    const [id, tone] = b.dataset.tone.split('|'), p = byId(id), holder = $(`[data-art="${id}"]`);
+    if (holder) holder.innerHTML = art(p, tone, 0, 'duration-500 transition-transform');
+    $$(`[data-tone^="${id}|"]`).forEach(x => x.classList.toggle('ring-2', x === b));
+    $$(`[data-tone^="${id}|"]`).forEach(x => x.classList.toggle('ring-ring', x === b));
+    return;
+  }
+  if ((b = el('[data-opt]'))) {
+    const [who, i, v] = b.dataset.opt.split('|');
+    const target = who === 'pd' ? STATE.pd : QV;
+    target.sel[+i] = v;
+    const p = byId(target.id); target.qty = Math.min(target.qty, Math.max(1, stockOf(p, target.sel)));
+    who === 'pd' ? renderPD() : renderQuick(target.id);
+    return;
+  }
+  if ((b = el('[data-frame]'))) { STATE.pd.frame = +b.dataset.frame; renderPD(); return; }
+  if ((b = el('[data-tab]'))) { STATE.pd.tab = b.dataset.tab; renderPD(); return; }
+  if ((b = el('[data-qtystep]'))) {
+    const who = b.dataset.qtystep, target = who === 'pd' ? STATE.pd : QV, p = byId(target.id);
+    target.qty = Math.max(1, Math.min(Math.max(1, stockOf(p, target.sel)), target.qty + (+b.dataset.d)));
+    who === 'pd' ? renderPD() : renderQuick(target.id);
+    return;
+  }
+  if ((b = el('[data-cartstep]'))) { const key = b.dataset.cartstep, l = STATE.cart.find(x => x.key === key); if (l) setQty(key, l.qty + (+b.dataset.d)); return; }
+  if ((b = el('[data-del]'))) { removeLine(b.dataset.del); return; }
+  if ((b = el('[data-chip]'))) {
+    const k = b.dataset.chip;
+    if (k === 'cat') STATE.cat = 'all';
+    else if (k === 'wish') STATE.wishOnly = false;
+    else if (k === 'instock') STATE.inStock = false;
+    else if (k === 'price') { STATE.min = 0; STATE.max = PRICE_MAX; }
+    else if (k === 'q') { STATE.q = ''; $('#search').value = ''; $('#msearch-input').value = ''; }
+    else if (k.startsWith('colour:')) STATE.colours.delete(k.slice(7));
+    STATE.page = 1; renderRail(); renderChips(); renderGrid(); return;
+  }
+  if (el('[data-clear-all]')) { resetFilters(); return; }
+  if ((b = el('[data-cat]')) && b.hasAttribute('data-cat') && !b.hasAttribute('data-go')) { STATE.cat = b.dataset.cat; STATE.wishOnly = false; STATE.page = 1; renderRail(); renderChips(); renderGrid(); return; }
+  if ((b = el('[data-colour]'))) { const c = b.dataset.colour; STATE.colours.has(c) ? STATE.colours.delete(c) : STATE.colours.add(c); STATE.page = 1; renderRail(); renderChips(); renderGrid(); return; }
+  if (el('[data-more]')) { STATE.page++; paintGrid(); return; }
+  if (el('[data-retry]')) { STATE.error = false; $('#ctl-error').checked = false; renderGrid(); return; }
+  if (el('[data-promo]')) { applyPromo($('#promo').value); return; }
+  if (el('[data-checkout]')) { if (!STATE.cart.length) return; closeOverlay(true); go('checkout'); return; }
+  if (el('[data-open-cart]')) { openOverlay('cart'); return; }
+  if ((b = el('[data-step-to]'))) { STATE.step = +b.dataset.stepTo; renderCheckout(); $('#co-alert').hidden = true; return; }
+  if (el('[data-open-wish]')) { STATE.wishOnly = true; STATE.cat = 'all'; STATE.page = 1; closeOverlay(true); go('catalog'); renderRail(); renderChips(); renderGrid(); return; }
+  if ((b = el('[data-toast]'))) { toast(t(b.dataset.toast) || b.dataset.toast); return; }
+  if ((b = el('.acc-head'))) { const a = b.closest('.acc'); a.classList.toggle('open'); b.setAttribute('aria-expanded', a.classList.contains('open')); return; }
+});
+
+/* ===== other input events ===== */
+document.addEventListener('input', e => {
+  const el = e.target;
+  if (el.id === 'search') { STATE.q = el.value; STATE.page = 1; renderSuggest(el.value); if (STATE.view !== 'catalog') go('catalog'); renderChips(); renderGrid(); }
+  if (el.id === 'msearch-input') { STATE.q = el.value; STATE.page = 1; renderMSearch(el.value); renderChips(); renderGrid(); }
+  if (el.dataset.price) {
+    const v = +el.value;
+    if (el.dataset.price === 'min') STATE.min = Math.min(v, STATE.max); else STATE.max = Math.max(v, STATE.min);
+    STATE.page = 1; renderRail(); renderChips(); renderGrid();
+  }
+  if (el.dataset.qtyinput) {
+    const who = el.dataset.qtyinput, target = who === 'pd' ? STATE.pd : QV, p = byId(target.id);
+    const n = Math.max(1, Math.min(Math.max(1, stockOf(p, target.sel)), parseInt(el.value, 10) || 1));
+    target.qty = n; el.value = n;
+  }
+  if (el.dataset.cartinput) { const n = parseInt(el.value, 10); if (n > 0) setQty(el.dataset.cartinput, n); }
+  if (el.id === 'f-card') {
+    const d = el.value.replace(/\D/g, '').slice(0, 19), am = brandOf(d) === 'Amex';
+    el.value = am ? d.replace(/(\d{4})(\d{0,6})(\d{0,5})/, (m, a, b2, c) => [a, b2, c].filter(Boolean).join(' ')) : d.replace(/(\d{4})(?=\d)/g, '$1 ').trim();
+    $('#card-brand').textContent = brandOf(d);
+  }
+  if (el.id === 'f-exp') { const d = el.value.replace(/\D/g, '').slice(0, 4); el.value = d.length > 2 ? d.slice(0, 2) + '/' + d.slice(2) : d; }
+  if (el.id === 'f-cvc') el.value = el.value.replace(/\D/g, '').slice(0, 4);
+  if (el.dataset.rule && el.getAttribute('aria-invalid')) validateField(el);
+});
+document.addEventListener('change', e => {
+  const el = e.target;
+  if (el.id === 'sort') { STATE.sort = el.value; STATE.page = 1; renderGrid(); }
+  if (el.hasAttribute('data-instock')) { STATE.inStock = el.checked; STATE.page = 1; renderRail(); renderChips(); renderGrid(); }
+  if (el.name === 'ship') { STATE.ship = el.value; renderShip(); renderSummary(); }
+  if (el.id === 'f-same') { $('#billing').hidden = el.checked; }
+  if (el.id === 'f-country') { const z = $('#f-zip'); if (z.value) validateField(z); }
+});
+document.addEventListener('blur', e => { if (e.target.dataset && e.target.dataset.rule) validateField(e.target); }, true);
+$('#co-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const bad = stepFields(STATE.step).map(f => ({ f, m: validateField(f) })).filter(x => x.m);
+  if (bad.length) { showAlert(bad.length); bad[0].f.focus(); return; }
+  $('#co-alert').hidden = true;
+  if (STATE.step < 4) { STATE.step++; renderCheckout(); $('#stepper').scrollIntoView({ block: 'nearest' }); }
+  else placeOrder();
+});
+$('#co-back').addEventListener('click', () => { if (STATE.step > 1) { STATE.step--; renderCheckout(); $('#co-alert').hidden = true; } });
+$('#news-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const i = $('#f-news-email'), err = $('#e-news'), msg = RULES.email(i.value);
+  if (msg) { i.setAttribute('aria-invalid', 'true'); err.innerHTML = `<i data-lucide="circle-alert" class="size-3.5 shrink-0"></i><span>${esc(t(msg))}</span>`; err.hidden = false; icons(); i.focus(); }
+  else { i.removeAttribute('aria-invalid'); err.hidden = true; i.value = ''; toast(LANG === 'ar' ? 'تم تسجيلك في رسالة المشغل' : 'You are on the bindery list'); }
+});
+
+/* ===== chrome ===== */
+$('#announce-x').addEventListener('click', () => { $('#announce').hidden = true; });
+$('#menu-btn').addEventListener('click', () => openOverlay('mmenu'));
+$('#cart-btn').addEventListener('click', () => openOverlay('cart'));
+$('#bb-cart').addEventListener('click', () => openOverlay('cart'));
+$('#filters-m').addEventListener('click', () => openOverlay('mfilters'));
+$('#wish-btn').addEventListener('click', () => { STATE.wishOnly = true; STATE.cat = 'all'; STATE.page = 1; go('catalog'); renderRail(); renderChips(); renderGrid(); });
+$('#bb-wish').addEventListener('click', () => $('#wish-btn').click());
+const openSearch = () => { openOverlay('msearch', '#msearch-input'); renderMSearch($('#msearch-input').value); };
+$('#search-m').addEventListener('click', openSearch);
+$('#bb-search').addEventListener('click', () => { if (innerWidth >= 768) $('#search').focus(); else openSearch(); });
+$('#account-btn').addEventListener('click', e => {
+  e.stopPropagation();
+  const m = $('#account-menu'); m.hidden = !m.hidden;
+  $('#account-btn').setAttribute('aria-expanded', String(!m.hidden));
+});
+$('#search').addEventListener('focus', () => { if ($('#search').value.trim()) renderSuggest($('#search').value); });
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+    e.preventDefault();
+    if (innerWidth >= 768) $('#search').focus(); else openSearch();
+  }
+});
+
+/* ===== theme, density, language, URL presets ===== */
+const THEMES = ['theme-clinic', 'theme-graphite', 'theme-editorial', 'theme-neo', 'theme-slate', 'theme-mint'], DENS = ['density-compact', 'density-airy'];
+function setDark(on) { html.classList.toggle('dark', on); try { localStorage.setItem('fr.theme', on ? 'dark' : 'light'); } catch (e) { } }
+$('#ctl-theme').addEventListener('change', e => { html.classList.remove(...THEMES); if (e.target.value) html.classList.add(e.target.value); });
+$('#ctl-density').addEventListener('change', e => { html.classList.remove(...DENS); if (e.target.value) html.classList.add(e.target.value); });
+$('#ctl-dark').addEventListener('click', () => setDark(!html.classList.contains('dark')));
+$('#ctl-error').addEventListener('change', e => { STATE.error = e.target.checked; STATE.page = 1; if (STATE.view !== 'catalog') go('catalog'); renderGrid(); });
+function renderAll() {
+  renderRail(); renderChips(); paintGrid(); syncCart();
+  if (STATE.view === 'product') renderPD();
+  if (STATE.view === 'checkout') renderCheckout();
+  if (STATE.view === 'done') renderDone();
+  if (!$('#quick').hidden && QV) renderQuick(QV.id);
+}
+function setLang(lang) {
+  const ar = lang === 'ar'; LANG = lang;
+  html.setAttribute('dir', ar ? 'rtl' : 'ltr'); html.setAttribute('lang', ar ? 'ar' : 'en');
+  $$('[data-i18n]').forEach(el2 => {
+    const k = el2.dataset.i18n; if (!I18N[k]) return;
+    const txt = ar ? I18N[k] : k;
+    if (el2.childNodes.length && el2.lastChild.nodeType === 3) el2.lastChild.nodeValue = txt; else el2.textContent = txt;
+  });
+  $$('[data-i18n-placeholder]').forEach(el2 => { const k = el2.dataset.i18nPlaceholder; el2.placeholder = ar && I18N[k] ? I18N[k] : k; });
+  try { localStorage.setItem('fr.lang', lang); } catch (e) { }
+  renderAll();
+}
+$('#ctl-rtl').addEventListener('click', () => setLang(html.getAttribute('dir') === 'rtl' ? 'en' : 'ar'));
+
+/* ===== boot ===== */
+try {
+  const c = JSON.parse(localStorage.getItem('fr.cart') || '[]');
+  if (Array.isArray(c)) STATE.cart = c.filter(l => byId(l.id));
+  const w = JSON.parse(localStorage.getItem('fr.wish') || '[]');
+  if (Array.isArray(w)) STATE.wish = new Set(w.filter(id => byId(id)));
+  if (localStorage.getItem('fr.theme') === 'dark') html.classList.add('dark');
+} catch (e) { }
+renderRail(); renderChips(); renderGrid(); syncCart(); renderShip(); icons();
+(function fromUrl() {
+  const q = new URLSearchParams(location.search || location.hash.slice(1));
+  const pick = (k, allowed, apply) => { const v = q.get(k); if (v === null) return; if (allowed.includes(v)) apply(v); else console.warn(`ignored URL preset ${k}=${v}`); };
+  pick('theme', THEMES, v => { html.classList.remove(...THEMES); html.classList.add(v); $('#ctl-theme').value = v; });
+  pick('density', DENS, v => { html.classList.remove(...DENS); html.classList.add(v); $('#ctl-density').value = v; });
+  pick('dark', ['0', '1'], v => setDark(v === '1'));
+  const dir = q.get('dir'), lang = q.get('lang');
+  const wanted = ['en', 'ar'].includes(lang) ? lang : dir === 'rtl' ? 'ar' : dir === 'ltr' ? 'en' : null;
+  if (wanted) setLang(wanted);
+  else { try { if (localStorage.getItem('fr.lang') === 'ar') setLang('ar'); } catch (e) { } }
+  if (q.get('view') === 'checkout' && STATE.cart.length) go('checkout');
+})();
+</script>
+</body>
+</html>
