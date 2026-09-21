@@ -1,0 +1,42 @@
+{
+  "brief": "02-landing",
+  "skill": "jbelly-ui",
+  "model": "claude-sonnet-5",
+  "agent": "claude-code",
+  "stamp": "20260919-164728",
+  "minutes": 7.21,
+  "wall_seconds": 432.8,
+  "total_tokens": 1321657,
+  "billed_tokens": 132137,
+  "tool_calls": 13,
+  "tools_used": {
+    "Bash": 5,
+    "Read": 3,
+    "Grep": 3,
+    "Skill": 1,
+    "Write": 1
+  },
+  "num_turns": 15,
+  "input_tokens": 28,
+  "output_tokens": 50307,
+  "cache_read_tokens": 1189520,
+  "cache_creation_tokens": 81802,
+  "assistant_messages": 30,
+  "skills_used": [
+    "jbelly-ui"
+  ],
+  "skill_fired": true,
+  "produced": [
+    "out/page.html"
+  ],
+  "exit_code": 0,
+  "complete": true,
+  "incomplete_reason": null,
+  "skills_switched_off": 66,
+  "allowed_tools": "Read,Write,Edit,Glob,Grep,Skill,Bash(python:*),Bash(python3:*),Bash(py:*),Bash(node:*)",
+  "clean": true,
+  "outside_workspace": [],
+  "blocked_attempts": [],
+  "rescored": "isolation rule corrected: a skill reading its own installed folder is the condition, not a leak",
+  "workspace": "a temporary folder outside the repository"
+}

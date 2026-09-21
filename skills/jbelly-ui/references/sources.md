@@ -26,20 +26,22 @@ or to add one (a new rule needs a row here).
 | The anti-patterns list (what loses head-to-head votes) and the "personality first" rule (what wins) | Design Arena (https://www.designarena.ai), LMArena WebDev (https://web.lmarena.ai): crowd-voted comparisons of generated UI |
 | Landing page section order, hero styles, pricing layouts | Curated galleries: Awwwards (https://www.awwwards.com), Godly (https://godly.website), Land-book (https://land-book.com), Refero (https://refero.design) |
 | App flows (booking, checkout, onboarding), real screens | Mobbin (https://mobbin.com), Page Flows (https://pageflows.com) |
-| Page inventories and flows per business type | A study of the best-selling commercial templates in ten categories (marketplace listings and item pages, 2026-09-09); patterns only |
+| Page inventories and flows per business type | A study of the page inventories buyers of admin and SaaS products expect in ten categories (2026-09-09); patterns only, nothing reproduced |
 
-## Competing skills (what was adopted, what was rejected)
+## Other skills and tools this one learned from
 
-| Skill | Adopted | Rejected (cost) |
-|---|---|---|
-| frontend-design (anthropics/skills) | the AI-tells list, "spend boldness in one place", copy rules | — |
-| web-design-guidelines (vercel-labs/agent-skills) | terse `file:line` findings; interface checklist restated locally | runtime fetch of the rules on every review |
-| design-taste-frontend | design read before code, mechanical pre-flight with thresholds, audit-first redesign | 35K-token file loaded every time |
-| a catalogue-style UI skill | accessibility-first priority table; searchable data as an idea | 75-word description (fires greedily), style catalogue without build recipes |
-| redesign-existing-projects | scan → diagnose → fix, fix-priority order | — |
-| emil-design-eng | animation frequency and duration tables, Before/After/Why review rows | — |
-| impeccable (critique) | ten-dimension rubric | mandatory two-subagent assessments |
-| dataviz | runnable validator, method/parameter split | 230-word description |
+Ideas adopted, with the project they came from. Each is restated here in this project's own words
+and adapted to its own structure; none of their text is reproduced.
+
+| Source | What it taught this project |
+|---|---|
+| frontend-design (anthropics/skills) | the AI-tells list, "spend boldness in one place", the copy rules |
+| web-design-guidelines (vercel-labs/agent-skills) | terse `file:line` findings, and an interface checklist worth keeping locally |
+| design-taste-frontend | a design read before any code, a mechanical pre-flight with thresholds, audit-first redesign |
+| redesign-existing-projects | scan → diagnose → fix, and the order to fix in |
+| emil-design-eng | animation frequency and duration tables, Before/After/Why review rows |
+| impeccable (critique) | the ten-dimension review rubric |
+| dataviz | a runnable validator, and the method/parameter split |
 
 ## Measured, in this repo
 

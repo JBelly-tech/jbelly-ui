@@ -22,10 +22,13 @@ utility class strings.
 
 Four claims, each with the thing in this repository that proves it.
 
-**1. A screen costs little to build.** The dashboard brief measures at 778,232 context tokens,
-42,859 billed tokens, 2.3 minutes and 12 tool calls, and the page it produces passes every
-deterministic check. Reproduce it with `python evals/run.py --brief evals/briefs/01-dashboard.md
---skill jbelly-ui`; the method, the isolation and the honest limits are in [`COST.md`](COST.md).
+**1. A screen costs little to build.** The dashboard brief measures at 831,640 context tokens,
+97,004 billed tokens, 2.07 minutes and 10 tool calls, and the page it produces passes every
+deterministic check. That is one run, not an average, and the file it wrote is in the repository:
+[`01-dashboard-jbelly-ui-20260919-162651.json`](evals/records/01-dashboard-jbelly-ui-20260919-162651.json). Reproduce it with `python evals/run.py
+--brief evals/briefs/01-dashboard.md --skill jbelly-ui`. A pricing page, where the generator has no
+shape yet, costs six times as much — that run is published too, and the method, the isolation and
+the limits are in [`COST.md`](COST.md).
 
 **2. Quality is decided by scripts, not by opinion.** One call renders the page headlessly in
 light, dark and RTL, collects console errors, fails on horizontal overflow, runs the token lint and
@@ -89,7 +92,7 @@ python skills/jbelly-ui/scripts/verify_page.py out/dashboard.html --variants ",#
 | Path | Purpose |
 |------|---------|
 | `SKILL.md` | The workflow, the system in one screen, the rules, the done list (about 4K tokens) |
-| `references/quick-card.md` | One page: tokens, sizes, the 20 most-used recipes, cost rules. The only reference a standard screen needs |
+| `references/quick-card.md` | One page: tokens, sizes, the presets, the most-used recipes, cost rules. About 2.6K tokens, and the only reference a standard screen needs |
 | `references/personalities.md` | 8 dials, 6 presets, density block, how to derive a new one, the persisted file format |
 | `references/tokens.css` | Drop-in tokens: light/dark roles, states, sidebar roles, radius scale, Tailwind v4 mapping, base resets |
 | `references/components.md` · `layouts.md` · `patterns.md` | Exact class strings for 25 controls; shells, nav, toolbar, settings, auth, landing, RTL; KPI, chart, table, feed, drawer, pricing, checkout, palette, empty states |
@@ -152,7 +155,7 @@ Distilled from public, licence-free sources developers already trust:
 shadcn/ui and Radix conventions, Shopify Polaris and GitHub Primer content
 and data-table guidance, the Refactoring UI rules, Vercel's Web Interface
 Guidelines, Linear-style keyboard and density patterns, Tremor/shadcn
-dashboard blocks, and and a study of the page inventories and flows that
+dashboard blocks, and a study of the page inventories and flows that
 buyers of admin and SaaS products expect in ten business categories. Nothing is
 copied; every rule is restated as an instruction.
 
