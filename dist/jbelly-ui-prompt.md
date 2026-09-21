@@ -186,6 +186,7 @@ Tailwind mapping — paste this too (generated from the token file, so no role i
   --font-display: "Manrope", var(--font-sans);          /* geometric, soft */
   --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
   --primary: oklch(50% 0.12 195);                        /* deep teal, 4.6:1 with white */
+  --primary-accent: oklch(50% 0.12 195);               /* links: 5.16:1 */
   --primary-foreground: oklch(100% 0 0);
   --accent-strong: oklch(72% 0.17 60);                   /* one warm highlight: amber-peach */
   --background: oklch(98.5% 0.006 190);                  /* faint teal tint */
@@ -219,6 +220,7 @@ Tailwind mapping — paste this too (generated from the token file, so no role i
   --font-display: "Fraunces", Georgia, serif;             /* serif display with optical sizing */
   --font-sans: "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
   --primary: oklch(48% 0.16 30);                          /* brick */
+  --primary-accent: oklch(48% 0.16 30);                /* links: 6.59:1 */
   --primary-foreground: oklch(98% 0.01 60);
   --background: oklch(97.5% 0.012 75);                    /* warm paper */
   --card: oklch(99% 0.008 75);

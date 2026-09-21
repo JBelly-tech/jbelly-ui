@@ -43,6 +43,7 @@ Google Fonts (all OFL-licensed).
   --font-display: "Manrope", var(--font-sans);          /* geometric, soft */
   --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
   --primary: oklch(50% 0.12 195);                        /* deep teal, 4.6:1 with white */
+  --primary-accent: oklch(50% 0.12 195);               /* links: 5.16:1 */
   --primary-foreground: oklch(100% 0 0);
   --accent-strong: oklch(72% 0.17 60);                   /* one warm highlight: amber-peach */
   --background: oklch(98.5% 0.006 190);                  /* faint teal tint */
@@ -64,6 +65,7 @@ Surface: tinted-page. Motion: micro only. Signature: KPI numerals in `--font-dis
   --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
   --primary: oklch(65% 0.17 150);                        /* signal green */
+  --primary-accent: oklch(52.25% 0.17 150);            /* links: 4.52:1 */
   --primary-foreground: oklch(14% 0 0);
   --background: oklch(97% 0.002 260); --muted-foreground: oklch(54% 0.014 285);
   --card: oklch(100% 0 0);
@@ -82,6 +84,7 @@ Surface: flat-bordered, tables everywhere, `tabular-nums` on all numbers. Motion
   --font-display: "Fraunces", Georgia, serif;             /* serif display with optical sizing */
   --font-sans: "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
   --primary: oklch(48% 0.16 30);                          /* brick */
+  --primary-accent: oklch(48% 0.16 30);                /* links: 6.59:1 */
   --primary-foreground: oklch(98% 0.01 60);
   --background: oklch(97.5% 0.012 75);                    /* warm paper */
   --card: oklch(99% 0.008 75);
@@ -102,6 +105,7 @@ Surface: elevated (no border, `shadow-md` at 6% warm black). Motion: one signatu
   --font-display: "Space Grotesk", var(--font-sans);
   --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
   --primary: oklch(55% 0.25 290);                         /* electric violet */
+  --primary-accent: oklch(55% 0.25 290);               /* links: 5.32:1 */
   --primary-foreground: oklch(100% 0 0);
   --accent-strong: oklch(90% 0.2 105);                    /* acid yellow for one highlight */
   --background: oklch(99% 0 0);
@@ -123,6 +127,7 @@ Surface: outlined-only with offset shadows. Motion: micro + button press `transl
   --font-display: "Public Sans", var(--font-sans);
   --font-sans: "Public Sans", ui-sans-serif, system-ui, sans-serif;
   --primary: oklch(42% 0.12 260);                         /* navy */
+  --primary-accent: oklch(42% 0.12 260);               /* links: 7.76:1 */
   --primary-foreground: oklch(100% 0 0);
   --background: oklch(96.5% 0.004 250); --muted-foreground: oklch(53% 0.014 285);
   --card: oklch(100% 0 0);
@@ -148,6 +153,7 @@ Surface: tinted-page with a dark sidebar. Motion: micro. Signature: gold active-
   --font-display: "Plus Jakarta Sans", var(--font-sans);
   --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   --primary: oklch(60% 0.15 165);                         /* mint-green */
+  --primary-accent: oklch(52.5% 0.15 165);             /* links: 4.51:1 */
   --primary-foreground: oklch(14% 0 0);
   --accent-strong: oklch(70% 0.18 25);                    /* coral */
   --background: oklch(98% 0.01 160);

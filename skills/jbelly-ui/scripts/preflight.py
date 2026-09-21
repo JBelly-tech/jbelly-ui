@@ -12,7 +12,9 @@ Checks
   contrast   — WCAG ratio of the token pairs in every scope that declares them - :root, .dark, a theme class,
                a wrapped @layer/@media block (foreground/background, primary-foreground/primary,
                muted-foreground/background) computed from oklch()/hex; text pairs must reach 4.5, muted 4.5,
-               large 3. A declared pair whose value cannot be read is a FAIL, never a skip
+               large 3. A declared pair whose value cannot be read is a FAIL, never a skip.
+               Any role the markup uses as text is checked against the surface behind it too, so a
+               page cannot pass by never declaring the pair it needed
 """
 import json, math, os, re, sys
 try: sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -91,6 +93,67 @@ def resolve(tokens, name, depth=0):
     m = re.match(r"var\(--([\w-]+)\)", v.strip())
     return resolve(tokens, m.group(1), depth + 1) if m else v
 
+ICON_TAG = re.compile(r"<\s*(?:i|svg|path|use)\b|data-lucide\s*=", re.I)
+ICON_SELECTOR = re.compile(r"(?:^|[\s,>+~])(?:svg|i|path|use)(?:[\s,:.]|$)")
+
+
+def text_role_pairs(txt, declared):
+    """The roles this page paints text with, paired against the surface that is actually behind them.
+
+    The fixed pair list can only check what a page declares. A page that writes `text-primary` on
+    its links and never declares `--primary-accent` was therefore checked for nothing at all --
+    which is how three shells shipped links below the floor. What the markup does is the better
+    question, so every `text-<role>` utility is read out of the class lists and checked.
+
+    What is deliberately left out, because the surface behind it is not the page:
+
+    - an icon, whether written as an element (`<i data-lucide="check" class="text-success">`), as a
+      variant (`[&_svg]:text-primary`) or as a rule whose selector targets one (`.feature svg`).
+      All three become an svg; a graphic is judged at 3:1, and holding icons to 4.5 would dull every
+      feature list for no accessibility gain.
+    - a `text-x` sitting in the same class list as `bg-x/NN`: it is on its own tint, and that pair is
+      a different question from this one.
+    - a `-foreground` role, which is the text half of a pair already in the list. Checking it against
+      the page would compare white with white.
+
+    Sidebar roles are checked against `--sidebar`, since that is the surface they sit on. Everything
+    else is checked against both the page and the card.
+    """
+    roles = set()
+    for m in re.finditer(r"""(?:class(?:Name)?\s*=\s*["'{]|@apply\s)([^"'}\n;]+)""", txt):
+        chunk = m.group(1)
+        head = txt[max(0, m.start() - 400):m.start()]
+        tag = head.rfind("<")
+        if tag != -1 and ICON_TAG.search(head[tag:]):
+            continue                                            # an icon element
+        brace = head.rfind("{")
+        if brace != -1:                                         # inside a rule: what does it select?
+            sel = head[:brace]
+            sel = sel[max(sel.rfind("}"), sel.rfind(";")) + 1:]
+            if ICON_SELECTOR.search(sel):
+                continue                                        # a rule that styles icons
+        for util in chunk.split():                              # whitespace only: brackets are syntax
+            if "svg" in util and ":" in util:
+                continue                                        # an arbitrary variant scoped to an svg
+            base = util.split(":")[-1].strip("[]")
+            if not base.startswith("text-"):
+                continue
+            role = base[5:].split("/")[0]
+            if not role or role.endswith("-foreground") or role not in declared:
+                continue                                        # a size or an alignment utility
+            if re.search(r"(?<![\w-])bg-" + re.escape(role) + r"/", chunk):
+                continue                                        # sits on its own tint
+            roles.add(role)
+    out = []
+    for role in sorted(roles):
+        if role.startswith("sidebar"):
+            if "sidebar" in declared:
+                out.append((role, "sidebar", 4.5))
+            continue
+        out += [(role, "background", 4.5), (role, "card", 4.5)]
+    return out
+
+
 def check_file(path, results):
     txt = open(path, encoding="utf-8", errors="replace").read()
     lines = txt.split("\n")
@@ -123,7 +186,10 @@ def check_file(path, results):
     if icon_only: results.append(("FAIL", "structure", f"{path}:{where(icon_only[0].start())}", f"{len(icon_only)} icon-only button(s) without aria-label"))
     # contrast on tokens (css or html with <style>)
     scopes = token_scopes(txt)
+    declared = {t.lstrip("-") for _, _, toks in scopes for t in toks}
     pairs = [("foreground", "background", 4.5), ("primary-foreground", "primary", 4.5), ("muted-foreground", "background", 4.5), ("secondary-foreground", "secondary", 4.5), ("card-foreground", "card", 4.5), ("primary-accent", "card", 4.5), ("primary-accent", "background", 4.5)]
+    # and whatever the markup itself paints text with, which a fixed list cannot know
+    pairs += [q for q in text_role_pairs(txt, declared) if q not in pairs]
     envs = {}  # keyed by narrowing-set: a page repeats few distinct scopes but can repeat them often
     for sel, sig, toks in scopes:
         if sig not in envs:

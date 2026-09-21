@@ -6,7 +6,7 @@ Exit 0 on PASS. Run before a pull request:  python tests/smoke.py
 Rendering needs Playwright (pip install playwright && playwright install chromium) or a local Chrome/Chromium/Edge;
 without either, the render step is skipped and reported.
 """
-import glob, os, subprocess, sys
+import glob, os, re, subprocess, sys
 try: sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 except Exception: pass
 
@@ -120,5 +120,50 @@ if len(_scores) < 8: print(f"    only {len(_scores)} heuristic(s) graded, expect
 for _l in _lost: print("    " + _l)
 if _graded == "OK": print(f"    {len(_scores)}/{len(_scores)} heuristics passed")
 ok &= _graded == "OK"
+# The reference is what people copy, so its examples have to obey its own prose. `## Link colour`
+# tells the reader every preset declares --primary-accent; for a while none of the six did, and
+# anyone copying a preset out of that file reproduced the defect the rule exists to prevent.
+sys.path.insert(0, os.path.join(SK, "scripts"))
+from preflight import to_srgb as _srgb, contrast as _cr
+_pers = open(os.path.join(SK, "references", "personalities.md"), encoding="utf-8").read()
+_WHITE = "oklch(100% 0 0)"
+_bad = []
+_blocks = re.findall(r"(\.theme-[\w.-]+)\s*\{([^}]*)\}", _pers)
+for _sel, _body in _blocks:
+    if "--primary:" not in _body: continue
+    _acc = re.search(r"--primary-accent:\s*([^;]+);", _body)
+    if not _acc:
+        _bad.append(f"{_sel}: no --primary-accent, so its links keep the default blue"); continue
+    _card = (re.search(r"--card:\s*([^;]+);", _body) or [None, _WHITE])[1].strip()
+    _bg = (re.search(r"--background:\s*([^;]+);", _body) or [None, _WHITE])[1].strip()
+    _r = min(_cr(_srgb(_acc.group(1).strip()), _srgb(_card)), _cr(_srgb(_acc.group(1).strip()), _srgb(_bg)))
+    if _r < 4.5: _bad.append(f"{_sel}: link colour {_r:.2f}:1 against its own surfaces (need 4.5)")
+_okp = len(_blocks) >= 6 and not _bad
+print("[" + ("OK" if _okp else "FAIL") + "] personalities.md presets declare a readable link colour")
+if len(_blocks) < 6: print(f"    only {len(_blocks)} preset block(s) found, expected 6")
+for _b in _bad: print("    " + _b)
+ok &= _okp
+
+# A check that cannot fail is not a check. The contrast pass now reads the roles the markup paints
+# text with, because the three shells passed for months while their links sat under 4.5:1 -- the
+# pair was never declared, so nothing was ever compared. Put the old colour back on a copy and the
+# pre-flight must refuse it.
+_shell = os.path.join(SK, "assets", "landing-shell.html")
+_src = open(_shell, encoding="utf-8").read()
+_broken = _src.replace(".link { @apply text-primary-accent underline-offset-4 hover:underline; }",
+                       ".link { @apply text-primary underline-offset-4 hover:underline; }")
+if _broken == _src:
+    print("[FAIL] pre-flight regression: the link recipe moved, so this test no longer tests anything")
+    ok = False
+else:
+    _tmp = os.path.join(OUT, "contrast-regression.html")
+    open(_tmp, "w", encoding="utf-8").write(_broken)
+    _r = subprocess.run([sys.executable, os.path.join(SK, "scripts", "preflight.py"), _tmp],
+                        capture_output=True, text=True)
+    _caught = _r.returncode == 1 and "--primary on --" in _r.stdout
+    print("[" + ("OK" if _caught else "FAIL") + "] pre-flight fails a page that paints links with an unreadable role")
+    if not _caught: print("    it passed a page whose links are 3.96:1 in dark mode")
+    ok &= _caught
+
 print("\nSMOKE:", "PASS" if ok else "FAIL")
 sys.exit(0 if ok else 1)
