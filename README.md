@@ -4,7 +4,8 @@
 
 [![ci](https://github.com/mohammadJohar/jbelly-ui/actions/workflows/ci.yml/badge.svg)](https://github.com/mohammadJohar/jbelly-ui/actions/workflows/ci.yml) · MIT · Agent Skills format · Python 3.9+ tooling, no dependencies
 
-**[Live demo](https://mohammadjohar.github.io/jbelly-ui/skills/jbelly-ui/assets/app-shell.html)** · [Landing page](https://mohammadjohar.github.io/jbelly-ui/) · [Cost, measured](COST.md) · [Roadmap](docs/roadmap.md)
+**Live demos:** [app shell](https://mohammadjohar.github.io/jbelly-ui/skills/jbelly-ui/assets/app-shell.html) · [landing page](https://mohammadjohar.github.io/jbelly-ui/skills/jbelly-ui/assets/landing-shell.html) · [pricing page](https://mohammadjohar.github.io/jbelly-ui/skills/jbelly-ui/assets/pricing-shell.html)
+[Cost, measured](COST.md) · [Recorded runs](evals/records/) · [Roadmap](docs/roadmap.md)
 
 **A licence-free UI system for web products, packaged as an agent skill.**
 Dashboards, admin panels, settings and auth pages, data tables, landing
@@ -83,6 +84,17 @@ python skills/jbelly-ui/scripts/verify_page.py out/dashboard.html --variants ",#
 |---|---|---|
 | ![](docs/showcase/demo-sidebar-dark.png) | ![](docs/showcase/demo-neo-empty.png) | ![](docs/showcase/demo-slate-rtl.png) |
 
+Two more shells ship with the skill, both self-contained and both built from the same tokens: a
+[landing page](https://mohammadjohar.github.io/jbelly-ui/skills/jbelly-ui/assets/landing-shell.html) and a [pricing page](https://mohammadjohar.github.io/jbelly-ui/skills/jbelly-ui/assets/pricing-shell.html). Every
+control in them works, and each carries the same six personality presets, dark mode and RTL.
+
+| Landing shell | Pricing shell |
+|---|---|
+| ![](docs/showcase/landing-light.png) | ![](docs/showcase/pricing-light.png) |
+
+Every capture on this page is taken from the shells themselves by
+`python scripts/capture_showcase.py`, so a screenshot cannot quietly fall behind the code.
+
 ## What is inside
 
 `skills/jbelly-ui/` is the installable skill (what `npx skills add` copies). Everything else is evidence and tooling around it.
@@ -98,7 +110,7 @@ python skills/jbelly-ui/scripts/verify_page.py out/dashboard.html --variants ",#
 | `references/components.md` · `layouts.md` · `patterns.md` | Exact class strings for 25 controls; shells, nav, toolbar, settings, auth, landing, RTL; KPI, chart, table, feed, drawer, pricing, checkout, palette, empty states |
 | `references/charts.md` · `ux-behaviours.md` · `integrations.md` | ApexCharts theme from tokens + 8 recipes; loading/empty/error, tables, forms, overlays, keyboard, responsive; licence-safe libraries per need |
 | `references/industry-playbooks.md` · `interface-guidelines.md` · `anti-patterns.md` · `review-rubric.md` · `stacks.md` · `sources.md` | Page inventories for 10 business types; exact-value interface rules; the AI-tells list; ten scored review dimensions; plain-CSS and React mappings; where every rule comes from |
-| `assets/app-shell.html` | Self-contained demo and scaffold: shell, dark mode, RTL + i18n, density, personality switcher, table states, drawer, ⌘K palette, toasts, ApexCharts |
+| `assets/app-shell.html` · `landing-shell.html` · `pricing-shell.html` | Three self-contained demos and scaffolds: shell, dark mode, RTL + i18n, density, personality switcher, table states, drawer, ⌘K palette, toasts, ApexCharts |
 | `assets/spec.example.json` · `assets/tokens.json` | Example spec for the page builder; DTCG tokens for design tools |
 
 **The scripts** (Python 3.9+, no dependencies; PowerShell twins where noted)
