@@ -69,7 +69,7 @@ _want += [("kpis", v) for k in distinct["kpis"] for v in (k["label"], k["value"]
 _want += [("activity", v) for a in distinct["activity"] for v in (a["who"], a["text"])]
 _missing = [f"{slot}: {w}" for slot, w in _want if w not in _html and _esc(w, quote=True) not in _html]
 # One marker per slot that only the shell says: still on the page means that slot was never rebuilt.
-_stale = [f"{slot}: {w}" for slot, w in [("brand", "Acme Ops"), ("chart", "Orders per week"), ("highlights", "Orders completed"),
+_stale = [f"{slot}: {w}" for slot, w in [("brand", "Bayan Ops"), ("chart", "Orders per week"), ("highlights", "Orders completed"),
           ("table", "Recent orders"), ("table rows", "Dana Qasem"), ("nav", "Insights"), ("toolbar", "Order created"),
           ("kpis", 'data-count="1284"'), ("activity", "Ramadan 14-day")] if w in _html]
 _thin = len(_want) < 40    # a gutted list would pass vacuously, so the count is asserted too
@@ -91,7 +91,7 @@ MARKERS = {
     "landing": ["Mishwar", "مشوار", "Beirut depot", "Barakat Dairy", "orders-2025-10-11.csv",
                 "Tomorrow's routes, planned before the depot opens.", "Dispatch supervisor",
                 "Asked by every dispatcher we meet", "Route planning for wholesale delivery fleets."],
-    "pricing": ["Acme Ops", "الطلبات والمتاجر", "Pricing that follows your order volume", "1,500 orders a month",
+    "pricing": ["Sijil", "الطلبات والمتاجر", "Pricing that follows your order volume", "1,500 orders a month",
                 "For one shop and a team that fits around one table.", "What counts as an order?",
                 "Everything in Starter, plus", "Start on the plan you need this month"],
 }

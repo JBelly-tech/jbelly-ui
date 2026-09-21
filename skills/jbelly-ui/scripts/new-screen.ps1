@@ -55,7 +55,7 @@ if ($Dark) { $darkClass = "dark" }
 $classes = @("h-full", $Theme, $Density, $darkClass) | Where-Object { $_ -ne "" }
 $html = Set-Anchor $html '<html lang="en" dir="ltr" class="h-full">' ('<html lang="en" dir="' + $Direction + '" class="' + ($classes -join " ") + '">') "root element"
 $html = Set-Anchor $html ('<title>jbelly-ui ' + $emDash + ' app shell</title>') ('<title>' + $Product + ' ' + $emDash + ' ' + $Title + '</title>') "page title"
-$html = Set-Anchor $html 'Acme Ops' $Product "product name"
+$html = Set-Anchor $html 'Bayan Ops' $Product "product name"
 $html = Set-Anchor $html '<h1 class="text-xl font-medium text-mono font-display" data-i18n="Dashboard">Dashboard</h1>' ('<h1 class="text-xl font-medium text-mono font-display" data-i18n="' + $Title + '">' + $Title + '</h1>') "page heading"
 if ($StripDemoControls) {
   $stripped = [regex]::Replace($html, '(?s)<!-- ===== Demo controls.*?</details>\s*', '')

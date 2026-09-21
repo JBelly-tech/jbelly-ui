@@ -77,7 +77,7 @@ def asset(name): return os.path.join(ROOT, "assets", name)
 # if the shell is reworded, update this table -- tests/smoke.py builds a spec with different
 # words on purpose and fails when a slot stops landing.
 SHELL = {
-    "brand": "Acme Ops",
+    "brand": "Bayan Ops",
     "chart_title": "Orders per week",
     "series": ["Completed", "Refunded"],
     "highlights_title": "Highlights",
@@ -854,7 +854,7 @@ def applied_check_landing(spec, out_html):
 # ---------------------------------------------------------------- pricing ----
 # What the shipped pricing shell says today, per region -- the wording a built page must never keep.
 SHELL_PRICING = {
-    "header": ["Acme Ops"],
+    "header": ["Sijil"],
     "pricing-intro": ["Pricing that follows your order volume", "Every plan carries the whole order pipeline."],
     "plans": ["For one shop and a team that fits around one table.", "1,500 orders a month",
               "Prices in US dollars per workspace."],

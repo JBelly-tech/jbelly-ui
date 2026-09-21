@@ -2,7 +2,7 @@
 """Write design/personality.md for a product: the contract every later screen is checked against (Class D).
 
 Usage:
-  python scripts/personality_init.py --product "Acme Ops" --kind dashboard --audience "ops managers, all day, keyboard" \
+  python scripts/personality_init.py --product "Your product" --kind dashboard --audience "ops managers, all day, keyboard" \
       --vibe "precise, calm, premium" --preset theme-clinic --change "density compact" --change "radius 0.5rem" \
       --signature "3px start rail on active nav" [--avoid "blue primary" ...] [--out design/personality.md]
 

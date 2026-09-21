@@ -2,7 +2,7 @@
 """Scaffold a new screen from the house shell with zero model tokens (cross-platform).
 
 Usage: python scripts/new_screen.py <out.html> [--theme theme-clinic] [--density density-compact] [--dir rtl] [--dark]
-                                    [--title "Dashboard"] [--product "Acme"] [--strip-demo-controls]
+                                    [--title "Dashboard"] [--product "Your product"] [--strip-demo-controls]
 """
 import os, re, sys
 
@@ -22,7 +22,7 @@ def main():
     classes = " ".join(c for c in ["h-full", theme, dens, "dark" if "--dark" in a else ""] if c)
     s = s.replace('<html lang="en" dir="ltr" class="h-full">', f'<html lang="en" dir="{direction}" class="{classes}">')
     s = s.replace("<title>jbelly-ui — app shell</title>", f"<title>{product} — {title}</title>")
-    s = s.replace("Acme Ops", product)
+    s = s.replace("Bayan Ops", product)
     s = s.replace('<h1 class="text-xl font-medium text-mono font-display" data-i18n="Dashboard">Dashboard</h1>', f'<h1 class="text-xl font-medium text-mono font-display">{title}</h1>')
     if "--strip-demo-controls" in a:
         s = re.sub(r"(?s)<!-- ===== Demo controls.*?</details>\s*", "", s)
