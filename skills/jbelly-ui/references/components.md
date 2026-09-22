@@ -281,7 +281,9 @@ label row above: flex justify-between text-2sm → name text-mono, value text-se
 ```
 nav:    flex items-center gap-1
 button: inline-flex items-center justify-center size-7 rounded-md text-xs text-secondary-foreground hover:bg-accent
-        active: bg-accent text-mono font-medium   disabled: opacity-50 pointer-events-none
+        active: bg-accent text-mono font-medium
+        unavailable: the `disabled` attribute plus disabled:opacity-50 disabled:pointer-events-none
+        (styling it without the attribute leaves it reachable by keyboard and announced as available)
 prev/next: icon-only with chevrons (auto-mirror: rtl:rotate-180 on the svg)
 ellipsis: size-7 inline-flex items-center justify-center text-muted-foreground
 ```
