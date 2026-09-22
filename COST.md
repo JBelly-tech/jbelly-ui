@@ -29,12 +29,18 @@ is the term the cost model charges for. **Billed** excludes cache reads.
 | Landing page | 1,321,657 | 132,137 | 7.21 | 13 | [run](evals/records/02-landing-jbelly-ui-20260919-164728.json) |
 | Pricing page | 4,906,916 | 182,638 | 9.28 | 41 | [run](evals/records/03-pricing-jbelly-ui-20260919-170349.json) |
 
-**A pricing page costs six times a dashboard, and that is the most useful number here.** The
-dashboard is the shape the page builder knows: a spec of about 2 KB becomes the whole screen, and
-the model writes no markup at all. There is no generator shape for a pricing page yet, so the model
-writes every line itself — and the cost is what it costs to write a page by hand, which is what this
-skill exists to avoid. The gap between those two rows is the honest measure of how much of the work
-is actually automated: not all of it.
+**A pricing page cost six times a dashboard, and that gap is the most useful number here.** The
+dashboard was the one shape the page builder knew: a spec becomes the whole screen and the model
+writes no markup at all. Nothing filled the landing or pricing shape, so the model wrote every line
+itself, and the cost is what it costs to write a page by hand — which is the thing this skill exists
+to avoid. The gap between those rows measured how much of the work was actually automated: not all
+of it.
+
+**Those two rows are now out of date, and are kept until they are replaced.** Both shapes have
+templates as of 2026-09-22, so a landing or pricing page is built from a spec like the dashboard is.
+The numbers above were taken before that and are not evidence about the version you would install
+today. No new figure is claimed here until the briefs have been run again; when they have, these rows
+are replaced whatever the result.
 
 ## What the transcripts showed
 

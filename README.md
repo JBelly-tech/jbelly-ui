@@ -48,10 +48,23 @@ project's own words with its source recorded in `references/sources.md`.
 
 ## Where it is weak
 
-Said plainly, because you will find out anyway. The page builder knows the shape of an app screen,
-so a dashboard, a settings page or a data table is nearly free while a landing page or a marketing
-site is not yet — the model writes that markup itself and the numbers above do not apply. It has
-been measured with one model family in one agent, so treat the rest as untested. It is web only.
+Said plainly, because you will find out anyway.
+
+**The published cost figures are older than the tool they describe.** They were measured when the
+page builder knew one shape, the app screen, so the landing and pricing runs are the cost of a model
+writing that markup by hand. Both shapes now have templates, which should move those two numbers a
+long way — but *should* is not *measured*, and nothing here will claim the improvement until the
+briefs have been run again. The dashboard figure is unaffected.
+
+**One run each, one model, one agent.** No repeats, so no variance. Treat the ordering as real and
+the precision as not, and treat every other agent and model as untested.
+
+**Only three page shapes are generated**: the app screen, the landing page and the pricing page. The
+storefront ships as a demo shell to copy from, not yet as a generator kind. Anything else is the
+model writing markup with the system's rules in front of it, which is better than nothing and costs
+what it costs.
+
+**It is web only.**
 
 ## Install (three ways, one source)
 
