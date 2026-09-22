@@ -25,6 +25,7 @@ ASSETS = ROOT / "skills" / "jbelly-ui" / "assets"
 # capturing the top of the page would show everything except the thing the caption promises.
 SHOTS = {
     "default-light":                   ("app-shell.html", "", None),
+    "default-dark":                    ("app-shell.html", "#dark=1", None),
     "demo-clinic-dark":                ("app-shell.html", "#theme=theme-clinic&dark=1", None),
     "demo-graphite-compact-loading":   ("app-shell.html", "#theme=theme-graphite&density=density-compact&state=loading", "#table-toolbar"),
     "demo-neo-empty":                  ("app-shell.html", "#theme=theme-neo&state=empty", "#table-toolbar"),

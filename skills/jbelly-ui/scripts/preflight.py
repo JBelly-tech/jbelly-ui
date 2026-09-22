@@ -5,7 +5,8 @@ Usage: python scripts/preflight.py <file-or-dir> [--json]
 Exit 1 on any FAIL, 2 when there was nothing to check. Every check prints file:line evidence so a fix is one edit away.
 
 Checks
-  tells      — signatures of default-AI UI: purple/indigo gradient hexes, gradient text, glass-by-reflex,
+  tells      — signatures of default-AI UI (a region marked data-preflight="quote" is exempt from
+               this pass only, and the exemption is printed so it cannot hide quietly): purple/indigo gradient hexes, gradient text, glass-by-reflex,
                `uppercase tracking-` eyebrows over budget, Sparkles/Zap icons, marketing filler words, emoji icons,
                DiceBear avatars, `transition: all`, pure #000 text, rounded-2xl+shadow-lg on everything
   structure  — one primary action per view, h1 count, skip link present when a nav exists, icon-only buttons labelled
@@ -154,14 +155,46 @@ def text_role_pairs(txt, declared):
     return out
 
 
+def quoted_spans(txt):
+    """The spans of every element marked data-preflight="quote", nesting included.
+
+    A non-greedy regex stops at the first closing tag, which on a list of divs exempts the first item
+    and nothing else. Depth has to be counted, so it is counted here.
+    """
+    spans = []
+    for m in re.finditer(r"<(\w+)(?=[^>]*\sdata-preflight=[\"']quote[\"'])[^>]*>", txt, re.I):
+        tag = m.group(1)
+        depth, i = 1, m.end()
+        step = re.compile(rf"</?{re.escape(tag)}\b[^>]*>", re.I)
+        while depth and i < len(txt):
+            nxt = step.search(txt, i)
+            if not nxt:
+                break
+            depth += -1 if nxt.group(0).startswith("</") else 1
+            i = nxt.end()
+        spans.append((m.start(), i))
+    return spans
+
+
 def check_file(path, results):
     txt = open(path, encoding="utf-8", errors="replace").read()
     lines = txt.split("\n")
     def where(pos):
         return txt.count("\n", 0, pos) + 1
+    # A page that documents these rules has to be able to name what they ban, so a region marked
+    # data-preflight="quote" is exempt from the tells pass -- and only from that pass. A quotation
+    # cannot hide a contrast failure or an unlabelled button, because those are facts about the
+    # rendered page rather than about its words.
+    quoted = quoted_spans(txt)
+    tell_txt = txt
+    for a, b in reversed(quoted):
+        tell_txt = tell_txt[:a] + (" " * (b - a)) + tell_txt[b:]
+    if quoted:
+        results.append(("OK", "exempt", f"{path}:{where(quoted[0][0])}",
+                        f"{len(quoted)} quoted region(s) exempt from the tells pass -- check they are quotations"))
     # tells
     for key, pat, label, allowed in TELLS:
-        hits = [m for m in re.finditer(pat, txt, re.I)]
+        hits = [m for m in re.finditer(pat, tell_txt, re.I)]
         if len(hits) > allowed:
             results.append(("FAIL", "tells", f"{path}:{where(hits[0].start())}", f"{label} ({len(hits)} hit{'s' if len(hits) != 1 else ''}, allowed {allowed})"))
     sections = max(1, len(re.findall(r"<section\b|<div[^>]*" + CLASS_ATTR + r"[^>]*\bcard\b", txt)))
@@ -229,7 +262,7 @@ def main():
         print(json.dumps([dict(status=s, group=g, where=w, detail=d) for s, g, w, d in results], indent=2))
     else:
         for s, g, w, d in results:
-            if s != "OK" or g == "contrast": print(f"[{s}] {g:9} {w}: {d}")
+            if s != "OK" or g in ("contrast", "exempt"): print(f"[{s}] {g:9} {w}: {d}")   # an exemption nobody can see is one that gets abused
         print(f"\npreflight: {len(files)} file(s), {len(fails)} FAIL, {sum(1 for r in results if r[0]=='WARN')} WARN -> {'FAIL' if fails else 'PASS'}")
     return 1 if fails else 0
 

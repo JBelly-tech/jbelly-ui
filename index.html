@@ -1,59 +1,504 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>jbelly-ui — UI design skill for AI agents</title>
-<meta name="description" content="A licence-free UI system for web products, packaged as an agent skill. Exact tokens and recipes, a spec-driven page builder, a pre-flight against AI-default looks, and a mandatory personality step.">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>jbelly-ui — a UI system your agent installs</title>
+<meta name="description" content="A UI design system packaged as an agent skill: exact tokens, 25 component recipes, a spec-driven page builder, and scripts that exit non-zero when a screen drifts back to the defaults.">
+<meta name="color-scheme" content="light dark">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Source+Sans+3:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=DM+Sans:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root { --bg: oklch(100% 0 0); --fg: oklch(14.5% 0.005 285); --muted: oklch(55% 0.014 285); --line: oklch(94% 0.004 286); --card: #fff; --primary: oklch(54% 0.2 258); --primary-fg: #fff; --radius: .5rem; }
-  @media (prefers-color-scheme: dark) { :root { --bg: oklch(14.5% 0.005 285); --fg: oklch(98.5% 0 0); --muted: oklch(64% 0.014 285); --line: oklch(27.5% 0.006 286); --card: oklch(17% 0.005 285); --primary: oklch(55% 0.21 258); } }
-  * { box-sizing: border-box } body { margin: 0; font: 15px/1.55 Inter, system-ui, sans-serif; background: var(--bg); color: var(--fg); -webkit-font-smoothing: antialiased }
-  main { max-width: 68rem; margin: 0 auto; padding: 56px 24px 80px }
-  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 500; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px }
-  h1 { font-size: clamp(30px, 5vw, 44px); line-height: 1.1; letter-spacing: -.02em; margin: 18px 0 12px; font-weight: 600 }
-  .sub { font-size: 17px; color: var(--muted); max-width: 40rem; margin: 0 0 26px }
-  .row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 40px }
-  .btn { display: inline-flex; align-items: center; height: 40px; padding: 0 16px; border-radius: calc(var(--radius) - 2px); font-weight: 500; font-size: 14px; text-decoration: none; border: 1px solid var(--line); color: var(--fg); background: var(--card); box-shadow: 0 1px 2px rgb(0 0 0 / .05) }
-  .btn.primary { background: var(--primary); color: var(--primary-fg); border-color: transparent }
-  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 40px }
-  .card { border: 1px solid var(--line); background: var(--card); border-radius: calc(var(--radius) + 4px); padding: 20px; box-shadow: 0 1px 2px rgb(0 0 0 / .05) }
-  .card h3 { margin: 0 0 6px; font-size: 15px; font-weight: 600 } .card p { margin: 0; color: var(--muted); font-size: 14px }
-  pre { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; overflow-x: auto; font-size: 13px }
-  img { max-width: 100%; border: 1px solid var(--line); border-radius: calc(var(--radius) + 4px); display: block }
-  .muted { color: var(--muted); font-size: 13px }
-  h2 { font-size: 20px; letter-spacing: -.01em; margin: 40px 0 12px }
+/* ============================================================================
+   The tokens below are copied from skills/jbelly-ui/references/tokens.css and
+   assets/app-shell.html without edit. This page is not a description of the
+   system; it is an instance of it, which is why the rail at the top can retheme
+   it without touching a single component.
+   ========================================================================= */
+:root {
+  --radius: 0.5rem;
+  --font-display: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+  --background: oklch(100% 0 0); --foreground: oklch(14.5% 0.005 285);
+  --card: oklch(100% 0 0); --card-foreground: oklch(14.5% 0.005 285);
+  --primary: oklch(54% 0.2 258); --primary-accent: oklch(54% 0.2 258); --primary-foreground: oklch(100% 0 0);
+  --secondary-foreground: oklch(21% 0.006 285);
+  --muted: oklch(96.5% 0.002 285); --muted-foreground: oklch(55% 0.014 285);
+  --accent: oklch(96.5% 0.002 285); --accent-foreground: oklch(21% 0.006 285);
+  --mono: oklch(14.5% 0.005 285);
+  --border: oklch(94% 0.004 286); --input: oklch(92% 0.004 286); --ring: oklch(71% 0.01 286);
+  --shadow-xs: 0 1px 2px oklch(0% 0 0 / .05);
+}
+.dark {
+  --background: oklch(14.5% 0.005 285); --foreground: oklch(98.5% 0 0);
+  --card: oklch(14.5% 0.005 285); --card-foreground: oklch(98.5% 0 0);
+  --primary: oklch(55% 0.21 258); --primary-accent: oklch(58.25% 0.21 258);
+  --secondary-foreground: oklch(98.5% 0 0);
+  --muted: oklch(21% 0.006 285); --muted-foreground: oklch(64% 0.014 285);
+  --accent: oklch(21% 0.006 285); --accent-foreground: oklch(98.5% 0 0);
+  --mono: oklch(87% 0.006 286);
+  --border: oklch(27.5% 0.006 286); --input: oklch(27.5% 0.006 286); --ring: oklch(44% 0.01 286);
+  --shadow-xs: 0 1px 2px oklch(0% 0 0 / .4);
+}
+/* The six presets, verbatim. Each declares its own --primary-accent, because a
+   var(--primary) written on :root is computed there and would leave every
+   preset's links this same blue. */
+.theme-clinic { --primary: oklch(50% 0.12 195); --primary-accent: oklch(50% 0.12 195); --font-display: "Manrope", sans-serif; --background: oklch(98.5% 0.006 190); --card: oklch(100% 0 0); --border: oklch(92% 0.012 190); --input: oklch(90% 0.014 190); --muted: oklch(96% 0.01 190); --accent: oklch(95% 0.012 190); --radius: 0.75rem; }
+.theme-graphite { --primary: oklch(65% 0.17 150); --primary-accent: oklch(52.25% 0.17 150); --primary-foreground: oklch(14% 0 0); --muted-foreground: oklch(54% 0.014 285); --font-display: "IBM Plex Sans", sans-serif; --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif; --font-mono: "IBM Plex Mono", monospace; --background: oklch(97% 0.002 260); --card: oklch(100% 0 0); --border: oklch(88% 0.004 260); --input: oklch(86% 0.004 260); --radius: 0.25rem; }
+.theme-editorial { --primary: oklch(48% 0.16 30); --primary-accent: oklch(48% 0.16 30); --primary-foreground: oklch(98% 0.01 60); --font-display: "Fraunces", Georgia, serif; --font-sans: "Source Sans 3", ui-sans-serif, system-ui, sans-serif; --background: oklch(97.5% 0.012 75); --card: oklch(99% 0.008 75); --foreground: oklch(22% 0.02 50); --mono: oklch(22% 0.02 50); --border: oklch(90% 0.02 70); --input: oklch(88% 0.02 70); --muted: oklch(94% 0.015 75); --accent: oklch(93% 0.018 75); --muted-foreground: oklch(50% 0.03 50); }
+.theme-neo { --primary: oklch(55% 0.25 290); --primary-accent: oklch(55% 0.25 290); --font-display: "Space Grotesk", sans-serif; --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif; --background: oklch(99% 0 0); --card: oklch(100% 0 0); --foreground: oklch(10% 0 0); --mono: oklch(10% 0 0); --border: oklch(10% 0 0); --input: oklch(10% 0 0); --radius: 0.25rem; }
+.theme-slate { --primary: oklch(42% 0.12 260); --primary-accent: oklch(42% 0.12 260); --muted-foreground: oklch(53% 0.014 285); --background: oklch(96.5% 0.004 250); --card: oklch(100% 0 0); --foreground: oklch(18% 0.02 260); --border: oklch(88% 0.008 250); --input: oklch(86% 0.008 250); --radius: 0.375rem; }
+.theme-mint { --primary: oklch(60% 0.15 165); --primary-accent: oklch(52.5% 0.15 165); --primary-foreground: oklch(14% 0 0); --font-display: "Plus Jakarta Sans", sans-serif; --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif; --background: oklch(98% 0.01 160); --card: oklch(100% 0 0); --border: oklch(93% 0.02 160); --input: oklch(90% 0.02 160); --muted: oklch(96% 0.012 160); --accent: oklch(95% 0.015 160); --radius: 1rem; }
+
+*, *::before, *::after { box-sizing: border-box; border-color: var(--border); }
+html { font-family: var(--font-sans); -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--background); color: var(--foreground);
+  font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; border-radius: 3px; }
+::selection { background: var(--primary); color: var(--primary-foreground); }
+img { max-width: 100%; height: auto; display: block; }
+[hidden] { display: none !important; }
+
+.skip { position: absolute; inset-inline-start: -9999px; top: 0; z-index: 99; background: var(--card); color: var(--foreground); padding: 10px 16px; border: 1px solid var(--border); border-radius: var(--radius); }
+.skip:focus { inset-inline-start: 12px; top: 12px; }
+
+.wrap { width: 100%; max-width: 74rem; margin-inline: auto; padding-inline: 20px; }
+section { padding-block: clamp(52px, 7vw, 88px); border-top: 1px solid var(--border); }
+section:first-of-type { border-top: 0; padding-block-start: clamp(44px, 6vw, 72px); }
+
+h1, h2, h3 { font-family: var(--font-display); color: var(--mono); margin: 0; text-wrap: balance; letter-spacing: -0.022em; }
+h1 { font-size: clamp(2.125rem, 5.2vw, 3.5rem); line-height: 1.06; font-weight: 600; }
+h2 { font-size: clamp(1.4375rem, 2.5vw, 1.9375rem); line-height: 1.18; font-weight: 600; }
+h3 { font-size: 1rem; line-height: 1.35; font-weight: 600; }
+p { margin: 0; text-wrap: pretty; }
+.lead { font-size: clamp(1.0625rem, 1.4vw, 1.1875rem); color: var(--secondary-foreground); max-width: 46rem; }
+.sub { color: var(--muted-foreground); max-width: 48rem; }
+.small { font-size: .875rem; color: var(--muted-foreground); }
+a { color: var(--primary-accent); text-underline-offset: 3px; }
+a:hover { text-decoration: underline; }
+.stack > * + * { margin-top: 1.125rem; }
+.stack-sm > * + * { margin-top: .5rem; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  min-height: 44px; padding-inline: 20px; border-radius: calc(var(--radius) - 2px);
+  font: 500 .9375rem/1.2 var(--font-sans); text-decoration: none; cursor: pointer;
+  border: 1px solid var(--input); background: var(--card); color: var(--secondary-foreground);
+  box-shadow: var(--shadow-xs);
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+.btn:hover { background: var(--accent); color: var(--accent-foreground); text-decoration: none; }
+.btn-primary { background: var(--primary); color: var(--primary-foreground); border-color: transparent; }
+.btn-primary:hover { background: var(--primary); color: var(--primary-foreground); filter: brightness(1.08); }
+.row { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; }
+
+.rail { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--background); border-bottom: 1px solid var(--border); }
+.rail-in { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; padding-block: 10px; }
+.rail-label { font-size: .75rem; color: var(--muted-foreground); }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip {
+  border: 1px solid var(--input); background: var(--card); color: var(--secondary-foreground);
+  border-radius: 999px; padding: 6px 12px; min-height: 32px;
+  font: 500 .8125rem/1.3 var(--font-sans); cursor: pointer;
+  transition: background-color .15s ease, color .15s ease, border-color .15s ease;
+}
+.chip:hover { background: var(--accent); color: var(--accent-foreground); }
+.chip[aria-checked="true"], .chip[aria-pressed="true"] { background: var(--primary); color: var(--primary-foreground); border-color: transparent; }
+.rail-end { margin-inline-start: auto; }
+
+.card { border: 1px solid var(--border); background: var(--card); color: var(--card-foreground); border-radius: calc(var(--radius) + 4px); padding: 22px; box-shadow: var(--shadow-xs); }
+.grid { display: grid; gap: 16px; }
+.g2 { grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr)); }
+.g2x2 { grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr)); }
+.shot { margin-top: clamp(28px, 4vw, 44px); }
+.shot img { border: 1px solid var(--border); border-radius: calc(var(--radius) + 4px); box-shadow: var(--shadow-xs); }
+.shot p { margin-top: .75rem; }
+.g4 { grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); }
+
+pre { margin: 0; background: var(--muted); color: var(--foreground); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; overflow-x: auto; font-family: var(--font-mono); font-size: .8125rem; line-height: 1.7; }
+code { font-family: var(--font-mono); font-size: .875em; }
+.cmd { display: flex; align-items: center; gap: 10px; border: 1px solid var(--input); background: var(--card); border-radius: calc(var(--radius) - 2px); padding-inline-start: 14px; padding-inline-end: 6px; min-height: 44px; max-width: 38rem; box-shadow: var(--shadow-xs); }
+.cmd code { flex: 1; overflow-x: auto; white-space: nowrap; color: var(--secondary-foreground); }
+.copy { border: 0; background: transparent; color: var(--muted-foreground); cursor: pointer; font: 500 .8125rem/1 var(--font-sans); padding: 10px; border-radius: 6px; min-height: 32px; }
+.copy:hover { background: var(--accent); color: var(--accent-foreground); }
+
+table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+th, td { text-align: start; padding: 10px 12px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+th { color: var(--muted-foreground); font-weight: 500; font-size: .8125rem; }
+td.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.scroller { overflow-x: auto; }
+
+.refuse { display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); border: 1px solid var(--border); border-radius: calc(var(--radius) + 4px); overflow: hidden; background: var(--card); }
+.refuse div { padding: 14px 18px; border-bottom: 1px solid var(--border); }
+.refuse strong { display: block; font-weight: 600; font-size: .875rem; color: var(--mono); }
+.refuse span { font-size: .8125rem; color: var(--muted-foreground); }
+
+.kpi { font-family: var(--font-mono); font-size: clamp(1.4rem, 2.8vw, 1.875rem); font-weight: 500; color: var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+.kpi-src { font-size: .75rem; color: var(--muted-foreground); font-family: var(--font-mono); overflow-wrap: anywhere; }
+
+footer { border-top: 1px solid var(--border); padding-block: 36px 56px; color: var(--muted-foreground); font-size: .875rem; }
+
+@media (width < 40rem) {
+  /* Three wrapped rows pinned to the top is most of a phone screen, so here it scrolls away. */
+  .rail { position: static; }
+  .rail-label { display: none; }
+  .rail-end { margin-inline-start: 0; }
+  .rail-in { gap: 6px; }
+}
+
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: 0.01ms !important; } }
 </style>
 </head>
 <body>
-<main>
-  <span class="eyebrow">Public beta · MIT · Agent Skills format</span>
-  <h1>jbelly-ui — a UI design skill for AI agents</h1>
-  <p class="sub">A licence-free UI system for dashboards, admin panels, settings and auth pages, data tables and landing pages. Exact tokens and recipes, a spec-driven page builder, a pre-flight that blocks the default-AI look, and a mandatory personality step so every product looks deliberately its own.</p>
-  <div class="row">
-    <a class="btn primary" href="skills/jbelly-ui/assets/app-shell.html">Open the live demo</a>
-    <a class="btn" href="skills/jbelly-ui/assets/landing-shell.html">Landing shell</a>
-    <a class="btn" href="skills/jbelly-ui/assets/pricing-shell.html">Pricing shell</a>
-    <a class="btn" href="https://github.com/mohammadJohar/jbelly-ui">GitHub</a>
-    <a class="btn" href="COST.md">Measured cost</a>
+<a class="skip" href="#main">Skip to main content</a>
+
+<div class="rail">
+  <div class="wrap rail-in">
+    <span class="rail-label" id="rail-label">This page, rethemed:</span>
+    <div class="chips" role="radiogroup" aria-labelledby="rail-label" id="presets">
+      <button class="chip" type="button" role="radio" aria-checked="true" data-theme="">Default</button>
+      <button class="chip" type="button" role="radio" aria-checked="false" data-theme="theme-clinic">Clinic</button>
+      <button class="chip" type="button" role="radio" aria-checked="false" data-theme="theme-graphite">Graphite</button>
+      <button class="chip" type="button" role="radio" aria-checked="false" data-theme="theme-editorial">Editorial</button>
+      <button class="chip" type="button" role="radio" aria-checked="false" data-theme="theme-neo">Neo</button>
+      <button class="chip" type="button" role="radio" aria-checked="false" data-theme="theme-slate">Slate</button>
+      <button class="chip" type="button" role="radio" aria-checked="false" data-theme="theme-mint">Mint</button>
+    </div>
+    <div class="rail-end">
+      <button class="chip" type="button" id="dark-toggle" aria-pressed="false">Dark</button>
+    </div>
   </div>
-  <img src="docs/showcase/default-light.png" alt="The default app shell: sidebar, header, KPI cards with sparklines, area chart, donut, table" width="1440" height="1000">
-  <h2>Install</h2>
-<pre>npx skills add mohammadJohar/jbelly-ui -a claude-code   # or -a cursor, -a codex, -a copilot, -a gemini-cli
-# no Node:  ./install.sh cursor        or        .\install.ps1 -Agent cursor
-# rules-file tools: dist/AGENTS.md    · chat-only tools: paste dist/jbelly-ui-prompt.md</pre>
-  <h2>What you get</h2>
-  <div class="grid">
-    <div class="card"><h3>Tokens and recipes</h3><p>Semantic colour roles, one control scale (28/34/40px), 25 components with exact class strings, light and dark, RTL with one attribute.</p></div>
-    <div class="card"><h3>Personality, not sameness</h3><p>Eight dials and six presets; the agent must choose and write them down before any code, so two products never share a look.</p></div>
-    <div class="card"><h3>Build from a spec</h3><p>A 2 KB JSON spec becomes a complete page: nav, KPIs with sparklines, charts, table with loading, empty and error states, i18n.</p></div>
-    <div class="card"><h3>Pre-flight judgement</h3><p>A script catches AI tells (purple gradients, gradient text, Sparkles icons, filler copy), structure faults and WCAG contrast before you ship.</p></div>
-    <div class="card"><h3>Cheap by design</h3><p>A 2.6K-token quick card instead of the 34K of full references, one verification call, a named call budget. The dashboard brief measured 831,640 context tokens and 10 tool calls — one run, and the file it wrote is in the repository.</p></div>
-    <div class="card"><h3>Every agent, every stack</h3><p>Skills-CLI agents, rules-file tools and chat-only tools from one source; plain CSS, Tailwind and React mappings; DTCG tokens for design tools.</p></div>
+</div>
+
+<main id="main">
+
+<section>
+  <div class="wrap stack">
+    <h1>You can tell which screens an agent built.</h1>
+    <p class="lead">The purple-to-blue gradient. The Sparkles icon. Three identical cards under a
+    hero that says nothing. Every agent reaches for the same defaults, so every product ends up
+    wearing the same face.</p>
+    <p class="lead"><strong>jbelly-ui</strong> is a UI system your agent installs: exact colour and
+    spacing tokens, 25 component recipes written as literal class strings, a builder that turns a
+    small JSON spec into a whole page, and a script that exits non-zero when a screen drifts back to
+    those defaults. That script runs on your code too — one file, stock Python, nothing to install.</p>
+    <div class="row">
+      <a class="btn btn-primary" href="skills/jbelly-ui/assets/app-shell.html">Open the live demo</a>
+      <a class="btn" href="https://github.com/mohammadJohar/jbelly-ui">Source on GitHub</a>
+    </div>
+    <div class="cmd">
+      <code id="install-cmd">npx skills add mohammadJohar/jbelly-ui -a claude-code</code>
+      <button class="copy" type="button" id="copy-btn">Copy</button>
+    </div>
+    <p class="small">MIT · no account, no API key, no telemetry · works with Claude Code, Cursor,
+    Codex, Copilot, Gemini CLI and anything else that reads skills</p>
   </div>
-  <p class="muted">Beta means: complete and measured on a few briefs with one model family; help test it on yours and report through the issue templates.</p>
+  <div class="wrap shot">
+    <a href="skills/jbelly-ui/assets/app-shell.html">
+      <img id="shot" src="docs/showcase/default-light.png" width="1440" height="1000" loading="lazy"
+           alt="The app shell: collapsible sidebar, search and notifications header, four KPI cards
+                with sparklines, an area chart, a donut with a channel breakdown, and a data table
+                with filters and pagination.">
+    </a>
+    <p class="small">The demo, as it ships. Open it and everything works — collapse the sidebar,
+    press ⌘K, sort a column, switch to Arabic. This capture is taken from that file by
+    <code>scripts/capture_showcase.py</code>, so it cannot fall behind the code.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap stack">
+    <h2>Every colour on this page came from the skill</h2>
+    <p class="sub">The rail at the top writes one class on this document and changes nothing else.
+    The typeface, the corner radius, the surface tint and the brand colour all move together,
+    because they are tokens rather than values typed into components. A re-brand is one file, not a
+    sweep through the markup.</p>
+    <p class="sub">The same six presets ship inside the skill, and the agent has to choose one and
+    write it to <code>design/personality.md</code> before it writes any code — so two products do not
+    have to wear the same face.</p>
+    <div class="row">
+      <a class="btn" href="skills/jbelly-ui/assets/app-shell.html">App shell</a>
+      <a class="btn" href="skills/jbelly-ui/assets/landing-shell.html">Landing page</a>
+      <a class="btn" href="skills/jbelly-ui/assets/pricing-shell.html">Pricing page</a>
+    </div>
+    <p class="small">Three self-contained demos, one HTML file each. Everything in them works:
+    sidebar collapse, ⌘K palette, table loading, empty and error states, drawer, column sort,
+    notifications, and AR/EN with full RTL.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap stack">
+    <h2>It is a script, not an opinion</h2>
+    <p class="sub">Most design guidance is advice an agent can skip. This is eleven rules with an
+    exit code. <code>preflight.py</code> reads a file or a folder and fails when it finds one,
+    printing <code>file:line</code> so the fix is a single edit.</p>
+    <div class="refuse" data-preflight="quote">
+      <div><strong>Purple–indigo gradients</strong><span>the palette every generated hero arrives in</span></div>
+      <div><strong>Gradient text</strong><span>bg-clip-text on a headline</span></div>
+      <div><strong>Sparkles, Zap, Rocket icons</strong><span>decoration standing in for meaning</span></div>
+      <div><strong>A hero over three identical cards</strong><span>the default page shape</span></div>
+      <div><strong>Filler adjectives</strong><span>Elevate, Seamless, Unleash, Supercharge, Next-gen</span></div>
+      <div><strong>Emoji used as icons</strong><span>in place of a real icon set</span></div>
+      <div><strong>Glass outside a sticky header</strong><span>backdrop-blur by reflex — two allowed</span></div>
+      <div><strong>rounded-2xl with a heavy shadow</strong><span>on everything — two allowed</span></div>
+      <div><strong>transition on every property</strong><span>animates layout, janks, never intended</span></div>
+      <div><strong>Pure black body text</strong><span>on white, never correct</span></div>
+      <div><strong>Generated placeholder avatars</strong><span>DiceBear and its relatives</span></div>
+    </div>
+    <p class="small">Two of the eleven allow two hits before failing, because a rule with no
+    tolerance gets switched off. The other nine allow none. It bans the purple-to-blue gradient, not
+    the colour purple — one of the six presets above has an electric-violet brand colour.</p>
+    <p class="sub">The same run checks structure and contrast: one <code>h1</code>, a skip link
+    wherever there is a nav, an accessible name on every icon-only button, and the WCAG ratio of
+    every colour role the markup actually paints text with — not only the pairs a stylesheet happens
+    to declare. On the shipped app shell that is <strong>137 ratios across 16 scopes</strong>: every
+    preset, in light and in dark.</p>
+    <pre>python skills/jbelly-ui/scripts/preflight.py ./src
+python skills/jbelly-ui/scripts/lint_tokens.py ./src</pre>
+    <p class="small">Clone the repository, or lift those two files out of it. Stock Python 3.9, no
+    dependencies, no network. They work on any project, whether or not you use the rest of this.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap stack">
+    <h2>A page costs a spec, not a conversation</h2>
+    <p class="sub">The expensive part of agent-built UI is not the thinking. It is re-sending the
+    whole context on every step while the model types out markup. So the markup is not modelled: a
+    JSON spec goes in, a finished page comes out, and every field is asserted afterwards — a value
+    that never reached the page exits non-zero instead of shipping quietly.</p>
+    <div class="grid g4">
+      <div class="card">
+        <div class="kpi">3,458</div>
+        <p class="small">bytes of spec</p>
+        <p class="kpi-src">assets/spec.example.json</p>
+      </div>
+      <div class="card">
+        <div class="kpi">73,499</div>
+        <p class="small">bytes of page — 21× larger</p>
+        <p class="kpi-src">scripts/build-screen.py</p>
+      </div>
+      <div class="card">
+        <div class="kpi">3</div>
+        <p class="small">page shapes: app, landing, pricing</p>
+        <p class="kpi-src">--kind on the builder</p>
+      </div>
+      <div class="card">
+        <div class="kpi">0</div>
+        <p class="small">model tokens spent on markup</p>
+        <p class="kpi-src">it is a Python script</p>
+      </div>
+    </div>
+    <pre>python skills/jbelly-ui/scripts/build-screen.py spec.json out.html --kind landing
+python skills/jbelly-ui/scripts/verify_page.py out.html --variants ",#dark=1,#dir=rtl"</pre>
+    <p class="small">The second command renders the page headlessly in light, dark and RTL, collects
+    console errors, runs the lint and the pre-flight, and — with Playwright installed — fails on
+    horizontal overflow at 375 and 1440. Without Playwright it falls back to any Chrome, Chromium or
+    Edge already on the machine and runs everything except the overflow check.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap stack">
+    <h2>What one screen cost</h2>
+    <p class="sub">Three briefs, each run in a workspace outside the repository with every other
+    skill switched off. Each row links to the file the run wrote, with the counts exactly as the
+    agent CLI reported them.</p>
+    <div class="scroller">
+      <table>
+        <caption class="small" style="text-align:start;padding-block:8px">Context counts every token
+        sent, cache reads included, because that is the term the cost model charges for.</caption>
+        <thead><tr><th scope="col">Brief</th><th scope="col">Context tokens</th><th scope="col">Billed</th><th scope="col">Minutes</th><th scope="col">Tool calls</th><th scope="col">Record</th></tr></thead>
+        <tbody>
+          <tr><td>Dashboard</td><td class="num">831,640</td><td class="num">97,004</td><td class="num">2.07</td><td class="num">10</td><td><a href="evals/records/01-dashboard-jbelly-ui-20260919-162651.json">run</a></td></tr>
+          <tr><td>Landing page</td><td class="num">1,321,657</td><td class="num">132,137</td><td class="num">7.21</td><td class="num">13</td><td><a href="evals/records/02-landing-jbelly-ui-20260919-164728.json">run</a></td></tr>
+          <tr><td>Pricing page</td><td class="num">4,906,916</td><td class="num">182,638</td><td class="num">9.28</td><td class="num">41</td><td><a href="evals/records/03-pricing-jbelly-ui-20260919-170349.json">run</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="sub">A pricing page cost six times a dashboard, and that gap is the useful number. The
+    dashboard was the one shape the builder knew, so a spec became the whole screen. Nothing filled
+    the landing or pricing shape, so the model wrote every line by hand — which is exactly the cost
+    this exists to remove. Both shapes have templates now, which should move those two rows a long
+    way, and nothing here claims the improvement until the briefs have been run again.</p>
+    <p class="small">One run each, one model, one agent, one machine. No repeats, so no variance:
+    read the ordering as real and the precision as not. The method, the isolation, and the numbers
+    this project has withdrawn because the harness that produced them was unfair, are all in
+    <a href="COST.md">COST.md</a>.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap stack">
+    <h2>Where it is weak</h2>
+    <div class="grid g2x2">
+      <div class="card stack-sm">
+        <h3>The cost figures are older than the tool</h3>
+        <p class="small">They were measured when the builder knew one page shape. The landing and
+        pricing rows are the cost of a model writing that markup by hand. The dashboard figure is
+        unaffected.</p>
+      </div>
+      <div class="card stack-sm">
+        <h3>One run, one model, one agent</h3>
+        <p class="small">Everything outside this machine's single model family and single agent is
+        untested. Twelve briefs exist in the repository; three have been measured.</p>
+      </div>
+      <div class="card stack-sm">
+        <h3>Three generated shapes, not every shape</h3>
+        <p class="small">App screen, landing page, pricing page. Anything else is the model writing
+        markup with the system's rules in front of it, which is better than nothing and costs what it
+        costs.</p>
+      </div>
+      <div class="card stack-sm">
+        <h3>The checks are a floor, not a review</h3>
+        <p class="small">They catch the defaults, the contrast failures and the structural faults. No
+        script judges whether a screen is good, and this one does not pretend to.</p>
+      </div>
+    </div>
+    <p class="small">It is web only. About 695 KB installed across 37 files, and 57% of that is the
+    three demo shells, which you can delete.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap stack">
+    <h2>Install</h2>
+    <div class="grid g2">
+      <div class="card stack-sm">
+        <h3>Agents that read skills</h3>
+        <p class="small">Claude Code, Codex, Cursor, Copilot, Gemini CLI, Windsurf, Kiro, Roo Code,
+        OpenCode, Amp, Goose and more.</p>
+        <pre>npx skills add mohammadJohar/jbelly-ui -a claude-code</pre>
+        <p class="small">No Node? <code>./install.sh cursor</code> on macOS and Linux, or
+        <code>.\install.ps1 -Agent cursor</code> on Windows, copies the folder into place.</p>
+      </div>
+      <div class="card stack-sm">
+        <h3>Tools that read a rules file</h3>
+        <p class="small">Copy <code>dist/AGENTS.md</code> to your project root, or into the tool's
+        knowledge box.</p>
+        <h3 style="margin-top:1.25rem">Chat-only tools</h3>
+        <p class="small">Paste <code>dist/jbelly-ui-prompt.md</code> — about 5K tokens,
+        self-contained, with the tokens and a manual checklist. Both files are generated from the
+        skill, so they cannot drift from it.</p>
+      </div>
+    </div>
+    <p class="sub">Then ask for any UI: <em>add a dashboard</em>, <em>build the settings page</em>,
+    <em>restyle this table</em>, <em>review this screen</em>. The skill triggers on UI work only.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap stack">
+    <h2>Fork it, strip the name, ship it in something you charge for</h2>
+    <p class="lead">MIT. No attribution required, no per-project licence, no account, and nothing
+    here phones home. If your agent produces something bad with it, that is the result worth having:
+    the issue template asks for the brief, the agent, the model and the verdict lines.</p>
+    <div class="row">
+      <a class="btn btn-primary" href="https://github.com/mohammadJohar/jbelly-ui">Read the source</a>
+      <a class="btn" href="COST.md">How it was measured</a>
+      <a class="btn" href="evals/records/">The recorded runs</a>
+    </div>
+  </div>
+</section>
+
 </main>
+
+<footer>
+  <div class="wrap stack-sm">
+    <p>Built and maintained by JBelly. MIT — see
+    <a href="https://github.com/mohammadJohar/jbelly-ui/blob/main/LICENSE">LICENSE</a>. Fonts via
+    Google Fonts (OFL), icons Lucide (ISC), charts ApexCharts (MIT).</p>
+    <p class="small">This page is one static HTML file: no build step, no framework, no analytics and
+    no trackers. It remembers one thing in your browser — which preset you picked — and the only
+    third-party requests are the font files. It is built from the tokens at the top of its own
+    source, and the project's <code>preflight.py</code> and <code>lint_tokens.py</code> run against
+    it in CI.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var html = document.documentElement;
+  var THEMES = ['theme-clinic', 'theme-graphite', 'theme-editorial', 'theme-neo', 'theme-slate', 'theme-mint'];
+  var chips = Array.prototype.slice.call(document.querySelectorAll('#presets .chip'));
+
+  function setTheme(name) {
+    THEMES.forEach(function (t) { html.classList.remove(t); });
+    if (name) html.classList.add(name);
+    chips.forEach(function (c) {
+      var on = c.getAttribute('data-theme') === name;
+      c.setAttribute('aria-checked', String(on));
+      c.tabIndex = on ? 0 : -1;               // a radiogroup is one tab stop, not seven
+    });
+    try { localStorage.setItem('jb-preset', name); } catch (e) { /* private window: not fatal */ }
+  }
+
+  chips.forEach(function (chip, i) {
+    chip.addEventListener('click', function () { setTheme(chip.getAttribute('data-theme')); });
+    chip.addEventListener('keydown', function (e) {
+      // Arrow keys move within the group and select as they go, which is what a radiogroup does.
+      var rtl = html.getAttribute('dir') === 'rtl';
+      var fwd = e.key === 'ArrowDown' || e.key === (rtl ? 'ArrowLeft' : 'ArrowRight');
+      var back = e.key === 'ArrowUp' || e.key === (rtl ? 'ArrowRight' : 'ArrowLeft');
+      if (!fwd && !back) return;
+      e.preventDefault();
+      var next = chips[(i + (fwd ? 1 : -1) + chips.length) % chips.length];
+      setTheme(next.getAttribute('data-theme'));
+      next.focus();
+    });
+  });
+
+  var dark = document.getElementById('dark-toggle');
+  function setDark(on) {
+    html.classList.toggle('dark', on);
+    dark.setAttribute('aria-pressed', String(on));
+    dark.textContent = on ? 'Light' : 'Dark';
+    var shot = document.getElementById('shot');
+    if (shot) shot.src = 'docs/showcase/default-' + (on ? 'dark' : 'light') + '.png';
+    try { localStorage.setItem('jb-dark', on ? '1' : '0'); } catch (e) { /* not fatal */ }
+  }
+  dark.addEventListener('click', function () { setDark(!html.classList.contains('dark')); });
+
+  // A stored preference that throws must not take the page down with it, so every read is guarded
+  // and the fallback is what the markup already says.
+  var stored = null, storedDark = null;
+  try {
+    stored = localStorage.getItem('jb-preset');
+    storedDark = localStorage.getItem('jb-dark');
+  } catch (e) { /* blocked site data */ }
+  setTheme(stored === null ? '' : stored);
+  setDark(storedDark === null ? matchMedia('(prefers-color-scheme: dark)').matches : storedDark === '1');
+
+  // The same fragments the demo shells answer, so a preset is a link you can send and the
+  // verification script can drive this page the way it drives everything else.
+  (function fromUrl() {
+    var q = new URLSearchParams(location.search || location.hash.slice(1));
+    var t = q.get('theme');
+    if (t !== null) setTheme(THEMES.indexOf(t) > -1 ? t : '');
+    var d = q.get('dark');
+    if (d === '0' || d === '1') setDark(d === '1');
+  })();
+
+  var copy = document.getElementById('copy-btn');
+  copy.addEventListener('click', function () {
+    var text = document.getElementById('install-cmd').textContent;
+    var done = function () {
+      copy.textContent = 'Copied';
+      setTimeout(function () { copy.textContent = 'Copy'; }, 1600);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, function () { copy.textContent = 'Select and copy'; });
+    } else {
+      copy.textContent = 'Select and copy';
+    }
+  });
+})();
+</script>
 </body>
 </html>

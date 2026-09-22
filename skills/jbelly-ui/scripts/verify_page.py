@@ -131,7 +131,7 @@ def main():
         print(f"[{status}] variant '{v or '(default)'}' @ {w}px: screenshot {size:,} bytes -> {png}")
         for r in why: print("    " + r)
         for e in errors[:3]: print("    " + e)
-    lint = subprocess.run([sys.executable, os.path.join(os.path.dirname(__file__), "lint_tokens.py"), os.path.dirname(path), "--quiet"], capture_output=True, text=True)
+    lint = subprocess.run([sys.executable, os.path.join(os.path.dirname(__file__), "lint_tokens.py"), path, "--quiet"], capture_output=True, text=True)
     print(f"[{'OK' if lint.returncode == 0 else 'FAIL'}] token lint: {'no raw palette classes' if lint.returncode == 0 else lint.stdout.strip().splitlines()[-2:]}")
     fail |= lint.returncode != 0
     pf = subprocess.run([sys.executable, os.path.join(os.path.dirname(__file__), "preflight.py"), path], capture_output=True, text=True, encoding="utf-8", errors="replace")
