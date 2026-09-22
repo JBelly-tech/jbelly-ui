@@ -1,5 +1,56 @@
 # Changelog
 
+## 0.6.0-beta.1 — 2026-09-22
+
+**A motion system, and a linter that refuses decoration.** Motion here reports a state change and
+nothing else: every animating element declares its cause from a closed set of six, and an animation
+whose target resolves no cause is decoration by definition. It is declared in `references/motion.css`
+rather than computed in JavaScript, which is what makes it checkable — a stylesheet cannot animate on
+a timer or on scroll position unless someone writes a timeline for it, so nothing moves by default.
+`lint_motion.py` implements fourteen source rules and `verify_motion.py` eight runtime ones, both
+built against 107 fixtures: one per rule for the smallest source that should trip it, and one for the
+legitimate code that most resembles a violation. `prefers-reduced-motion` removes the travel and
+shortens the tempo while opacity, colour and position keep carrying the message, with four named
+exceptions where the position *is* the state.
+
+**`check_controls.py`: every control is driven, so "everything works" stops being a promise.** It
+activates every button, menu item, tab, radio, summary and same-page link in a real browser, each in
+its own browser context so nothing the last one chose is remembered, and fails on any control that
+produces no change. Getting it to tell the truth took five corrections, every one of them the tool
+being wrong rather than a page: an empty fragment counted as a navigation, focus landing on the
+control you just clicked counted as evidence, a `<select>` was clicked rather than changed, an
+`sr-only` radio behind a visible label was driven directly, and the sweep depended on the order it
+happened to run in. It then found real dead controls in four of the five shipped pages.
+
+**A storefront demo**, `assets/commerce-shell.html`: browse, filter, sort, search, quick view,
+variants with out-of-stock combinations disabled, a cart with promo codes and undo, and a four-step
+checkout that validates — all client-side, one file. Six independent testers reported 119 defects and
+sixteen of them were one bug: a region repainted with `innerHTML` deletes the node the reader is
+holding, so focus falls to the body. One focus layer replaced sixteen patches.
+
+**Two page shapes joined the builder.** `--kind landing` and `--kind pricing` build from their own
+spec schemas, so the two briefs that cost the most — a pricing page measured six times a dashboard —
+are generated rather than typed. The app kind is byte-identical to before.
+
+**A colour used as text is now checked as text.** The pre-flight compared the pairs a page declares,
+so a page painting links with `text-primary` and never declaring `--primary-accent` had nothing
+compared at all: three shells shipped links at 3.96:1 in dark mode. It now reads the roles the markup
+actually paints text with. The same check then caught `--destructive` failing as error text, which is
+the one sentence a reader most needs to read. Both roles have a readable form derived per scope.
+
+**The pre-flight's cascade model was wrong** and only the new role exposed it: it walked the
+stylesheet top to bottom and let the last matching block win, so a `.theme-x` block written below a
+`.theme-x.dark` block overrode it. Checked against a real engine before changing anything.
+
+**Every published number points at a file.** `evals/records/` carries the run each figure comes from,
+as the agent CLI reported it. Three numbers did not survive that and were withdrawn rather than
+restated — including a before-and-after pair that flattered this project, because the harness that
+produced it denied every condition access to its own skill directory.
+
+**The site is the product.** `index.html` is built from the skill's own tokens, rethemes itself
+through the same six presets, and is held to the skill's own lint, pre-flight, motion checks and
+control driver in CI.
+
 ## 0.5.0-beta.4 — 2026-09-19
 
 - **`build-screen.py` now applies the whole spec, and fails instead of pretending.** It swapped the
