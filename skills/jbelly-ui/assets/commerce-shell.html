@@ -122,6 +122,121 @@
   --radius-xl: calc(var(--radius) + 4px); --radius-lg: var(--radius); --radius-md: calc(var(--radius) - 2px); --radius-sm: calc(var(--radius) - 4px);
   --shadow-xs: var(--shadow-xs); --shadow-md: var(--shadow-md);
 }
+/* MOTION TOKENS START */
+:root {
+  /* the two switches — reduced motion moves these and nothing else */
+  --travel-on: 1;        /* 1 = displacement allowed. Reduced motion sets 0.   */
+  --motion-reduce: 1;    /* tempo multiplier under reduce. Reduced motion 0.7. */
+
+  /* direction — the whole RTL mechanism */
+  --flow-x: 1;           /* multiply EVERY authored inline-axis length by this */
+  --origin-inline: left; /* transform-origin has no logical keyword; this is it */
+
+  /* preset + density dials */
+  --motion-preset: 1;    /* a personality may set 0.85 .. 1.15 and nothing else */
+  --travel-density: 1;   /* a density may set 0.75 .. 1.25 and nothing else     */
+  --motion-scale: calc(var(--motion-preset) * var(--motion-reduce));
+  --motion-max: 450ms;   /* nothing in this system may resolve longer           */
+  --reduced: var(--travel-on);  /* canary the runtime probe reads off :root     */
+
+  /* base durations, named by CLASS OF CHANGE, never by component */
+  --d-0:         0ms;    /* keyboard-initiated: no animation, ever              */
+  --d-press:   100ms;    /* the control received the press                      */
+  --d-tint:    140ms;    /* paint-tier state change; also the paint-tier cap    */
+  --d-pop:     180ms;    /* tooltip / menu / popover ENTER                      */
+  --d-pop-out: 130ms;    /*                              LEAVE                  */
+  --d-menu:    220ms;    /* disclosure, selection marker, inline panel ENTER    */
+  --d-menu-out:150ms;    /*                                          LEAVE      */
+  --d-move:    260ms;    /* an object kept its identity and changed position    */
+  --d-panel:   300ms;    /* drawer, dialog, sheet, command palette ENTER        */
+  --d-panel-out:200ms;   /*                                         LEAVE       */
+  --d-heavy:   390ms;    /* destructive or irreversible; overdamped             */
+
+  /* resolved: what every recipe references */
+  --t-press:     calc(var(--d-press)     * var(--motion-scale));
+  --t-tint:      calc(var(--d-tint)      * var(--motion-scale));
+  --t-pop:       calc(var(--d-pop)       * var(--motion-scale));
+  --t-pop-out:   calc(var(--d-pop-out)   * var(--motion-scale));
+  --t-menu:      calc(var(--d-menu)      * var(--motion-scale));
+  --t-menu-out:  calc(var(--d-menu-out)  * var(--motion-scale));
+  --t-move:      calc(var(--d-move)      * var(--motion-scale));
+  --t-panel:     calc(var(--d-panel)     * var(--motion-scale));
+  --t-panel-out: calc(var(--d-panel-out) * var(--motion-scale));
+  --t-heavy:     calc(var(--d-heavy)     * var(--motion-scale));
+
+  /* not UI tempo: unscaled, exempt from the 80-450ms budget */
+  --t-grace:   250ms;    /* no wait shorter than this is reported as pending     */
+  --t-elapsed:   30s;    /* how long a wait has lasted. FINITE: it is not a loop */
+  --t-linger:     6s;    /* how long a "this just changed" mark stays on screen  */
+
+  /* easings: enter decelerates, exit accelerates, loops do not exist */
+  --ease-enter: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --ease-exit:  cubic-bezier(0.3, 0, 0.8, 0.15);
+  --ease-move:  cubic-bezier(0.2, 0, 0, 1);
+  --ease-tint:  cubic-bezier(0.2, 0, 0.38, 0.9);
+  --ease-flat:  linear;              /* elapsed time and scroll position ONLY   */
+
+  /* Springs as linear(). Critically damped and overdamped only: no curve in
+     this system has a stop above 1, because an overshoot clamps on opacity and
+     colour into a visible dead hold. Each is paired with the duration it means. */
+  --spring-ui: linear(0, 0.004 1%, 0.0229 2.5%, 0.0789 5%, 0.4656 17%, 0.6384 23.5%,
+    0.7641 30%, 0.8147 33.5%, 0.8604 37.5%, 0.8993 42%, 0.9305 47%, 0.9542 52.5%,
+    0.9712 58.5%, 0.9912 73.5%, 1);            /* zeta 1.00 — pair with --t-panel */
+  --spring-heavy: linear(0, 0.0105 1%, 0.0541 2.5%, 0.4077 10.5%, 0.6101 16.5%,
+    0.6849 19.5%, 0.7544 23%, 0.8154 27%, 0.8613 31%, 0.8995 35.5%, 0.9321 41%,
+    0.9558 47%, 0.9722 53.5%, 0.9918 70.5%, 1); /* zeta 1.31 — pair with --t-heavy */
+  --ease-elapsed: linear(0, 0.42 6%, 0.68 16%, 0.82 30%, 0.9 46%, 0.95 68%, 1);
+  --ease-elapsed-steps: steps(8, end);          /* the reduced answer for elapsed  */
+
+  /* travel: one unit, bent by density, nulled by reduce */
+  --travel-unit: calc(4px * var(--travel-density) * var(--travel-on));
+  --travel-sm:   var(--travel-unit);                    /*  4px  */
+  --travel:      calc(var(--travel-unit) * 2);          /*  8px  */
+  --travel-lg:   calc(var(--travel-unit) * 4);          /* 16px  */
+  --recoil:      calc(var(--travel-unit) * 0.75);       /*  3px  */
+  --panel-travel: calc(100% * var(--travel-on));
+  --press-depth: 0.03;  --press-scale: calc(1 - var(--press-depth) * var(--travel-on));
+  --pop-depth:   0.04;  --pop-scale:   calc(1 - var(--pop-depth)   * var(--travel-on));
+  --elapsed-cap: 0.92;  /* the pending bar stops here: it does not know when it ends */
+  --seam-range:  48px;  /* scroll distance over which a sticky seam resolves        */
+
+  /* the one surface value motion needs and the colour roles above lack */
+  --scrim: color-mix(in oklab, var(--foreground) 45%, transparent);
+}
+
+/* Direction. Both selectors on purpose: :dir() for the document, the attribute
+   for a subtree that sets dir on itself. */
+:root:dir(rtl), [dir="rtl"] { --flow-x: -1; --origin-inline: right; }
+
+/* Density changes DISTANCE only. A compact UI is not a faster UI. */
+.density-compact { --travel-density: 0.75; }
+.density-airy    { --travel-density: 1.25; }
+
+/* A personality may set --motion-preset (0.85-1.15), --ease-enter,
+   --press-depth and --pop-depth. At most three of them. Nothing else. */
+.theme-graphite  { --motion-preset: 0.85; }
+.theme-slate     { --motion-preset: 0.9; }
+.theme-clinic    { --ease-enter: var(--spring-ui); }
+.theme-editorial { --motion-preset: 1.15; }
+.theme-neo       { --motion-preset: 0.85; --press-depth: 0.05; }
+.theme-mint      { --motion-preset: 1.1;  --pop-depth: 0.06; }
+
+/* Reduced motion. This REPLACES the blanket `* { duration: 0.01ms !important }`
+   block this file used to end with. Travel goes to zero and the tempo shortens;
+   opacity, colour and position keep working, so every state is still reported.
+   The four named exceptions live in motion.css, next to the recipes they answer. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --travel-on: 0;
+    --motion-reduce: 0.7;
+    --ease-enter: var(--ease-tint);
+    --ease-exit:  var(--ease-tint);
+    --ease-elapsed: var(--ease-elapsed-steps);
+  }
+  html { scroll-behavior: auto; }
+}
+/* MOTION TOKENS END */
+
 @theme { --text-2sm: 0.8125rem; --text-2sm--line-height: 1.3; --text-2xs: 0.6875rem; --text-2xs--line-height: 1.2; }
 @layer base {
   * { border-color: var(--border); }
@@ -129,12 +244,11 @@
   body { background: var(--background); color: var(--foreground); -webkit-font-smoothing: antialiased; }
   :focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
   .scroll-thin { scrollbar-width: thin; scrollbar-color: var(--accent) transparent; }
-  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
 }
 @layer components {
   .container-fixed { @apply w-full grow px-6 xl:mx-auto xl:px-7.5 xl:max-w-(--breakpoint-xl); }
   /* buttons */
-  .btn { @apply inline-flex items-center justify-center gap-1.5 shrink-0 whitespace-nowrap font-medium rounded-md shadow-xs transition-colors cursor-pointer h-(--ctl-h) px-3 text-2sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background disabled:opacity-50 disabled:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0; }
+  .btn { @apply inline-flex items-center justify-center gap-1.5 shrink-0 whitespace-nowrap font-medium rounded-md shadow-xs cursor-pointer h-(--ctl-h) px-3 text-2sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background disabled:opacity-50 disabled:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0; }
   .btn-sm { @apply h-(--ctl-h-sm) px-2.5 text-xs gap-1.25; }
   .btn-icon { @apply p-0 w-(--ctl-h); }
   .btn-icon.btn-sm { @apply w-(--ctl-h-sm); }
@@ -143,7 +257,7 @@
   .btn-ghost { @apply shadow-none bg-transparent text-accent-foreground hover:bg-accent; }
   .btn-destructive { @apply bg-destructive text-destructive-foreground hover:bg-destructive/90; }
   /* inputs */
-  .input { @apply flex w-full rounded-md border border-input bg-background text-foreground shadow-xs placeholder:text-muted-foreground transition-colors h-(--ctl-h) px-3 text-2sm focus-visible:outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40; }
+  .input { @apply flex w-full rounded-md border border-input bg-background text-foreground shadow-xs placeholder:text-muted-foreground h-(--ctl-h) px-3 text-2sm focus-visible:outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40; }
   .input-sm { @apply h-(--ctl-h-sm) px-2.5 text-xs; }
   .select { @apply appearance-none cursor-pointer pe-8 bg-no-repeat bg-[length:14px_11px] bg-[position:right_0.6rem_center] rtl:bg-[position:left_0.6rem_center]; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%239f9fa9' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3E%3C/svg%3E"); }
   .checkbox { @apply appearance-none shrink-0 size-4 rounded-sm border border-input bg-background shadow-xs cursor-pointer checked:bg-primary checked:border-primary bg-center bg-no-repeat focus-visible:ring-2 focus-visible:ring-ring/40; }
@@ -169,7 +283,7 @@
   .table th { @apply h-11 px-4 text-start align-middle text-xs font-normal text-secondary-foreground border-b border-border whitespace-nowrap; }
   .table td { @apply px-4 align-middle border-b border-border h-(--row-h); }
   .table tbody tr:last-child td { @apply border-b-0; }
-  .table tbody tr { @apply hover:bg-muted/40 transition-colors; }
+  .table tbody tr { @apply hover:bg-muted/40; }
   .table tbody tr.selected { @apply bg-accent; }
   /* nav */
   .nav-heading { @apply px-2.5 pt-4 pb-1 text-xs font-medium uppercase text-sidebar-muted; }
@@ -186,7 +300,7 @@
   .menu { @apply min-w-44 rounded-md border border-border bg-popover text-popover-foreground shadow-md p-2 flex flex-col gap-0.5 z-50; }
   .menu-item { @apply flex items-center gap-2.5 rounded-md px-2 py-2 text-2sm text-foreground cursor-pointer hover:bg-accent [&_svg]:size-4 [&_svg]:text-muted-foreground; }
   .kbd { @apply inline-flex h-5 items-center rounded-sm border border-border bg-muted px-1.5 font-mono text-2xs text-secondary-foreground; }
-  .skeleton { @apply animate-pulse rounded-md bg-accent; }
+  .skeleton { @apply rounded-md bg-accent; }
 }
 
 /* ===== storefront additions (same token vocabulary, no new colours) ===== */
@@ -194,7 +308,7 @@
 @layer components {
   .chip { @apply inline-flex items-center gap-1 h-10 md:h-7 ps-2.5 pe-0 md:pe-1 rounded-md border border-border bg-muted text-xs text-secondary-foreground; }
   .chip-x { @apply inline-flex items-center justify-center size-10 md:size-6 rounded-md md:rounded-sm text-muted-foreground hover:bg-accent hover:text-foreground cursor-pointer [&_svg]:size-3.5; }
-  .opt { @apply inline-flex items-center justify-center min-h-10 px-3 rounded-md border border-input bg-background text-2sm text-secondary-foreground cursor-pointer transition-colors hover:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background; }
+  .opt { @apply inline-flex items-center justify-center min-h-10 px-3 rounded-md border border-input bg-background text-2sm text-secondary-foreground cursor-pointer hover:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background; }
   .opt[aria-pressed="true"] { @apply border-primary bg-primary/10 text-primary-accent font-medium; }
   .opt[disabled] { @apply opacity-40 cursor-not-allowed line-through hover:border-input; }
   .swatch { @apply relative inline-flex size-9 items-center justify-center rounded-full border border-border cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background; }
@@ -227,24 +341,399 @@ input[type="radio"].checkbox { border-radius: 999px; }
 input[type="radio"].checkbox:checked { background-image: none; box-shadow: inset 0 0 0 3px var(--background); }
 .acc-body { display: none; }
 .acc.open > .acc-body { display: flex; }
-.acc.open .acc-arrow { transform: rotate(180deg); }
 @media (width >= 64rem) { .acc-body { display: flex; } .acc-head { display: none; } .acc-title { display: block; } }
 .acc-title { display: none; }
-.slide-in { animation: slide-in .22s cubic-bezier(.2,.8,.2,1); }
-.fade-in { animation: fade-in .18s ease-out; }
-.pop-in { animation: pop-in .2s cubic-bezier(.2,.8,.2,1); }
-@keyframes slide-in { from { transform: translateX(var(--slide-from, 18px)); opacity: 0 } to { transform: none; opacity: 1 } }
-@keyframes fade-in { from { opacity: 0 } to { opacity: 1 } }
-@keyframes pop-in { from { transform: translateY(6px) scale(.985); opacity: 0 } to { transform: none; opacity: 1 } }
-[dir="rtl"] .slide-in { --slide-from: -18px; }
-@media (prefers-reduced-motion: reduce) { .slide-in, .fade-in, .pop-in { animation: none } }
+</style>
+
+<!-- motion: references/motion.css, inlined. Plain CSS on purpose - it must beat
+     @layer utilities and must not pass through the Tailwind browser compiler. -->
+<style id="jb-motion">
+/* ==========================================================================
+   jbelly-ui motion. Twelve recipes. No colour, no literal tempo, no literal
+   distance: every value comes from the MOTION TOKENS region of tokens.css.
+
+   Loaded as plain CSS, AFTER Tailwind. In a single-file page it is inlined into a
+   style element with id="jb-motion", placed immediately after the closing tag of the
+   type="text/tailwindcss" block. Unlayered on purpose: it must beat @layer utilities and it
+   must not pass through the browser compiler. Nothing in this file may contain the character
+   sequence that closes a style element, comment or not: the HTML parser ends the block there
+   and the whole sheet is silently dropped. V01 is the check that catches it.
+
+   THE THREE DECLARED LAYOUT EXCEPTIONS IN THIS SYSTEM:
+   motion-exception: #sidebar — inline-size: the rail's width IS the state, and
+     no composited property expresses how much space an element occupies.
+   motion-exception: .disclosure::details-content — block-size / grid-template-rows:
+     an intrinsic panel has no portable composited equivalent.
+   motion-exception: .list-item — grid-template-rows: the gap closing after a
+     removal is the second half of the departure report.
+   ========================================================================== */
+
+/* -- R1 - PRESS ----------------------------- data-motion="feedback" -- */
+.btn, .input, .checkbox, .select, .menu-item, .nav-link, .nav-child, .seg,
+.table tbody tr, .tick {
+  transition: background-color var(--t-tint) var(--ease-tint),
+              border-color     var(--t-tint) var(--ease-tint),
+              color            var(--t-tint) var(--ease-tint);
+}
+.btn {
+  transition: scale            var(--t-press) var(--ease-exit),
+              background-color var(--t-tint)  var(--ease-tint),
+              border-color     var(--t-tint)  var(--ease-tint),
+              color            var(--t-tint)  var(--ease-tint);
+}
+.btn:active { scale: var(--press-scale); }
+/* seen 100+ times a day: no motion at all. */
+[data-frequency="constant"] { transition-duration: var(--d-0); }
+/* the ring is instant: a transitioned focus ring lags the keyboard, which reads
+   as input latency. This rule is why M03 fails any transition on :focus-visible. */
+:focus-visible { transition-property: background-color, border-color, color; }
+
+/* -- R2 - MENU FROM ITS TRIGGER -------------- data-motion="spatial" -- */
+/* Preferred form for new markup: popover, zero JavaScript, enter AND exit. */
+.menu[popover] {
+  margin: 0; opacity: 0; scale: var(--pop-scale);
+  translate: 0 calc(-1 * var(--travel-sm));
+  transform-origin: top var(--origin-inline);
+  transition: opacity   var(--t-pop-out) var(--ease-exit),
+              scale     var(--t-pop-out) var(--ease-exit),
+              translate var(--t-pop-out) var(--ease-exit),
+              overlay   var(--t-pop-out) allow-discrete,
+              display   var(--t-pop-out) allow-discrete;
+}
+.menu[popover]:popover-open {
+  opacity: 1; scale: 1; translate: 0 0;
+  transition-duration: var(--t-pop);
+  transition-timing-function: var(--ease-enter);
+}
+/* MUST come after the open rule: equal specificity, source order decides. */
+@starting-style {
+  .menu[popover]:popover-open {
+    opacity: 0; scale: var(--pop-scale); translate: 0 calc(-1 * var(--travel-sm));
+  }
+}
+/* Shell-compatible form: the page's own JS flips data-open instead of .hidden.
+   Not the top layer, so the exit animates in every engine, not just Chromium. */
+.menu[data-menu] {
+  display: none; opacity: 0; scale: var(--pop-scale);
+  translate: 0 calc(-1 * var(--travel-sm));
+  transform-origin: top var(--origin-inline);
+  transition: opacity   var(--t-pop-out) var(--ease-exit),
+              scale     var(--t-pop-out) var(--ease-exit),
+              translate var(--t-pop-out) var(--ease-exit),
+              display   var(--t-pop-out) allow-discrete;
+}
+.menu[data-menu][data-open] {
+  display: flex; opacity: 1; scale: 1; translate: 0 0;
+  transition-duration: var(--t-pop);
+  transition-timing-function: var(--ease-enter);
+}
+@starting-style {
+  .menu[data-menu][data-open] {
+    opacity: 0; scale: var(--pop-scale); translate: 0 calc(-1 * var(--travel-sm));
+  }
+}
+@supports (anchor-name: --a) {          /* upgrade only; static placement below */
+  [data-anchor] { anchor-name: --jb-anchor; }
+  .menu[data-anchored] {
+    position: fixed; position-anchor: --jb-anchor;
+    position-area: block-end span-inline-start;    /* logical: RTL-correct free */
+    position-try-fallbacks: flip-block, flip-inline;
+    margin-block-start: var(--travel-sm);
+  }
+}
+
+/* -- R3 - PANEL + SCRIM ------ data-motion="spatial" | "continuity" --- */
+.panel {                                   /* closed state = the exit style */
+  display: none; opacity: 0;
+  translate: calc(var(--flow-x) * var(--panel-travel)) 0;
+  transition: opacity   var(--t-panel-out) var(--ease-exit),
+              translate var(--t-panel-out) var(--ease-exit),
+              display   var(--t-panel-out) allow-discrete;
+}
+.panel[data-open] {
+  display: flex; opacity: 1; translate: 0 0;
+  transition-duration: var(--t-panel);
+  transition-timing-function: var(--spring-ui);
+}
+@starting-style {
+  .panel[data-open] {
+    opacity: 0; translate: calc(var(--flow-x) * var(--panel-travel)) 0;
+  }
+}
+/* A centred overlay belongs to the viewport, not to a trigger: it scales, it
+   does not travel. The one legal transform-origin: center in the system. */
+.panel-centre { translate: 0 0; scale: var(--pop-scale); transform-origin: center;
+  transition: opacity var(--t-panel-out) var(--ease-exit),
+              scale   var(--t-panel-out) var(--ease-exit),
+              display var(--t-panel-out) allow-discrete; }
+.panel-centre[data-open] { scale: 1; }
+@starting-style { .panel-centre[data-open] { opacity: 0; scale: var(--pop-scale); } }
+/* Destructive or irreversible: heavier, slower, overdamped. Same tokens. */
+.panel-heavy[data-open] {
+  transition-duration: var(--t-heavy);
+  transition-timing-function: var(--spring-heavy);
+}
+/* The scrim is the SAME event: same two tokens, no exceptions, ever. */
+.scrim {
+  display: none; opacity: 0; background: var(--scrim);
+  transition: opacity var(--t-panel-out) var(--ease-exit),
+              display var(--t-panel-out) allow-discrete;
+}
+.scrim[data-open] {
+  display: block; opacity: 1;
+  transition-duration: var(--t-panel);
+  transition-timing-function: var(--ease-enter);
+}
+@starting-style { .scrim[data-open] { opacity: 0; } }
+.panel-heavy[data-open] ~ .scrim[data-open] { transition-duration: var(--t-heavy); }
+
+/* -- R4 - DISCLOSURE -------------------------- data-motion="state" --- */
+/* motion-exception: .disclosure::details-content */
+.disclosure-chevron {
+  rotate: 0deg;
+  transition: rotate var(--t-menu) var(--ease-move);
+}
+[dir="rtl"] .disclosure-chevron { rotate: 180deg; }   /* a directional glyph mirrors */
+.disclosure[open] > summary .disclosure-chevron,
+[aria-expanded="true"] .disclosure-chevron { rotate: calc(90deg * var(--flow-x)); }
+@supports selector(::details-content) {
+  .disclosure::details-content {
+    block-size: 0; overflow: clip;
+    transition: block-size        var(--t-menu) var(--ease-move),
+                content-visibility var(--t-menu) allow-discrete;
+  }
+  .disclosure[open]::details-content { block-size: auto; }
+  @supports (interpolate-size: allow-keywords) { :root { interpolate-size: allow-keywords; } }
+  @supports not (interpolate-size: allow-keywords) {   /* portable, no measurement */
+    .disclosure::details-content {
+      block-size: auto; display: grid; grid-template-rows: 0fr;
+      transition: grid-template-rows  var(--t-menu) var(--ease-move),
+                  content-visibility  var(--t-menu) allow-discrete;
+    }
+    .disclosure[open]::details-content { grid-template-rows: 1fr; }
+    .disclosure::details-content > * { min-block-size: 0; overflow: clip; }
+  }
+}
+
+/* -- R5 - SELECTION MARKER -------------------- data-motion="state" --- */
+/* The group MUST be equal columns: the marker's position is then arithmetic,
+   so no measurement and no JavaScript are needed. */
+.marker-group {
+  --mark-i: 0; --mark-n: 2;
+  position: relative; display: grid;
+  grid-auto-flow: column; grid-auto-columns: 1fr;
+}
+.marker-group:has(> :nth-child(2) :checked) { --mark-i: 1; }
+.marker-group:has(> :nth-child(3) :checked) { --mark-i: 2; }
+.marker-group:has(> :nth-child(4) :checked) { --mark-i: 3; }
+.marker {
+  position: absolute; inset-block-end: 0; inset-inline-start: 0;
+  inline-size: calc(100% / var(--mark-n)); block-size: 2px;
+  background: var(--primary);
+  translate: calc(var(--flow-x) * var(--mark-i) * 100%) 0;
+  transition: translate var(--t-menu) var(--spring-ui);
+}
+.marker-fill { inset-block: 0; block-size: auto; border-radius: var(--radius-md);
+  background: var(--card); z-index: 0; }   /* segmented control variant */
+
+/* -- R6 - ARRIVAL AND DEPARTURE --------------- data-motion="state" --- */
+/* Gated on [data-ready], which one line of script sets after load. Rows that
+   were in the server markup therefore render with no entrance: the page
+   arriving is not a state change. */
+html[data-ready] .arrives {
+  opacity: 1; translate: 0 0;
+  transition: opacity   var(--t-menu) var(--ease-enter),
+              translate var(--t-menu) var(--ease-enter);
+}
+@starting-style {
+  html[data-ready] .arrives { opacity: 0; translate: 0 calc(-1 * var(--travel)); }
+}
+.arrives[data-new] {          /* the non-motion half: a mark that outlives it */
+  box-shadow: inset calc(2px * var(--flow-x)) 0 0 0 var(--primary);
+}
+.departs[data-leaving] {
+  opacity: 0;
+  translate: calc(var(--flow-x) * var(--travel)) 0;
+  pointer-events: none;       /* legal ONLY while leaving, never as a gate */
+  transition: opacity   var(--t-menu-out) var(--ease-exit),
+              translate var(--t-menu-out) var(--ease-exit);
+}
+/* motion-exception: .list-item */
+.list-item { display: grid; grid-template-rows: 1fr;
+  transition: grid-template-rows var(--t-menu-out) var(--ease-exit); }
+.list-item > * { min-block-size: 0; overflow: clip; }
+.list-item[data-leaving] { grid-template-rows: 0fr; }
+
+/* -- R7 - SIDEBAR COLLAPSE --------------- data-motion="continuity" -- */
+/* motion-exception: #sidebar */
+#sidebar { transition: inline-size var(--t-panel) var(--ease-move); }
+#sidebar .nav-title, #sidebar .nav-badge {
+  transition: opacity var(--t-menu-out) var(--ease-exit);
+}
+/* One subject: the content pane follows the rail through layout, it does not
+   run an animation of its own. */
+.shell-main, .shell-header { transition: none; }
+
+/* -- R8 - REVISED IN PLACE -------------------- data-motion="state" --- */
+.revises { position: relative; }
+.revises::before {
+  content: ""; position: absolute; inset-block: 0; inset-inline-start: 0;
+  inline-size: 2px; background: var(--muted-foreground); opacity: 0;
+  transition: opacity var(--t-tint) var(--ease-enter);
+  pointer-events: none;
+}
+.revises[data-changed]::before      { opacity: 1; }
+.revises[data-changed="up"]::before   { background: var(--success); }
+.revises[data-changed="down"]::before { background: var(--destructive); }
+
+/* -- R9 - REFUSAL ----------------------------- data-motion="state" --- */
+.refuses[data-refused] { animation: jb-recoil var(--t-heavy) var(--spring-heavy) both; }
+@keyframes jb-recoil {
+  0%   { translate: 0 0; }
+  30%  { translate: calc(var(--recoil) * -1 * var(--flow-x)) 0; }
+  100% { translate: 0 0; }
+}
+
+/* -- R10 - PENDING --------------------------- data-motion="status" --- */
+/* The answer to the spinner and the shimmer. Finite, decelerating, stops at
+   92% because it does not know when the wait ends. `infinite` appears nowhere
+   in this system. */
+.pends { position: relative; }
+.pends::after {
+  content: ""; position: absolute; inset-block-start: 0; inset-inline-start: 0;
+  inline-size: 100%; block-size: 2px; background: var(--primary);
+  transform-origin: var(--origin-inline) center;
+  scale: 0 1; opacity: 0; pointer-events: none;
+}
+.pends[aria-busy="true"]::after {
+  opacity: 1;
+  animation: jb-elapsed var(--t-elapsed) var(--ease-elapsed) var(--t-grace) both;
+}
+@keyframes jb-elapsed { from { scale: 0 1; } to { scale: var(--elapsed-cap) 1; } }
+/* The skeleton goes back to being a static box that reserves height, which was
+   always its only job. It has no animation at all. */
+
+/* -- R11 - POSITION ------------------------ data-motion="position" --- */
+/* Resting truth OUTSIDE the guard: the seam is present and correct. */
+.app-seam { position: relative; }
+.app-seam::after {
+  content: ""; position: absolute; inset-inline: 0; inset-block-end: 0;
+  block-size: 1px; background: var(--border); opacity: 1;
+}
+.read-progress { display: none; }
+@supports (animation-timeline: scroll()) {
+  .app-seam::after {
+    animation: jb-seam var(--ease-flat) both;      /* shorthand FIRST: it resets */
+    animation-timeline: scroll(root block);        /* animation-timeline         */
+    animation-range: 0 var(--seam-range);
+  }
+  @keyframes jb-seam { from { opacity: 0; } to { opacity: 1; } }
+  .read-progress {
+    display: block; position: fixed; inset-block-start: 0; inset-inline: 0;
+    block-size: 2px; background: var(--primary); z-index: 60;
+    transform-origin: var(--origin-inline) center;
+    animation: jb-progress var(--ease-flat) both;
+    animation-timeline: scroll(root block);
+  }
+  @keyframes jb-progress { from { scale: 0 1; } to { scale: 1 1; } }
+}
+
+/* -- R12 - IDENTITY ----------------------- data-motion="continuity" -- */
+@supports (view-transition-name: none) {
+  /* the page did not change; only the named objects did. Without this line you
+     get the UA's undifferentiated 0.25s whole-document cross-fade. */
+  ::view-transition-old(root), ::view-transition-new(root) {
+    animation: none; mix-blend-mode: normal;
+  }
+  ::view-transition-group(*) {
+    animation-duration: var(--t-move);
+    animation-timing-function: var(--spring-ui);
+  }
+  /* members MOVE, they do not dissolve into each other. mix-blend-mode is reset
+     because the UA default is plus-lighter, which reads as a glow. */
+  ::view-transition-old(*), ::view-transition-new(*) {
+    animation: none; mix-blend-mode: normal; block-size: 100%;
+  }
+  :root:active-view-transition [data-vt-suppress] { visibility: hidden; }
+}
+
+/* == REDUCED MOTION: the four named exceptions ============================
+   The two token switches in tokens.css do everything else. These four are the
+   cases where the POSITION is the state, so nulling the travel would delete
+   the information instead of the motion. */
+@media (prefers-reduced-motion: reduce) {
+  /* the marker must still be under the selected tab: remove the travel, keep
+     the position, by removing the transition rather than the translate */
+  .marker { transition-property: none; }
+  /* layout is not reached by --travel-on, and a whole-shell reflow is the most
+     vestibular motion an admin page can produce: delete it, do not shorten it */
+  #sidebar, .disclosure::details-content, .list-item {
+    transition-property: opacity;
+  }
+  /* a scroll timeline has no duration to shorten. Detach it and rest at the
+     true state - which is why the resting styles live outside the guard. */
+  .read-progress { animation-timeline: none; display: none; }
+  .app-seam::after { animation-timeline: none; opacity: 1; }
+  /* the group carries the geometry (vestibular); the pair carries the identity
+     claim (pure opacity, safe). Collapse one, keep the other. */
+  /* 1ms, never 0.01ms: some engines round a sub-millisecond duration to zero and then never fire
+     transitionend, which breaks anything awaiting it. The literal is the point, so it is the one
+     tempo in the system written outside the token region. */
+  ::view-transition-group(*) { animation-duration: 1ms; }  /* motion-lint-ignore M01 */
+  ::view-transition-old(*), ::view-transition-new(*) {
+    animation-duration: var(--t-menu-out);
+  }
+}
+
+/* ===== commerce-shell page rules =========================================
+   What this page's own structure needs. Every value is still a token. */
+
+/* R1 names the shared component classes. These are the controls this page adds
+   on top of them, and they change the same three paint properties for the same
+   reason, so they take the same line rather than a Tailwind utility. */
+.opt, .swatch, .thumb, .chip-x, .rail-link, .tab, .qty button, .link,
+#topnav a, #announce-x {
+  transition: background-color var(--t-tint) var(--ease-tint),
+              border-color     var(--t-tint) var(--ease-tint),
+              color            var(--t-tint) var(--ease-tint);
+}
+
+/* R3. #cart and #mfilters sit on the reading-end edge and leave by it, which is
+   what .panel already does. #mmenu sits on the reading-start edge: the same
+   length with the opposite sign, still one --flow-x multiplier and no second rule
+   for RTL. The :not() matters -- an id beats .panel[data-open], so without it the
+   drawer would never arrive. */
+#mmenu.panel:not([data-open]) { translate: calc(var(--flow-x) * -1 * var(--panel-travel)) 0; }
+@starting-style {
+  #mmenu.panel[data-open] { translate: calc(var(--flow-x) * -1 * var(--panel-travel)) 0; }
+}
+/* The quick-view wrapper only centres the dialog: it appears with it and animates
+   nothing of its own, so the dialog stays the single subject. */
+#quick { display: none; }
+#quick[data-open] { display: flex; }
+/* ...and that dialog is a block. .panel[data-open] would lay its sticky header
+   out beside its body. */
+#quick > .panel[data-open] { display: block; }
+/* A surface on its way out must not take the next click. pointer-events is legal
+   while leaving, never as a gate: the exit ends in display:none either way. */
+.panel:not([data-open]), .scrim:not([data-open]), #quick:not([data-open]) { pointer-events: none; }
+
+/* A chevron that points down turns a half-turn, not a quarter: R4's tempo and
+   curve, this page's own angle. */
+.acc-arrow { rotate: 0deg; transition: rotate var(--t-menu) var(--ease-move); }
+.acc.open .acc-arrow { rotate: 180deg; }
+
+/* .app-seam promotes a STATIC host to position: relative so its pseudo-element has
+   something to anchor to. This header is already sticky, and motion.css is
+   unlayered, so the page has to say so after it. */
+header.app-seam { position: sticky; }
 </style>
 </head>
 <body class="min-h-full flex flex-col bg-background text-2sm">
-<a href="#content" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:start-2 focus:z-50 btn btn-primary btn-sm">Skip to content</a>
+<a href="#content" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:start-2 focus:z-50 btn btn-primary btn-sm" data-motion="feedback">Skip to content</a>
 
 <!-- ===== Announcement bar ===== -->
-<div id="announce" class="relative bg-mono text-mono-foreground">
+<div id="announce" class="relative bg-mono text-mono-foreground" data-motion="feedback">
   <div class="container-fixed flex items-center justify-center gap-2 py-2 pe-8 text-center text-xs">
     <i data-lucide="truck" class="size-3.5 shrink-0 rtl:-scale-x-100"></i>
     <span data-i18n="Free shipping over $75 — every order leaves the bindery within 24 hours">Free shipping over $75 — every order leaves the bindery within 24 hours</span>
@@ -253,8 +742,8 @@ input[type="radio"].checkbox:checked { background-image: none; box-shadow: inset
 </div>
 
 <!-- ===== Header ===== -->
-<header class="sticky top-0 z-30 bg-background/95 backdrop-blur-sm border-b border-border">
-  <div class="container-fixed flex items-center gap-1.5 sm:gap-3 h-(--header-height)">
+<header class="sticky top-0 z-30 bg-background/95 backdrop-blur-sm app-seam" data-motion="position">
+  <div class="container-fixed flex items-center gap-1.5 sm:gap-3 h-(--header-height)" data-motion="feedback">
     <button id="menu-btn" class="btn btn-ghost btn-icon lg:hidden" aria-label="Open menu" aria-expanded="false"><i data-lucide="menu"></i></button>
     <a href="#" data-go="catalog" data-cat="all" class="flex items-center gap-2.5 shrink-0 font-semibold text-mono">
       <span class="inline-flex size-8 items-center justify-center rounded-md bg-primary text-primary-foreground font-bold text-xs font-display">FR</span>
@@ -272,12 +761,12 @@ input[type="radio"].checkbox:checked { background-image: none; box-shadow: inset
     <div class="relative hidden md:block">
       <i data-lucide="search" class="absolute start-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none"></i>
       <input id="search" type="search" class="input ps-9 w-52 xl:w-72" placeholder="Search the shop" aria-label="Search products" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="suggest" aria-autocomplete="list" maxlength="80" data-i18n-placeholder="Search the shop">
-      <div id="suggest" role="listbox" aria-label="Search suggestions" class="menu absolute end-0 top-full mt-1.5 w-80" hidden></div>
+      <div id="suggest" role="listbox" aria-label="Search suggestions" class="menu absolute end-0 top-full mt-1.5 w-80" data-menu data-motion="spatial"></div>
     </div>
     <button id="search-m" class="btn btn-ghost btn-icon md:hidden" aria-label="Search"><i data-lucide="search"></i></button>
     <div class="relative hidden sm:block">
       <button id="account-btn" class="btn btn-ghost btn-icon" aria-label="Account" aria-haspopup="menu" aria-expanded="false"><i data-lucide="user-round"></i></button>
-      <div id="account-menu" class="menu absolute end-0 top-full mt-1.5 w-60" hidden role="menu">
+      <div id="account-menu" class="menu absolute end-0 top-full mt-1.5 w-60" data-menu data-motion="spatial" role="menu">
         <div class="px-2 py-1.5 flex flex-col"><span class="text-2sm font-medium text-mono">Nadia Freij</span><span class="text-xs text-muted-foreground">nadia@foldandrule.example</span></div>
         <div class="my-1 h-px bg-border"></div>
         <button class="menu-item" role="menuitem" data-toast="Your orders live in the account area"><i data-lucide="package"></i><span data-i18n="My orders">My orders</span></button>
@@ -295,7 +784,7 @@ input[type="radio"].checkbox:checked { background-image: none; box-shadow: inset
   </div>
 </header>
 
-<main id="content" tabindex="-1" class="grow pb-24 lg:pb-14 outline-none">
+<main id="content" tabindex="-1" class="grow pb-24 lg:pb-14 outline-none" data-motion="feedback">
 
 <!-- ===== View: catalogue ===== -->
 <section id="view-catalog" data-view="catalog">
@@ -344,7 +833,7 @@ input[type="radio"].checkbox:checked { background-image: none; box-shadow: inset
         </div>
       </div>
       <div id="chips" class="flex flex-wrap items-center gap-2 empty:hidden"></div>
-      <div id="grid" class="grid gap-(--page-gap) sm:grid-cols-2 xl:grid-cols-3" aria-busy="false"></div>
+      <div id="grid" class="pends grid gap-(--page-gap) sm:grid-cols-2 xl:grid-cols-3" aria-busy="false" data-motion="status"></div>
       <div id="grid-foot" class="flex flex-col items-center gap-3 pt-4"></div>
     </div>
   </div>
@@ -465,7 +954,7 @@ input[type="radio"].checkbox:checked { background-image: none; box-shadow: inset
 </main>
 
 <!-- ===== Footer ===== -->
-<footer class="mt-auto border-t border-border bg-card pb-14 lg:pb-12">
+<footer class="mt-auto border-t border-border bg-card pb-14 lg:pb-12" data-motion="feedback">
   <div class="container-fixed py-9 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
     <div class="flex flex-col gap-3">
       <div class="flex items-center gap-2.5 font-semibold text-mono">
@@ -475,7 +964,7 @@ input[type="radio"].checkbox:checked { background-image: none; box-shadow: inset
       <p class="text-2sm text-secondary-foreground max-w-xs" data-i18n="A bindery and a small shop on Rainbow Street. We fold, rule and stitch most of what we sell.">A bindery and a small shop on Rainbow Street. We fold, rule and stitch most of what we sell.</p>
       <p class="text-xs text-muted-foreground" data-i18n="Open Sun–Thu, 10:00–19:00">Open Sun–Thu, 10:00–19:00</p>
     </div>
-    <div class="acc border-t border-border pt-4 sm:border-0 sm:pt-0">
+    <div class="acc border-t border-border pt-4 sm:border-0 sm:pt-0" data-motion="state">
       <button type="button" class="acc-head w-full flex items-center justify-between gap-2 text-2sm font-semibold text-mono min-h-10" aria-expanded="false" aria-controls="acc-shop"><span data-i18n="Shop">Shop</span><i data-lucide="chevron-down" class="acc-arrow size-4 text-muted-foreground"></i></button>
       <h2 class="acc-title text-2sm font-semibold text-mono" data-i18n="Shop">Shop</h2>
       <ul id="acc-shop" class="acc-body flex-col gap-2 pt-3 text-2sm text-secondary-foreground">
@@ -485,7 +974,7 @@ input[type="radio"].checkbox:checked { background-image: none; box-shadow: inset
         <li><button class="link" data-go="catalog" data-cat="paper" data-i18n="Paper">Paper</button></li>
       </ul>
     </div>
-    <div class="acc border-t border-border pt-4 sm:border-0 sm:pt-0">
+    <div class="acc border-t border-border pt-4 sm:border-0 sm:pt-0" data-motion="state">
       <button type="button" class="acc-head w-full flex items-center justify-between gap-2 text-2sm font-semibold text-mono min-h-10" aria-expanded="false" aria-controls="acc-help"><span data-i18n="Help">Help</span><i data-lucide="chevron-down" class="acc-arrow size-4 text-muted-foreground"></i></button>
       <h2 class="acc-title text-2sm font-semibold text-mono" data-i18n="Help">Help</h2>
       <ul id="acc-help" class="acc-body flex-col gap-2 pt-3 text-2sm text-secondary-foreground">
@@ -495,7 +984,7 @@ input[type="radio"].checkbox:checked { background-image: none; box-shadow: inset
         <li><button class="link" data-toast="Write to hello@foldandrule.example" data-i18n="Contact">Contact</button></li>
       </ul>
     </div>
-    <div class="acc border-t border-border pt-4 sm:border-0 sm:pt-0">
+    <div class="acc border-t border-border pt-4 sm:border-0 sm:pt-0" data-motion="state">
       <button type="button" class="acc-head w-full flex items-center justify-between gap-2 text-2sm font-semibold text-mono min-h-10" aria-expanded="false" aria-controls="acc-news"><span data-i18n="Letters from the bindery">Letters from the bindery</span><i data-lucide="chevron-down" class="acc-arrow size-4 text-muted-foreground"></i></button>
       <h2 class="acc-title text-2sm font-semibold text-mono" data-i18n="Letters from the bindery">Letters from the bindery</h2>
       <div id="acc-news" class="acc-body flex-col gap-2.5 pt-3">
@@ -524,7 +1013,7 @@ input[type="radio"].checkbox:checked { background-image: none; box-shadow: inset
 </footer>
 
 <!-- ===== Mobile bottom bar ===== -->
-<nav id="bottombar" class="lg:hidden fixed bottom-0 inset-x-0 z-30 border-t border-border bg-background/95 backdrop-blur-sm" aria-label="Quick actions">
+<nav id="bottombar" class="lg:hidden fixed bottom-0 inset-x-0 z-30 border-t border-border bg-background/95 backdrop-blur-sm" aria-label="Quick actions" data-motion="feedback">
   <div class="grid grid-cols-4">
     <button class="flex flex-col items-center justify-center gap-1 min-h-14 text-2xs text-secondary-foreground cursor-pointer" data-go="catalog" data-cat="all"><i data-lucide="store" class="size-5"></i><span data-i18n="Shop">Shop</span></button>
     <button id="bb-search" class="flex flex-col items-center justify-center gap-1 min-h-14 text-2xs text-secondary-foreground cursor-pointer"><i data-lucide="search" class="size-5"></i><span data-i18n="Search">Search</span></button>
@@ -534,10 +1023,10 @@ input[type="radio"].checkbox:checked { background-image: none; box-shadow: inset
 </nav>
 
 <!-- ===== Overlays ===== -->
-<div id="scrim" class="fixed inset-0 z-40 bg-black/40 fade-in" hidden></div>
+<div id="scrim" class="scrim fixed inset-0 z-40" data-motion="spatial"></div>
 
 <!-- cart drawer -->
-<aside id="cart" class="fixed z-50 inset-y-0 end-0 w-[27rem] max-w-[88%] bg-card border-s border-border shadow-md flex flex-col slide-in" role="dialog" aria-modal="true" aria-labelledby="cart-title" hidden>
+<aside id="cart" class="panel fixed z-50 inset-y-0 end-0 w-[27rem] max-w-[88%] bg-card border-s border-border shadow-md flex-col" role="dialog" aria-modal="true" aria-labelledby="cart-title" data-motion="spatial">
   <div class="flex items-center justify-between gap-2 px-5 h-16 border-b border-border shrink-0">
     <h2 id="cart-title" class="text-base font-semibold text-mono flex items-center gap-2"><span data-i18n="Your bag">Your bag</span><span class="badge badge-sm badge-outline cart-count tabular-nums">0</span></h2>
     <button class="btn btn-ghost btn-icon" data-close="cart" aria-label="Close cart"><i data-lucide="x"></i></button>
@@ -547,8 +1036,8 @@ input[type="radio"].checkbox:checked { background-image: none; box-shadow: inset
 </aside>
 
 <!-- quick view -->
-<div id="quick" class="fixed z-50 inset-0 flex items-end sm:items-center justify-center p-0 sm:p-4 pointer-events-none" hidden>
-  <div class="pointer-events-auto w-full sm:max-w-3xl max-h-[92dvh] overflow-y-auto scroll-thin rounded-t-xl sm:rounded-xl border border-border bg-popover shadow-md pop-in" role="dialog" aria-modal="true" aria-labelledby="quick-title">
+<div id="quick" class="fixed z-50 inset-0 flex items-end sm:items-center justify-center p-0 sm:p-4 pointer-events-none" data-motion="spatial">
+  <div class="panel panel-centre pointer-events-auto w-full sm:max-w-3xl max-h-[92dvh] overflow-y-auto scroll-thin rounded-t-xl sm:rounded-xl border border-border bg-popover shadow-md" role="dialog" aria-modal="true" aria-labelledby="quick-title">
     <div class="flex items-center justify-between gap-2 px-5 h-14 border-b border-border sticky top-0 bg-popover z-10">
       <h2 id="quick-title" class="text-sm font-semibold text-mono truncate" data-i18n="Quick view">Quick view</h2>
       <button class="btn btn-ghost btn-icon" data-close="quick" aria-label="Close quick view"><i data-lucide="x"></i></button>
@@ -558,7 +1047,7 @@ input[type="radio"].checkbox:checked { background-image: none; box-shadow: inset
 </div>
 
 <!-- mobile menu -->
-<aside id="mmenu" class="fixed z-50 inset-y-0 start-0 w-80 max-w-[88%] bg-card border-e border-border shadow-md flex flex-col slide-in" role="dialog" aria-modal="true" aria-labelledby="mmenu-title" hidden>
+<aside id="mmenu" class="panel fixed z-50 inset-y-0 start-0 w-80 max-w-[88%] bg-card border-e border-border shadow-md flex-col" role="dialog" aria-modal="true" aria-labelledby="mmenu-title" data-motion="spatial">
   <div class="flex items-center justify-between gap-2 px-5 h-16 border-b border-border">
     <h2 id="mmenu-title" class="text-base font-semibold text-mono" data-i18n="Browse">Browse</h2>
     <button class="btn btn-ghost btn-icon" data-close="mmenu" aria-label="Close menu"><i data-lucide="x"></i></button>
@@ -581,7 +1070,7 @@ input[type="radio"].checkbox:checked { background-image: none; box-shadow: inset
 </aside>
 
 <!-- mobile filters -->
-<aside id="mfilters" class="fixed z-50 inset-y-0 end-0 w-88 max-w-[88%] bg-card border-s border-border shadow-md flex flex-col slide-in" role="dialog" aria-modal="true" aria-labelledby="mf-title" hidden>
+<aside id="mfilters" class="panel fixed z-50 inset-y-0 end-0 w-88 max-w-[88%] bg-card border-s border-border shadow-md flex-col" role="dialog" aria-modal="true" aria-labelledby="mf-title" data-motion="spatial">
   <div class="flex items-center justify-between gap-2 px-5 h-16 border-b border-border">
     <h2 id="mf-title" class="text-base font-semibold text-mono" data-i18n="Filters">Filters</h2>
     <button class="btn btn-ghost btn-icon" data-close="mfilters" aria-label="Close filters"><i data-lucide="x"></i></button>
@@ -594,7 +1083,7 @@ input[type="radio"].checkbox:checked { background-image: none; box-shadow: inset
 </aside>
 
 <!-- mobile search sheet -->
-<div id="msearch" class="fixed z-50 inset-0 flex flex-col bg-background" role="dialog" aria-modal="true" aria-labelledby="ms-title" hidden>
+<div id="msearch" class="panel panel-centre fixed z-50 inset-0 flex-col bg-background" role="dialog" aria-modal="true" aria-labelledby="ms-title" data-motion="spatial">
   <div class="flex items-center gap-2 px-4 h-16 border-b border-border shrink-0">
     <h2 id="ms-title" class="sr-only" data-i18n="Search the shop">Search the shop</h2>
     <div class="relative grow">
@@ -607,11 +1096,11 @@ input[type="radio"].checkbox:checked { background-image: none; box-shadow: inset
 </div>
 
 <!-- ===== Toasts + live region ===== -->
-<div id="toasts" role="status" aria-live="polite" aria-relevant="additions" class="fixed top-[calc(var(--header-height)+0.75rem)] end-4 bottom-auto lg:top-auto lg:bottom-24 lg:start-5 lg:end-auto z-50 flex flex-col gap-2.5 w-[22rem] max-w-[calc(100%-2.5rem)]"></div>
+<div id="toasts" role="status" aria-live="polite" aria-relevant="additions" data-motion="state" class="fixed top-[calc(var(--header-height)+0.75rem)] end-4 bottom-auto lg:top-auto lg:bottom-24 lg:start-5 lg:end-auto z-50 flex flex-col gap-2.5 w-[22rem] max-w-[calc(100%-2.5rem)]"></div>
 <p id="live" class="sr-only" aria-live="polite"></p>
 
 <!-- ===== Demo controls (not part of the shop) ===== -->
-<details id="demo" class="fixed bottom-16 lg:bottom-5 end-3 start-auto lg:start-5 lg:end-auto z-40 rounded-lg border border-border bg-popover shadow-md text-2sm w-auto open:w-64 lg:w-64 open:pb-3 opacity-70 hover:opacity-100 focus-within:opacity-100 open:opacity-100">
+<details id="demo" data-motion="feedback" class="fixed bottom-16 lg:bottom-5 end-3 start-auto lg:start-5 lg:end-auto z-40 rounded-lg border border-border bg-popover shadow-md text-2sm w-auto open:w-64 lg:w-64 open:pb-3 opacity-70 hover:opacity-100 focus-within:opacity-100 open:opacity-100">
   <summary class="cursor-pointer select-none px-3 py-2 font-medium text-mono flex items-center gap-2"><i data-lucide="sliders-horizontal" class="size-4 text-muted-foreground"></i><span class="hidden lg:inline">Demo controls</span><span class="lg:hidden sr-only">Demo controls</span></summary>
   <div class="px-3 flex flex-col gap-2.5">
     <label class="flex flex-col gap-1"><span class="text-xs text-muted-foreground">Personality</span>
@@ -623,6 +1112,108 @@ input[type="radio"].checkbox:checked { background-image: none; box-shadow: inset
       <input id="ctl-error" type="checkbox" class="checkbox" role="switch"></label>
   </div>
 </details>
+
+<!-- motion: assets/motion.js, inlined. The one file allowed to hand the engine a delta. -->
+<script id="jb-motion">
+/* jbelly-ui identity module. No dependencies. Optional: a page without it is
+   correct, just not animated on re-sort and re-filter.
+   Contract: an object that can appear in more than one place or order carries
+   data-vt-key, whose value is a STABLE domain id — never a loop index, never a
+   row number, because a position-derived key cannot survive the one change it
+   exists to survive. */
+window.JBMotion = (function () {
+  const root = document.documentElement;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  const css = n => getComputedStyle(root).getPropertyValue(n).trim();
+  const ms = (n, d) => { const v = css(n);
+    return v.endsWith('ms') ? parseFloat(v) : v.endsWith('s') ? parseFloat(v) * 1000 : d; };
+  const CAP = 24, MARGIN = 200;          // snapshot layers are not free
+  const held = new Set(); let running = null, busy = false;
+
+  function release() { for (const el of held) el.style.viewTransitionName = ''; held.clear(); }
+  addEventListener('pageshow', e => { if (e.persisted) release(); });  // bfcache restores stale names
+
+  /* Lease names only to RENDERED members near the action, capped. A duplicate
+     name rejects ViewTransition.ready and silently skips the whole transition,
+     so first claim wins and there is never a second. */
+  function lease(scope, anchor) {
+    release();
+    const seen = new Set(), vh = innerHeight, out = [];
+    for (const el of scope.querySelectorAll('[data-vt-key]')) {
+      const r = el.getBoundingClientRect();
+      if (!r.width || r.bottom < -MARGIN || r.top > vh + MARGIN) continue;
+      out.push([el, r.top + r.height / 2]);
+    }
+    if (anchor) {
+      const a = anchor.getBoundingClientRect(), mid = a.top + a.height / 2;
+      out.sort((p, q) => Math.abs(p[1] - mid) - Math.abs(q[1] - mid));
+    }
+    for (const [el] of out.slice(0, CAP)) {
+      const name = 'vt-' + el.dataset.vtKey.replace(/[^A-Za-z0-9_-]/g, '-');
+      if (seen.has(name)) continue;
+      seen.add(name); held.add(el); el.style.viewTransitionName = name;
+    }
+  }
+
+  /* reorder(): the nodes may be replaced, so the engine derives the motion from
+     the real geometry delta. An element that did not move produces no motion,
+     because there is nothing to interpolate. */
+  function reorder(scope, mutate, o = {}) {
+    if (busy) return Promise.resolve();
+    if (!document.startViewTransition || document.visibilityState === 'hidden') {
+      mutate(); return Promise.resolve();
+    }
+    busy = true;
+    if (running) running.skipTransition();
+    lease(scope, o.anchor);
+    const t = running = document.startViewTransition({
+      update: () => { mutate(); lease(scope, o.anchor); },
+      types: o.types || [],
+    });
+    return t.finished.catch(() => {}).finally(() => { release(); running = null; busy = false; });
+  }
+
+  /* reflow(): the nodes survive, so two measurements are enough — and unlike a
+     view transition the page stays fully interactive. Preferred for anything
+     the user repeats. */
+  function reflow(scope, mutate, o = {}) {
+    if (reduce.matches) { mutate(); return Promise.resolve(); }
+    const first = new Map();
+    for (const el of scope.querySelectorAll('[data-vt-key]')) {
+      const r = el.getBoundingClientRect();
+      if (r.width) first.set(el.dataset.vtKey, r);
+    }
+    mutate();                                 // layout is final immediately after
+    const duration = ms('--t-move', 260), easing = css('--spring-ui') || 'ease-out';
+    const done = [];
+    for (const el of scope.querySelectorAll('[data-vt-key]')) {
+      const a = first.get(el.dataset.vtKey); if (!a) continue;
+      for (const x of el.getAnimations()) if (x.id === 'jb-flip') x.cancel();
+      const b = el.getBoundingClientRect(); if (!b.width) continue;
+      const dx = a.left - b.left, dy = a.top - b.top;
+      if (!dx && !dy) continue;               // <- did not change, so does not move
+      // dx is REAL SCREEN COORDINATES and is already correct in RTL. Multiplying
+      // it by --flow-x here is the double-mirror bug; M07 fails it.
+      const an = el.animate(
+        [{ translate: dx + 'px ' + dy + 'px' }, { translate: '0px 0px' }],
+        { duration, easing, fill: 'none' });  // fill:'none': a forwards fill would
+      an.id = 'jb-flip'; done.push(an.finished.catch(() => {}));   // override styles forever
+    }
+    return Promise.all(done);
+  }
+
+  /* leave(): the departure report. The only timer in the system, and it waits
+     on the animation rather than guessing at it. */
+  function leave(el) {
+    el.dataset.leaving = '';
+    return Promise.allSettled(el.getAnimations().map(a => a.finished))
+      .then(() => el.remove());
+  }
+
+  addEventListener('load', () => root.setAttribute('data-ready', ''));
+  return { reorder, reflow, leave };
+})();
+</script>
 
 <script>
 "use strict";
@@ -977,15 +1568,17 @@ function stars(r) {
 }
 function toast(msg, action) {
   const el = document.createElement('div');
-  el.className = 'flex items-start gap-2.5 rounded-lg border border-border bg-popover text-popover-foreground shadow-md p-3.5 text-sm pop-in';
+  el.className = 'arrives departs flex items-start gap-2.5 rounded-lg border border-border bg-popover text-popover-foreground shadow-md p-3.5 text-sm';
   el.innerHTML = `<i data-lucide="${action ? 'undo-2' : 'check'}" class="size-4 mt-0.5 ${action ? 'text-secondary-foreground rtl:-scale-x-100' : 'text-success-accent'} shrink-0"></i>
     <div class="grow min-w-0"><div class="font-medium text-mono">${esc(msg)}</div></div>
     ${action ? `<button type="button" class="btn btn-outline btn-sm shrink-0" data-toast-action>${esc(t('Undo'))}</button>` : ''}
     <button type="button" class="btn btn-ghost btn-icon btn-sm shrink-0" aria-label="${esc(t('Remove'))}"><i data-lucide="x"></i></button>`;
   $('#toasts').appendChild(el); icons();
-  let timer = setTimeout(() => el.remove(), action ? 6000 : 3600);
+  /* the departure is the second half of the report, so the node leaves when its exit ends */
+  const dismiss = () => (window.JBMotion ? JBMotion.leave(el) : el.remove());
+  let timer = setTimeout(dismiss, action ? 6000 : 3600);
   const hold = () => clearTimeout(timer);
-  const release = () => { timer = setTimeout(() => el.remove(), 2000); };
+  const release = () => { timer = setTimeout(dismiss, 2000); };
   el.addEventListener('mouseenter', hold);
   el.addEventListener('mouseleave', release);
   /* a keyboard user reaches the toast by focus, not by pointer, so focus has to stop the clock too */
@@ -993,7 +1586,7 @@ function toast(msg, action) {
   el.addEventListener('focusout', release);
   $$('button', el).forEach(b => b.addEventListener('click', () => {
     if (b.hasAttribute('data-toast-action') && action) action();
-    clearTimeout(timer); el.remove();
+    clearTimeout(timer); dismiss();
   }));
   while ($('#toasts').children.length > 3) $('#toasts').firstChild.remove();
 }
@@ -1054,13 +1647,22 @@ function keepFocus(fn) { const s = focusSnapshot(); const out = fn(); focusResto
 let pendingFocus = null;
 
 /* ===== overlays: one at a time, focus trapped, Escape closes, focus restored ===== */
+/* R3 opens and closes on an attribute rather than on `hidden`, because [hidden] is display:none
+   with !important and no transition can leave it: the drawer would appear instantly and the exit
+   would never run at all. The surface and any panel it wraps take the same attribute, so one flip
+   drives both halves of the report. */
+const setOpen = (el, on) => {
+  for (const n of [el, ...$$('.panel', el)]) {
+    if (on) n.setAttribute('data-open', ''); else n.removeAttribute('data-open');
+  }
+};
 let openId = null, lastFocus = null;
 const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
 function openOverlay(id, focusSel) {
   if (openId) closeOverlay(true);
   lastFocus = document.activeElement;
   const el = $('#' + id); if (!el) return;
-  $('#scrim').hidden = false; el.hidden = false; openId = id;
+  setOpen($('#scrim'), true); setOpen(el, true); openId = id;
   document.body.style.overflow = 'hidden';
   const first = (focusSel && $(focusSel, el)) || $(FOCUSABLE, el);
   requestAnimationFrame(() => first && first.focus());
@@ -1069,16 +1671,16 @@ function openOverlay(id, focusSel) {
 }
 function closeOverlay(quiet) {
   if (!openId) return;
-  const el = $('#' + openId); if (el) el.hidden = true;
+  const el = $('#' + openId); if (el) setOpen(el, false);
   if (openId === 'cart') $('#cart-btn').setAttribute('aria-expanded', 'false');
   if (openId === 'mmenu') $('#menu-btn').setAttribute('aria-expanded', 'false');
-  openId = null; $('#scrim').hidden = true; document.body.style.overflow = '';
+  openId = null; setOpen($('#scrim'), false); document.body.style.overflow = '';
   if (!quiet && lastFocus && document.contains(lastFocus)) lastFocus.focus();
 }
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
-    if (!$('#suggest').hidden) { closeSuggest(); return; }
-    if (!$('#account-menu').hidden) { closeAccount(true); return; }
+    if (menuOpen($('#suggest'))) { closeSuggest(); return; }
+    if (menuOpen($('#account-menu'))) { closeAccount(true); return; }
     if (openId) { e.preventDefault(); closeOverlay(); }
     return;
   }
@@ -1196,7 +1798,7 @@ function cardHTML(p) {
   return `<article class="card overflow-hidden relative group h-full" data-card="${p.id}">
     <div class="relative">
       <button type="button" class="block w-full cursor-pointer" data-open="${p.id}" aria-label="${esc(pname(p))}">
-        <span class="block aspect-[4/3] overflow-hidden" data-art="${p.id}">${art(p, shown, 0, 'duration-500 group-hover:scale-105 transition-transform')}</span>
+        <span class="block aspect-[4/3] overflow-hidden" data-art="${p.id}">${art(p, shown)}</span>
       </button>
       <div class="absolute top-2.5 start-2.5 flex flex-col items-start gap-1.5 pointer-events-none">
         ${out ? `<span class="badge badge-sm badge-outline">${esc(t('Out of stock'))}</span>` : p.stock <= 12 ? `<span class="badge badge-sm badge-light-warning">${esc(t('Low stock'))}</span>` : ''}
@@ -1204,7 +1806,7 @@ function cardHTML(p) {
         ${p.added <= 10 ? `<span class="badge badge-sm badge-light-primary">${esc(t('New'))}</span>` : ''}
       </div>
       <button type="button" class="absolute top-2 end-2 btn btn-ghost btn-icon bg-card/80 hover:bg-card" data-wish="${p.id}" aria-pressed="${liked}" aria-label="${esc(liked ? t('Saved') : t('Save for later'))}: ${esc(pname(p))}"><i data-lucide="heart" class="${liked ? 'fill-primary text-primary-accent' : ''}"></i></button>
-      <button type="button" class="static mt-2 mx-3 w-[calc(100%-1.5rem)] lg:absolute lg:mt-0 lg:mx-0 lg:w-auto lg:inset-x-3 lg:bottom-3 btn btn-outline bg-card/95 gap-1.5 lg:opacity-0 lg:group-hover:opacity-100 lg:group-focus-within:opacity-100 transition-opacity" data-quick="${p.id}"><i data-lucide="eye"></i>${esc(t('Quick view'))}</button>
+      <button type="button" class="static mt-2 mx-3 w-[calc(100%-1.5rem)] lg:absolute lg:mt-0 lg:mx-0 lg:w-auto lg:inset-x-3 lg:bottom-3 btn btn-outline bg-card/95 gap-1.5" data-quick="${p.id}"><i data-lucide="eye"></i>${esc(t('Quick view'))}</button>
     </div>
     <div class="p-(--card-p) flex flex-col gap-1.5 grow">
       <span class="text-xs text-muted-foreground">${esc(p.maker)}</span>
@@ -1984,9 +2586,13 @@ function matches(q) {
 /* The input calls itself a combobox and points at a listbox, so it has to drive one: the active
    option is named by aria-activedescendant rather than focused, the options are out of the tab
    sequence, and Arrow/Enter/Escape do what the role promises. */
+/* The same attribute for the same reason, and one pair of readers so that no site is left
+   asking `hidden` a question it can no longer answer. */
+const menuOpen = el => el.hasAttribute('data-open');
+const setMenu = (el, on) => on ? el.setAttribute('data-open', '') : el.removeAttribute('data-open');
 let sugIndex = -1;
 function closeSuggest() {
-  $('#suggest').hidden = true; $('#search').setAttribute('aria-expanded', 'false');
+  setMenu($('#suggest'), false); $('#search').setAttribute('aria-expanded', 'false');
   $('#search').removeAttribute('aria-activedescendant'); sugIndex = -1;
 }
 function sugOptions() { return $$('#suggest [role="option"]'); }
@@ -2012,7 +2618,7 @@ function renderSuggest(q) {
     + (list.length
       ? list.map(sugOption).join('')
       : `<p class="px-2 py-4 text-center text-2sm text-muted-foreground" role="status">${esc(t('No results'))}</p>`);
-  $('#suggest').hidden = false; $('#search').setAttribute('aria-expanded', 'true');
+  setMenu($('#suggest'), true); $('#search').setAttribute('aria-expanded', 'true');
   $('#search').removeAttribute('aria-activedescendant'); sugIndex = -1;
   icons();
 }
@@ -2041,16 +2647,22 @@ function menuFocus(i) {
   its[n].focus();
 }
 function openAccount() {
-  $('#account-menu').hidden = false;
+  setMenu($('#account-menu'), true);
   $('#account-btn').setAttribute('aria-expanded', 'true');
   menuItems().forEach((b, k) => b.tabIndex = k === 0 ? 0 : -1);
 }
 function closeAccount(restore) {
-  const m = $('#account-menu'); if (m.hidden) return;
+  const m = $('#account-menu'); if (!menuOpen(m)) return;
   const inside = m.contains(document.activeElement);
-  m.hidden = true; $('#account-btn').setAttribute('aria-expanded', 'false');
+  setMenu(m, false); $('#account-btn').setAttribute('aria-expanded', 'false');
   if (restore || inside) $('#account-btn').focus();
 }
+
+/* R3 and R2 mark an open surface with a valueless data-open, and this page already spelt
+   "open this product" data-open="<id>". The two meet on any click with no product button between
+   it and the panel -- which is every click inside an open drawer -- so the product reader asks
+   for the attribute WITH a value and the collision cannot arise. */
+const PRODUCT_OPEN = '[data-open]:not([data-open=""])';
 
 /* ===== one delegated click handler ===== */
 document.addEventListener('click', e => {
@@ -2060,7 +2672,7 @@ document.addEventListener('click', e => {
   if (!e.target.closest('#search, #suggest')) closeSuggest();
 
   if ((b = el('[data-go]'))) { e.preventDefault(); go(b.dataset.go, b.dataset.cat); return; }
-  if ((b = el('[data-open]'))) { e.preventDefault(); closeSuggest(); openProduct(b.dataset.open); return; }
+  if ((b = el(PRODUCT_OPEN))) { e.preventDefault(); closeSuggest(); openProduct(b.dataset.open); return; }
   if ((b = el('[data-quick]'))) { renderQuick(b.dataset.quick); openOverlay('quick'); return; }
   if ((b = el('[data-add]'))) { const p = byId(b.dataset.add); addToCart(p.id, defaultSel(p), 1); return; }
   if (el('[data-add-pd]')) { addToCart(STATE.pd.id, STATE.pd.sel, STATE.pd.qty); return; }
@@ -2071,7 +2683,7 @@ document.addEventListener('click', e => {
        border, leaving the ring to mean focus and nothing else */
     const [id, tone] = b.dataset.tone.split('|'), p = byId(id);
     STATE.tone[id] = tone;
-    $$(`[data-art="${attrQ(id)}"]`).forEach(h => h.innerHTML = art(p, tone, 0, 'duration-500 transition-transform'));
+    $$(`[data-art="${attrQ(id)}"]`).forEach(h => h.innerHTML = art(p, tone));
     $$(`[data-tone^="${attrQ(id)}|"]`).forEach(x => {
       const on = x === b || x.dataset.tone === b.dataset.tone;
       x.setAttribute('aria-pressed', on);
@@ -2125,7 +2737,7 @@ document.addEventListener('click', e => {
     const before = $$('#grid [data-card]').length;
     STATE.page++; paintGrid();
     const cards = $$('#grid [data-card]');
-    const next = cards[before] && cards[before].querySelector('[data-open]');
+    const next = cards[before] && cards[before].querySelector(PRODUCT_OPEN);
     if (next) next.focus();
     say(`${t('Showing')} ${cards.length} ${t('of')} ${filtered().length} ${t('products')}.`);
     return;
@@ -2284,13 +2896,13 @@ $('#search-m').addEventListener('click', openSearch);
 $('#bb-search').addEventListener('click', () => { if (innerWidth >= 768) $('#search').focus(); else openSearch(); });
 $('#account-btn').addEventListener('click', e => {
   e.stopPropagation();
-  if ($('#account-menu').hidden) openAccount(); else closeAccount(true);
+  if (!menuOpen($('#account-menu'))) openAccount(); else closeAccount(true);
 });
 /* ArrowDown from the trigger enters the menu, as role="menu" promises */
 $('#account-btn').addEventListener('keydown', e => {
   if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
   e.preventDefault();
-  if ($('#account-menu').hidden) openAccount();
+  if (!menuOpen($('#account-menu'))) openAccount();
   menuFocus(e.key === 'ArrowDown' ? 0 : menuItems().length - 1);
 });
 $('#account-menu').addEventListener('keydown', e => {
@@ -2302,10 +2914,10 @@ $('#account-menu').addEventListener('keydown', e => {
   else if (e.key === 'Tab') closeAccount(false);
 });
 $('#search').addEventListener('focus', () => renderSuggest($('#search').value));
-$('#search').addEventListener('click', () => { if ($('#suggest').hidden) renderSuggest($('#search').value); });
+$('#search').addEventListener('click', () => { if (!menuOpen($('#suggest'))) renderSuggest($('#search').value); });
 /* the combobox keyboard: the listbox is driven from the input, the options are never tab stops */
 $('#search').addEventListener('keydown', e => {
-  const open = !$('#suggest').hidden, opts = sugOptions();
+  const open = menuOpen($('#suggest')), opts = sugOptions();
   if (e.key === 'ArrowDown') { e.preventDefault(); if (!open) renderSuggest($('#search').value); sugActivate(sugIndex + 1); }
   else if (e.key === 'ArrowUp') { e.preventDefault(); if (open) sugActivate(sugIndex - 1); }
   else if (e.key === 'Home' && open && opts.length) { e.preventDefault(); sugActivate(0); }
