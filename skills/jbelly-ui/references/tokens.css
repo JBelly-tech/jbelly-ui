@@ -33,9 +33,9 @@
   --popover-foreground: oklch(14.5% 0.005 285);
 
   /* brand — the one colour that carries identity */
-  --primary: oklch(54% 0.2 258);
+  --primary: oklch(48% 0.13 255);
   /* the brand colour as text: a link has to be readable on the surface, which a fill does not */
-  --primary-accent: oklch(54% 0.2 258);
+  --primary-accent: oklch(48% 0.13 255);
   --primary-foreground: oklch(100% 0 0);
 
   /* neutrals */
@@ -55,7 +55,7 @@
   --success-foreground: oklch(100% 0 0);
   --warning: oklch(85% 0.17 90);
   --warning-foreground: oklch(30% 0.05 90);   /* dark text: white on amber fails contrast */
-  --info: oklch(60% 0.22 293);
+  --info: oklch(56% 0.15 293);
   --info-foreground: oklch(100% 0 0);
 
   /* lines + focus */
@@ -86,7 +86,7 @@
   :root { --header-height: 60px; }
 }
 
-.dark { --destructive-accent: oklch(60.25% 0.22 27); --primary-accent: oklch(59% 0.21 258);
+.dark { --destructive-accent: oklch(60.25% 0.22 27); --primary-accent: oklch(68% 0.11 255);
   color-scheme: dark;
 
   --background: oklch(14.5% 0.005 285);
@@ -96,7 +96,7 @@
   --popover: oklch(14.5% 0.005 285);
   --popover-foreground: oklch(98.5% 0 0);
 
-  --primary: oklch(55% 0.21 258);
+  --primary: oklch(50% 0.13 255);
   --primary-foreground: oklch(100% 0 0);
 
   --secondary: oklch(27.5% 0.006 286);
@@ -127,7 +127,7 @@
   --sidebar-muted: oklch(55% 0.014 285);
   --sidebar-accent: oklch(21% 0.006 285);
   --sidebar-accent-foreground: oklch(98.5% 0 0);
-  --sidebar-primary: oklch(70% 0.16 255);
+  --sidebar-primary: oklch(70% 0.11 255);
   --sidebar-border: oklch(27.5% 0.006 286);
 }
 
