@@ -52,6 +52,129 @@
 .theme-slate { --primary: oklch(42% 0.12 260); --primary-accent: oklch(42% 0.12 260); --muted-foreground: oklch(53% 0.014 285); --background: oklch(96.5% 0.004 250); --card: oklch(100% 0 0); --foreground: oklch(18% 0.02 260); --border: oklch(88% 0.008 250); --input: oklch(86% 0.008 250); --radius: 0.375rem; }
 .theme-mint { --primary: oklch(60% 0.15 165); --primary-accent: oklch(52.5% 0.15 165); --primary-foreground: oklch(14% 0 0); --font-display: "Plus Jakarta Sans", sans-serif; --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif; --background: oklch(98% 0.01 160); --card: oklch(100% 0 0); --border: oklch(93% 0.02 160); --input: oklch(90% 0.02 160); --muted: oklch(96% 0.012 160); --accent: oklch(95% 0.015 160); --radius: 1rem; }
 
+/* ---------- Motion ------------------------------------------------------- */
+/* The ONLY place in the system where a duration, an easing curve or a travel
+   distance may be written as a literal. Everything downstream reads a var().
+   Motion is authored in references/motion.css, never in a class attribute:
+   see references/motion.md. The sentinels below are load-bearing —
+   scripts/lint_motion.py treats this region as the one place literals are legal.
+   Contains no colour: --scrim is a color-mix of an existing role. */
+
+/* MOTION TOKENS START */
+:root {
+  /* the two switches — reduced motion moves these and nothing else */
+  --travel-on: 1;        /* 1 = displacement allowed. Reduced motion sets 0.   */
+  --motion-reduce: 1;    /* tempo multiplier under reduce. Reduced motion 0.7. */
+
+  /* direction — the whole RTL mechanism */
+  --flow-x: 1;           /* multiply EVERY authored inline-axis length by this */
+  --origin-inline: left; /* transform-origin has no logical keyword; this is it */
+
+  /* preset + density dials */
+  --motion-preset: 1;    /* a personality may set 0.85 .. 1.15 and nothing else */
+  --travel-density: 1;   /* a density may set 0.75 .. 1.25 and nothing else     */
+  --motion-scale: calc(var(--motion-preset) * var(--motion-reduce));
+  --motion-max: 450ms;   /* nothing in this system may resolve longer           */
+  --reduced: var(--travel-on);  /* canary the runtime probe reads off :root     */
+
+  /* base durations, named by CLASS OF CHANGE, never by component */
+  --d-0:         0ms;    /* keyboard-initiated: no animation, ever              */
+  --d-press:   100ms;    /* the control received the press                      */
+  --d-tint:    140ms;    /* paint-tier state change; also the paint-tier cap    */
+  --d-pop:     180ms;    /* tooltip / menu / popover ENTER                      */
+  --d-pop-out: 130ms;    /*                              LEAVE                  */
+  --d-menu:    220ms;    /* disclosure, selection marker, inline panel ENTER    */
+  --d-menu-out:150ms;    /*                                          LEAVE      */
+  --d-move:    260ms;    /* an object kept its identity and changed position    */
+  --d-panel:   300ms;    /* drawer, dialog, sheet, command palette ENTER        */
+  --d-panel-out:200ms;   /*                                         LEAVE       */
+  --d-heavy:   390ms;    /* destructive or irreversible; overdamped             */
+
+  /* resolved: what every recipe references */
+  --t-press:     calc(var(--d-press)     * var(--motion-scale));
+  --t-tint:      calc(var(--d-tint)      * var(--motion-scale));
+  --t-pop:       calc(var(--d-pop)       * var(--motion-scale));
+  --t-pop-out:   calc(var(--d-pop-out)   * var(--motion-scale));
+  --t-menu:      calc(var(--d-menu)      * var(--motion-scale));
+  --t-menu-out:  calc(var(--d-menu-out)  * var(--motion-scale));
+  --t-move:      calc(var(--d-move)      * var(--motion-scale));
+  --t-panel:     calc(var(--d-panel)     * var(--motion-scale));
+  --t-panel-out: calc(var(--d-panel-out) * var(--motion-scale));
+  --t-heavy:     calc(var(--d-heavy)     * var(--motion-scale));
+
+  /* not UI tempo: unscaled, exempt from the 80-450ms budget */
+  --t-grace:   250ms;    /* no wait shorter than this is reported as pending     */
+  --t-elapsed:   30s;    /* how long a wait has lasted. FINITE: it is not a loop */
+  --t-linger:     6s;    /* how long a "this just changed" mark stays on screen  */
+
+  /* easings: enter decelerates, exit accelerates, loops do not exist */
+  --ease-enter: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --ease-exit:  cubic-bezier(0.3, 0, 0.8, 0.15);
+  --ease-move:  cubic-bezier(0.2, 0, 0, 1);
+  --ease-tint:  cubic-bezier(0.2, 0, 0.38, 0.9);
+  --ease-flat:  linear;              /* elapsed time and scroll position ONLY   */
+
+  /* Springs as linear(). Critically damped and overdamped only: no curve in
+     this system has a stop above 1, because an overshoot clamps on opacity and
+     colour into a visible dead hold. Each is paired with the duration it means. */
+  --spring-ui: linear(0, 0.004 1%, 0.0229 2.5%, 0.0789 5%, 0.4656 17%, 0.6384 23.5%,
+    0.7641 30%, 0.8147 33.5%, 0.8604 37.5%, 0.8993 42%, 0.9305 47%, 0.9542 52.5%,
+    0.9712 58.5%, 0.9912 73.5%, 1);            /* zeta 1.00 — pair with --t-panel */
+  --spring-heavy: linear(0, 0.0105 1%, 0.0541 2.5%, 0.4077 10.5%, 0.6101 16.5%,
+    0.6849 19.5%, 0.7544 23%, 0.8154 27%, 0.8613 31%, 0.8995 35.5%, 0.9321 41%,
+    0.9558 47%, 0.9722 53.5%, 0.9918 70.5%, 1); /* zeta 1.31 — pair with --t-heavy */
+  --ease-elapsed: linear(0, 0.42 6%, 0.68 16%, 0.82 30%, 0.9 46%, 0.95 68%, 1);
+  --ease-elapsed-steps: steps(8, end);          /* the reduced answer for elapsed  */
+
+  /* travel: one unit, bent by density, nulled by reduce */
+  --travel-unit: calc(4px * var(--travel-density) * var(--travel-on));
+  --travel-sm:   var(--travel-unit);                    /*  4px  */
+  --travel:      calc(var(--travel-unit) * 2);          /*  8px  */
+  --travel-lg:   calc(var(--travel-unit) * 4);          /* 16px  */
+  --recoil:      calc(var(--travel-unit) * 0.75);       /*  3px  */
+  --panel-travel: calc(100% * var(--travel-on));
+  --press-depth: 0.03;  --press-scale: calc(1 - var(--press-depth) * var(--travel-on));
+  --pop-depth:   0.04;  --pop-scale:   calc(1 - var(--pop-depth)   * var(--travel-on));
+  --elapsed-cap: 0.92;  /* the pending bar stops here: it does not know when it ends */
+  --seam-range:  48px;  /* scroll distance over which a sticky seam resolves        */
+
+  /* the one surface value motion needs and the colour roles above lack */
+  --scrim: color-mix(in oklab, var(--foreground) 45%, transparent);
+}
+
+/* Direction. Both selectors on purpose: :dir() for the document, the attribute
+   for a subtree that sets dir on itself. */
+:root:dir(rtl), [dir="rtl"] { --flow-x: -1; --origin-inline: right; }
+
+/* Density changes DISTANCE only. A compact UI is not a faster UI. */
+.density-compact { --travel-density: 0.75; }
+.density-airy    { --travel-density: 1.25; }
+
+/* A personality may set --motion-preset (0.85-1.15), --ease-enter,
+   --press-depth and --pop-depth. At most three of them. Nothing else. */
+.theme-graphite  { --motion-preset: 0.85; }
+.theme-slate     { --motion-preset: 0.9; }
+.theme-clinic    { --ease-enter: var(--spring-ui); }
+.theme-editorial { --motion-preset: 1.15; }
+.theme-neo       { --motion-preset: 0.85; --press-depth: 0.05; }
+.theme-mint      { --motion-preset: 1.1;  --pop-depth: 0.06; }
+
+/* Reduced motion. This REPLACES the blanket `* { duration: 0.01ms !important }`
+   block this file used to end with. Travel goes to zero and the tempo shortens;
+   opacity, colour and position keep working, so every state is still reported.
+   The four named exceptions live in motion.css, next to the recipes they answer. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --travel-on: 0;
+    --motion-reduce: 0.7;
+    --ease-enter: var(--ease-tint);
+    --ease-exit:  var(--ease-tint);
+    --ease-elapsed: var(--ease-elapsed-steps);
+  }
+  html { scroll-behavior: auto; }
+}
+/* MOTION TOKENS END */
+
 *, *::before, *::after { box-sizing: border-box; border-color: var(--border); }
 html { font-family: var(--font-sans); -webkit-text-size-adjust: 100%; }
 body {
@@ -90,7 +213,7 @@ a:hover { text-decoration: underline; }
   font: 500 .9375rem/1.2 var(--font-sans); text-decoration: none; cursor: pointer;
   border: 1px solid var(--input); background: var(--card); color: var(--secondary-foreground);
   box-shadow: var(--shadow-xs);
-  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+  transition: background-color var(--t-tint) var(--ease-out), border-color var(--t-tint) var(--ease-out), color var(--t-tint) var(--ease-out);
 }
 .btn:hover { background: var(--accent); color: var(--accent-foreground); text-decoration: none; }
 .btn-primary { background: var(--primary); color: var(--primary-foreground); border-color: transparent; }
@@ -105,7 +228,7 @@ a:hover { text-decoration: underline; }
   border: 1px solid var(--input); background: var(--card); color: var(--secondary-foreground);
   border-radius: 999px; padding: 6px 12px; min-height: 32px;
   font: 500 .8125rem/1.3 var(--font-sans); cursor: pointer;
-  transition: background-color .15s ease, color .15s ease, border-color .15s ease;
+  transition: background-color var(--t-tint) var(--ease-out), color var(--t-tint) var(--ease-out), border-color var(--t-tint) var(--ease-out);
 }
 .chip:hover { background: var(--accent); color: var(--accent-foreground); }
 .chip[aria-checked="true"], .chip[aria-pressed="true"] { background: var(--primary); color: var(--primary-foreground); border-color: transparent; }
@@ -154,13 +277,350 @@ footer { border-top: 1px solid var(--border); padding-block: 36px 56px; color: v
   .rail-in { gap: 6px; }
 }
 
-@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: 0.01ms !important; } }
+</style>
+<style id="jb-motion">
+/* ==========================================================================
+   jbelly-ui motion. Twelve recipes. No colour, no literal tempo, no literal
+   distance: every value comes from the MOTION TOKENS region of tokens.css.
+
+   Loaded as plain CSS, AFTER Tailwind. In a single-file page it is inlined into a
+   style element with id="jb-motion", placed immediately after the closing tag of the
+   type="text/tailwindcss" block. Unlayered on purpose: it must beat @layer utilities and it
+   must not pass through the browser compiler. Nothing in this file may contain the character
+   sequence that closes a style element, comment or not: the HTML parser ends the block there
+   and the whole sheet is silently dropped. V01 is the check that catches it.
+
+   THE THREE DECLARED LAYOUT EXCEPTIONS IN THIS SYSTEM:
+   motion-exception: #sidebar — inline-size: the rail's width IS the state, and
+     no composited property expresses how much space an element occupies.
+   motion-exception: .disclosure::details-content — block-size / grid-template-rows:
+     an intrinsic panel has no portable composited equivalent.
+   motion-exception: .list-item — grid-template-rows: the gap closing after a
+     removal is the second half of the departure report.
+   ========================================================================== */
+
+/* -- R1 - PRESS ----------------------------- data-motion="feedback" -- */
+.btn, .input, .checkbox, .select, .menu-item, .nav-link, .nav-child, .seg,
+.table tbody tr, .tick {
+  transition: background-color var(--t-tint) var(--ease-tint),
+              border-color     var(--t-tint) var(--ease-tint),
+              color            var(--t-tint) var(--ease-tint);
+}
+.btn {
+  transition: scale            var(--t-press) var(--ease-exit),
+              background-color var(--t-tint)  var(--ease-tint),
+              border-color     var(--t-tint)  var(--ease-tint),
+              color            var(--t-tint)  var(--ease-tint);
+}
+.btn:active { scale: var(--press-scale); }
+/* seen 100+ times a day: no motion at all. */
+[data-frequency="constant"] { transition-duration: var(--d-0); }
+/* the ring is instant: a transitioned focus ring lags the keyboard, which reads
+   as input latency. This rule is why M03 fails any transition on :focus-visible. */
+:focus-visible { transition-property: background-color, border-color, color; }
+
+/* -- R2 - MENU FROM ITS TRIGGER -------------- data-motion="spatial" -- */
+/* Preferred form for new markup: popover, zero JavaScript, enter AND exit. */
+.menu[popover] {
+  margin: 0; opacity: 0; scale: var(--pop-scale);
+  translate: 0 calc(-1 * var(--travel-sm));
+  transform-origin: top var(--origin-inline);
+  transition: opacity   var(--t-pop-out) var(--ease-exit),
+              scale     var(--t-pop-out) var(--ease-exit),
+              translate var(--t-pop-out) var(--ease-exit),
+              overlay   var(--t-pop-out) allow-discrete,
+              display   var(--t-pop-out) allow-discrete;
+}
+.menu[popover]:popover-open {
+  opacity: 1; scale: 1; translate: 0 0;
+  transition-duration: var(--t-pop);
+  transition-timing-function: var(--ease-enter);
+}
+/* MUST come after the open rule: equal specificity, source order decides. */
+@starting-style {
+  .menu[popover]:popover-open {
+    opacity: 0; scale: var(--pop-scale); translate: 0 calc(-1 * var(--travel-sm));
+  }
+}
+/* Shell-compatible form: the page's own JS flips data-open instead of .hidden.
+   Not the top layer, so the exit animates in every engine, not just Chromium. */
+.menu[data-menu] {
+  display: none; opacity: 0; scale: var(--pop-scale);
+  translate: 0 calc(-1 * var(--travel-sm));
+  transform-origin: top var(--origin-inline);
+  transition: opacity   var(--t-pop-out) var(--ease-exit),
+              scale     var(--t-pop-out) var(--ease-exit),
+              translate var(--t-pop-out) var(--ease-exit),
+              display   var(--t-pop-out) allow-discrete;
+}
+.menu[data-menu][data-open] {
+  display: flex; opacity: 1; scale: 1; translate: 0 0;
+  transition-duration: var(--t-pop);
+  transition-timing-function: var(--ease-enter);
+}
+@starting-style {
+  .menu[data-menu][data-open] {
+    opacity: 0; scale: var(--pop-scale); translate: 0 calc(-1 * var(--travel-sm));
+  }
+}
+@supports (anchor-name: --a) {          /* upgrade only; static placement below */
+  [data-anchor] { anchor-name: --jb-anchor; }
+  .menu[data-anchored] {
+    position: fixed; position-anchor: --jb-anchor;
+    position-area: block-end span-inline-start;    /* logical: RTL-correct free */
+    position-try-fallbacks: flip-block, flip-inline;
+    margin-block-start: var(--travel-sm);
+  }
+}
+
+/* -- R3 - PANEL + SCRIM ------ data-motion="spatial" | "continuity" --- */
+.panel {                                   /* closed state = the exit style */
+  display: none; opacity: 0;
+  translate: calc(var(--flow-x) * var(--panel-travel)) 0;
+  transition: opacity   var(--t-panel-out) var(--ease-exit),
+              translate var(--t-panel-out) var(--ease-exit),
+              display   var(--t-panel-out) allow-discrete;
+}
+.panel[data-open] {
+  display: flex; opacity: 1; translate: 0 0;
+  transition-duration: var(--t-panel);
+  transition-timing-function: var(--spring-ui);
+}
+@starting-style {
+  .panel[data-open] {
+    opacity: 0; translate: calc(var(--flow-x) * var(--panel-travel)) 0;
+  }
+}
+/* A centred overlay belongs to the viewport, not to a trigger: it scales, it
+   does not travel. The one legal transform-origin: center in the system. */
+.panel-centre { translate: 0 0; scale: var(--pop-scale); transform-origin: center;
+  transition: opacity var(--t-panel-out) var(--ease-exit),
+              scale   var(--t-panel-out) var(--ease-exit),
+              display var(--t-panel-out) allow-discrete; }
+.panel-centre[data-open] { scale: 1; }
+@starting-style { .panel-centre[data-open] { opacity: 0; scale: var(--pop-scale); } }
+/* Destructive or irreversible: heavier, slower, overdamped. Same tokens. */
+.panel-heavy[data-open] {
+  transition-duration: var(--t-heavy);
+  transition-timing-function: var(--spring-heavy);
+}
+/* The scrim is the SAME event: same two tokens, no exceptions, ever. */
+.scrim {
+  display: none; opacity: 0; background: var(--scrim);
+  transition: opacity var(--t-panel-out) var(--ease-exit),
+              display var(--t-panel-out) allow-discrete;
+}
+.scrim[data-open] {
+  display: block; opacity: 1;
+  transition-duration: var(--t-panel);
+  transition-timing-function: var(--ease-enter);
+}
+@starting-style { .scrim[data-open] { opacity: 0; } }
+.panel-heavy[data-open] ~ .scrim[data-open] { transition-duration: var(--t-heavy); }
+
+/* -- R4 - DISCLOSURE -------------------------- data-motion="state" --- */
+/* motion-exception: .disclosure::details-content */
+.disclosure-chevron {
+  rotate: 0deg;
+  transition: rotate var(--t-menu) var(--ease-move);
+}
+[dir="rtl"] .disclosure-chevron { rotate: 180deg; }   /* a directional glyph mirrors */
+.disclosure[open] > summary .disclosure-chevron,
+[aria-expanded="true"] .disclosure-chevron { rotate: calc(90deg * var(--flow-x)); }
+@supports selector(::details-content) {
+  .disclosure::details-content {
+    block-size: 0; overflow: clip;
+    transition: block-size        var(--t-menu) var(--ease-move),
+                content-visibility var(--t-menu) allow-discrete;
+  }
+  .disclosure[open]::details-content { block-size: auto; }
+  @supports (interpolate-size: allow-keywords) { :root { interpolate-size: allow-keywords; } }
+  @supports not (interpolate-size: allow-keywords) {   /* portable, no measurement */
+    .disclosure::details-content {
+      block-size: auto; display: grid; grid-template-rows: 0fr;
+      transition: grid-template-rows  var(--t-menu) var(--ease-move),
+                  content-visibility  var(--t-menu) allow-discrete;
+    }
+    .disclosure[open]::details-content { grid-template-rows: 1fr; }
+    .disclosure::details-content > * { min-block-size: 0; overflow: clip; }
+  }
+}
+
+/* -- R5 - SELECTION MARKER -------------------- data-motion="state" --- */
+/* The group MUST be equal columns: the marker's position is then arithmetic,
+   so no measurement and no JavaScript are needed. */
+.marker-group {
+  --mark-i: 0; --mark-n: 2;
+  position: relative; display: grid;
+  grid-auto-flow: column; grid-auto-columns: 1fr;
+}
+.marker-group:has(> :nth-child(2) :checked) { --mark-i: 1; }
+.marker-group:has(> :nth-child(3) :checked) { --mark-i: 2; }
+.marker-group:has(> :nth-child(4) :checked) { --mark-i: 3; }
+.marker {
+  position: absolute; inset-block-end: 0; inset-inline-start: 0;
+  inline-size: calc(100% / var(--mark-n)); block-size: 2px;
+  background: var(--primary);
+  translate: calc(var(--flow-x) * var(--mark-i) * 100%) 0;
+  transition: translate var(--t-menu) var(--spring-ui);
+}
+.marker-fill { inset-block: 0; block-size: auto; border-radius: var(--radius-md);
+  background: var(--card); z-index: 0; }   /* segmented control variant */
+
+/* -- R6 - ARRIVAL AND DEPARTURE --------------- data-motion="state" --- */
+/* Gated on [data-ready], which one line of script sets after load. Rows that
+   were in the server markup therefore render with no entrance: the page
+   arriving is not a state change. */
+html[data-ready] .arrives {
+  opacity: 1; translate: 0 0;
+  transition: opacity   var(--t-menu) var(--ease-enter),
+              translate var(--t-menu) var(--ease-enter);
+}
+@starting-style {
+  html[data-ready] .arrives { opacity: 0; translate: 0 calc(-1 * var(--travel)); }
+}
+.arrives[data-new] {          /* the non-motion half: a mark that outlives it */
+  box-shadow: inset calc(2px * var(--flow-x)) 0 0 0 var(--primary);
+}
+.departs[data-leaving] {
+  opacity: 0;
+  translate: calc(var(--flow-x) * var(--travel)) 0;
+  pointer-events: none;       /* legal ONLY while leaving, never as a gate */
+  transition: opacity   var(--t-menu-out) var(--ease-exit),
+              translate var(--t-menu-out) var(--ease-exit);
+}
+/* motion-exception: .list-item */
+.list-item { display: grid; grid-template-rows: 1fr;
+  transition: grid-template-rows var(--t-menu-out) var(--ease-exit); }
+.list-item > * { min-block-size: 0; overflow: clip; }
+.list-item[data-leaving] { grid-template-rows: 0fr; }
+
+/* -- R7 - SIDEBAR COLLAPSE --------------- data-motion="continuity" -- */
+/* motion-exception: #sidebar */
+#sidebar { transition: inline-size var(--t-panel) var(--ease-move); }
+#sidebar .nav-title, #sidebar .nav-badge {
+  transition: opacity var(--t-menu-out) var(--ease-exit);
+}
+/* One subject: the content pane follows the rail through layout, it does not
+   run an animation of its own. */
+.shell-main, .shell-header { transition: none; }
+
+/* -- R8 - REVISED IN PLACE -------------------- data-motion="state" --- */
+.revises { position: relative; }
+.revises::before {
+  content: ""; position: absolute; inset-block: 0; inset-inline-start: 0;
+  inline-size: 2px; background: var(--muted-foreground); opacity: 0;
+  transition: opacity var(--t-tint) var(--ease-enter);
+  pointer-events: none;
+}
+.revises[data-changed]::before      { opacity: 1; }
+.revises[data-changed="up"]::before   { background: var(--success); }
+.revises[data-changed="down"]::before { background: var(--destructive); }
+
+/* -- R9 - REFUSAL ----------------------------- data-motion="state" --- */
+.refuses[data-refused] { animation: jb-recoil var(--t-heavy) var(--spring-heavy) both; }
+@keyframes jb-recoil {
+  0%   { translate: 0 0; }
+  30%  { translate: calc(var(--recoil) * -1 * var(--flow-x)) 0; }
+  100% { translate: 0 0; }
+}
+
+/* -- R10 - PENDING --------------------------- data-motion="status" --- */
+/* The answer to the spinner and the shimmer. Finite, decelerating, stops at
+   92% because it does not know when the wait ends. `infinite` appears nowhere
+   in this system. */
+.pends { position: relative; }
+.pends::after {
+  content: ""; position: absolute; inset-block-start: 0; inset-inline-start: 0;
+  inline-size: 100%; block-size: 2px; background: var(--primary);
+  transform-origin: var(--origin-inline) center;
+  scale: 0 1; opacity: 0; pointer-events: none;
+}
+.pends[aria-busy="true"]::after {
+  opacity: 1;
+  animation: jb-elapsed var(--t-elapsed) var(--ease-elapsed) var(--t-grace) both;
+}
+@keyframes jb-elapsed { from { scale: 0 1; } to { scale: var(--elapsed-cap) 1; } }
+/* The skeleton goes back to being a static box that reserves height, which was
+   always its only job. It has no animation at all. */
+
+/* -- R11 - POSITION ------------------------ data-motion="position" --- */
+/* Resting truth OUTSIDE the guard: the seam is present and correct. */
+.app-seam { position: relative; }
+.app-seam::after {
+  content: ""; position: absolute; inset-inline: 0; inset-block-end: 0;
+  block-size: 1px; background: var(--border); opacity: 1;
+}
+.read-progress { display: none; }
+@supports (animation-timeline: scroll()) {
+  .app-seam::after {
+    animation: jb-seam var(--ease-flat) both;      /* shorthand FIRST: it resets */
+    animation-timeline: scroll(root block);        /* animation-timeline         */
+    animation-range: 0 var(--seam-range);
+  }
+  @keyframes jb-seam { from { opacity: 0; } to { opacity: 1; } }
+  .read-progress {
+    display: block; position: fixed; inset-block-start: 0; inset-inline: 0;
+    block-size: 2px; background: var(--primary); z-index: 60;
+    transform-origin: var(--origin-inline) center;
+    animation: jb-progress var(--ease-flat) both;
+    animation-timeline: scroll(root block);
+  }
+  @keyframes jb-progress { from { scale: 0 1; } to { scale: 1 1; } }
+}
+
+/* -- R12 - IDENTITY ----------------------- data-motion="continuity" -- */
+@supports (view-transition-name: none) {
+  /* the page did not change; only the named objects did. Without this line you
+     get the UA's undifferentiated 0.25s whole-document cross-fade. */
+  ::view-transition-old(root), ::view-transition-new(root) {
+    animation: none; mix-blend-mode: normal;
+  }
+  ::view-transition-group(*) {
+    animation-duration: var(--t-move);
+    animation-timing-function: var(--spring-ui);
+  }
+  /* members MOVE, they do not dissolve into each other. mix-blend-mode is reset
+     because the UA default is plus-lighter, which reads as a glow. */
+  ::view-transition-old(*), ::view-transition-new(*) {
+    animation: none; mix-blend-mode: normal; block-size: 100%;
+  }
+  :root:active-view-transition [data-vt-suppress] { visibility: hidden; }
+}
+
+/* == REDUCED MOTION: the four named exceptions ============================
+   The two token switches in tokens.css do everything else. These four are the
+   cases where the POSITION is the state, so nulling the travel would delete
+   the information instead of the motion. */
+@media (prefers-reduced-motion: reduce) {
+  /* the marker must still be under the selected tab: remove the travel, keep
+     the position, by removing the transition rather than the translate */
+  .marker { transition-property: none; }
+  /* layout is not reached by --travel-on, and a whole-shell reflow is the most
+     vestibular motion an admin page can produce: delete it, do not shorten it */
+  #sidebar, .disclosure::details-content, .list-item {
+    transition-property: opacity;
+  }
+  /* a scroll timeline has no duration to shorten. Detach it and rest at the
+     true state - which is why the resting styles live outside the guard. */
+  .read-progress { animation-timeline: none; display: none; }
+  .app-seam::after { animation-timeline: none; opacity: 1; }
+  /* the group carries the geometry (vestibular); the pair carries the identity
+     claim (pure opacity, safe). Collapse one, keep the other. */
+  /* 1ms, never 0.01ms: some engines round a sub-millisecond duration to zero and then never fire
+     transitionend, which breaks anything awaiting it. The literal is the point, so it is the one
+     tempo in the system written outside the token region. */
+  ::view-transition-group(*) { animation-duration: 1ms; }  /* motion-lint-ignore M01 */
+  ::view-transition-old(*), ::view-transition-new(*) {
+    animation-duration: var(--t-menu-out);
+  }
+}
 </style>
 </head>
 <body>
 <a class="skip" href="#main">Skip to main content</a>
 
-<div class="rail">
+<div class="rail" data-motion="feedback">
   <div class="wrap rail-in">
     <span class="rail-label" id="rail-label">This page, rethemed:</span>
     <div class="chips" role="radiogroup" aria-labelledby="rail-label" id="presets">
@@ -178,7 +638,7 @@ footer { border-top: 1px solid var(--border); padding-block: 36px 56px; color: v
   </div>
 </div>
 
-<main id="main">
+<main id="main" data-motion="feedback">
 
 <section>
   <div class="wrap stack">
@@ -226,10 +686,11 @@ footer { border-top: 1px solid var(--border); padding-block: 36px 56px; color: v
     have to wear the same face.</p>
     <div class="row">
       <a class="btn" href="skills/jbelly-ui/assets/app-shell.html">App shell</a>
+      <a class="btn" href="skills/jbelly-ui/assets/commerce-shell.html">Storefront</a>
       <a class="btn" href="skills/jbelly-ui/assets/landing-shell.html">Landing page</a>
       <a class="btn" href="skills/jbelly-ui/assets/pricing-shell.html">Pricing page</a>
     </div>
-    <p class="small">Three self-contained demos, one HTML file each. Everything in them works:
+    <p class="small">Four self-contained demos, one HTML file each. Everything in them works:
     sidebar collapse, ⌘K palette, table loading, empty and error states, drawer, column sort,
     notifications, and AR/EN with full RTL.</p>
   </div>
@@ -379,8 +840,8 @@ python skills/jbelly-ui/scripts/verify_page.py out.html --variants ",#dark=1,#di
         script judges whether a screen is good, and this one does not pretend to.</p>
       </div>
     </div>
-    <p class="small">It is web only. About 695 KB installed across 37 files, and 57% of that is the
-    three demo shells, which you can delete.</p>
+    <p class="small">It is web only. About 1019 KB installed across 43 files, and 53% of that is the four
+    demo shells, which you can delete.</p>
   </div>
 </section>
 
@@ -427,7 +888,7 @@ python skills/jbelly-ui/scripts/verify_page.py out.html --variants ",#dark=1,#di
 
 </main>
 
-<footer>
+<footer data-motion="feedback">
   <div class="wrap stack-sm">
     <p>Built and maintained by JBelly. MIT — see
     <a href="https://github.com/mohammadJohar/jbelly-ui/blob/main/LICENSE">LICENSE</a>. Fonts via
@@ -516,6 +977,106 @@ python skills/jbelly-ui/scripts/verify_page.py out.html --variants ",#dark=1,#di
       copy.textContent = 'Select and copy';
     }
   });
+})();
+</script>
+<script id="jb-motion">
+/* jbelly-ui identity module. No dependencies. Optional: a page without it is
+   correct, just not animated on re-sort and re-filter.
+   Contract: an object that can appear in more than one place or order carries
+   data-vt-key, whose value is a STABLE domain id — never a loop index, never a
+   row number, because a position-derived key cannot survive the one change it
+   exists to survive. */
+window.JBMotion = (function () {
+  const root = document.documentElement;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  const css = n => getComputedStyle(root).getPropertyValue(n).trim();
+  const ms = (n, d) => { const v = css(n);
+    return v.endsWith('ms') ? parseFloat(v) : v.endsWith('s') ? parseFloat(v) * 1000 : d; };
+  const CAP = 24, MARGIN = 200;          // snapshot layers are not free
+  const held = new Set(); let running = null, busy = false;
+
+  function release() { for (const el of held) el.style.viewTransitionName = ''; held.clear(); }
+  addEventListener('pageshow', e => { if (e.persisted) release(); });  // bfcache restores stale names
+
+  /* Lease names only to RENDERED members near the action, capped. A duplicate
+     name rejects ViewTransition.ready and silently skips the whole transition,
+     so first claim wins and there is never a second. */
+  function lease(scope, anchor) {
+    release();
+    const seen = new Set(), vh = innerHeight, out = [];
+    for (const el of scope.querySelectorAll('[data-vt-key]')) {
+      const r = el.getBoundingClientRect();
+      if (!r.width || r.bottom < -MARGIN || r.top > vh + MARGIN) continue;
+      out.push([el, r.top + r.height / 2]);
+    }
+    if (anchor) {
+      const a = anchor.getBoundingClientRect(), mid = a.top + a.height / 2;
+      out.sort((p, q) => Math.abs(p[1] - mid) - Math.abs(q[1] - mid));
+    }
+    for (const [el] of out.slice(0, CAP)) {
+      const name = 'vt-' + el.dataset.vtKey.replace(/[^A-Za-z0-9_-]/g, '-');
+      if (seen.has(name)) continue;
+      seen.add(name); held.add(el); el.style.viewTransitionName = name;
+    }
+  }
+
+  /* reorder(): the nodes may be replaced, so the engine derives the motion from
+     the real geometry delta. An element that did not move produces no motion,
+     because there is nothing to interpolate. */
+  function reorder(scope, mutate, o = {}) {
+    if (busy) return Promise.resolve();
+    if (!document.startViewTransition || document.visibilityState === 'hidden') {
+      mutate(); return Promise.resolve();
+    }
+    busy = true;
+    if (running) running.skipTransition();
+    lease(scope, o.anchor);
+    const t = running = document.startViewTransition({
+      update: () => { mutate(); lease(scope, o.anchor); },
+      types: o.types || [],
+    });
+    return t.finished.catch(() => {}).finally(() => { release(); running = null; busy = false; });
+  }
+
+  /* reflow(): the nodes survive, so two measurements are enough — and unlike a
+     view transition the page stays fully interactive. Preferred for anything
+     the user repeats. */
+  function reflow(scope, mutate, o = {}) {
+    if (reduce.matches) { mutate(); return Promise.resolve(); }
+    const first = new Map();
+    for (const el of scope.querySelectorAll('[data-vt-key]')) {
+      const r = el.getBoundingClientRect();
+      if (r.width) first.set(el.dataset.vtKey, r);
+    }
+    mutate();                                 // layout is final immediately after
+    const duration = ms('--t-move', 260), easing = css('--spring-ui') || 'ease-out';
+    const done = [];
+    for (const el of scope.querySelectorAll('[data-vt-key]')) {
+      const a = first.get(el.dataset.vtKey); if (!a) continue;
+      for (const x of el.getAnimations()) if (x.id === 'jb-flip') x.cancel();
+      const b = el.getBoundingClientRect(); if (!b.width) continue;
+      const dx = a.left - b.left, dy = a.top - b.top;
+      if (!dx && !dy) continue;               // <- did not change, so does not move
+      // dx is REAL SCREEN COORDINATES and is already correct in RTL. Multiplying
+      // it by --flow-x here is the double-mirror bug; M07 fails it.
+      const an = el.animate(
+        [{ translate: dx + 'px ' + dy + 'px' }, { translate: '0px 0px' }],
+        { duration, easing, fill: 'none' });  // fill:'none': a forwards fill would
+      an.id = 'jb-flip'; done.push(an.finished.catch(() => {}));   // override styles forever
+    }
+    return Promise.all(done);
+  }
+
+  /* leave(): the departure report. The only timer in the system, and it waits
+     on the animation rather than guessing at it. */
+  function leave(el) {
+    el.dataset.leaving = '';
+    return Promise.allSettled(el.getAnimations().map(a => a.finished))
+      .then(() => el.remove());
+  }
+
+  addEventListener('load', () => root.setAttribute('data-ready', ''));
+  return { reorder, reflow, leave };
 })();
 </script>
 </body>

@@ -2130,6 +2130,12 @@ function undoRemove() {
   else STATE.cart.splice(Math.min(u.at, STATE.cart.length), 0, u.line);
   syncCart();
   say(`${pname(byId(u.line.id))} — ${t('Restored to your bag')}.`);
+  // The button that did this no longer exists, so there is nothing for the focus layer to restore
+  // to. The line it brought back is where the reader was, so focus lands there.
+  const back = document.querySelector(`[data-cartinput="${CSS.escape(u.line.key)}"]`)
+            || document.querySelector(`[data-cartstep^="${CSS.escape(u.line.key)}"]`)
+            || document.querySelector(`[data-del="${CSS.escape(u.line.key)}"]`);
+  if (back) back.focus();
 }
 function setQty(key, n) {
   const l = STATE.cart.find(x => x.key === key); if (!l) return;

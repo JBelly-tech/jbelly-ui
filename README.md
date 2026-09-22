@@ -4,7 +4,7 @@
 
 [![ci](https://github.com/mohammadJohar/jbelly-ui/actions/workflows/ci.yml/badge.svg)](https://github.com/mohammadJohar/jbelly-ui/actions/workflows/ci.yml) · MIT · Agent Skills format · Python 3.9+ tooling, no dependencies
 
-**Live demos:** [app shell](https://mohammadjohar.github.io/jbelly-ui/skills/jbelly-ui/assets/app-shell.html) · [landing page](https://mohammadjohar.github.io/jbelly-ui/skills/jbelly-ui/assets/landing-shell.html) · [pricing page](https://mohammadjohar.github.io/jbelly-ui/skills/jbelly-ui/assets/pricing-shell.html)
+**Live demos:** [app shell](https://mohammadjohar.github.io/jbelly-ui/skills/jbelly-ui/assets/app-shell.html) · [storefront](https://mohammadjohar.github.io/jbelly-ui/skills/jbelly-ui/assets/commerce-shell.html) · [landing page](https://mohammadjohar.github.io/jbelly-ui/skills/jbelly-ui/assets/landing-shell.html) · [pricing page](https://mohammadjohar.github.io/jbelly-ui/skills/jbelly-ui/assets/pricing-shell.html)
 [Cost, measured](COST.md) · [Recorded runs](evals/records/) · [Roadmap](docs/roadmap.md)
 
 **A licence-free UI system for web products, packaged as an agent skill.**
@@ -44,7 +44,7 @@ later screen is checked against that file. Colour lives in semantic tokens, so a
 token, not a sweep.
 
 **4. Nothing here is licensed per project, and nothing is copied.** MIT, one copyright holder, no
-dependencies beyond a stock Python 3.9+, under 500 KB installed. Every rule is restated in the
+dependencies beyond a stock Python 3.9+, about 1 MB installed and 53% of that the four demo shells. Every rule is restated in the
 project's own words with its source recorded in `references/sources.md`.
 
 ## Where it is weak
@@ -98,13 +98,16 @@ python skills/jbelly-ui/scripts/verify_page.py out/dashboard.html --variants ",#
 |---|---|---|
 | ![](docs/showcase/demo-sidebar-dark.png) | ![](docs/showcase/demo-neo-empty.png) | ![](docs/showcase/demo-slate-rtl.png) |
 
-Two more shells ship with the skill, both self-contained and both built from the same tokens: a
-[landing page](https://mohammadjohar.github.io/jbelly-ui/skills/jbelly-ui/assets/landing-shell.html) and a [pricing page](https://mohammadjohar.github.io/jbelly-ui/skills/jbelly-ui/assets/pricing-shell.html). Every
-control in them works, and each carries the same six personality presets, dark mode and RTL.
+Three more shells ship with the skill, all self-contained and all built from the same tokens: a
+[storefront](https://mohammadjohar.github.io/jbelly-ui/skills/jbelly-ui/assets/commerce-shell.html), a [landing page](https://mohammadjohar.github.io/jbelly-ui/skills/jbelly-ui/assets/landing-shell.html) and a
+[pricing page](https://mohammadjohar.github.io/jbelly-ui/skills/jbelly-ui/assets/pricing-shell.html). The storefront is the largest — browse, filter, sort,
+search, quick view, variants, a cart with promo codes and undo, and a four-step checkout that
+validates, all client-side with no server. Every control in all of them works, and each carries the
+same six presets, dark mode and RTL.
 
-| Landing shell | Pricing shell |
-|---|---|
-| ![](docs/showcase/landing-light.png) | ![](docs/showcase/pricing-light.png) |
+| Storefront | Landing shell | Pricing shell |
+|---|---|---|
+| ![](docs/showcase/commerce-light.png) | ![](docs/showcase/landing-light.png) | ![](docs/showcase/pricing-light.png) |
 
 Every capture on this page is taken from the shells themselves by
 `python scripts/capture_showcase.py`, so a screenshot cannot quietly fall behind the code.
@@ -124,7 +127,7 @@ Every capture on this page is taken from the shells themselves by
 | `references/components.md` · `layouts.md` · `patterns.md` | Exact class strings for 25 controls; shells, nav, toolbar, settings, auth, landing, RTL; KPI, chart, table, feed, drawer, pricing, checkout, palette, empty states |
 | `references/charts.md` · `ux-behaviours.md` · `integrations.md` | ApexCharts theme from tokens + 8 recipes; loading/empty/error, tables, forms, overlays, keyboard, responsive; licence-safe libraries per need |
 | `references/industry-playbooks.md` · `interface-guidelines.md` · `anti-patterns.md` · `review-rubric.md` · `stacks.md` · `sources.md` | Page inventories for 10 business types; exact-value interface rules; the AI-tells list; ten scored review dimensions; plain-CSS and React mappings; where every rule comes from |
-| `assets/app-shell.html` · `landing-shell.html` · `pricing-shell.html` | Three self-contained demos and scaffolds: shell, dark mode, RTL + i18n, density, personality switcher, table states, drawer, ⌘K palette, toasts, ApexCharts |
+| `assets/app-shell.html` · `commerce-shell.html` · `landing-shell.html` · `pricing-shell.html` | Four self-contained demos and scaffolds: shell, dark mode, RTL + i18n, density, personality switcher, table states, drawer, ⌘K palette, toasts, ApexCharts |
 | `assets/spec.example.json` · `assets/tokens.json` | Example spec for the page builder; DTCG tokens for design tools |
 
 **The scripts** (Python 3.9+, no dependencies; PowerShell twins where noted)
