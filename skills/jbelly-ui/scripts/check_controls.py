@@ -151,49 +151,64 @@ def run(target: str, width: int, height: int) -> dict:
     with sync_playwright() as p:
         browser = p.chromium.launch()
 
+        context = browser.new_context(viewport={"width": width, "height": height})
+        page = context.new_page()
+        page.on("console", lambda m: console.append(m.text) if m.type == "error" else None)
+        page.on("pageerror", lambda e: console.append(str(e)))
+
         def fresh():
-            """A context of its own, so nothing the last control chose is still remembered."""
-            ctx = browser.new_context(viewport={"width": width, "height": height})
-            pg = ctx.new_page()
-            pg.on("console", lambda m: console.append(m.text) if m.type == "error" else None)
-            pg.on("pageerror", lambda e: console.append(str(e)))
-            pg.goto(target, wait_until="networkidle", timeout=60000)
-            pg.wait_for_timeout(900)
-            return ctx, pg
+            """Back to the page a reader first meets, with nothing the last control chose kept.
 
-        context, page = fresh()
+            A reload re-runs every script, so the only state that can survive it is the storage these
+            demos persist their preferences to. Clearing that is the whole isolation, and it keeps
+            the network cache a new context would have thrown away.
+            """
+            page.evaluate("() => { try { localStorage.clear(); sessionStorage.clear(); } catch (e) {} }")
+            context.clear_cookies()
+            page.goto("about:blank")
+            page.goto(target, wait_until="networkidle", timeout=60000)
+            page.wait_for_timeout(700)
+            return context, page
 
-        # Take the roster once, from the page as a reader first meets it. Anything that only
-        # appears after navigating somewhere is out of this sweep's reach by construction, and the
-        # summary says so rather than counting it as checked.
-        roster = [h.evaluate(SIGNATURE) for h in page.query_selector_all(SELECTOR)]
+        page.goto(target, wait_until="networkidle", timeout=60000)
+        page.wait_for_timeout(900)
+
+        # One pass over the page as a reader first meets it: what each control is, and whether it
+        # is going to be driven at all. Settling the skips here is what makes this affordable --
+        # opening a context for a control only to discover it is hidden costs a page load for
+        # nothing, and most controls on a large page are hidden at any one width.
+        roster = []
+        for h in page.query_selector_all(SELECTOR):
+            info = describe(h)
+            href = (info["href"] or "").strip()
+            skip = (info["disabled"] or info["current"] or not h.is_visible()
+                    or (href and href not in ("#", "#!") and not href.startswith("#")
+                        and not href.startswith("javascript:")))
+            roster.append({"sig": h.evaluate(SIGNATURE), "info": info, "skip": skip})
         total = len(roster)
         unreachable = 0
+        skipped = sum(1 for r in roster if r["skip"])
+        drivable = [i for i, r in enumerate(roster) if not r["skip"]]
+        first = True
 
-        for i, sig in enumerate(roster):
-            if i:                                       # a context of its own: nothing carried over
-                context.close()
-                context, page = fresh()
+        for i in drivable:
+            if not first:                               # back to a page that remembers nothing
+                fresh()
+            first = False
             here = page.query_selector_all(SELECTOR)
             if i >= len(here):
                 unreachable += 1                        # the page did not come back the same
                 continue
             el = here[i]
-            if el.evaluate(SIGNATURE) != sig:
+            if el.evaluate(SIGNATURE) != roster[i]["sig"]:
                 # The roster and the reload disagree, so position is no longer meaningful and the
                 # rest of this sweep would be measuring the wrong elements.
-                unreachable += len(roster) - i
+                left = len([j for j in drivable if j >= i])
+                unreachable += left
                 print(f"check_controls: the page did not reload identically at control {i}; "
-                      f"{len(roster) - i} control(s) were not driven", file=sys.stderr)
+                      f"{left} control(s) were not driven", file=sys.stderr)
                 break
-            info = describe(el)
-
-            if info["disabled"] or info["current"]:
-                skipped += 1
-                continue
-            if not el.is_visible():
-                skipped += 1
-                continue
+            info = roster[i]["info"]
             href = (info["href"] or "").strip()
             if href.startswith("#") and len(href) > 1:
                 # A link to this same page is the one kind that can be driven without leaving, and
@@ -206,9 +221,6 @@ def run(target: str, width: int, height: int) -> dict:
                     dead.append({**info, "why": f"points at #{target_id}, which is not in the page"})
                     checked += 1
                     continue
-            elif href and href not in ("#", "#!") and not href.startswith("javascript:"):
-                skipped += 1                            # leaves the page; following it is another check
-                continue
 
             reach = el.evaluate(REACHABLE)
             if not reach["reachable"]:
@@ -314,7 +326,7 @@ def main() -> int:
               f"({r['total']} matched the selector, all skipped)", file=sys.stderr)
         return 2
     verdict = "PASS" if not r["dead"] else "FAIL"
-    if not a.quiet:
+    if not a.quiet and not a.json:   # --json means JSON, not JSON with a sentence after it
         tail = f", {r['unreachable']} not present on a fresh load" if r.get("unreachable") else ""
         print(f"check_controls: {r['checked']} control(s) driven at {a.width}px, "
               f"{len(r['dead'])} dead, {r['skipped']} skipped (links, disabled, hidden){tail} "
