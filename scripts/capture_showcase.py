@@ -28,6 +28,8 @@ ASSETS = ROOT / "skills" / "jbelly-ui" / "assets"
 SHOTS = {
     "default-light":                   ("app-shell.html", "", None),
     "default-dark":                    ("app-shell.html", "#dark=1", None),
+    "default-ar-light":                ("app-shell.html", "#lang=ar", None),
+    "default-ar-dark":                 ("app-shell.html", "#lang=ar&dark=1", None),
     "demo-clinic-dark":                ("app-shell.html", "#theme=theme-clinic&dark=1", None),
     "demo-graphite-compact-loading":   ("app-shell.html", "#theme=theme-graphite&density=density-compact&state=loading", "#table-toolbar"),
     "demo-neo-empty":                  ("app-shell.html", "#theme=theme-neo&state=empty", "#table-toolbar"),
@@ -38,6 +40,8 @@ SHOTS = {
     "pricing-light":                   ("pricing-shell.html", "", None),
     "commerce-light":                  ("commerce-shell.html", "", None),
     "commerce-dark":                   ("commerce-shell.html", "#dark=1", None),
+    "commerce-ar-light":               ("commerce-shell.html", "#lang=ar", None),
+    "commerce-ar-dark":                ("commerce-shell.html", "#lang=ar&dark=1", None),
 }
 
 

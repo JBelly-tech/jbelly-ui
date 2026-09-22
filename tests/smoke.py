@@ -138,7 +138,7 @@ for _kind2 in ("app", "landing", "pricing"):
     if os.path.exists(_p):
         ok &= run(f"lint_motion.py (built {_kind2})", [os.path.join(SK, "scripts", "lint_motion.py"), _p])
 ok &= run("lint_motion.py (the system itself)", [os.path.join(SK, "scripts", "lint_motion.py"), os.path.join(SK, "references")])
-for _shellname in ("app-shell", "landing-shell", "pricing-shell"):
+for _shellname in ("app-shell", "commerce-shell", "landing-shell", "pricing-shell"):
     ok &= run(f"lint_motion.py ({_shellname})", [os.path.join(SK, "scripts", "lint_motion.py"), os.path.join(SK, "assets", _shellname + ".html")])
 ok &= run("preflight.py", [os.path.join(SK, "scripts", "preflight.py"), page])
 have_renderer = False
@@ -280,6 +280,51 @@ if have_renderer:
         print("[" + ("OK" if _caught else "FAIL") + "] verify_motion.py refuses a page whose motion sheet never reached the document")
         if not _caught: print(f"    exit {_r.returncode}: " + " | ".join(_r.stdout.strip().splitlines()[-2:]))
         ok &= _caught
+
+# The site claims the demos ship AR/EN with full RTL, and now the site itself does. That claim is
+# worth what checks it: every element that asks to be translated has an entry, every entry is asked
+# for by some element, and switching back restores the markup that was SERVED rather than a
+# re-rendering of it -- an i18n layer that rebuilds English from its own table drifts silently.
+try:
+    from playwright.sync_api import sync_playwright as _spw
+except ImportError:
+    _spw = None
+if _spw is None:
+    print("[SKIP] the site's Arabic edition: needs Playwright")
+else:
+    _url = "file:///" + os.path.join(ROOT, "index.html").replace("\\", "/")
+    with _spw() as _p:
+        _b = _p.chromium.launch(); _pg = _b.new_page(viewport={"width": 1440, "height": 1000})
+        _pg.goto(_url, wait_until="load"); _pg.wait_for_timeout(400)
+        _before = _pg.evaluate("document.getElementById('main').innerHTML")
+        _t0 = _pg.title()
+        _pg.click("#lang-toggle"); _pg.wait_for_timeout(200)
+        _ar = (_pg.get_attribute("html", "dir"), _pg.get_attribute("html", "lang"))
+        _t1 = _pg.title()
+        _gaps = _pg.evaluate("""() => {
+          const t = document.getElementById('ar');
+          const has = new Set([...t.content.querySelectorAll('[data-for]')].map(n => n.getAttribute('data-for')));
+          const used = new Set([...document.querySelectorAll('[data-i18n]')].map(e => e.getAttribute('data-i18n')));
+          const loose = new Set(['doc-title','doc-desc','dark','light','copy-done','copy-manual']);
+          return { missing: [...used].filter(k => !has.has(k)),
+                   unused: [...has].filter(k => !used.has(k) && !loose.has(k)) };
+        }""")
+        _pg.click("#lang-toggle"); _pg.wait_for_timeout(200)
+        _after = _pg.evaluate("document.getElementById('main').innerHTML")
+        _t2 = _pg.title()
+        _b.close()
+    for _name, _cond, _why in [
+        ("the language button switches the document to Arabic and RTL", _ar == ("rtl", "ar"), str(_ar)),
+        ("the document title is translated with the page", _t1 != _t0, _t1),
+        ("every element that asks for a translation has one", not _gaps["missing"], ", ".join(_gaps["missing"])),
+        ("every translation is asked for by some element", not _gaps["unused"], ", ".join(_gaps["unused"])),
+        ("switching back restores the served markup exactly", _before == _after,
+         f"{len(_before)} -> {len(_after)} characters"),
+        ("switching back restores the title", _t2 == _t0, _t2),
+    ]:
+        print("[" + ("OK" if _cond else "FAIL") + "] " + _name + ("" if _cond else "\n    " + _why))
+        ok &= _cond
+
 
 print("\nSMOKE:", "PASS" if ok else "FAIL")
 sys.exit(0 if ok else 1)

@@ -8,7 +8,7 @@
 <meta name="color-scheme" content="light dark">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Source+Sans+3:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=DM+Sans:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Source+Sans+3:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=DM+Sans:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Cairo:wght@400;500;600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
 <style>
 /* ============================================================================
    The tokens below are copied from skills/jbelly-ui/references/tokens.css and
@@ -23,7 +23,7 @@
   --font-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
   --background: oklch(100% 0 0); --foreground: oklch(14.5% 0.005 285);
   --card: oklch(100% 0 0); --card-foreground: oklch(14.5% 0.005 285);
-  --primary: oklch(54% 0.2 258); --primary-accent: oklch(54% 0.2 258); --primary-foreground: oklch(100% 0 0);
+  --primary: oklch(48% 0.13 255); --primary-accent: oklch(48% 0.13 255); --primary-foreground: oklch(100% 0 0);
   --secondary-foreground: oklch(21% 0.006 285);
   --muted: oklch(96.5% 0.002 285); --muted-foreground: oklch(55% 0.014 285);
   --accent: oklch(96.5% 0.002 285); --accent-foreground: oklch(21% 0.006 285);
@@ -34,7 +34,7 @@
 .dark {
   --background: oklch(14.5% 0.005 285); --foreground: oklch(98.5% 0 0);
   --card: oklch(14.5% 0.005 285); --card-foreground: oklch(98.5% 0 0);
-  --primary: oklch(55% 0.21 258); --primary-accent: oklch(58.25% 0.21 258);
+  --primary: oklch(50% 0.13 255); --primary-accent: oklch(68% 0.11 255);
   --secondary-foreground: oklch(98.5% 0 0);
   --muted: oklch(21% 0.006 285); --muted-foreground: oklch(64% 0.014 285);
   --accent: oklch(21% 0.006 285); --accent-foreground: oklch(98.5% 0 0);
@@ -232,7 +232,7 @@ a:hover { text-decoration: underline; }
 }
 .chip:hover { background: var(--accent); color: var(--accent-foreground); }
 .chip[aria-checked="true"], .chip[aria-pressed="true"] { background: var(--primary); color: var(--primary-foreground); border-color: transparent; }
-.rail-end { margin-inline-start: auto; }
+.rail-end { margin-inline-start: auto; display: flex; gap: 6px; }
 
 .card { border: 1px solid var(--border); background: var(--card); color: var(--card-foreground); border-radius: calc(var(--radius) + 4px); padding: 22px; box-shadow: var(--shadow-xs); }
 .grid { display: grid; gap: 16px; }
@@ -276,6 +276,32 @@ footer { border-top: 1px solid var(--border); padding-block: 36px 56px; color: v
   .rail-end { margin-inline-start: 0; }
   .rail-in { gap: 6px; }
 }
+
+/* ---------- Arabic ------------------------------------------------------- */
+/* :root[lang] and not [lang] on its own: the language button carries lang="ar"
+   so a screen reader says the word properly, and that must not pull an Arabic
+   webfont onto a page nobody has switched yet. */
+:root[lang="ar"] {
+  --font-display: "IBM Plex Sans Arabic", "Noto Sans Arabic", "Segoe UI", Tahoma, sans-serif;
+  --font-sans: "IBM Plex Sans Arabic", "Noto Sans Arabic", "Segoe UI", Tahoma, sans-serif;
+}
+/* The presets keep their voice in Arabic: a serif preset stays a serif preset. */
+:root[lang="ar"].theme-editorial { --font-display: "Amiri", "Noto Naskh Arabic", Georgia, serif; }
+:root[lang="ar"].theme-neo, :root[lang="ar"].theme-mint {
+  --font-display: "Cairo", "Noto Sans Arabic", "Segoe UI", Tahoma, sans-serif;
+  --font-sans: "Cairo", "Noto Sans Arabic", "Segoe UI", Tahoma, sans-serif;
+}
+/* Arabic has no uppercase and no small caps, and it is taller per line than
+   Latin: tracking goes to zero, the display sizes come down, the leading opens. */
+:root[lang="ar"] h1, :root[lang="ar"] h2, :root[lang="ar"] h3 { letter-spacing: 0; }
+:root[lang="ar"] h1 { font-size: clamp(1.875rem, 4.6vw, 3rem); line-height: 1.25; }
+:root[lang="ar"] h2 { line-height: 1.35; }
+:root[lang="ar"] body { line-height: 1.85; }
+:root[lang="ar"] .refuse strong { line-height: 1.5; }
+/* A command, a path and a class name are Latin whichever way the page runs.
+   isolate keeps the surrounding Arabic punctuation on the correct side of it. */
+code { unicode-bidi: isolate; }
+pre, .cmd code, .kpi-src { unicode-bidi: isolate; }
 
 </style>
 <style id="jb-motion">
@@ -618,21 +644,22 @@ html[data-ready] .arrives {
 </style>
 </head>
 <body>
-<a class="skip" href="#main">Skip to main content</a>
+<a class="skip" href="#main" data-i18n="skip">Skip to main content</a>
 
 <div class="rail" data-motion="feedback">
   <div class="wrap rail-in">
-    <span class="rail-label" id="rail-label">This page, rethemed:</span>
+    <span class="rail-label" id="rail-label" data-i18n="rail-label">This page, rethemed:</span>
     <div class="chips" role="radiogroup" aria-labelledby="rail-label" id="presets">
-      <button class="chip" type="button" role="radio" aria-checked="true" data-theme="">Default</button>
-      <button class="chip" type="button" role="radio" aria-checked="false" data-theme="theme-clinic">Clinic</button>
-      <button class="chip" type="button" role="radio" aria-checked="false" data-theme="theme-graphite">Graphite</button>
-      <button class="chip" type="button" role="radio" aria-checked="false" data-theme="theme-editorial">Editorial</button>
-      <button class="chip" type="button" role="radio" aria-checked="false" data-theme="theme-neo">Neo</button>
-      <button class="chip" type="button" role="radio" aria-checked="false" data-theme="theme-slate">Slate</button>
-      <button class="chip" type="button" role="radio" aria-checked="false" data-theme="theme-mint">Mint</button>
+      <button class="chip" type="button" role="radio" aria-checked="true" data-theme="" data-i18n="preset-default">Default</button>
+      <button class="chip" type="button" role="radio" aria-checked="false" data-theme="theme-clinic" data-i18n="preset-clinic">Clinic</button>
+      <button class="chip" type="button" role="radio" aria-checked="false" data-theme="theme-graphite" data-i18n="preset-graphite">Graphite</button>
+      <button class="chip" type="button" role="radio" aria-checked="false" data-theme="theme-editorial" data-i18n="preset-editorial">Editorial</button>
+      <button class="chip" type="button" role="radio" aria-checked="false" data-theme="theme-neo" data-i18n="preset-neo">Neo</button>
+      <button class="chip" type="button" role="radio" aria-checked="false" data-theme="theme-slate" data-i18n="preset-slate">Slate</button>
+      <button class="chip" type="button" role="radio" aria-checked="false" data-theme="theme-mint" data-i18n="preset-mint">Mint</button>
     </div>
     <div class="rail-end">
+      <button class="chip" type="button" id="lang-toggle" lang="ar" aria-label="اعرض هذه الصفحة بالعربية">العربية</button>
       <button class="chip" type="button" id="dark-toggle" aria-pressed="false">Dark</button>
     </div>
   </div>
@@ -642,33 +669,34 @@ html[data-ready] .arrives {
 
 <section>
   <div class="wrap stack">
-    <h1>You can tell which screens an agent built.</h1>
-    <p class="lead">The purple-to-blue gradient. The Sparkles icon. Three identical cards under a
+    <h1 data-i18n="hero-h1">You can tell which screens an agent built.</h1>
+    <p class="lead" data-i18n="hero-p1">The purple-to-blue gradient. The Sparkles icon. Three identical cards under a
     hero that says nothing. Every agent reaches for the same defaults, so every product ends up
     wearing the same face.</p>
-    <p class="lead"><strong>jbelly-ui</strong> is a UI system your agent installs: exact colour and
+    <p class="lead" data-i18n="hero-p2"><strong>jbelly-ui</strong> is a UI system your agent installs: exact colour and
     spacing tokens, 25 component recipes written as literal class strings, a builder that turns a
     small JSON spec into a whole page, and a script that exits non-zero when a screen drifts back to
     those defaults. That script runs on your code too — one file, stock Python, nothing to install.</p>
     <div class="row">
-      <a class="btn btn-primary" href="skills/jbelly-ui/assets/app-shell.html">Open the live demo</a>
-      <a class="btn" href="https://github.com/mohammadJohar/jbelly-ui">Source on GitHub</a>
+      <a class="btn btn-primary" href="skills/jbelly-ui/assets/app-shell.html" data-i18n="hero-cta">Open the live demo</a>
+      <a class="btn" href="https://github.com/mohammadJohar/jbelly-ui" data-i18n="hero-source">Source on GitHub</a>
     </div>
     <div class="cmd">
-      <code id="install-cmd">npx skills add mohammadJohar/jbelly-ui -a claude-code</code>
-      <button class="copy" type="button" id="copy-btn">Copy</button>
+      <code id="install-cmd" dir="ltr">npx skills add mohammadJohar/jbelly-ui -a claude-code</code>
+      <button class="copy" type="button" id="copy-btn" data-i18n="copy">Copy</button>
     </div>
-    <p class="small">MIT · no account, no API key, no telemetry · works with Claude Code, Cursor,
+    <p class="small" data-i18n="hero-note">MIT · no account, no API key, no telemetry · works with Claude Code, Cursor,
     Codex, Copilot, Gemini CLI and anything else that reads skills</p>
   </div>
   <div class="wrap shot">
     <a href="skills/jbelly-ui/assets/app-shell.html">
       <img id="shot" src="docs/showcase/default-light.png" width="1440" height="1000" loading="lazy"
+           data-i18n="hero-shot"
            alt="The app shell: collapsible sidebar, search and notifications header, four KPI cards
                 with sparklines, an area chart, a donut with a channel breakdown, and a data table
                 with filters and pagination.">
     </a>
-    <p class="small">The demo, as it ships. Open it and everything works — collapse the sidebar,
+    <p class="small" data-i18n="hero-caption">The demo, as it ships. Open it and everything works — collapse the sidebar,
     press ⌘K, sort a column, switch to Arabic. This capture is taken from that file by
     <code>scripts/capture_showcase.py</code>, so it cannot fall behind the code.</p>
   </div>
@@ -676,21 +704,21 @@ html[data-ready] .arrives {
 
 <section>
   <div class="wrap stack">
-    <h2>Every colour on this page came from the skill</h2>
-    <p class="sub">The rail at the top writes one class on this document and changes nothing else.
+    <h2 data-i18n="theme-h2">Every colour on this page came from the skill</h2>
+    <p class="sub" data-i18n="theme-p1">The rail at the top writes one class on this document and changes nothing else.
     The typeface, the corner radius, the surface tint and the brand colour all move together,
     because they are tokens rather than values typed into components. A re-brand is one file, not a
     sweep through the markup.</p>
-    <p class="sub">The same six presets ship inside the skill, and the agent has to choose one and
+    <p class="sub" data-i18n="theme-p2">The same six presets ship inside the skill, and the agent has to choose one and
     write it to <code>design/personality.md</code> before it writes any code — so two products do not
     have to wear the same face.</p>
     <div class="row">
-      <a class="btn" href="skills/jbelly-ui/assets/app-shell.html">App shell</a>
-      <a class="btn" href="skills/jbelly-ui/assets/commerce-shell.html">Storefront</a>
-      <a class="btn" href="skills/jbelly-ui/assets/landing-shell.html">Landing page</a>
-      <a class="btn" href="skills/jbelly-ui/assets/pricing-shell.html">Pricing page</a>
+      <a class="btn" href="skills/jbelly-ui/assets/app-shell.html" data-i18n="demo-app">App shell</a>
+      <a class="btn" href="skills/jbelly-ui/assets/commerce-shell.html" data-i18n="demo-shop">Storefront</a>
+      <a class="btn" href="skills/jbelly-ui/assets/landing-shell.html" data-i18n="demo-landing">Landing page</a>
+      <a class="btn" href="skills/jbelly-ui/assets/pricing-shell.html" data-i18n="demo-pricing">Pricing page</a>
     </div>
-    <p class="small">Four self-contained demos, one HTML file each. Everything in them works:
+    <p class="small" data-i18n="theme-note">Four self-contained demos, one HTML file each. Everything in them works:
     sidebar collapse, ⌘K palette, table loading, empty and error states, drawer, column sort,
     notifications, and AR/EN with full RTL.</p>
   </div>
@@ -698,85 +726,116 @@ html[data-ready] .arrives {
 
 <section>
   <div class="wrap stack">
-    <h2>It is a script, not an opinion</h2>
-    <p class="sub">Most design guidance is advice an agent can skip. This is eleven rules with an
+    <h2 data-i18n="shop-h2">The storefront is a shop, not a screenshot</h2>
+    <p class="sub" data-i18n="shop-p1">Browse the catalogue, filter by category and price, sort it, search it, open a
+    quick view, pick a size and a finish, add to the cart, apply a promo code, remove a line and undo
+    that, then go through a four-step checkout that validates every field. There is no API and no
+    back end behind any of it: one HTML file that keeps its own state.</p>
+    <p class="sub" data-i18n="shop-p2">None of that is a promise. <code>check_controls.py</code> drives every button,
+    link, field and select in a real browser and fails on any control that produces no change at all
+    — no DOM mutation, no navigation, no focus move, no animation, no scroll. On this file that is
+    <strong>30 controls driven, 0 dead</strong>, and it runs in CI against all four demos.</p>
+    <div class="row">
+      <a class="btn" href="skills/jbelly-ui/assets/commerce-shell.html" data-i18n="shop-cta">Open the storefront</a>
+      <a class="btn" href="skills/jbelly-ui/assets/commerce-shell.html#dir=rtl" data-i18n="shop-rtl">Open it in Arabic</a>
+    </div>
+  </div>
+  <div class="wrap shot">
+    <a href="skills/jbelly-ui/assets/commerce-shell.html">
+      <img id="shop-shot" src="docs/showcase/commerce-light.png" width="1440" height="1000" loading="lazy"
+           data-i18n="shop-shot"
+           alt="The storefront: a filter rail with category, price and availability, a grid of
+                products with quick-view controls, a cart drawer with a promo code field, and a
+                four-step checkout.">
+    </a>
+    <p class="small" data-i18n="shop-caption">Fold &amp; Rule, a stationery shop. Same tokens as the dashboard above, same
+    six presets, same checks — a different kind of screen, built out of the same recipes.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap stack">
+    <h2 data-i18n="rules-h2">It is a script, not an opinion</h2>
+    <p class="sub" data-i18n="rules-p1">Most design guidance is advice an agent can skip. This is eleven rules with an
     exit code. <code>preflight.py</code> reads a file or a folder and fails when it finds one,
     printing <code>file:line</code> so the fix is a single edit.</p>
     <div class="refuse" data-preflight="quote">
-      <div><strong>Purple–indigo gradients</strong><span>the palette every generated hero arrives in</span></div>
-      <div><strong>Gradient text</strong><span>bg-clip-text on a headline</span></div>
-      <div><strong>Sparkles, Zap, Rocket icons</strong><span>decoration standing in for meaning</span></div>
-      <div><strong>A hero over three identical cards</strong><span>the default page shape</span></div>
-      <div><strong>Filler adjectives</strong><span>Elevate, Seamless, Unleash, Supercharge, Next-gen</span></div>
-      <div><strong>Emoji used as icons</strong><span>in place of a real icon set</span></div>
-      <div><strong>Glass outside a sticky header</strong><span>backdrop-blur by reflex — two allowed</span></div>
-      <div><strong>rounded-2xl with a heavy shadow</strong><span>on everything — two allowed</span></div>
-      <div><strong>transition on every property</strong><span>animates layout, janks, never intended</span></div>
-      <div><strong>Pure black body text</strong><span>on white, never correct</span></div>
-      <div><strong>Generated placeholder avatars</strong><span>DiceBear and its relatives</span></div>
+      <div data-i18n="r1"><strong>Purple–indigo gradients</strong><span>the palette every generated hero arrives in</span></div>
+      <div data-i18n="r2"><strong>Gradient text</strong><span>bg-clip-text on a headline</span></div>
+      <div data-i18n="r3"><strong>Sparkles, Zap, Rocket icons</strong><span>decoration standing in for meaning</span></div>
+      <div data-i18n="r4"><strong>A hero over three identical cards</strong><span>the default page shape</span></div>
+      <div data-i18n="r5"><strong>Filler adjectives</strong><span>Elevate, Seamless, Unleash, Supercharge, Next-gen</span></div>
+      <div data-i18n="r6"><strong>Emoji used as icons</strong><span>in place of a real icon set</span></div>
+      <div data-i18n="r7"><strong>Glass outside a sticky header</strong><span>backdrop-blur by reflex — two allowed</span></div>
+      <div data-i18n="r8"><strong>rounded-2xl with a heavy shadow</strong><span>on everything — two allowed</span></div>
+      <div data-i18n="r9"><strong>transition on every property</strong><span>animates layout, janks, never intended</span></div>
+      <div data-i18n="r10"><strong>Pure black body text</strong><span>on white, never correct</span></div>
+      <div data-i18n="r11"><strong>Generated placeholder avatars</strong><span>DiceBear and its relatives</span></div>
     </div>
-    <p class="small">Two of the eleven allow two hits before failing, because a rule with no
+    <p class="small" data-i18n="rules-note">Two of the eleven allow two hits before failing, because a rule with no
     tolerance gets switched off. The other nine allow none. It bans the purple-to-blue gradient, not
     the colour purple — one of the six presets above has an electric-violet brand colour.</p>
-    <p class="sub">The same run checks structure and contrast: one <code>h1</code>, a skip link
+    <p class="sub" data-i18n="rules-p2">The same run checks structure and contrast: one <code>h1</code>, a skip link
     wherever there is a nav, an accessible name on every icon-only button, and the WCAG ratio of
     every colour role the markup actually paints text with — not only the pairs a stylesheet happens
     to declare. On the shipped app shell that is <strong>137 ratios across 16 scopes</strong>: every
     preset, in light and in dark.</p>
-    <pre>python skills/jbelly-ui/scripts/preflight.py ./src
+    <pre dir="ltr">python skills/jbelly-ui/scripts/preflight.py ./src
 python skills/jbelly-ui/scripts/lint_tokens.py ./src</pre>
-    <p class="small">Clone the repository, or lift those two files out of it. Stock Python 3.9, no
+    <p class="small" data-i18n="rules-p3">Clone the repository, or lift those two files out of it. Stock Python 3.9, no
     dependencies, no network. They work on any project, whether or not you use the rest of this.</p>
   </div>
 </section>
 
 <section>
   <div class="wrap stack">
-    <h2>A page costs a spec, not a conversation</h2>
-    <p class="sub">The expensive part of agent-built UI is not the thinking. It is re-sending the
+    <h2 data-i18n="spec-h2">A page costs a spec, not a conversation</h2>
+    <p class="sub" data-i18n="spec-p1">The expensive part of agent-built UI is not the thinking. It is re-sending the
     whole context on every step while the model types out markup. So the markup is not modelled: a
     JSON spec goes in, a finished page comes out, and every field is asserted afterwards — a value
     that never reached the page exits non-zero instead of shipping quietly.</p>
     <div class="grid g4">
       <div class="card">
         <div class="kpi">3,458</div>
-        <p class="small">bytes of spec</p>
-        <p class="kpi-src">assets/spec.example.json</p>
+        <p class="small" data-i18n="spec-k1">bytes of spec</p>
+        <p class="kpi-src" dir="ltr">assets/spec.example.json</p>
       </div>
       <div class="card">
         <div class="kpi">73,499</div>
-        <p class="small">bytes of page — 21× larger</p>
-        <p class="kpi-src">scripts/build-screen.py</p>
+        <p class="small" data-i18n="spec-k2">bytes of page — 21× larger</p>
+        <p class="kpi-src" dir="ltr">scripts/build-screen.py</p>
       </div>
       <div class="card">
         <div class="kpi">3</div>
-        <p class="small">page shapes: app, landing, pricing</p>
-        <p class="kpi-src">--kind on the builder</p>
+        <p class="small" data-i18n="spec-k3">page shapes: app, landing, pricing</p>
+        <p class="kpi-src" data-i18n="spec-k3s">--kind on the builder</p>
       </div>
       <div class="card">
         <div class="kpi">0</div>
-        <p class="small">model tokens spent on markup</p>
-        <p class="kpi-src">it is a Python script</p>
+        <p class="small" data-i18n="spec-k4">model tokens spent on markup</p>
+        <p class="kpi-src" data-i18n="spec-k4s">it is a Python script</p>
       </div>
     </div>
-    <pre>python skills/jbelly-ui/scripts/build-screen.py spec.json out.html --kind landing
+    <pre dir="ltr">python skills/jbelly-ui/scripts/build-screen.py spec.json out.html --kind landing
 python skills/jbelly-ui/scripts/verify_page.py out.html --variants ",#dark=1,#dir=rtl"</pre>
     <div class="grid g2">
       <figure class="pair">
         <img src="docs/showcase/landing-light.png" width="1440" height="1000" loading="lazy"
+             data-i18n="spec-shot1"
              alt="The landing template as it ships: a route-planning product for delivery fleets,
                   with a depot schedule panel beside the headline.">
-        <figcaption class="small">The landing template, as it ships.</figcaption>
+        <figcaption class="small" data-i18n="spec-cap1">The landing template, as it ships.</figcaption>
       </figure>
       <figure class="pair">
         <img src="docs/showcase/generated-landing.png" width="1440" height="1000" loading="lazy"
+             data-i18n="spec-shot2"
              alt="The same template built from a different spec: a greenhouse climate monitor, with
                   a panel of temperature and humidity readings per growing span.">
-        <figcaption class="small">The same file, built from a different spec. Different product,
+        <figcaption class="small" data-i18n="spec-cap2">The same file, built from a different spec. Different product,
         different words, different numbers — no markup was written.</figcaption>
       </figure>
     </div>
-    <p class="small">The second command renders the page headlessly in light, dark and RTL, collects
+    <p class="small" data-i18n="spec-p2">The second command renders the page headlessly in light, dark and RTL, collects
     console errors, runs the lint and the pre-flight, and — with Playwright installed — fails on
     horizontal overflow at 375 and 1440. Without Playwright it falls back to any Chrome, Chromium or
     Edge already on the machine and runs everything except the overflow check.</p>
@@ -785,28 +844,28 @@ python skills/jbelly-ui/scripts/verify_page.py out.html --variants ",#dark=1,#di
 
 <section>
   <div class="wrap stack">
-    <h2>What one screen cost</h2>
-    <p class="sub">Three briefs, each run in a workspace outside the repository with every other
+    <h2 data-i18n="cost-h2">What one screen cost</h2>
+    <p class="sub" data-i18n="cost-p1">Three briefs, each run in a workspace outside the repository with every other
     skill switched off. Each row links to the file the run wrote, with the counts exactly as the
     agent CLI reported them.</p>
     <div class="scroller">
       <table>
-        <caption class="small" style="text-align:start;padding-block:8px">Context counts every token
+        <caption class="small" style="text-align:start;padding-block:8px" data-i18n="cost-caption">Context counts every token
         sent, cache reads included, because that is the term the cost model charges for.</caption>
-        <thead><tr><th scope="col">Brief</th><th scope="col">Context tokens</th><th scope="col">Billed</th><th scope="col">Minutes</th><th scope="col">Tool calls</th><th scope="col">Record</th></tr></thead>
+        <thead><tr><th scope="col" data-i18n="cost-th1">Brief</th><th scope="col" data-i18n="cost-th2">Context tokens</th><th scope="col" data-i18n="cost-th3">Billed</th><th scope="col" data-i18n="cost-th4">Minutes</th><th scope="col" data-i18n="cost-th5">Tool calls</th><th scope="col" data-i18n="cost-th6">Record</th></tr></thead>
         <tbody>
-          <tr><td>Dashboard</td><td class="num">831,640</td><td class="num">97,004</td><td class="num">2.07</td><td class="num">10</td><td><a href="evals/records/01-dashboard-jbelly-ui-20260919-162651.json">run</a></td></tr>
-          <tr><td>Landing page</td><td class="num">1,321,657</td><td class="num">132,137</td><td class="num">7.21</td><td class="num">13</td><td><a href="evals/records/02-landing-jbelly-ui-20260919-164728.json">run</a></td></tr>
-          <tr><td>Pricing page</td><td class="num">4,906,916</td><td class="num">182,638</td><td class="num">9.28</td><td class="num">41</td><td><a href="evals/records/03-pricing-jbelly-ui-20260919-170349.json">run</a></td></tr>
+          <tr><td data-i18n="cost-r1">Dashboard</td><td class="num">831,640</td><td class="num">97,004</td><td class="num">2.07</td><td class="num">10</td><td><a href="evals/records/01-dashboard-jbelly-ui-20260919-162651.json" data-i18n="cost-run1">run</a></td></tr>
+          <tr><td data-i18n="cost-r2">Landing page</td><td class="num">1,321,657</td><td class="num">132,137</td><td class="num">7.21</td><td class="num">13</td><td><a href="evals/records/02-landing-jbelly-ui-20260919-164728.json" data-i18n="cost-run2">run</a></td></tr>
+          <tr><td data-i18n="cost-r3">Pricing page</td><td class="num">4,906,916</td><td class="num">182,638</td><td class="num">9.28</td><td class="num">41</td><td><a href="evals/records/03-pricing-jbelly-ui-20260919-170349.json" data-i18n="cost-run3">run</a></td></tr>
         </tbody>
       </table>
     </div>
-    <p class="sub">A pricing page cost six times a dashboard, and that gap is the useful number. The
+    <p class="sub" data-i18n="cost-p2">A pricing page cost six times a dashboard, and that gap is the useful number. The
     dashboard was the one shape the builder knew, so a spec became the whole screen. Nothing filled
     the landing or pricing shape, so the model wrote every line by hand — which is exactly the cost
     this exists to remove. Both shapes have templates now, which should move those two rows a long
     way, and nothing here claims the improvement until the briefs have been run again.</p>
-    <p class="small">One run each, one model, one agent, one machine. No repeats, so no variance:
+    <p class="small" data-i18n="cost-p3">One run each, one model, one agent, one machine. No repeats, so no variance:
     read the ordering as real and the precision as not. The method, the isolation, and the numbers
     this project has withdrawn because the harness that produced them was unfair, are all in
     <a href="COST.md">COST.md</a>.</p>
@@ -815,73 +874,73 @@ python skills/jbelly-ui/scripts/verify_page.py out.html --variants ",#dark=1,#di
 
 <section>
   <div class="wrap stack">
-    <h2>Where it is weak</h2>
+    <h2 data-i18n="weak-h2">Where it is weak</h2>
     <div class="grid g2x2">
       <div class="card stack-sm">
-        <h3>The cost figures are older than the tool</h3>
-        <p class="small">They were measured when the builder knew one page shape. The landing and
+        <h3 data-i18n="weak-h3a">The cost figures are older than the tool</h3>
+        <p class="small" data-i18n="weak-pa">They were measured when the builder knew one page shape. The landing and
         pricing rows are the cost of a model writing that markup by hand. The dashboard figure is
         unaffected.</p>
       </div>
       <div class="card stack-sm">
-        <h3>One run, one model, one agent</h3>
-        <p class="small">Everything outside this machine's single model family and single agent is
+        <h3 data-i18n="weak-h3b">One run, one model, one agent</h3>
+        <p class="small" data-i18n="weak-pb">Everything outside this machine's single model family and single agent is
         untested. Twelve briefs exist in the repository; three have been measured.</p>
       </div>
       <div class="card stack-sm">
-        <h3>Three generated shapes, not every shape</h3>
-        <p class="small">App screen, landing page, pricing page. Anything else is the model writing
+        <h3 data-i18n="weak-h3c">Three generated shapes, not every shape</h3>
+        <p class="small" data-i18n="weak-pc">App screen, landing page, pricing page. Anything else is the model writing
         markup with the system's rules in front of it, which is better than nothing and costs what it
         costs.</p>
       </div>
       <div class="card stack-sm">
-        <h3>The checks are a floor, not a review</h3>
-        <p class="small">They catch the defaults, the contrast failures and the structural faults. No
+        <h3 data-i18n="weak-h3d">The checks are a floor, not a review</h3>
+        <p class="small" data-i18n="weak-pd">They catch the defaults, the contrast failures and the structural faults. No
         script judges whether a screen is good, and this one does not pretend to.</p>
       </div>
     </div>
-    <p class="small">It is web only. About 1019 KB installed across 43 files, and 53% of that is the four
+    <p class="small" data-i18n="weak-note">It is web only. About 1019 KB installed across 43 files, and 53% of that is the four
     demo shells, which you can delete.</p>
   </div>
 </section>
 
 <section>
   <div class="wrap stack">
-    <h2>Install</h2>
+    <h2 data-i18n="install-h2">Install</h2>
     <div class="grid g2">
       <div class="card stack-sm">
-        <h3>Agents that read skills</h3>
-        <p class="small">Claude Code, Codex, Cursor, Copilot, Gemini CLI, Windsurf, Kiro, Roo Code,
+        <h3 data-i18n="install-h3a">Agents that read skills</h3>
+        <p class="small" data-i18n="install-pa">Claude Code, Codex, Cursor, Copilot, Gemini CLI, Windsurf, Kiro, Roo Code,
         OpenCode, Amp, Goose and more.</p>
-        <pre>npx skills add mohammadJohar/jbelly-ui -a claude-code</pre>
-        <p class="small">No Node? <code>./install.sh cursor</code> on macOS and Linux, or
+        <pre dir="ltr">npx skills add mohammadJohar/jbelly-ui -a claude-code</pre>
+        <p class="small" data-i18n="install-pb">No Node? <code>./install.sh cursor</code> on macOS and Linux, or
         <code>.\install.ps1 -Agent cursor</code> on Windows, copies the folder into place.</p>
       </div>
       <div class="card stack-sm">
-        <h3>Tools that read a rules file</h3>
-        <p class="small">Copy <code>dist/AGENTS.md</code> to your project root, or into the tool's
+        <h3 data-i18n="install-h3b">Tools that read a rules file</h3>
+        <p class="small" data-i18n="install-pc">Copy <code>dist/AGENTS.md</code> to your project root, or into the tool's
         knowledge box.</p>
-        <h3 style="margin-top:1.25rem">Chat-only tools</h3>
-        <p class="small">Paste <code>dist/jbelly-ui-prompt.md</code> — about 5K tokens,
+        <h3 style="margin-top:1.25rem" data-i18n="install-h3c">Chat-only tools</h3>
+        <p class="small" data-i18n="install-pd">Paste <code>dist/jbelly-ui-prompt.md</code> — about 5K tokens,
         self-contained, with the tokens and a manual checklist. Both files are generated from the
         skill, so they cannot drift from it.</p>
       </div>
     </div>
-    <p class="sub">Then ask for any UI: <em>add a dashboard</em>, <em>build the settings page</em>,
+    <p class="sub" data-i18n="install-p">Then ask for any UI: <em>add a dashboard</em>, <em>build the settings page</em>,
     <em>restyle this table</em>, <em>review this screen</em>. The skill triggers on UI work only.</p>
   </div>
 </section>
 
 <section>
   <div class="wrap stack">
-    <h2>Fork it, strip the name, ship it in something you charge for</h2>
-    <p class="lead">MIT. No attribution required, no per-project licence, no account, and nothing
+    <h2 data-i18n="fork-h2">Fork it, strip the name, ship it in something you charge for</h2>
+    <p class="lead" data-i18n="fork-p">MIT. No attribution required, no per-project licence, no account, and nothing
     here phones home. If your agent produces something bad with it, that is the result worth having:
     the issue template asks for the brief, the agent, the model and the verdict lines.</p>
     <div class="row">
-      <a class="btn btn-primary" href="https://github.com/mohammadJohar/jbelly-ui">Read the source</a>
-      <a class="btn" href="COST.md">How it was measured</a>
-      <a class="btn" href="evals/records/">The recorded runs</a>
+      <a class="btn btn-primary" href="https://github.com/mohammadJohar/jbelly-ui" data-i18n="fork-cta">Read the source</a>
+      <a class="btn" href="COST.md" data-i18n="fork-cost">How it was measured</a>
+      <a class="btn" href="evals/records/" data-i18n="fork-runs">The recorded runs</a>
     </div>
   </div>
 </section>
@@ -890,17 +949,220 @@ python skills/jbelly-ui/scripts/verify_page.py out.html --variants ",#dark=1,#di
 
 <footer data-motion="feedback">
   <div class="wrap stack-sm">
-    <p>Built and maintained by JBelly. MIT — see
+    <p data-i18n="foot-p1">Built and maintained by JBelly. MIT — see
     <a href="https://github.com/mohammadJohar/jbelly-ui/blob/main/LICENSE">LICENSE</a>. Fonts via
     Google Fonts (OFL), icons Lucide (ISC), charts ApexCharts (MIT).</p>
-    <p class="small">This page is one static HTML file: no build step, no framework, no analytics and
-    no trackers. It remembers one thing in your browser — which preset you picked — and the only
-    third-party requests are the font files. It is built from the tokens at the top of its own
-    source, and the project's <code>preflight.py</code> and <code>lint_tokens.py</code> run against
-    it in CI.</p>
+    <p class="small" data-i18n="foot-p2">This page is one static HTML file: no build step, no framework, no analytics and
+    no trackers. It remembers three things in your browser — the preset, the mode and the language —
+    and the only third-party requests are the font files. It is built from the tokens at the top of
+    its own source, and the project's <code>preflight.py</code> and <code>lint_tokens.py</code> run
+    against it in CI.</p>
   </div>
 </footer>
+<!-- The Arabic edition of this page, as markup rather than as strings in a script: every entry
+     below is the inner HTML of the element whose data-i18n matches its data-for, so a paragraph
+     keeps its <strong>, its <code> and its links instead of being flattened into a translation
+     table. A <template> is parsed but not rendered, so none of this costs a layout, an Arabic font
+     file or a byte of bandwidth until someone asks for it. -->
+<template id="ar">
+  <div data-for="doc-title">jbelly-ui — نظام واجهات يثبّته وكيلك</div>
+  <div data-for="doc-desc">نظام تصميم واجهات مُغلَّف كمهارة للوكلاء: توكِنات محدّدة، و25 وصفة مكوّن، وبانٍ للصفحات يقرأ مواصفة، وسكربتات تخرج بكود خطأ حين تنزلق الشاشة إلى الإعدادات الافتراضية.</div>
 
+  <div data-for="skip">تخطَّ إلى المحتوى الرئيسي</div>
+  <div data-for="rail-label">هذه الصفحة، بهويّة أخرى:</div>
+  <div data-for="preset-default">افتراضي</div>
+  <div data-for="preset-clinic">عيادة</div>
+  <div data-for="preset-graphite">جرافيت</div>
+  <div data-for="preset-editorial">تحريري</div>
+  <div data-for="preset-neo">نيو</div>
+  <div data-for="preset-slate">سليت</div>
+  <div data-for="preset-mint">نعناع</div>
+  <div data-for="dark">داكن</div>
+  <div data-for="light">فاتح</div>
+  <div data-for="copy">انسخ</div>
+  <div data-for="copy-done">نُسِخ</div>
+  <div data-for="copy-manual">حدّد وانسخ</div>
+
+  <div data-for="hero-h1">الشاشات التي يبنيها الوكيل تُعرَف من أوّل نظرة.</div>
+  <div data-for="hero-p1">التدرّج من البنفسجي إلى الأزرق. أيقونة Sparkles. ثلاث بطاقات متطابقة تحت عنوان لا
+  يقول شيئاً. كل وكيل يمدّ يده إلى الإعدادات الافتراضية نفسها، فينتهي كل منتج وهو يرتدي الوجه نفسه.</div>
+  <div data-for="hero-p2"><strong>jbelly-ui</strong> نظام واجهات يثبّته وكيلك: توكِنات لون ومسافات
+  محدَّدة بالضبط، و25 وصفة مكوّن مكتوبة كسلاسل أصناف حرفية، وبانٍ يحوّل مواصفة JSON صغيرة إلى صفحة
+  كاملة، وسكربت يخرج بكود خطأ حين تنزلق الشاشة عائدةً إلى تلك الإعدادات. والسكربت نفسه يعمل على
+  شيفرتك أنت — ملف واحد، بايثون قياسي، ولا شيء يُثبَّت.</div>
+  <div data-for="hero-cta">افتح الديمو الحيّ</div>
+  <div data-for="hero-source">الشيفرة على GitHub</div>
+  <div data-for="hero-note">رخصة MIT · بلا حساب، بلا مفتاح API، بلا تتبّع · يعمل مع Claude Code
+  وCursor وCodex وCopilot وGemini CLI وكل أداة تقرأ المهارات</div>
+  <div data-for="hero-shot" data-alt="شاشة التطبيق: شريط جانبي قابل للطيّ، وترويسة فيها بحث وإشعارات،
+  وأربع بطاقات مؤشرات مع رسوم مصغّرة، ورسم مساحي، ورسم دائري بتوزيع القنوات، وجدول بيانات فيه
+  مرشّحات وتنقّل بين الصفحات."></div>
+  <div data-for="hero-caption">الديمو كما يُسلَّم. افتحه وكل شيء فيه يعمل — اطوِ الشريط الجانبي، اضغط
+  ⌘K، رتّب عموداً، بدّل إلى العربية. هذه اللقطة مأخوذة من ذلك الملف نفسه بواسطة
+  <code>scripts/capture_showcase.py</code>، فلا يمكن أن تتخلّف عن الشيفرة.</div>
+
+  <div data-for="theme-h2">كل لون في هذه الصفحة جاء من المهارة</div>
+  <div data-for="theme-p1">الشريط في الأعلى يكتب صنفاً واحداً على هذا المستند، ولا يغيّر شيئاً غيره.
+  الخط، وانحناء الزوايا، ودرجة السطح، ولون الهوية — كلها تتحرك معاً، لأنها توكِنات لا قيم مكتوبة
+  داخل المكوّنات. تغيير الهوية ملف واحد، لا مسحٌ شامل للوسوم.</div>
+  <div data-for="theme-p2">الإعدادات الستة نفسها تُشحَن داخل المهارة، وعلى الوكيل أن يختار واحداً
+  ويكتبه في <code>design/personality.md</code> قبل أن يكتب أي شيفرة — حتى لا يضطر منتجان إلى ارتداء
+  الوجه نفسه.</div>
+  <div data-for="demo-app">شاشة تطبيق</div>
+  <div data-for="demo-shop">متجر</div>
+  <div data-for="demo-landing">صفحة هبوط</div>
+  <div data-for="demo-pricing">صفحة أسعار</div>
+  <div data-for="theme-note">أربعة ديموهات مكتفية بذاتها، ملف HTML واحد لكلٍّ منها. وكل شيء فيها يعمل:
+  طيّ الشريط الجانبي، ولوحة ⌘K، وتحميل الجدول، وحالتا الفراغ والخطأ، والدرج، وترتيب الأعمدة،
+  والإشعارات، والعربية/الإنجليزية باتجاه كامل من اليمين إلى اليسار.</div>
+
+  <div data-for="shop-h2">المتجر متجرٌ، لا لقطة شاشة</div>
+  <div data-for="shop-p1">تصفّح الكتالوج، ورشّح حسب الفئة والسعر، ورتّب، وابحث، وافتح عرضاً سريعاً،
+  واختر مقاساً وتشطيباً، وأضف إلى السلة، وطبّق رمز خصم، واحذف سطراً ثم تراجَع عنه، ثم أكمل شراءً من
+  أربع خطوات يتحقّق من كل حقل فيه. لا واجهة برمجية ولا خادم خلف أيٍّ من ذلك: ملف HTML واحد يحتفظ
+  بحالته بنفسه.</div>
+  <div data-for="shop-p2">ولا شيء من هذا وعد. <code>check_controls.py</code> يقود كل زر ورابط وحقل
+  وقائمة في متصفح حقيقي، ويفشل عند أي عنصر لا ينتج عنه تغيير البتّة — لا تعديل في DOM، ولا تنقّل، ولا
+  انتقال تركيز، ولا حركة، ولا تمرير. على هذا الملف: <strong>30 عنصراً مُقاداً، و0 ميت</strong>،
+  والفحص يعمل في CI على الديموهات الأربعة كلها.</div>
+  <div data-for="shop-cta">افتح المتجر</div>
+  <div data-for="shop-rtl" data-href="skills/jbelly-ui/assets/commerce-shell.html#dir=ltr">افتحه بالإنجليزية</div>
+  <div data-for="shop-shot" data-alt="المتجر: شريط مرشّحات فيه الفئة والسعر والتوفّر، وشبكة منتجات مع
+  أزرار عرض سريع، ودرج سلة فيه حقل رمز خصم، وشراء من أربع خطوات."></div>
+  <div data-for="shop-caption">‏Fold &amp; Rule، متجر قرطاسية. التوكِنات نفسها التي في لوحة التحكم
+  أعلاه، والإعدادات الستة نفسها، والفحوص نفسها — نوع شاشة مختلف، مبنيّ من الوصفات ذاتها.</div>
+
+  <div data-for="rules-h2">سكربت، لا رأي</div>
+  <div data-for="rules-p1">معظم إرشادات التصميم نصيحة يستطيع الوكيل تجاوزها. هذه إحدى عشرة قاعدة لها
+  كود خروج. <code>preflight.py</code> يقرأ ملفاً أو مجلداً، ويفشل حين يجد واحدة، ويطبع
+  <code>file:line</code> ليكون الإصلاح تعديلاً واحداً.</div>
+
+  <!-- The eleven refusals, quoted here for the same reason the English list is quoted: this is
+       what the checker forbids, written out, and a checker that fails its own list of forbidden
+       things is a checker nobody can read. -->
+  <div data-preflight="quote">
+    <div data-for="r1"><strong>تدرّجات بنفسجية–نيلية</strong><span>اللوحة التي يصل بها كل عنوان مُولَّد</span></div>
+    <div data-for="r2"><strong>نص متدرّج</strong><span>‏bg-clip-text على عنوان</span></div>
+    <div data-for="r3"><strong>أيقونات Sparkles وZap وRocket</strong><span>زينة تحلّ محلّ المعنى</span></div>
+    <div data-for="r4"><strong>عنوان فوق ثلاث بطاقات متطابقة</strong><span>شكل الصفحة الافتراضي</span></div>
+    <div data-for="r5"><strong>صفات حشو</strong><span>‏Elevate وSeamless وUnleash وSupercharge وNext-gen</span></div>
+    <div data-for="r6"><strong>إيموجي مكان الأيقونات</strong><span>بدل طقم أيقونات حقيقي</span></div>
+    <div data-for="r7"><strong>زجاج خارج ترويسة ملتصقة</strong><span>‏backdrop-blur بحكم العادة — اثنان مسموحان</span></div>
+    <div data-for="r8"><strong>‏rounded-2xl مع ظلّ ثقيل</strong><span>على كل شيء — اثنان مسموحان</span></div>
+    <div data-for="r9"><strong>انتقال على كل خاصية</strong><span>يحرّك التخطيط، ويتقطّع، ولم يُقصَد قط</span></div>
+    <div data-for="r10"><strong>نص أسود خالص</strong><span>على أبيض، ليس صحيحاً أبداً</span></div>
+    <div data-for="r11"><strong>صور رمزية مُولَّدة</strong><span>‏DiceBear وما شابهه</span></div>
+  </div>
+
+  <div data-for="rules-note">اثنتان من الإحدى عشرة تسمحان بمخالفتين قبل أن تفشلا، لأن القاعدة التي لا
+  هامش فيها تُطفَأ. والتسع الباقية لا تسمح بشيء. والمرفوض هو التدرّج من البنفسجي إلى الأزرق، لا اللون
+  البنفسجي نفسه — فأحد الإعدادات الستة أعلاه لون هويته بنفسجي كهربائي.</div>
+  <div data-for="rules-p2">التشغيلة نفسها تفحص البنية والتباين: <code>h1</code> واحد، ورابط تخطٍّ
+  حيثما وُجد تنقّل، واسم مقروء لكل زر بأيقونة وحدها، ونسبة WCAG لكل دور لوني تطلي به الوسوم نصاً
+  فعلاً — لا الأزواج التي تصادف أن تعلنها ورقة الأنماط. على شاشة التطبيق المشحونة هذه
+  <strong>137 نسبة عبر 16 نطاقاً</strong>: كل إعداد، في الفاتح وفي الداكن.</div>
+  <div data-for="rules-p3">استنسخ المستودع، أو انتزع هذين الملفين منه. بايثون 3.9 قياسي، بلا
+  اعتماديات، وبلا شبكة. يعملان على أي مشروع، سواء استخدمت بقية هذا أم لا.</div>
+
+  <div data-for="spec-h2">الصفحة تكلّف مواصفة، لا محادثة</div>
+  <div data-for="spec-p1">الجزء الغالي في الواجهات التي يبنيها وكيل ليس التفكير، بل إعادة إرسال
+  السياق كاملاً في كل خطوة بينما يكتب النموذج الوسوم حرفاً حرفاً. لذلك لا يُولَّد الوسم بالنموذج: تدخل
+  مواصفة JSON، وتخرج صفحة جاهزة، ثم يُتحقَّق من كل حقل بعدها — والقيمة التي لم تصل إلى الصفحة تُخرِج
+  كود خطأ بدل أن تُشحَن بصمت.</div>
+  <div data-for="spec-k1">بايت من المواصفة</div>
+  <div data-for="spec-k2">بايت من الصفحة — أكبر بـ21 مرة</div>
+  <div data-for="spec-k3">أشكال صفحات: تطبيق، وهبوط، وأسعار</div>
+  <div data-for="spec-k3s">‏--kind على البانِي</div>
+  <div data-for="spec-k4">توكِن من النموذج أُنفِق على الوسوم</div>
+  <div data-for="spec-k4s">إنه سكربت بايثون</div>
+  <div data-for="spec-shot1" data-alt="قالب الهبوط كما يُشحَن: منتج لتخطيط المسارات لأساطيل التوصيل،
+  وإلى جانب العنوان لوحة جدولة للمستودعات."></div>
+  <div data-for="spec-cap1">قالب الهبوط كما يُشحَن.</div>
+  <div data-for="spec-shot2" data-alt="القالب نفسه مبنيّاً من مواصفة أخرى: مراقب مناخ لبيت زجاجي، مع
+  لوحة قراءات حرارة ورطوبة لكل مساحة زراعة."></div>
+  <div data-for="spec-cap2">الملف نفسه، مبنيّاً من مواصفة أخرى. منتج مختلف، وكلمات مختلفة، وأرقام
+  مختلفة — ولم تُكتَب وسوم.</div>
+  <div data-for="spec-p2">الأمر الثاني يرسم الصفحة بلا واجهة في الفاتح والداكن ومن اليمين إلى اليسار،
+  ويجمع أخطاء الكونسول، ويشغّل الفحص اللغوي والفحص القبلي، ثم — إن كان Playwright مثبّتاً — يفشل عند
+  أي تجاوز أفقي عند 375 و1440. وبدونه يرجع إلى أي Chrome أو Chromium أو Edge موجود على الجهاز،
+  ويشغّل كل شيء عدا فحص التجاوز.</div>
+
+  <div data-for="cost-h2">كم كلّفت شاشة واحدة</div>
+  <div data-for="cost-p1">ثلاثة طلبات، شُغِّل كلٌّ منها في مساحة عمل خارج المستودع وكل مهارة أخرى
+  مطفأة. وكل صف يرتبط بالملف الذي كتبته تلك التشغيلة، والأعداد كما أبلغ عنها سطر أوامر الوكيل
+  بالضبط.</div>
+  <div data-for="cost-caption">السياق يحسب كل توكِن أُرسِل، بما في ذلك قراءات الكاش، لأنه الحدّ الذي
+  يحاسب عليه نموذج التكلفة.</div>
+  <div data-for="cost-th1">الطلب</div>
+  <div data-for="cost-th2">توكِنات السياق</div>
+  <div data-for="cost-th3">المحاسَب</div>
+  <div data-for="cost-th4">دقائق</div>
+  <div data-for="cost-th5">استدعاءات الأدوات</div>
+  <div data-for="cost-th6">السجل</div>
+  <div data-for="cost-r1">لوحة تحكم</div>
+  <div data-for="cost-r2">صفحة هبوط</div>
+  <div data-for="cost-r3">صفحة أسعار</div>
+  <div data-for="cost-run1">التشغيلة</div>
+  <div data-for="cost-run2">التشغيلة</div>
+  <div data-for="cost-run3">التشغيلة</div>
+  <div data-for="cost-p2">صفحة الأسعار كلّفت ستة أضعاف لوحة التحكم، وتلك الفجوة هي الرقم المفيد. لوحة
+  التحكم كانت الشكل الوحيد الذي يعرفه البانِي، فصارت المواصفة هي الشاشة كلها. ولم يكن ثمّة ما يملأ شكل
+  الهبوط ولا شكل الأسعار، فكتب النموذج كل سطر بيده — وهذه بالضبط التكلفة التي وُجِد هذا لإزالتها.
+  الشكلان صار لكلٍّ منهما قالب الآن، وهذا يُفترض أن يحرّك هذين الصفّين كثيراً، ولا شيء هنا يدّعي
+  التحسّن قبل إعادة تشغيل الطلبات.</div>
+  <div data-for="cost-p3">تشغيلة واحدة لكلٍّ، ونموذج واحد، ووكيل واحد، وجهاز واحد. بلا تكرار، فبلا
+  تباين: اقرأ الترتيب على أنه حقيقي، والدقّة على أنها ليست كذلك. أمّا الطريقة، والعزل، والأرقام التي
+  سحبها هذا المشروع لأن الإطار الذي أنتجها كان غير منصف، فكلها في <a href="COST.md">COST.md</a>.</div>
+
+  <div data-for="weak-h2">أين يضعف</div>
+  <div data-for="weak-h3a">أرقام التكلفة أقدم من الأداة</div>
+  <div data-for="weak-pa">قِيسَت حين كان البانِي يعرف شكل صفحة واحداً. وصفّا الهبوط والأسعار هما تكلفة
+  نموذج يكتب تلك الوسوم بيده. ورقم لوحة التحكم غير متأثر بذلك.</div>
+  <div data-for="weak-h3b">تشغيلة واحدة، نموذج واحد، وكيل واحد</div>
+  <div data-for="weak-pb">كل ما هو خارج عائلة النموذج الواحدة والوكيل الواحد على هذا الجهاز غير
+  مُختبَر. في المستودع اثنا عشر طلباً؛ ثلاثة منها قِيسَت.</div>
+  <div data-for="weak-h3c">ثلاثة أشكال مُولَّدة، لا كل شكل</div>
+  <div data-for="weak-pc">شاشة تطبيق، وصفحة هبوط، وصفحة أسعار. وما عدا ذلك هو النموذج يكتب الوسوم
+  وقواعد النظام أمامه، وهذا أفضل من لا شيء، ويكلّف ما يكلّف.</div>
+  <div data-for="weak-h3d">الفحوص أرضية، لا مراجعة</div>
+  <div data-for="weak-pd">تمسك الإعدادات الافتراضية، وإخفاقات التباين، والعيوب البنيوية. ولا سكربت
+  يحكم إن كانت الشاشة جيدة، وهذا لا يدّعي أنه يفعل.</div>
+  <div data-for="weak-note">للويب فقط. نحو 1019 كيلوبايت مثبّتة عبر 43 ملفاً، و53% منها الديموهات
+  الأربعة، ويمكنك حذفها.</div>
+
+  <div data-for="install-h2">التثبيت</div>
+  <div data-for="install-h3a">وكلاء يقرؤون المهارات</div>
+  <div data-for="install-pa">‏Claude Code وCodex وCursor وCopilot وGemini CLI وWindsurf وKiro وRoo Code
+  وOpenCode وAmp وGoose وغيرها.</div>
+  <div data-for="install-pb">لا يوجد Node؟ <code>./install.sh cursor</code> على macOS وLinux، أو
+  <code>.\install.ps1 -Agent cursor</code> على Windows، ينسخ المجلد إلى مكانه.</div>
+  <div data-for="install-h3b">أدوات تقرأ ملف قواعد</div>
+  <div data-for="install-pc">انسخ <code>dist/AGENTS.md</code> إلى جذر مشروعك، أو إلى صندوق المعرفة في
+  الأداة.</div>
+  <div data-for="install-h3c">أدوات محادثة فقط</div>
+  <div data-for="install-pd">الصق <code>dist/jbelly-ui-prompt.md</code> — نحو خمسة آلاف توكِن، مكتفٍ
+  بذاته، ومعه التوكِنات وقائمة تحقّق يدوية. والملفان مُولَّدان من المهارة، فلا يمكن أن ينزلقا
+  عنها.</div>
+  <div data-for="install-p">ثم اطلب أي واجهة: <em>أضف لوحة تحكم</em>، <em>ابنِ صفحة الإعدادات</em>،
+  <em>أعد تنسيق هذا الجدول</em>، <em>راجع هذه الشاشة</em>. والمهارة تُستدعى على عمل الواجهات
+  وحده.</div>
+
+  <div data-for="fork-h2">انسخه، وانزع الاسم، واشحنه في شيء تتقاضى عليه</div>
+  <div data-for="fork-p">رخصة MIT. لا نسبة مطلوبة، ولا ترخيص لكل مشروع، ولا حساب، ولا شيء هنا يتصل
+  بجهة ما. وإن أخرج وكيلك شيئاً سيئاً به، فتلك هي النتيجة التي تستحق: قالب المشكلة يطلب الطلب،
+  والوكيل، والنموذج، وأسطر الحكم.</div>
+  <div data-for="fork-cta">اقرأ الشيفرة</div>
+  <div data-for="fork-cost">كيف قِيسَ</div>
+  <div data-for="fork-runs">التشغيلات المسجّلة</div>
+
+  <div data-for="foot-p1">بناه ويصونه JBelly. رخصة MIT — انظر
+  <a href="https://github.com/mohammadJohar/jbelly-ui/blob/main/LICENSE">LICENSE</a>. الخطوط عبر
+  Google Fonts (OFL)، والأيقونات Lucide (ISC)، والرسوم ApexCharts (MIT).</div>
+  <div data-for="foot-p2">هذه الصفحة ملف HTML ثابت واحد: بلا خطوة بناء، وبلا إطار، وبلا تحليلات ولا
+  متتبّعات. تتذكّر ثلاثة أشياء في متصفحك — الإعداد، والوضع، واللغة — وطلبات الطرف الثالث الوحيدة فيها
+  هي ملفات الخطوط. وهي مبنيّة من التوكِنات في أعلى مصدرها، ويعمل عليها <code>preflight.py</code>
+  و<code>lint_tokens.py</code> الخاصان بالمشروع داخل CI.</div>
+</template>
 <script>
 (function () {
   var html = document.documentElement;
@@ -933,26 +1195,94 @@ python skills/jbelly-ui/scripts/verify_page.py out.html --variants ",#dark=1,#di
     });
   });
 
+  // ---- the Arabic edition ---------------------------------------------------
+  // Every translated string is markup in the template at the end of the document, keyed by the
+  // data-i18n attribute of the element it belongs to, so a paragraph keeps its <strong>, its
+  // <code> and its links. The English is read once, at load, before anything can have changed it:
+  // caching it lazily would preserve whatever a button happened to be saying at that moment.
+  var AR = {}, EN = {}, lang = 'en';
+  var tmpl = document.getElementById('ar');
+  if (tmpl) Array.prototype.forEach.call(tmpl.content.querySelectorAll('[data-for]'), function (n) {
+    AR[n.getAttribute('data-for')] = n;
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-i18n]'), function (el) {
+    EN[el.getAttribute('data-i18n')] = { html: el.innerHTML, alt: el.getAttribute('alt'), href: el.getAttribute('href') };
+  });
+  var META = document.querySelector('meta[name="description"]');
+  var EN_TITLE = document.title, EN_DESC = META ? META.getAttribute('content') : '';
+  var langBtn = document.getElementById('lang-toggle');
   var dark = document.getElementById('dark-toggle');
+
+  function word(key, en) {
+    var n = AR[key];
+    return lang === 'ar' && n ? n.textContent.replace(/\s+/g, ' ').trim() : en;
+  }
+
+  // The product shots follow the page: a reader who switched the site to Arabic is shown the
+  // demo in Arabic, because a screenshot that contradicts the page is worse than no screenshot.
+  function shots() {
+    var tone = html.classList.contains('dark') ? 'dark' : 'light';
+    var ar = lang === 'ar' ? 'ar-' : '';
+    var a = document.getElementById('shot'), b = document.getElementById('shop-shot');
+    if (a) a.src = 'docs/showcase/default-' + ar + tone + '.png';
+    if (b) b.src = 'docs/showcase/commerce-' + ar + tone + '.png';
+  }
+
+  function label() {
+    var on = html.classList.contains('dark');
+    dark.setAttribute('aria-pressed', String(on));
+    dark.textContent = on ? word('light', 'Light') : word('dark', 'Dark');
+  }
+
+  function setLang(next) {
+    var ar = next === 'ar';
+    lang = ar ? 'ar' : 'en';
+    html.setAttribute('lang', lang);
+    html.setAttribute('dir', ar ? 'rtl' : 'ltr');
+    Array.prototype.forEach.call(document.querySelectorAll('[data-i18n]'), function (el) {
+      var k = el.getAttribute('data-i18n'), src = AR[k], was = EN[k];
+      if (!src || !was) return;
+      if (src.hasAttribute('data-alt')) {
+        el.setAttribute('alt', ar ? src.getAttribute('data-alt').replace(/\s+/g, ' ').trim() : was.alt);
+        return;
+      }
+      el.innerHTML = ar ? src.innerHTML : was.html;
+      if (src.hasAttribute('data-href')) el.setAttribute('href', ar ? src.getAttribute('data-href') : was.href);
+    });
+    document.title = word('doc-title', EN_TITLE);
+    if (META) META.setAttribute('content', word('doc-desc', EN_DESC));
+    if (langBtn) {
+      langBtn.textContent = ar ? 'English' : '\u0627\u0644\u0639\u0631\u0628\u064a\u0629';
+      langBtn.setAttribute('lang', ar ? 'en' : 'ar');
+      langBtn.setAttribute('aria-label', ar ? 'View this page in English'
+        : '\u0627\u0639\u0631\u0636 \u0647\u0630\u0647 \u0627\u0644\u0635\u0641\u062d\u0629 \u0628\u0627\u0644\u0639\u0631\u0628\u064a\u0629');
+    }
+    label();                                  // the mode button says a translated word too
+    shots();
+    try { localStorage.setItem('jb-lang', lang); } catch (e) { /* not fatal */ }
+  }
+
+  if (langBtn) langBtn.addEventListener('click', function () { setLang(lang === 'ar' ? 'en' : 'ar'); });
+
   function setDark(on) {
     html.classList.toggle('dark', on);
-    dark.setAttribute('aria-pressed', String(on));
-    dark.textContent = on ? 'Light' : 'Dark';
-    var shot = document.getElementById('shot');
-    if (shot) shot.src = 'docs/showcase/default-' + (on ? 'dark' : 'light') + '.png';
+    label();
+    shots();
     try { localStorage.setItem('jb-dark', on ? '1' : '0'); } catch (e) { /* not fatal */ }
   }
   dark.addEventListener('click', function () { setDark(!html.classList.contains('dark')); });
 
   // A stored preference that throws must not take the page down with it, so every read is guarded
   // and the fallback is what the markup already says.
-  var stored = null, storedDark = null;
+  var stored = null, storedDark = null, storedLang = null;
   try {
     stored = localStorage.getItem('jb-preset');
     storedDark = localStorage.getItem('jb-dark');
+    storedLang = localStorage.getItem('jb-lang');
   } catch (e) { /* blocked site data */ }
   setTheme(stored === null ? '' : stored);
   setDark(storedDark === null ? matchMedia('(prefers-color-scheme: dark)').matches : storedDark === '1');
+  if (storedLang === 'ar') setLang('ar');
 
   // The same fragments the demo shells answer, so a preset is a link you can send and the
   // verification script can drive this page the way it drives everything else.
@@ -962,19 +1292,22 @@ python skills/jbelly-ui/scripts/verify_page.py out.html --variants ",#dark=1,#di
     if (t !== null) setTheme(THEMES.indexOf(t) > -1 ? t : '');
     var d = q.get('dark');
     if (d === '0' || d === '1') setDark(d === '1');
+    var l = q.get('lang'), dir = q.get('dir');
+    if (l === 'ar' || l === 'en') setLang(l);
+    else if (dir === 'rtl' || dir === 'ltr') setLang(dir === 'rtl' ? 'ar' : 'en');
   })();
 
   var copy = document.getElementById('copy-btn');
   copy.addEventListener('click', function () {
     var text = document.getElementById('install-cmd').textContent;
     var done = function () {
-      copy.textContent = 'Copied';
-      setTimeout(function () { copy.textContent = 'Copy'; }, 1600);
+      copy.textContent = word('copy-done', 'Copied');
+      setTimeout(function () { copy.textContent = word('copy', 'Copy'); }, 1600);
     };
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(done, function () { copy.textContent = 'Select and copy'; });
+      navigator.clipboard.writeText(text).then(done, function () { copy.textContent = word('copy-manual', 'Select and copy'); });
     } else {
-      copy.textContent = 'Select and copy';
+      copy.textContent = word('copy-manual', 'Select and copy');
     }
   });
 })();

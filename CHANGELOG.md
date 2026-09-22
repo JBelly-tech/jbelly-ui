@@ -1,5 +1,27 @@
 # Changelog
 
+## Unreleased
+
+**The default palette stops shouting.** `--primary` was chroma 0.2 on a white page and 0.21 on
+near-black, which made it the loudest object on every screen the system produces — a template's
+accent, not a considered one. It is now deeper and much less saturated, and the dark-mode link
+colour gets lighter rather than more saturated, because a dark ground amplifies chroma and not
+lightness. Every pair ends up with more contrast than it had: the dark link role went from 4.53:1
+to 6.88:1. `--info`, a chroma-0.22 violet on a system that bans purple-to-blue gradients by name,
+came down with it. Hues, roles and foregrounds are unchanged, so nothing needs re-mapping.
+
+**The site has an Arabic edition.** The page had been telling people the demos ship AR/EN with full
+RTL while existing only in English. The translations are markup in a `<template>` rather than
+strings in a table, so a paragraph keeps its `<strong>`, its `<code>` and its links; a template is
+parsed and never rendered, so the Arabic costs no layout and no font file until someone presses the
+button. Each preset keeps its voice in Arabic — the serif preset stays a serif — and the product
+captures follow the page, so a reader who switches to Arabic is shown the demo in Arabic. The smoke
+test checks that every element asking for a translation has one, that no translation is unused, and
+that switching back restores the served markup byte for byte.
+
+**The storefront is on the site**, with its own section and a capture, instead of being the third of
+four small buttons.
+
 ## 0.6.0-beta.1 — 2026-09-22
 
 **A motion system, and a linter that refuses decoration.** Motion here reports a state change and

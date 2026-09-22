@@ -6,6 +6,7 @@
 
 **Live demos:** [app shell](https://mohammadjohar.github.io/jbelly-ui/skills/jbelly-ui/assets/app-shell.html) · [storefront](https://mohammadjohar.github.io/jbelly-ui/skills/jbelly-ui/assets/commerce-shell.html) · [landing page](https://mohammadjohar.github.io/jbelly-ui/skills/jbelly-ui/assets/landing-shell.html) · [pricing page](https://mohammadjohar.github.io/jbelly-ui/skills/jbelly-ui/assets/pricing-shell.html)
 [Cost, measured](COST.md) · [Recorded runs](evals/records/) · [Roadmap](docs/roadmap.md)
+**This project's own site**, built from these tokens and checked by these scripts: [English](https://mohammadjohar.github.io/jbelly-ui/) · [بالعربية](https://mohammadjohar.github.io/jbelly-ui/#lang=ar)
 
 **A licence-free UI system for web products, packaged as an agent skill.**
 Dashboards, admin panels, settings and auth pages, data tables, landing
