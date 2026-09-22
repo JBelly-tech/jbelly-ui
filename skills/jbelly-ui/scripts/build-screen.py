@@ -143,7 +143,7 @@ def build_toolbar(spec):
       <div class="flex flex-wrap items-center justify-between gap-5 pb-7.5">
         <div class="flex flex-col gap-1">
           <h1 class="text-xl font-medium text-mono font-display" data-i18n="{esc(spec.get("title","Dashboard"))}">{esc(spec.get("title","Dashboard"))}</h1>
-          <p class="text-2sm text-secondary-foreground">{esc(spec.get("subtitle",""))}</p>
+          <p class="text-2sm text-secondary-foreground">{esc(spec.get("subtitle",""))}{" · " if spec.get("subtitle") else ""}<span id="period-label">{esc(periods[min(1, len(periods)-1)])}</span></p>
         </div>
         <div class="flex flex-wrap items-center gap-2.5">
           <select id="period" class="input select w-40">{opts}</select>
@@ -357,6 +357,49 @@ def build_app(spec, s):
     s = s.replace(f'© 2026 {SHELL["brand"]}', f'© 2026 {esc(spec.get("product", "Product"))}')
     if spec.get("nav"): s = region(s, "nav", build_nav(spec["nav"]))
     s = region(s, "toolbar", build_toolbar(spec))
+    # The period control is keyed by the period's own name, so a spec that names its own periods
+    # left every lookup missing and the control moved nothing. The table is built from the spec.
+    periods = (spec.get("toolbar") or {}).get("periods") or ["Last 7 days", "Last 30 days", "This quarter"]
+    kpis_for_table = spec.get("kpis") or []
+    if kpis_for_table and periods:
+        sel = min(1, len(periods) - 1)                 # build_toolbar selects this one
+        def as_num(v):
+            t = str(v).replace(",", "").strip()
+            keep = "".join(c for c in t if c.isdigit() or c == ".")
+            try: return float(keep) if keep else 0.0
+            except ValueError: return 0.0
+        def fmt(sample, value):
+            t = str(sample)
+            # However many decimals the spec printed, print that many. A rate written 78% does not
+            # become 74.88% because the window moved.
+            dp = len(t.split(".")[1].rstrip("%").strip()) if "." in t else 0
+            body = f"{value:,.{dp}f}" if ("," in t or value >= 1000) else f"{value:.{dp}f}"
+            pre = t[:len(t) - len(t.lstrip("$£€"))]
+            suf = "%" if t.rstrip().endswith("%") else ""
+            return pre + body + suf
+        base = [as_num(k.get("value", 0)) for k in kpis_for_table]
+        # A longer window holds more; the shape is the spec's numbers scaled by the window's length.
+        weight = {p: (i + 1) / (sel + 1) for i, p in enumerate(periods)}
+        rows = []
+        for idx, name in enumerate(periods):
+            w = weight[name] if name != periods[sel] else 1.0
+            vals = []
+            for k, b in zip(kpis_for_table, base):
+                sample = str(k.get("value", 0))
+                if sample.rstrip().endswith("%"):
+                    # A rate drifts with the window; it does not multiply by it.
+                    v = max(0.0, min(100.0, b * (0.96 + 0.02 * idx)))
+                else:
+                    v = b * w
+                vals.append(fmt(k.get("value", 0), v))
+            rows.append(f"  {js(name)}: {js(vals)},")
+        s = sub1(s, r"const KPI_PERIODS = \{[\s\S]*?\n\};",
+                 lambda m: "const KPI_PERIODS = {\n" + "\n".join(rows) + "\n};",
+                 "period -> KPI table")
+        s = sub1(s, r"let kpiPeriod = '[^']*';",
+                 lambda m: "let kpiPeriod = " + js(periods[sel]) + ";",
+                 "the period the page opens on")
+
     if spec.get("kpis"): s = region(s, "kpis", build_kpis(spec["kpis"]))
     ch = spec.get("chart")
     if ch:
@@ -389,9 +432,10 @@ def build_app(spec, s):
     if hl.get("delta"):
         # the shell hard-codes a green "up" badge, so a falling delta has to repaint it too
         up = hl.get("trend", "down" if str(hl["delta"]).lstrip().startswith("-") else "up") == "up"
-        s = sub1(s, r'<span class="badge badge-sm badge-light-(?:success|destructive) mb-1"><i data-lucide="trending-(?:up|down)" class="size-3"></i>[^<]*</span>',
-                 lambda m: f'<span class="badge badge-sm badge-light-{"success" if up else "destructive"} mb-1">'
-                           f'<i data-lucide="trending-{"up" if up else "down"}" class="size-3"></i>{esc(hl["delta"])}</span>',
+        s = sub1(s, r'<span id="hl-delta" class="badge badge-sm badge-light-(?:success|destructive) mb-1"><i data-lucide="trending-(?:up|down)" class="size-3"></i><span data-hl="delta">[^<]*</span></span>',
+                 lambda m: f'<span id="hl-delta" class="badge badge-sm badge-light-{"success" if up else "destructive"} mb-1">'
+                           f'<i data-lucide="trending-{"up" if up else "down"}" class="size-3"></i>'
+                           f'<span data-hl="delta">{esc(hl["delta"])}</span></span>',
                  "highlights.delta badge")
     if hl.get("items"):
         items = hl["items"]; total = sum(int(str(i.get("value", 0)).replace(",", "")) for i in items)
@@ -399,10 +443,19 @@ def build_app(spec, s):
         s = s.replace(f'data-i18n="{old_ht}">{old_ht}</h3>', f'data-i18n="{esc(ht)}">{esc(ht)}</h3>')
         old_tl = SHELL["highlights_total_label"]; tl = hl.get("total_label", old_tl)
         s = s.replace(f'data-i18n="{old_tl}">{old_tl}</span>', f'data-i18n="{esc(tl)}">{esc(tl)}</span>')
-        s = s.replace('<span class="text-2xl font-semibold text-mono tabular-nums font-display">214</span>', f'<span class="text-2xl font-semibold text-mono tabular-nums font-display">{esc(hl.get("total", total))}</span>')
-        s = sub1(s, r"series: \[98, 58, 36, 22\], labels: \[[^\]]*\]",
-                 lambda m: "series: " + js([int(str(i.get("value", 0)).replace(",", "")) for i in items]) + ", labels: " + js([i["label"] for i in items]),
-                 "highlights donut data")
+        s = s.replace('<span id="hl-total" class="text-2xl font-semibold text-mono tabular-nums font-display">214</span>', f'<span class="text-2xl font-semibold text-mono tabular-nums font-display">{esc(hl.get("total", total))}</span>')
+        # The shell reads its series from PERIOD so the month/quarter control can redraw the donut.
+        # A generated page has one period, so both entries carry the spec's numbers.
+        vals = [int(str(i.get("value", 0)).replace(",", "")) for i in items]
+        s = sub1(s, r"month:\s*\{[^}]*\}", lambda m: "month:   { total: " + js(total) +
+                 ", delta: " + js(str(hl.get("delta", ""))) + ", up: " + ("true" if up else "false") +
+                 ", split: " + js(vals) + " }", "highlights period data")
+        s = sub1(s, r"quarter:\s*\{[^}]*\}", lambda m: "quarter: { total: " + js(total) +
+                 ", delta: " + js(str(hl.get("delta", ""))) + ", up: " + ("true" if up else "false") +
+                 ", split: " + js(vals) + " }", "highlights period data (quarter)")
+        s = sub1(s, r"labels: \['Online store', 'Marketplace', 'Wholesale', 'In-store'\]",
+                 lambda m: "labels: " + js([i["label"] for i in items]),
+                 "highlights donut labels")
         dots = ["bg-primary", "bg-info", "bg-success", "bg-warning", "bg-muted-foreground"]
         legend = "\n".join(f'                <div class="flex justify-between"><span class="flex items-center gap-2"><span class="size-2 rounded-full {dots[i % 5]}"></span><span data-i18n="{esc(it["label"])}">{esc(it["label"])}</span></span><span class="text-mono font-medium tabular-nums">{esc(it.get("value",""))}</span></div>' for i, it in enumerate(items))
         s = sub1(s, r'<div class="flex flex-col gap-2\.5 text-2sm">[\s\S]*?</div>\n[ \t]*</div>\n[ \t]*<div class="card-footer justify-center">',

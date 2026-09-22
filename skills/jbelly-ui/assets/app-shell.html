@@ -11,7 +11,7 @@
 <script src="https://cdn.jsdelivr.net/npm/apexcharts@4.7.0/dist/apexcharts.min.js"></script>
 <style type="text/tailwindcss">
 /* ===== tokens.css (inlined for the single-file demo) ===== */
-:root {
+:root { --destructive-accent: oklch(57.5% 0.22 27);
   color-scheme: light;
   --radius: 0.5rem;
   --font-display: "Inter", ui-sans-serif, system-ui, sans-serif;
@@ -40,7 +40,7 @@
   --chart-2: var(--info); --chart-3: var(--success); --chart-4: var(--warning);
 }
 @media (max-width: 63.99rem) { :root { --header-height: 60px; } }
-.dark { --primary-accent: oklch(58.25% 0.21 258);
+.dark { --destructive-accent: oklch(60.25% 0.22 27); --primary-accent: oklch(58.25% 0.21 258);
   color-scheme: dark;
   --background: oklch(14.5% 0.005 285); --foreground: oklch(98.5% 0 0);
   --card: oklch(14.5% 0.005 285); --card-foreground: oklch(98.5% 0 0);
@@ -62,30 +62,30 @@
 .density-compact { --ctl-h: 30px; --ctl-h-sm: 24px; --row-h: 38px; --card-p: 1rem; --page-gap: 1rem; }
 .density-airy    { --ctl-h: 40px; --ctl-h-sm: 32px; --row-h: 56px; --card-p: 1.75rem; --page-gap: 1.75rem; }
 /* ===== personalities (from references/personalities.md) ===== */
-.theme-clinic { --primary-accent: oklch(50% 0.12 195); --font-display: "Manrope", sans-serif; --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+.theme-clinic { --destructive-accent: oklch(57.5% 0.22 27); --primary-accent: oklch(50% 0.12 195); --font-display: "Manrope", sans-serif; --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --primary: oklch(50% 0.12 195); --background: oklch(98.5% 0.006 190); --card: oklch(100% 0 0);
   --border: oklch(92% 0.012 190); --input: oklch(90% 0.014 190); --muted: oklch(96% 0.01 190); --accent: oklch(95% 0.012 190); --radius: 0.75rem; }
-.theme-clinic.dark { --primary-accent: oklch(70% 0.13 195); --background: oklch(15% 0.012 195); --card: oklch(18% 0.012 195); --popover: oklch(18% 0.012 195); --border: oklch(28% 0.015 195); --input: oklch(28% 0.015 195); --muted: oklch(22% 0.012 195); --accent: oklch(24% 0.014 195); --primary: oklch(70% 0.13 195); --primary-foreground: oklch(12% 0.02 195); }
-.theme-graphite { --primary-accent: oklch(52.25% 0.17 150); --muted-foreground: oklch(54% 0.014 285); --font-display: "IBM Plex Sans", sans-serif; --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif; --font-mono: "IBM Plex Mono", monospace;
+.theme-clinic.dark { --destructive-accent: oklch(61.5% 0.22 27); --primary-accent: oklch(70% 0.13 195); --background: oklch(15% 0.012 195); --card: oklch(18% 0.012 195); --popover: oklch(18% 0.012 195); --border: oklch(28% 0.015 195); --input: oklch(28% 0.015 195); --muted: oklch(22% 0.012 195); --accent: oklch(24% 0.014 195); --primary: oklch(70% 0.13 195); --primary-foreground: oklch(12% 0.02 195); }
+.theme-graphite { --destructive-accent: oklch(57.25% 0.22 27); --primary-accent: oklch(52.25% 0.17 150); --muted-foreground: oklch(54% 0.014 285); --font-display: "IBM Plex Sans", sans-serif; --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif; --font-mono: "IBM Plex Mono", monospace;
   --primary: oklch(65% 0.17 150); --primary-foreground: oklch(14% 0 0); --background: oklch(97% 0.002 260); --card: oklch(100% 0 0); --border: oklch(88% 0.004 260); --input: oklch(86% 0.004 260); --radius: 0.25rem; }
-.theme-graphite.dark { --primary-accent: oklch(65% 0.17 150); --muted-foreground: oklch(60.0% 0.014 285); --background: oklch(12% 0.004 260); --card: oklch(15% 0.004 260); --popover: oklch(15% 0.004 260); --border: oklch(24% 0.005 260); --input: oklch(26% 0.005 260); }
-.theme-editorial { --primary-accent: oklch(48% 0.16 30); --font-display: "Fraunces", Georgia, serif; --font-sans: "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
+.theme-graphite.dark { --destructive-accent: oklch(60.25% 0.22 27); --primary-accent: oklch(65% 0.17 150); --muted-foreground: oklch(60.0% 0.014 285); --background: oklch(12% 0.004 260); --card: oklch(15% 0.004 260); --popover: oklch(15% 0.004 260); --border: oklch(24% 0.005 260); --input: oklch(26% 0.005 260); }
+.theme-editorial { --destructive-accent: oklch(57.5% 0.22 27); --primary-accent: oklch(48% 0.16 30); --font-display: "Fraunces", Georgia, serif; --font-sans: "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
   --primary: oklch(48% 0.16 30); --primary-foreground: oklch(98% 0.01 60); --background: oklch(97.5% 0.012 75); --card: oklch(99% 0.008 75);
   --foreground: oklch(22% 0.02 50); --mono: oklch(22% 0.02 50); --border: oklch(90% 0.02 70); --input: oklch(88% 0.02 70); --muted: oklch(94% 0.015 75); --accent: oklch(93% 0.018 75); --muted-foreground: oklch(50% 0.03 50);
   --radius: 0.5rem; --shadow-xs: 0 1px 3px rgb(60 30 10 / 0.08); --shadow-md: 0 6px 16px -6px rgb(60 30 10 / 0.18); }
-.theme-editorial.dark { --primary-accent: oklch(70% 0.15 35); --background: oklch(16% 0.012 60); --card: oklch(19% 0.012 60); --popover: oklch(19% 0.012 60); --foreground: oklch(95% 0.01 75); --mono: oklch(95% 0.01 75); --border: oklch(28% 0.015 60); --input: oklch(28% 0.015 60); --muted: oklch(23% 0.012 60); --accent: oklch(25% 0.014 60); --muted-foreground: oklch(65% 0.02 60); --primary: oklch(70% 0.15 35); --primary-foreground: oklch(14% 0.02 40); }
-.theme-neo { --primary-accent: oklch(55% 0.25 290); --font-display: "Space Grotesk", sans-serif; --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+.theme-editorial.dark { --destructive-accent: oklch(61.75% 0.22 27); --primary-accent: oklch(70% 0.15 35); --background: oklch(16% 0.012 60); --card: oklch(19% 0.012 60); --popover: oklch(19% 0.012 60); --foreground: oklch(95% 0.01 75); --mono: oklch(95% 0.01 75); --border: oklch(28% 0.015 60); --input: oklch(28% 0.015 60); --muted: oklch(23% 0.012 60); --accent: oklch(25% 0.014 60); --muted-foreground: oklch(65% 0.02 60); --primary: oklch(70% 0.15 35); --primary-foreground: oklch(14% 0.02 40); }
+.theme-neo { --destructive-accent: oklch(57.5% 0.22 27); --primary-accent: oklch(55% 0.25 290); --font-display: "Space Grotesk", sans-serif; --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
   --primary: oklch(55% 0.25 290); --background: oklch(99% 0 0); --card: oklch(100% 0 0); --foreground: oklch(10% 0 0); --mono: oklch(10% 0 0);
   --border: oklch(10% 0 0); --input: oklch(10% 0 0); --radius: 0.25rem; --shadow-xs: 3px 3px 0 0 var(--foreground); --shadow-md: 5px 5px 0 0 var(--foreground); }
-.theme-neo.dark { --primary-accent: oklch(75% 0.2 290); --background: oklch(12% 0 0); --card: oklch(15% 0 0); --popover: oklch(15% 0 0); --foreground: oklch(98% 0 0); --mono: oklch(98% 0 0); --border: oklch(98% 0 0); --input: oklch(98% 0 0); --primary: oklch(75% 0.2 290); --primary-foreground: oklch(10% 0 0); }
-.theme-slate { --muted-foreground: oklch(53% 0.014 285); --font-display: "Inter", sans-serif; --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+.theme-neo.dark { --destructive-accent: oklch(60.25% 0.22 27); --primary-accent: oklch(75% 0.2 290); --background: oklch(12% 0 0); --card: oklch(15% 0 0); --popover: oklch(15% 0 0); --foreground: oklch(98% 0 0); --mono: oklch(98% 0 0); --border: oklch(98% 0 0); --input: oklch(98% 0 0); --primary: oklch(75% 0.2 290); --primary-foreground: oklch(10% 0 0); }
+.theme-slate { --destructive-accent: oklch(57% 0.22 27); --muted-foreground: oklch(53% 0.014 285); --font-display: "Inter", sans-serif; --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --primary: oklch(42% 0.12 260); --background: oklch(96.5% 0.004 250); --card: oklch(100% 0 0); --foreground: oklch(18% 0.02 260); --border: oklch(88% 0.008 250); --input: oklch(86% 0.008 250); --radius: 0.375rem;
   --sidebar: oklch(18% 0.03 260); --sidebar-foreground: oklch(92% 0.01 250); --sidebar-muted: oklch(65% 0.02 250); --primary-accent: oklch(42% 0.12 260); --sidebar-accent: oklch(24% 0.03 260); --sidebar-accent-foreground: oklch(100% 0 0); --sidebar-primary: oklch(78% 0.12 80); --sidebar-border: oklch(26% 0.03 260); }
-.theme-slate.dark { --primary-accent: oklch(72% 0.12 80); --muted-foreground: oklch(60.0% 0.014 285); --background: oklch(13% 0.02 260); --card: oklch(17% 0.02 260); --popover: oklch(17% 0.02 260); --foreground: oklch(95% 0.01 250); --border: oklch(26% 0.02 260); --input: oklch(26% 0.02 260); --primary: oklch(72% 0.12 80); --primary-foreground: oklch(15% 0.03 80); --sidebar: oklch(11% 0.02 260); }
-.theme-mint { --primary-accent: oklch(52.5% 0.15 165); --font-display: "Plus Jakarta Sans", sans-serif; --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+.theme-slate.dark { --destructive-accent: oklch(61% 0.22 27); --primary-accent: oklch(72% 0.12 80); --muted-foreground: oklch(60.0% 0.014 285); --background: oklch(13% 0.02 260); --card: oklch(17% 0.02 260); --popover: oklch(17% 0.02 260); --foreground: oklch(95% 0.01 250); --border: oklch(26% 0.02 260); --input: oklch(26% 0.02 260); --primary: oklch(72% 0.12 80); --primary-foreground: oklch(15% 0.03 80); --sidebar: oklch(11% 0.02 260); }
+.theme-mint { --destructive-accent: oklch(57.5% 0.22 27); --primary-accent: oklch(52.5% 0.15 165); --font-display: "Plus Jakarta Sans", sans-serif; --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   --primary: oklch(60% 0.15 165); --primary-foreground: oklch(14% 0 0); --background: oklch(98% 0.01 160); --card: oklch(100% 0 0); --border: oklch(93% 0.02 160); --input: oklch(90% 0.02 160); --muted: oklch(96% 0.012 160); --accent: oklch(95% 0.015 160); --radius: 1rem;
   --shadow-xs: 0 1px 2px rgb(20 60 40 / 0.06); --shadow-md: 0 8px 24px -8px rgb(20 60 40 / 0.18); }
-.theme-mint.dark { --primary-accent: oklch(72% 0.15 165); --background: oklch(14% 0.01 160); --card: oklch(18% 0.012 160); --popover: oklch(18% 0.012 160); --border: oklch(27% 0.015 160); --input: oklch(27% 0.015 160); --muted: oklch(22% 0.012 160); --accent: oklch(24% 0.014 160); --primary: oklch(72% 0.15 165); }
+.theme-mint.dark { --destructive-accent: oklch(61.5% 0.22 27); --primary-accent: oklch(72% 0.15 165); --background: oklch(14% 0.01 160); --card: oklch(18% 0.012 160); --popover: oklch(18% 0.012 160); --border: oklch(27% 0.015 160); --input: oklch(27% 0.015 160); --muted: oklch(22% 0.012 160); --accent: oklch(24% 0.014 160); --primary: oklch(72% 0.15 165); }
 
 @custom-variant dark (&:where(.dark, .dark *));
 @theme inline {
@@ -98,7 +98,7 @@
   --color-muted: var(--muted); --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent); --color-accent-foreground: var(--accent-foreground);
   --color-mono: var(--mono); --color-mono-foreground: var(--mono-foreground);
-  --color-destructive: var(--destructive); --color-destructive-foreground: var(--destructive-foreground);
+  --color-destructive: var(--destructive); --color-destructive-accent: var(--destructive-accent); --color-destructive-foreground: var(--destructive-foreground);
   --color-success: var(--success); --color-success-foreground: var(--success-foreground);
   --color-warning: var(--warning); --color-warning-foreground: var(--warning-foreground);
   --color-info: var(--info); --color-info-foreground: var(--info-foreground);
@@ -255,7 +255,7 @@
   .badge-light-primary { @apply bg-primary/10 text-primary; }
   .badge-light-success { @apply bg-success/15 text-success; }
   .badge-light-warning { @apply bg-warning/20 text-warning-foreground; }
-  .badge-light-destructive { @apply bg-destructive/10 text-destructive; }
+  .badge-light-destructive { @apply bg-destructive/10 text-destructive-accent; }
   .badge-outline { @apply border border-border bg-muted text-secondary-foreground; }
   .dot { @apply size-1.5 rounded-full bg-current opacity-75; }
   /* card */
@@ -716,7 +716,7 @@ th[aria-sort="descending"] .sort-chevron { rotate: 180deg; }
       <a class="menu-item" href="#"><i data-lucide="settings"></i><span data-i18n="Settings">Settings</span></a>
       <a class="menu-item" href="#"><i data-lucide="keyboard"></i>Shortcuts<span class="ms-auto kbd">?</span></a>
       <div class="my-1 h-px bg-border"></div>
-      <a class="menu-item text-destructive hover:bg-destructive/10" href="#"><i data-lucide="log-out" class="text-destructive!"></i><span data-i18n="Log out">Log out</span></a>
+      <a class="menu-item text-destructive-accent hover:bg-destructive/10" href="#"><i data-lucide="log-out" class="text-destructive-accent!"></i><span data-i18n="Log out">Log out</span></a>
     </div>
     <button id="side-user-btn" class="w-full flex items-center gap-2.5 rounded-lg px-2 py-2 hover:bg-sidebar-accent text-start" aria-haspopup="menu" aria-expanded="false" title="Account">
       <span class="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold text-2xs">LA</span>
@@ -762,7 +762,7 @@ th[aria-sort="descending"] .sort-chevron { rotate: 180deg; }
             <a class="menu-item" href="#"><i data-lucide="user"></i>Profile</a>
             <a class="menu-item" href="#"><i data-lucide="settings"></i>Settings<span class="ms-auto kbd">,</span></a>
             <div class="my-1 h-px bg-border"></div>
-            <a class="menu-item text-destructive hover:bg-destructive/10" href="#"><i data-lucide="log-out" class="text-destructive!"></i>Log out</a>
+            <a class="menu-item text-destructive-accent hover:bg-destructive/10" href="#"><i data-lucide="log-out" class="text-destructive-accent!"></i>Log out</a>
           </div>
         </div>
       </div>
@@ -859,7 +859,7 @@ th[aria-sort="descending"] .sort-chevron { rotate: 180deg; }
             </div>
             <div class="card-header hidden bg-accent/60" id="bulk-bar">
               <span class="text-2sm font-medium text-mono"><span id="sel-count">0</span> selected</span>
-              <div class="flex items-center gap-2.5"><button class="btn btn-ghost btn-sm"><i data-lucide="mail"></i>Send reminder</button><button class="btn btn-ghost btn-sm"><i data-lucide="clock"></i>Reschedule</button><button class="btn btn-outline btn-sm text-destructive border-destructive/40 hover:bg-destructive/10"><i data-lucide="trash-2"></i>Cancel</button></div>
+              <div class="flex items-center gap-2.5"><button class="btn btn-ghost btn-sm"><i data-lucide="mail"></i>Send reminder</button><button class="btn btn-ghost btn-sm"><i data-lucide="clock"></i>Reschedule</button><button class="btn btn-outline btn-sm text-destructive-accent border-destructive/40 hover:bg-destructive/10"><i data-lucide="trash-2"></i>Cancel</button></div>
             </div>
             <div class="overflow-x-auto pends" data-motion="status">
               <table class="table" id="appt-table">
@@ -1085,7 +1085,7 @@ function renderState(state) {
   const tb = $('#tbody');
   if (!STATES.includes(state)) {   // a typo used to fall through to the data table and screenshot as if it had worked
     console.error(`renderState: unknown state ${JSON.stringify(state)}; expected one of ${STATES.join(', ')}`);
-    tb.innerHTML = panel('circle-alert', 'bg-destructive/10 text-destructive', 'alert', 'Unknown demo state', `"${escText(state)}" is not one of: ${STATES.join(', ')}.`, '');
+    tb.innerHTML = panel('circle-alert', 'bg-destructive/10 text-destructive-accent', 'alert', 'Unknown demo state', `"${escText(state)}" is not one of: ${STATES.join(', ')}.`, '');
     syncTabs(null); lucide.createIcons(); return;
   }
   const region = tb.closest('.pends');
@@ -1093,7 +1093,7 @@ function renderState(state) {
   $('#row-count').textContent = state === 'loading' ? 'Loading orders' : '';
   if (state === 'loading') tb.innerHTML = Array.from({ length: 5 }, skeletonRow).join('');
   else if (state === 'empty') tb.innerHTML = panel('package-x', 'bg-muted text-muted-foreground', 'status', 'No orders match', 'Try another status or clear the search.', '<button class="btn btn-outline btn-sm" data-state="data">Clear filters</button>');
-  else if (state === 'error') tb.innerHTML = panel('circle-alert', 'bg-destructive/10 text-destructive', 'alert', 'Could not load orders', 'The request failed before any rows arrived. Nothing was changed.', '<button class="btn btn-outline btn-sm" data-state="data"><i data-lucide="rotate-ccw"></i>Try again</button>');
+  else if (state === 'error') tb.innerHTML = panel('circle-alert', 'bg-destructive/10 text-destructive-accent', 'alert', 'Could not load orders', 'The request failed before any rows arrived. Nothing was changed.', '<button class="btn btn-outline btn-sm" data-state="data"><i data-lucide="rotate-ccw"></i>Try again</button>');
   else if (state === 'success') tb.innerHTML = panel('circle-check', 'bg-success/10 text-success', 'status', 'All orders are up to date', 'Every order in this view has been confirmed. Nothing needs attention.', '<button class="btn btn-outline btn-sm" data-state="data">Back to the list</button>');
   else renderRows();
   lucide.createIcons();
@@ -1179,7 +1179,8 @@ function toast(msg, undo) { const el = document.createElement('div');
   $$('button', el).forEach(b => b.onclick = dismiss); while ($('#toasts').children.length > 3) dismiss.call(null, $('#toasts').firstChild.remove()); }
 document.addEventListener('click', e => { const b = e.target.closest('[data-toast]'); if (b) toast(b.dataset.toast, b.hasAttribute('data-toast-undo')); });
 // period
-$('#period').onchange = e => { $('#period-label').textContent = e.target.value; setPeriod(e.target.value); };
+$('#period').onchange = e => { const lab = $('#period-label'); if (lab) lab.textContent = e.target.value;   // a page without the label still filters
+  setPeriod(e.target.value); };
 // demo controls
 const THEMES = ['theme-clinic', 'theme-graphite', 'theme-editorial', 'theme-neo', 'theme-slate', 'theme-mint'], DENS = ['density-compact', 'density-airy'];
 if ($('#ctl-theme')) $('#ctl-theme').onchange = e => { html.classList.remove(...THEMES); if (e.target.value) html.classList.add(e.target.value); };

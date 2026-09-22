@@ -227,8 +227,12 @@ def check_file(path, results):
     for sel, sig, toks in scopes:
         if sig not in envs:
             envs[sig] = env = {}
-            for _, sig2, toks2 in scopes:
-                if sig2 <= sig: env.update(toks2)  # every scope this one narrows, later definition winning
+            # Specificity decides, and source order only breaks a tie -- which is what the engine
+            # does. Walking the file top to bottom instead let a `.theme-x` block written below a
+            # `.theme-x.dark` block override it, and reported the light value as the dark one's.
+            applies = [(len(sig2), i, toks2) for i, (_, sig2, toks2) in enumerate(scopes) if sig2 <= sig]
+            for _, _, toks2 in sorted(applies, key=lambda x: (x[0], x[1])):
+                env.update(toks2)
         env = envs[sig]
         for fg, bg, need in pairs:
             if fg not in toks and bg not in toks: continue  # scope leaves the pair alone; whoever set it reports it

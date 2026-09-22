@@ -9,6 +9,7 @@ Output complete HTML with Tailwind v4 (`<script src="https://cdn.jsdelivr.net/np
 ## 2. Tokens — paste this CSS first (it is the whole colour system; components use roles only)
 ```css
 :root {
+  --destructive-accent: oklch(57.5% 0.22 27);   /* --destructive as text: a fill's lightness is not a reader's */
   color-scheme: light;
 
   /* shape + type */
@@ -83,7 +84,7 @@ Output complete HTML with Tailwind v4 (`<script src="https://cdn.jsdelivr.net/np
   :root { --header-height: 60px; }
 }
 
-.dark { --primary-accent: oklch(59% 0.21 258);
+.dark { --destructive-accent: oklch(60.25% 0.22 27); --primary-accent: oklch(59% 0.21 258);
   color-scheme: dark;
 
   --background: oklch(14.5% 0.005 285);
@@ -140,7 +141,7 @@ Tailwind mapping — paste this too (generated from the token file, so no role i
   --color-accent-foreground: var(--accent-foreground);
   --color-mono: var(--mono);
   --color-mono-foreground: var(--mono-foreground);
-  --color-destructive: var(--destructive);
+  --color-destructive: var(--destructive); --color-destructive-accent: var(--destructive-accent);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);

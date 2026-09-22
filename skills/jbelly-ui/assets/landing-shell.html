@@ -11,7 +11,7 @@
 <script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
 <style type="text/tailwindcss">
 /* ===== tokens.css (inlined for the single-file demo) ===== */
-:root { --primary-accent: oklch(54% 0.2 258);
+:root { --destructive-accent: oklch(57.5% 0.22 27); --primary-accent: oklch(54% 0.2 258);
   color-scheme: light;
   --radius: 0.5rem;
   --font-display: "Inter", ui-sans-serif, system-ui, sans-serif;
@@ -40,7 +40,7 @@
   --chart-2: var(--info); --chart-3: var(--success); --chart-4: var(--warning);
 }
 @media (max-width: 63.99rem) { :root { --header-height: 60px; } }
-.dark { --primary-accent: oklch(58.25% 0.21 258);
+.dark { --destructive-accent: oklch(60.25% 0.22 27); --primary-accent: oklch(58.25% 0.21 258);
   color-scheme: dark;
   --background: oklch(14.5% 0.005 285); --foreground: oklch(98.5% 0 0);
   --card: oklch(14.5% 0.005 285); --card-foreground: oklch(98.5% 0 0);
@@ -62,30 +62,30 @@
 .density-compact { --ctl-h: 30px; --ctl-h-sm: 24px; --row-h: 38px; --card-p: 1rem; --page-gap: 1rem; }
 .density-airy    { --ctl-h: 40px; --ctl-h-sm: 32px; --row-h: 56px; --card-p: 1.75rem; --page-gap: 1.75rem; }
 /* ===== personalities (from references/personalities.md) ===== */
-.theme-clinic { --primary-accent: oklch(50% 0.12 195); --font-display: "Manrope", sans-serif; --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+.theme-clinic { --destructive-accent: oklch(57.5% 0.22 27); --primary-accent: oklch(50% 0.12 195); --font-display: "Manrope", sans-serif; --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --primary: oklch(50% 0.12 195); --background: oklch(98.5% 0.006 190); --card: oklch(100% 0 0);
   --border: oklch(92% 0.012 190); --input: oklch(90% 0.014 190); --muted: oklch(96% 0.01 190); --accent: oklch(95% 0.012 190); --radius: 0.75rem; }
-.theme-clinic.dark { --primary-accent: oklch(70% 0.13 195); --background: oklch(15% 0.012 195); --card: oklch(18% 0.012 195); --popover: oklch(18% 0.012 195); --border: oklch(28% 0.015 195); --input: oklch(28% 0.015 195); --muted: oklch(22% 0.012 195); --accent: oklch(24% 0.014 195); --primary: oklch(70% 0.13 195); --primary-foreground: oklch(12% 0.02 195); }
-.theme-graphite { --primary-accent: oklch(52.25% 0.17 150); --muted-foreground: oklch(54% 0.014 285); --font-display: "IBM Plex Sans", sans-serif; --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif; --font-mono: "IBM Plex Mono", monospace;
+.theme-clinic.dark { --destructive-accent: oklch(61.5% 0.22 27); --primary-accent: oklch(70% 0.13 195); --background: oklch(15% 0.012 195); --card: oklch(18% 0.012 195); --popover: oklch(18% 0.012 195); --border: oklch(28% 0.015 195); --input: oklch(28% 0.015 195); --muted: oklch(22% 0.012 195); --accent: oklch(24% 0.014 195); --primary: oklch(70% 0.13 195); --primary-foreground: oklch(12% 0.02 195); }
+.theme-graphite { --destructive-accent: oklch(57.25% 0.22 27); --primary-accent: oklch(52.25% 0.17 150); --muted-foreground: oklch(54% 0.014 285); --font-display: "IBM Plex Sans", sans-serif; --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif; --font-mono: "IBM Plex Mono", monospace;
   --primary: oklch(65% 0.17 150); --primary-foreground: oklch(14% 0 0); --background: oklch(97% 0.002 260); --card: oklch(100% 0 0); --border: oklch(88% 0.004 260); --input: oklch(86% 0.004 260); --radius: 0.25rem; }
-.theme-graphite.dark { --primary-accent: oklch(65% 0.17 150); --muted-foreground: oklch(60.0% 0.014 285); --background: oklch(12% 0.004 260); --card: oklch(15% 0.004 260); --popover: oklch(15% 0.004 260); --border: oklch(24% 0.005 260); --input: oklch(26% 0.005 260); }
-.theme-editorial { --primary-accent: oklch(48% 0.16 30); --font-display: "Fraunces", Georgia, serif; --font-sans: "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
+.theme-graphite.dark { --destructive-accent: oklch(60.25% 0.22 27); --primary-accent: oklch(65% 0.17 150); --muted-foreground: oklch(60.0% 0.014 285); --background: oklch(12% 0.004 260); --card: oklch(15% 0.004 260); --popover: oklch(15% 0.004 260); --border: oklch(24% 0.005 260); --input: oklch(26% 0.005 260); }
+.theme-editorial { --destructive-accent: oklch(57.5% 0.22 27); --primary-accent: oklch(48% 0.16 30); --font-display: "Fraunces", Georgia, serif; --font-sans: "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
   --primary: oklch(48% 0.16 30); --primary-foreground: oklch(98% 0.01 60); --background: oklch(97.5% 0.012 75); --card: oklch(99% 0.008 75);
   --foreground: oklch(22% 0.02 50); --mono: oklch(22% 0.02 50); --border: oklch(90% 0.02 70); --input: oklch(88% 0.02 70); --muted: oklch(94% 0.015 75); --accent: oklch(93% 0.018 75); --muted-foreground: oklch(50% 0.03 50);
   --radius: 0.5rem; --shadow-xs: 0 1px 3px rgb(60 30 10 / 0.08); --shadow-md: 0 6px 16px -6px rgb(60 30 10 / 0.18); }
-.theme-editorial.dark { --primary-accent: oklch(70% 0.15 35); --background: oklch(16% 0.012 60); --card: oklch(19% 0.012 60); --popover: oklch(19% 0.012 60); --foreground: oklch(95% 0.01 75); --mono: oklch(95% 0.01 75); --border: oklch(28% 0.015 60); --input: oklch(28% 0.015 60); --muted: oklch(23% 0.012 60); --accent: oklch(25% 0.014 60); --muted-foreground: oklch(65% 0.02 60); --primary: oklch(70% 0.15 35); --primary-foreground: oklch(14% 0.02 40); }
-.theme-neo { --primary-accent: oklch(55% 0.25 290); --font-display: "Space Grotesk", sans-serif; --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+.theme-editorial.dark { --destructive-accent: oklch(61.75% 0.22 27); --primary-accent: oklch(70% 0.15 35); --background: oklch(16% 0.012 60); --card: oklch(19% 0.012 60); --popover: oklch(19% 0.012 60); --foreground: oklch(95% 0.01 75); --mono: oklch(95% 0.01 75); --border: oklch(28% 0.015 60); --input: oklch(28% 0.015 60); --muted: oklch(23% 0.012 60); --accent: oklch(25% 0.014 60); --muted-foreground: oklch(65% 0.02 60); --primary: oklch(70% 0.15 35); --primary-foreground: oklch(14% 0.02 40); }
+.theme-neo { --destructive-accent: oklch(57.5% 0.22 27); --primary-accent: oklch(55% 0.25 290); --font-display: "Space Grotesk", sans-serif; --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
   --primary: oklch(55% 0.25 290); --background: oklch(99% 0 0); --card: oklch(100% 0 0); --foreground: oklch(10% 0 0); --mono: oklch(10% 0 0);
   --border: oklch(10% 0 0); --input: oklch(10% 0 0); --radius: 0.25rem; --shadow-xs: 3px 3px 0 0 var(--foreground); --shadow-md: 5px 5px 0 0 var(--foreground); }
-.theme-neo.dark { --primary-accent: oklch(75% 0.2 290); --background: oklch(12% 0 0); --card: oklch(15% 0 0); --popover: oklch(15% 0 0); --foreground: oklch(98% 0 0); --mono: oklch(98% 0 0); --border: oklch(98% 0 0); --input: oklch(98% 0 0); --primary: oklch(75% 0.2 290); --primary-foreground: oklch(10% 0 0); }
-.theme-slate { --primary-accent: oklch(42% 0.12 260); --muted-foreground: oklch(53% 0.014 285); --font-display: "Inter", sans-serif; --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+.theme-neo.dark { --destructive-accent: oklch(60.25% 0.22 27); --primary-accent: oklch(75% 0.2 290); --background: oklch(12% 0 0); --card: oklch(15% 0 0); --popover: oklch(15% 0 0); --foreground: oklch(98% 0 0); --mono: oklch(98% 0 0); --border: oklch(98% 0 0); --input: oklch(98% 0 0); --primary: oklch(75% 0.2 290); --primary-foreground: oklch(10% 0 0); }
+.theme-slate { --destructive-accent: oklch(57% 0.22 27); --primary-accent: oklch(42% 0.12 260); --muted-foreground: oklch(53% 0.014 285); --font-display: "Inter", sans-serif; --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --primary: oklch(42% 0.12 260); --background: oklch(96.5% 0.004 250); --card: oklch(100% 0 0); --foreground: oklch(18% 0.02 260); --border: oklch(88% 0.008 250); --input: oklch(86% 0.008 250); --radius: 0.375rem;
   --sidebar: oklch(18% 0.03 260); --sidebar-foreground: oklch(92% 0.01 250); --sidebar-muted: oklch(65% 0.02 250); --sidebar-accent: oklch(24% 0.03 260); --sidebar-accent-foreground: oklch(100% 0 0); --sidebar-primary: oklch(78% 0.12 80); --sidebar-border: oklch(26% 0.03 260); }
-.theme-slate.dark { --primary-accent: oklch(72% 0.12 80); --muted-foreground: oklch(60.0% 0.014 285); --background: oklch(13% 0.02 260); --card: oklch(17% 0.02 260); --popover: oklch(17% 0.02 260); --foreground: oklch(95% 0.01 250); --border: oklch(26% 0.02 260); --input: oklch(26% 0.02 260); --primary: oklch(72% 0.12 80); --primary-foreground: oklch(15% 0.03 80); --sidebar: oklch(11% 0.02 260); }
-.theme-mint { --primary-accent: oklch(52.5% 0.15 165); --font-display: "Plus Jakarta Sans", sans-serif; --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+.theme-slate.dark { --destructive-accent: oklch(61% 0.22 27); --primary-accent: oklch(72% 0.12 80); --muted-foreground: oklch(60.0% 0.014 285); --background: oklch(13% 0.02 260); --card: oklch(17% 0.02 260); --popover: oklch(17% 0.02 260); --foreground: oklch(95% 0.01 250); --border: oklch(26% 0.02 260); --input: oklch(26% 0.02 260); --primary: oklch(72% 0.12 80); --primary-foreground: oklch(15% 0.03 80); --sidebar: oklch(11% 0.02 260); }
+.theme-mint { --destructive-accent: oklch(57.5% 0.22 27); --primary-accent: oklch(52.5% 0.15 165); --font-display: "Plus Jakarta Sans", sans-serif; --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   --primary: oklch(60% 0.15 165); --primary-foreground: oklch(14% 0 0); --background: oklch(98% 0.01 160); --card: oklch(100% 0 0); --border: oklch(93% 0.02 160); --input: oklch(90% 0.02 160); --muted: oklch(96% 0.012 160); --accent: oklch(95% 0.015 160); --radius: 1rem;
   --shadow-xs: 0 1px 2px rgb(20 60 40 / 0.06); --shadow-md: 0 8px 24px -8px rgb(20 60 40 / 0.18); }
-.theme-mint.dark { --primary-accent: oklch(72% 0.15 165); --background: oklch(14% 0.01 160); --card: oklch(18% 0.012 160); --popover: oklch(18% 0.012 160); --border: oklch(27% 0.015 160); --input: oklch(27% 0.015 160); --muted: oklch(22% 0.012 160); --accent: oklch(24% 0.014 160); --primary: oklch(72% 0.15 165); }
+.theme-mint.dark { --destructive-accent: oklch(61.5% 0.22 27); --primary-accent: oklch(72% 0.15 165); --background: oklch(14% 0.01 160); --card: oklch(18% 0.012 160); --popover: oklch(18% 0.012 160); --border: oklch(27% 0.015 160); --input: oklch(27% 0.015 160); --muted: oklch(22% 0.012 160); --accent: oklch(24% 0.014 160); --primary: oklch(72% 0.15 165); }
 
 @custom-variant dark (&:where(.dark, .dark *));
 @theme inline {
@@ -98,7 +98,7 @@
   --color-muted: var(--muted); --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent); --color-accent-foreground: var(--accent-foreground);
   --color-mono: var(--mono); --color-mono-foreground: var(--mono-foreground);
-  --color-destructive: var(--destructive); --color-destructive-foreground: var(--destructive-foreground);
+  --color-destructive: var(--destructive); --color-destructive-accent: var(--destructive-accent); --color-destructive-foreground: var(--destructive-foreground);
   --color-success: var(--success); --color-success-foreground: var(--success-foreground);
   --color-warning: var(--warning); --color-warning-foreground: var(--warning-foreground);
   --color-info: var(--info); --color-info-foreground: var(--info-foreground);
@@ -1164,6 +1164,36 @@ header.app-seam { position: sticky; inset-block-start: 0; }
 </footer>
 <!-- @endregion site-footer -->
 
+<!-- ===== Sign in ===== -->
+<div id="signin-scrim" class="scrim fixed inset-0 z-50 backdrop-blur-[2px]" data-motion="spatial"></div>
+<div id="signin" class="panel panel-centre fixed z-50 top-[12%] inset-x-0 mx-auto w-[calc(100%-2rem)] max-w-[25rem] rounded-xl border border-border bg-card shadow-md flex-col"
+     data-motion="spatial" role="dialog" aria-modal="true" aria-labelledby="signin-title">
+  <div class="flex items-start justify-between gap-4 border-b border-border px-5 py-4">
+    <div>
+      <h2 id="signin-title" class="text-base font-semibold tracking-tight text-mono" data-i18n="Sign in">Sign in</h2>
+      <p class="text-2sm text-muted-foreground" data-i18n="Use the address this account was opened with.">Use the address this account was opened with.</p>
+    </div>
+    <button id="signin-close" class="btn btn-ghost btn-icon btn-sm" aria-label="Close"><i data-lucide="x"></i></button>
+  </div>
+  <form id="signin-form" class="flex flex-col gap-4 p-5" novalidate>
+    <div class="flex flex-col gap-1.5">
+      <label class="text-2sm font-medium text-mono" for="signin-email" data-i18n="Email">Email</label>
+      <input id="signin-email" name="email" type="email" autocomplete="username" class="input" aria-describedby="signin-email-err" dir="ltr">
+      <p id="signin-email-err" class="text-2xs text-destructive-accent" hidden></p>
+    </div>
+    <div class="flex flex-col gap-1.5">
+      <div class="flex items-center justify-between gap-3">
+        <label class="text-2sm font-medium text-mono" for="signin-pass" data-i18n="Password">Password</label>
+        <button type="button" id="signin-forgot" class="text-2xs text-primary-accent hover:underline underline-offset-4" data-i18n="Forgot it?">Forgot it?</button>
+      </div>
+      <input id="signin-pass" name="password" type="password" autocomplete="current-password" class="input" aria-describedby="signin-pass-err">
+      <p id="signin-pass-err" class="text-2xs text-destructive-accent" hidden></p>
+    </div>
+    <p id="signin-note" class="text-2xs text-muted-foreground" role="status"></p>
+    <button type="submit" class="btn btn-primary w-full" data-i18n="Sign in">Sign in</button>
+  </form>
+</div>
+
 <script>
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const html = document.documentElement;
@@ -1333,6 +1363,82 @@ try { if (localStorage.getItem('ui.lang') === 'ar') setLang('ar'); } catch {}
 })();
 
 lucide.createIcons();
+
+// ===== Sign in: a control that opened nothing now opens this =====
+(function signin() {
+  const dlg = $('#signin'), scrim = $('#signin-scrim');
+  if (!dlg || !scrim) return;
+  let restore = null;
+
+  const say = (id, msg) => {
+    const el = $(id);
+    if (!el) return;
+    el.textContent = msg || '';
+    el.hidden = !msg;
+    const field = $(id.replace('-err', ''));
+    if (field) field.setAttribute('aria-invalid', msg ? 'true' : 'false');
+  };
+
+  function open(trigger) {
+    restore = trigger || document.activeElement;
+    dlg.setAttribute('data-open', '');
+    scrim.setAttribute('data-open', '');
+    say('#signin-email-err', ''); say('#signin-pass-err', '');
+    $('#signin-note').textContent = '';
+    $('#signin-email').focus();
+  }
+  function close() {
+    dlg.removeAttribute('data-open');
+    scrim.removeAttribute('data-open');
+    if (restore && restore.isConnected) restore.focus();
+  }
+
+  // Every control labelled Sign in opens it, whichever nav it lives in.
+  $$('a,button').forEach(el => {
+    const t = (el.textContent || '').trim();
+    if (t === 'Sign in' || el.getAttribute('data-i18n') === 'Sign in' ||
+        (el.firstElementChild && el.firstElementChild.getAttribute('data-i18n') === 'Sign in')) {
+      if (dlg.contains(el)) return;
+      el.addEventListener('click', e => { e.preventDefault(); open(el); });
+    }
+  });
+
+  $('#signin-close').addEventListener('click', close);
+  scrim.addEventListener('click', close);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && dlg.hasAttribute('data-open')) { e.stopPropagation(); close(); }
+    if (e.key !== 'Tab' || !dlg.hasAttribute('data-open')) return;
+    // Focus stays inside a modal dialog; without this it walks out into the page behind.
+    const items = [...dlg.querySelectorAll('button,input,a[href]')].filter(n => !n.disabled && n.offsetParent);
+    if (!items.length) return;
+    const first = items[0], last = items[items.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+
+  $('#signin-forgot').addEventListener('click', () => {
+    const v = $('#signin-email').value.trim();
+    $('#signin-note').textContent = v
+      ? 'If ' + v + ' has an account, a reset link is on its way.'
+      : 'Enter the address first and we will send a reset link.';
+  });
+
+  $('#signin-form').addEventListener('submit', e => {
+    e.preventDefault();
+    const email = $('#signin-email').value.trim(), pass = $('#signin-pass').value;
+    // Deliberately not a specification-complete address grammar: enough to refuse what is plainly
+    // not an address, and never enough to refuse one that is.
+    const bad = !email ? 'Enter your email address.'
+      : !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) ? 'That does not look like an email address.'
+      : '';
+    say('#signin-email-err', bad);
+    const badPass = !pass ? 'Enter your password.' : '';
+    say('#signin-pass-err', badPass);
+    if (bad) { $('#signin-email').focus(); return; }
+    if (badPass) { $('#signin-pass').focus(); return; }
+    $('#signin-note').textContent = 'Signed in as ' + email + '. This demo goes no further.';
+  });
+})();
 </script>
 </body>
 </html>

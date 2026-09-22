@@ -16,6 +16,12 @@ What is deliberately not reported:
   - a disabled control, which is doing exactly what it should by refusing.
   - a control the page hides at this width. It is not dead, it is not there.
 
+Each control is driven from a freshly loaded page, so no activation can move, hide or renumber the
+ones after it. The cost is a page load per control; the benefit is an answer that does not depend on
+the order things happened to run in. The limit of that design is stated in the summary: this sweep
+covers the page as a reader first meets it, and a control that only exists after navigating
+elsewhere is out of its reach.
+
 Usage:
   python scripts/check_controls.py <file-or-url> [--width 1440] [--json] [--quiet]
 Exit 1 if any control did nothing, 2 if the page could not be driven at all.
@@ -105,6 +111,17 @@ REACHABLE = """
 """
 
 
+
+# What a control is, independently of where it sits in a list that keeps changing under us.
+SIGNATURE = """
+  e => {
+    const name = (e.getAttribute('aria-label') || e.getAttribute('title') ||
+                  (e.innerText || e.value || '')).trim().replace(/\\s+/g, ' ').slice(0, 60);
+    return [e.tagName.toLowerCase(), e.id || '', e.getAttribute('href') || '',
+            e.getAttribute('data-theme') || '', name].join('\\u0001');
+  }
+"""
+
 def describe(handle):
     """A label a person would recognise, and where to find it."""
     return handle.evaluate("""
@@ -117,6 +134,8 @@ def describe(handle):
           name: name || '(no accessible name)',
           href: e.getAttribute('href') || '',
           disabled: e.disabled === true || e.getAttribute('aria-disabled') === 'true',
+          // The page you are already on is meant to go nowhere.
+          current: e.getAttribute('aria-current') === 'page',
           outer: e.outerHTML.slice(0, 160)
         };
       }
@@ -127,24 +146,49 @@ def run(target: str, width: int, height: int) -> dict:
     from playwright.sync_api import sync_playwright
 
     dead, checked, skipped = [], 0, 0
+    console = []
+
     with sync_playwright() as p:
         browser = p.chromium.launch()
-        page = browser.new_page(viewport={"width": width, "height": height})
-        console = []
-        page.on("console", lambda m: console.append(m.text) if m.type == "error" else None)
-        page.on("pageerror", lambda e: console.append(str(e)))
-        page.goto(target, wait_until="networkidle", timeout=60000)
-        page.wait_for_timeout(900)
 
-        total = len(page.query_selector_all(SELECTOR))
-        for i in range(total):
-            handles = page.query_selector_all(SELECTOR)
-            if i >= len(handles):
-                break                                   # the page rebuilt itself; the rest re-index
-            el = handles[i]
+        def fresh():
+            """A context of its own, so nothing the last control chose is still remembered."""
+            ctx = browser.new_context(viewport={"width": width, "height": height})
+            pg = ctx.new_page()
+            pg.on("console", lambda m: console.append(m.text) if m.type == "error" else None)
+            pg.on("pageerror", lambda e: console.append(str(e)))
+            pg.goto(target, wait_until="networkidle", timeout=60000)
+            pg.wait_for_timeout(900)
+            return ctx, pg
+
+        context, page = fresh()
+
+        # Take the roster once, from the page as a reader first meets it. Anything that only
+        # appears after navigating somewhere is out of this sweep's reach by construction, and the
+        # summary says so rather than counting it as checked.
+        roster = [h.evaluate(SIGNATURE) for h in page.query_selector_all(SELECTOR)]
+        total = len(roster)
+        unreachable = 0
+
+        for i, sig in enumerate(roster):
+            if i:                                       # a context of its own: nothing carried over
+                context.close()
+                context, page = fresh()
+            here = page.query_selector_all(SELECTOR)
+            if i >= len(here):
+                unreachable += 1                        # the page did not come back the same
+                continue
+            el = here[i]
+            if el.evaluate(SIGNATURE) != sig:
+                # The roster and the reload disagree, so position is no longer meaningful and the
+                # rest of this sweep would be measuring the wrong elements.
+                unreachable += len(roster) - i
+                print(f"check_controls: the page did not reload identically at control {i}; "
+                      f"{len(roster) - i} control(s) were not driven", file=sys.stderr)
+                break
             info = describe(el)
 
-            if info["disabled"]:
+            if info["disabled"] or info["current"]:
                 skipped += 1
                 continue
             if not el.is_visible():
@@ -167,15 +211,6 @@ def run(target: str, width: int, height: int) -> dict:
                 continue
 
             reach = el.evaluate(REACHABLE)
-            if not reach["reachable"] and reach["reason"].startswith("covered by"):
-                # Something the previous control opened is in the way. Start clean and re-find it.
-                page.goto(target, wait_until="networkidle", timeout=60000)
-                page.wait_for_timeout(700)
-                handles = page.query_selector_all(SELECTOR)
-                if i >= len(handles):
-                    break
-                el = handles[i]
-                reach = el.evaluate(REACHABLE)
             if not reach["reachable"]:
                 if reach.get("reason") == "pointer-events: none":
                     # Inert to a mouse, and still available to a keyboard and to assistive
@@ -211,8 +246,6 @@ def run(target: str, width: int, height: int) -> dict:
                 checked += 1
                 if not any(v.values()):
                     dead.append({**info, "why": "changing the selection changed nothing in the page"})
-                page.keyboard.press("Escape")
-                page.wait_for_timeout(90)
                 continue
 
             page.evaluate(WATCHER)
@@ -232,13 +265,12 @@ def run(target: str, width: int, height: int) -> dict:
             if not any(v.values()):
                 dead.append({**info, "why": "nothing in the page changed"})
 
-            # Put the page back into a state where the next control is reachable.
-            page.keyboard.press("Escape")
-            page.wait_for_timeout(90)
 
+        context.close()
         browser.close()
     return {"target": target, "width": width, "total": total, "checked": checked,
-            "skipped": skipped, "dead": dead, "console_errors": console[:10]}
+            "skipped": skipped, "unreachable": unreachable, "dead": dead,
+            "console_errors": console[:10]}
 
 
 def main() -> int:
@@ -283,8 +315,10 @@ def main() -> int:
         return 2
     verdict = "PASS" if not r["dead"] else "FAIL"
     if not a.quiet:
+        tail = f", {r['unreachable']} not present on a fresh load" if r.get("unreachable") else ""
         print(f"check_controls: {r['checked']} control(s) driven at {a.width}px, "
-              f"{len(r['dead'])} dead, {r['skipped']} skipped (links, disabled, hidden) -> {verdict}")
+              f"{len(r['dead'])} dead, {r['skipped']} skipped (links, disabled, hidden){tail} "
+              f"-> {verdict}")
     return 1 if r["dead"] else 0
 
 
