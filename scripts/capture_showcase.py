@@ -15,7 +15,9 @@ Exit 1 if any capture fails, 2 if there is no renderer.
 import argparse
 import os
 import pathlib
+import subprocess
 import sys
+import tempfile
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 ASSETS = ROOT / "skills" / "jbelly-ui" / "assets"
@@ -34,6 +36,16 @@ SHOTS = {
     "landing-light":                   ("landing-shell.html", "", None),
     "landing-dark":                    ("landing-shell.html", "#dark=1", None),
     "pricing-light":                   ("pricing-shell.html", "", None),
+    "commerce-light":                  ("commerce-shell.html", "", None),
+    "commerce-dark":                   ("commerce-shell.html", "#dark=1", None),
+}
+
+
+# Built from a spec rather than opened from assets/: name -> (spec, kind). These are the pictures
+# that show what the generator does, which a template on its own cannot.
+BUILT = {
+    "generated-landing": ("spec.landing.example.json", "landing"),
+    "generated-pricing": ("spec.pricing.example.json", "pricing"),
 }
 
 
@@ -89,6 +101,30 @@ def main():
         except Exception as exc:                                  # a failed capture must not pass
             failed.append(f"{name}: {exc}")
             print(f"[FAIL] {name}: {exc}", file=sys.stderr)
+    # The generated pages: build each from its example spec into a temp file, then capture it.
+    builder = ROOT / "skills" / "jbelly-ui" / "scripts" / "build-screen.py"
+    for name, (spec, kind) in BUILT.items():
+        if a.only and name != a.only:
+            continue
+        spec_path = ASSETS / spec
+        if not (builder.is_file() and spec_path.is_file()):
+            print(f"[SKIP] {name}: {spec} or the builder is not present")
+            continue
+        tmp = pathlib.Path(tempfile.gettempdir()) / f"jb-{name}.html"
+        r = subprocess.run([sys.executable, str(builder), str(spec_path), str(tmp), "--kind", kind],
+                           capture_output=True, text=True)
+        if r.returncode != 0:
+            failed.append(f"{name}: the builder exited {r.returncode}")
+            print(f"[FAIL] {name}: {(r.stderr or r.stdout).strip()[:140]}", file=sys.stderr)
+            continue
+        png = out / f"{name}.png"
+        try:
+            capture(tmp.resolve().as_uri(), png, a.width, a.height)
+            print(f"[OK]   {name}.png  {os.path.getsize(png):,} bytes  <- {spec} via --kind {kind}")
+        except Exception as exc:
+            failed.append(f"{name}: {exc}")
+            print(f"[FAIL] {name}: {exc}", file=sys.stderr)
+
     if failed:
         print(f"\n{len(failed)} capture(s) failed", file=sys.stderr)
         return 1

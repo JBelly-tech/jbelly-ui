@@ -118,6 +118,9 @@ a:hover { text-decoration: underline; }
 .shot { margin-top: clamp(28px, 4vw, 44px); }
 .shot img { border: 1px solid var(--border); border-radius: calc(var(--radius) + 4px); box-shadow: var(--shadow-xs); }
 .shot p { margin-top: .75rem; }
+.pair { margin: 0; }
+.pair img { border: 1px solid var(--border); border-radius: var(--radius); }
+.pair figcaption { margin-top: .5rem; }
 .g4 { grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); }
 
 pre { margin: 0; background: var(--muted); color: var(--foreground); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; overflow-x: auto; font-family: var(--font-mono); font-size: .8125rem; line-height: 1.7; }
@@ -297,6 +300,21 @@ python skills/jbelly-ui/scripts/lint_tokens.py ./src</pre>
     </div>
     <pre>python skills/jbelly-ui/scripts/build-screen.py spec.json out.html --kind landing
 python skills/jbelly-ui/scripts/verify_page.py out.html --variants ",#dark=1,#dir=rtl"</pre>
+    <div class="grid g2">
+      <figure class="pair">
+        <img src="docs/showcase/landing-light.png" width="1440" height="1000" loading="lazy"
+             alt="The landing template as it ships: a route-planning product for delivery fleets,
+                  with a depot schedule panel beside the headline.">
+        <figcaption class="small">The landing template, as it ships.</figcaption>
+      </figure>
+      <figure class="pair">
+        <img src="docs/showcase/generated-landing.png" width="1440" height="1000" loading="lazy"
+             alt="The same template built from a different spec: a greenhouse climate monitor, with
+                  a panel of temperature and humidity readings per growing span.">
+        <figcaption class="small">The same file, built from a different spec. Different product,
+        different words, different numbers — no markup was written.</figcaption>
+      </figure>
+    </div>
     <p class="small">The second command renders the page headlessly in light, dark and RTL, collects
     console errors, runs the lint and the pre-flight, and — with Playwright installed — fails on
     horizontal overflow at 375 and 1440. Without Playwright it falls back to any Chrome, Chromium or
