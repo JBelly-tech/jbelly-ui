@@ -158,6 +158,7 @@ Tailwind mapping — paste this too (generated from the token file, so no role i
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-border: var(--sidebar-border);
+  --color-scrim: var(--scrim);
 
   --radius-xl: calc(var(--radius) + 4px);
   --radius-lg: var(--radius);
@@ -166,6 +167,19 @@ Tailwind mapping — paste this too (generated from the token file, so no role i
 
   --shadow-xs: var(--shadow-xs);
   --shadow-md: var(--shadow-md);
+
+  /* Easings: mapped so the system's curves replace Tailwind's own --ease-* and
+     resolve through var(), which is how the reduced-motion override still
+     reaches them. The tempo tokens are deliberately NOT mapped — a duration in
+     a class attribute is the thing lint_motion.py refuses (see motion.md). */
+  --ease-enter: var(--ease-enter);
+  --ease-exit: var(--ease-exit);
+  --ease-move: var(--ease-move);
+  --ease-tint: var(--ease-tint);
+  --ease-flat: var(--ease-flat);
+  --ease-elapsed: var(--ease-elapsed);
+  --ease-spring-ui: var(--spring-ui);
+  --ease-spring-heavy: var(--spring-heavy);
 }
 
 @theme {
@@ -249,7 +263,7 @@ Rhythm: cards `gap-5 lg:gap-7.5` · inside rows `gap-2.5` · card padding `p-5` 
 Shell: sidebar 280 (collapsed 80) · header 70 (60 mobile) · container `px-6 xl:px-7.5 xl:max-w-(--breakpoint-xl)`.
 
 ## 5. Recipes (exact class strings)
-- **btn** `inline-flex items-center justify-center gap-1.5 shrink-0 whitespace-nowrap font-medium rounded-md shadow-xs h-8.5 px-3 text-2sm transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 [&_svg]:size-4`
+- **btn** `inline-flex items-center justify-center gap-1.5 shrink-0 whitespace-nowrap font-medium rounded-md shadow-xs h-8.5 px-3 text-2sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 [&_svg]:size-4`
   primary `bg-primary text-primary-foreground hover:bg-primary/90` · outline `border border-input bg-background text-secondary-foreground hover:bg-accent` · ghost `shadow-none hover:bg-accent` · icon-only `p-0 w-8.5`
 - **input** `flex w-full h-8.5 px-3 text-2sm rounded-md border border-input bg-background shadow-xs placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40` (leading icon: wrap `relative`, icon `absolute start-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground`, add `ps-9`)
 - **select** input + `appearance-none cursor-pointer pe-8` + chevron background · **textarea** input + `min-h-20 p-3 resize-y`
@@ -263,7 +277,7 @@ Shell: sidebar 280 (collapsed 80) · header 70 (60 mobile) · container `px-6 xl
 - **modal** overlay `fixed inset-0 z-50 bg-black/30` · panel `fixed top-1/2 start-1/2 -translate-x-1/2 rtl:translate-x-1/2 -translate-y-1/2 w-[calc(100%-2rem)] max-w-lg rounded-lg border bg-popover shadow-md` · header `px-5 py-3 border-b` · footer `px-5 py-3 border-t flex justify-end gap-2.5`
 - **drawer** `fixed z-50 top-5 bottom-5 end-5 w-[450px] max-w-[90%] rounded-xl border bg-card shadow-md flex flex-col`
 - **toast** `flex items-start gap-2.5 rounded-lg border bg-popover shadow-md p-3.5 text-sm w-[360px]` in `fixed bottom-5 end-5 flex flex-col gap-2.5`
-- **skeleton** `animate-pulse rounded-md bg-accent` · **empty** icon chip `size-12 rounded-full bg-muted text-muted-foreground`, title `text-sm font-semibold text-mono`, text `text-2sm text-secondary-foreground`, one button
+- **skeleton** `rounded-md bg-accent` — static; it reserves height and nothing else. The wait itself is reported by the `.pends` elapsed bar, never by a pulse or a spinner. · **empty** icon chip `size-12 rounded-full bg-muted text-muted-foreground`, title `text-sm font-semibold text-mono`, text `text-2sm text-secondary-foreground`, one button
 - **kbd** `inline-flex h-5 items-center rounded-sm border bg-muted px-1.5 font-mono text-2xs`
 - **KPI card** icon chip `size-9 rounded-lg bg-primary/10 text-primary` · delta badge light-success/destructive with trend icon · value + label; optional 40px sparkline SVG
 - **page toolbar** `flex flex-wrap items-center justify-between gap-5 pb-7.5` → title/subtitle · `flex gap-2.5` select · outline · ONE primary
@@ -276,7 +290,7 @@ Shell: sidebar 280 (collapsed 80) · header 70 (60 mobile) · container `px-6 xl
 - **Production**: the Tailwind browser build and CDN scripts are for demos and prototypes; a shipped product compiles Tailwind and self-hosts fonts and Lucide.
 
 ## 7. Decision tables
-Animate it? — appears > 10×/session (hover, toggles, list rows): no or ≤ 100ms · 1–10×/session (open/close, tabs, toasts): 150–250ms ease-out · once (page enter, KPI count-up): ≤ 600ms, this is the one signature moment · reduced-motion: none.
+Animate it? — only if something changed and the user needs to know what, where it went or where it came from; then use the recipe for that change, never a duration you chose. Decoration, page-enter reveals, count-ups and spinners are refusals.
 Card or no card? — data with a title and a toolbar: card · a single sentence of help: plain text in the toolbar · a list inside a card: `divide-y`, never nested cards.
 Which primary? — the one action the user came for (New order, Save, Book); Export/Filter/Import are outline; row actions ghost.
 
@@ -307,9 +321,29 @@ personality chosen and written to `design/personality.md` · never `@apply group
 - ⚙ **Emoji as icons** → inconsistent across platforms, not themable, screen readers read them aloud → Lucide at 16–20px.
 - ⚙ **Generated avatar services (DiceBear)** → obviously fake → initials chips from the real name.
 - **Stock photos of handshakes and laptops** → trust drops → product screenshots or no image.
-- ⚙ **`transition: all`** → animates layout properties, janky, accidental → transition colour/opacity/transform only, 150ms.
-- **Bounce/spring on everything, parallax on content** → distracting, motion-sickness → one signature moment; `prefers-reduced-motion` honoured.
-- **Skeletons that never end / spinners for everything** → users cannot tell loading from broken → skeleton with reserved height, error state with retry after timeout.
+- ⚙ **`transition: all`**, `transition-property: all`, `transition-all` → animates layout the moment a class adds padding → name the properties. (M03)
+- ⚙ **Any Tailwind motion utility** — `transition*`, `duration-*`, `ease-*`, `delay-*`, `animate-*`, including inside `@apply` → motion scattered across markup cannot be reviewed or reduced → declare it in `motion.css`. (M02)
+- **A literal duration or curve outside the token region** → six tempos nobody agreed on → `var(--t-*)`, `var(--ease-*)`. (M01)
+- **`infinite`, `animation-iteration-count`, `animate-pulse|spin|ping|bounce|marquee`** → a loop reports nothing and fails WCAG 2.2.2 once it runs past five seconds beside other content → the finite elapsed bar, R10. (M09)
+- **An animated property outside the compositor, discrete and paint tiers** → layout thrash → a `/* motion-exception: <selector> — <reason> */` line. There are exactly three in this system. (M03)
+- **Animated `box-shadow`, `background-position`, `background-size`** → a repaint every frame → `opacity` on a shadow pseudo-element. (M03)
+- **Animated `filter: blur()` on text** → illegible for the whole duration. (M03)
+- **A transition on the focus ring** — `outline`, `outline-offset`, `box-shadow`, `border-color` under `:focus-visible` → a ring that lags the keyboard reads as input latency. (M03)
+- **Any delay other than `0s` or `var(--t-grace)`**, and every stagger: a loop index, an `nth-child` ladder, `stagger(`, `sibling-index()` → a set arriving is one report, not N. (M11, M12)
+- **The blanket `@media (prefers-reduced-motion: reduce) { * { …!important } }`** → it freezes loading indicators, never matches `::view-transition-*`, and proves no per-recipe answer was made → `--travel-on: 0` and `--motion-reduce: 0.7`. (M05)
+- **An entrance at first paint** — an ungated `@starting-style`, `opacity: 0` in the initial viewport, anything animating within 200ms of load → it animates the page's own arrival and holds the LCP candidate invisible. (M11, V08)
+- **Scroll-triggered reveal** — `data-aos`, `AOS.init(`, `whileInView`, `useInView`, an IntersectionObserver writing opacity, `pointer-events: none` as a reveal gate → it reports the viewport moving, not anything changing. `animation-timeline` is permitted on `.read-progress` and `.app-seam::after` and nowhere else. (M10)
+- **Scroll hijack and parallax** — Lenis, Locomotive, ScrollSmoother, `ScrollTrigger` with `pin:`/`scrub:`, a `wheel` listener calling `preventDefault()`, `background-attachment: fixed`, `data-speed` → the scrollbar stops telling the truth. (M10)
+- **Pointer-driven motion** — magnetic buttons, tilt cards, cursor followers, `cursor: none` → it reports the pointer, and it does not exist on a keyboard. (M08)
+- **Per-character or per-word text splitting** → it breaks Arabic letter joining, which makes it a correctness bug and not a taste argument. (M14)
+- **A count-up, an odometer, a JavaScript loop writing `textContent`** → a false number in the DOM that assistive technology announces and copy captures → write the true value, then mark it changed. R8. (M14)
+- **rAF or a timer writing a motion style**, and `.animate(`, `startViewTransition(` or `view-transition-name` outside the one identity module → JavaScript declares a delta; it never draws a frame. (M08)
+- **Overshoot** — a `linear()` stop above 1, a `cubic-bezier` control point outside 0–1 → on a clamped value it is a visible dead hold, not a bounce. (M13)
+- **`will-change` in a static stylesheet** → a hint that cannot know when it stopped being true. (M08)
+- **Motion as the only delta** → if two states differ only in that one of them moved, the motion was decoration. (V06)
+- **Any animation dependency**: gsap, framer-motion, motion, motion-one, aos, lenis, locomotive-scroll, canvas-confetti, tsparticles, tw-animate-css, tailwindcss-animate. (M08)
+- **A chart that draws itself in** → motion at first paint → ApexCharts with `animations: { enabled: false }`. (M01)
+- **Skeletons that never end / spinners for everything** → users cannot tell loading from broken → a static skeleton at the real row height plus the finite elapsed bar, and an error state with retry after timeout. (M09)
 - ⚙ **"Elevate", "Seamless", "Unleash", "Supercharge"** → marketing filler inside a product → verbs and nouns of the domain; sentence case.
 - **Lorem ipsum, "John Doe", `user@example.com`, round fake metrics (1,000 users, 99%)** → reads as a mock-up → realistic names for the market, uneven numbers, a comparison line under each KPI.
 - **No empty / loading / error states** → the first real user sees a blank → four states per async region.

@@ -18,7 +18,7 @@ The default for dashboards, admin panels and SaaS apps.
   <aside id="sidebar"
          class="fixed inset-y-0 start-0 z-40 hidden lg:flex flex-col w-(--sidebar-width)
                 bg-sidebar text-sidebar-foreground border-e border-sidebar-border
-                transition-[width] duration-300 ease-in-out">
+                ">
     <div class="flex items-center justify-between h-(--header-height) px-6 shrink-0">
       <a href="/" class="flex items-center gap-2.5 font-semibold text-mono">LOGO</a>
       <button id="sidebar-toggle" class="… outline icon-only sm absolute start-full top-1/2 -translate-x-1/2 rtl:translate-x-1/2 -translate-y-1/2 rounded-full size-7.5"></button>
@@ -27,10 +27,10 @@ The default for dashboards, admin panels and SaaS apps.
   </aside>
 
   <!-- Wrapper: pushed right by the sidebar, down by the header -->
-  <div class="flex flex-col grow min-w-0 lg:ps-(--sidebar-width) pt-(--header-height) transition-[padding] duration-300">
+  <div class="flex flex-col grow min-w-0 lg:ps-(--sidebar-width) pt-(--header-height)">
 
     <header class="fixed top-0 end-0 start-0 lg:start-(--sidebar-width) z-30 h-(--header-height)
-                   flex items-stretch bg-background border-b border-border transition-[inset] duration-300">
+                   flex items-stretch bg-background app-seam" data-motion="position">
       <div class="container-fixed flex items-center justify-between gap-4"> …header recipe… </div>
     </header>
 
@@ -58,7 +58,8 @@ link:       group flex items-center gap-3.5 rounded-lg px-2.5 py-2 text-sm text-
 icon:       size-5 shrink-0 text-sidebar-muted group-hover:text-sidebar-foreground group-[.active]:text-sidebar-primary
 title:      grow truncate
 badge:      ms-auto  (Badge sm outline)
-arrow:      ms-auto size-4 text-sidebar-muted transition-transform [.open_&]:rotate-90 rtl:rotate-180 rtl:[.open_&]:-rotate-90
+arrow:      ms-auto size-4 text-sidebar-muted disclosure-chevron   (R4 rotates it; the trigger writes aria-expanded)
+              [.open_&]:rotate-90 rtl:rotate-180 rtl:[.open_&]:-rotate-90
 children:   flex flex-col gap-1 ms-[22px] ps-2.5 border-s border-sidebar-border   (hidden until parent .open)
 child link: relative flex items-center gap-3.5 rounded-lg px-2.5 py-1.5 text-2sm text-sidebar-foreground hover:bg-sidebar-accent
             before:absolute before:-start-[15px] before:top-1/2 before:size-1.5 before:-translate-y-1/2 before:rounded-full before:bg-transparent

@@ -39,9 +39,33 @@ replacement. Use this list when a page "looks generated".
 
 ## Motion
 
-- ⚙ **`transition: all`** → animates layout properties, janky, accidental → transition colour/opacity/transform only, 150ms.
-- **Bounce/spring on everything, parallax on content** → distracting, motion-sickness → one signature moment; `prefers-reduced-motion` honoured.
-- **Skeletons that never end / spinners for everything** → users cannot tell loading from broken → skeleton with reserved height, error state with retry after timeout.
+Twenty-two refusals, each one a rule `scripts/lint_motion.py` or `scripts/verify_motion.py` runs
+rather than an opinion in a document. The rule id is in brackets; the reasoning and the replacement
+for each are in `motion.md`.
+
+- ⚙ **`transition: all`**, `transition-property: all`, `transition-all` → animates layout the moment a class adds padding → name the properties. (M03)
+- ⚙ **Any Tailwind motion utility** — `transition*`, `duration-*`, `ease-*`, `delay-*`, `animate-*`, including inside `@apply` → motion scattered across markup cannot be reviewed or reduced → declare it in `motion.css`. (M02)
+- **A literal duration or curve outside the token region** → six tempos nobody agreed on → `var(--t-*)`, `var(--ease-*)`. (M01)
+- **`infinite`, `animation-iteration-count`, `animate-pulse|spin|ping|bounce|marquee`** → a loop reports nothing and fails WCAG 2.2.2 once it runs past five seconds beside other content → the finite elapsed bar, R10. (M09)
+- **An animated property outside the compositor, discrete and paint tiers** → layout thrash → a `/* motion-exception: <selector> — <reason> */` line. There are exactly three in this system. (M03)
+- **Animated `box-shadow`, `background-position`, `background-size`** → a repaint every frame → `opacity` on a shadow pseudo-element. (M03)
+- **Animated `filter: blur()` on text** → illegible for the whole duration. (M03)
+- **A transition on the focus ring** — `outline`, `outline-offset`, `box-shadow`, `border-color` under `:focus-visible` → a ring that lags the keyboard reads as input latency. (M03)
+- **Any delay other than `0s` or `var(--t-grace)`**, and every stagger: a loop index, an `nth-child` ladder, `stagger(`, `sibling-index()` → a set arriving is one report, not N. (M11, M12)
+- **The blanket `@media (prefers-reduced-motion: reduce) { * { …!important } }`** → it freezes loading indicators, never matches `::view-transition-*`, and proves no per-recipe answer was made → `--travel-on: 0` and `--motion-reduce: 0.7`. (M05)
+- **An entrance at first paint** — an ungated `@starting-style`, `opacity: 0` in the initial viewport, anything animating within 200ms of load → it animates the page's own arrival and holds the LCP candidate invisible. (M11, V08)
+- **Scroll-triggered reveal** — `data-aos`, `AOS.init(`, `whileInView`, `useInView`, an IntersectionObserver writing opacity, `pointer-events: none` as a reveal gate → it reports the viewport moving, not anything changing. `animation-timeline` is permitted on `.read-progress` and `.app-seam::after` and nowhere else. (M10)
+- **Scroll hijack and parallax** — Lenis, Locomotive, ScrollSmoother, `ScrollTrigger` with `pin:`/`scrub:`, a `wheel` listener calling `preventDefault()`, `background-attachment: fixed`, `data-speed` → the scrollbar stops telling the truth. (M10)
+- **Pointer-driven motion** — magnetic buttons, tilt cards, cursor followers, `cursor: none` → it reports the pointer, and it does not exist on a keyboard. (M08)
+- **Per-character or per-word text splitting** → it breaks Arabic letter joining, which makes it a correctness bug and not a taste argument. (M14)
+- **A count-up, an odometer, a JavaScript loop writing `textContent`** → a false number in the DOM that assistive technology announces and copy captures → write the true value, then mark it changed. R8. (M14)
+- **rAF or a timer writing a motion style**, and `.animate(`, `startViewTransition(` or `view-transition-name` outside the one identity module → JavaScript declares a delta; it never draws a frame. (M08)
+- **Overshoot** — a `linear()` stop above 1, a `cubic-bezier` control point outside 0–1 → on a clamped value it is a visible dead hold, not a bounce. (M13)
+- **`will-change` in a static stylesheet** → a hint that cannot know when it stopped being true. (M08)
+- **Motion as the only delta** → if two states differ only in that one of them moved, the motion was decoration. (V06)
+- **Any animation dependency**: gsap, framer-motion, motion, motion-one, aos, lenis, locomotive-scroll, canvas-confetti, tsparticles, tw-animate-css, tailwindcss-animate. (M08)
+- **A chart that draws itself in** → motion at first paint → ApexCharts with `animations: { enabled: false }`. (M01)
+- **Skeletons that never end / spinners for everything** → users cannot tell loading from broken → a static skeleton at the real row height plus the finite elapsed bar, and an error state with retry after timeout. (M09)
 
 ## Content and states
 

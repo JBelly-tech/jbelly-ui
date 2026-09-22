@@ -2,6 +2,9 @@
 """One-call page verification (cross-platform): render variants headlessly, collect console errors,
 run the token lint, print PASS/FAIL. Replaces multi-step verify loops.
 
+It also runs the token lint, the motion lint, the pre-flight and the runtime motion probe, so one
+call answers "does this page render, behave and move the way this system says it should".
+
 Usage: python scripts/verify_page.py <page.html> [--variants ",#dark=1,#dir=rtl"] [--widths 1440,768,375] [--out shots/] [--height 1000] [--json]
 
 Exit 1 on any of: a console or page error, a blank render, horizontal overflow (Playwright only),
@@ -134,6 +137,19 @@ def main():
     lint = subprocess.run([sys.executable, os.path.join(os.path.dirname(__file__), "lint_tokens.py"), path, "--quiet"], capture_output=True, text=True)
     print(f"[{'OK' if lint.returncode == 0 else 'FAIL'}] token lint: {'no raw palette classes' if lint.returncode == 0 else lint.stdout.strip().splitlines()[-2:]}")
     fail |= lint.returncode != 0
+    lm = subprocess.run([sys.executable, os.path.join(os.path.dirname(__file__), "lint_motion.py"), path, "--quiet"], capture_output=True, text=True, encoding="utf-8", errors="replace")
+    print(f"[{'OK' if lm.returncode == 0 else 'FAIL'}] motion lint: {'no motion outside motion.css' if lm.returncode == 0 else lm.stdout.strip().splitlines()[-1:]}")
+    for l in lm.stdout.splitlines()[:5]:
+        if ": M" in l: print("    " + l)
+    fail |= lm.returncode != 0
+    # The runtime probe needs a renderer. Without one it prints SKIP and returns 0, which is not a
+    # pass - so the verdict line below says "not verified" rather than staying silent about it.
+    vm = subprocess.run([sys.executable, os.path.join(os.path.dirname(__file__), "verify_motion.py"), path], capture_output=True, text=True, encoding="utf-8", errors="replace")
+    vm_line = (vm.stdout.strip().splitlines() or ["no output"])[-1]
+    print(f"[{'OK' if vm.returncode == 0 else 'FAIL'}] motion runtime: {vm_line}")
+    for l in vm.stdout.splitlines():
+        if l.startswith("[FAIL]") or l.startswith("[WARN]"): print("    " + l)
+    fail |= vm.returncode != 0
     pf = subprocess.run([sys.executable, os.path.join(os.path.dirname(__file__), "preflight.py"), path], capture_output=True, text=True, encoding="utf-8", errors="replace")
     pf_lines = [l for l in pf.stdout.splitlines() if l.startswith("[FAIL]") or l.startswith("[WARN]")]
     print(f"[{'OK' if pf.returncode == 0 else 'FAIL'}] pre-flight: {pf.stdout.strip().splitlines()[-1] if pf.stdout.strip() else 'no output'}")
@@ -141,7 +157,8 @@ def main():
     fail |= pf.returncode != 0
     if "--json" in a:
         import json
-        json.dump({"page": path, "renders": report, "lint_ok": lint.returncode == 0, "preflight_ok": pf.returncode == 0, "verdict": "FAIL" if fail else "PASS"}, open(os.path.join(out, name + "-verify.json"), "w", encoding="utf-8"), indent=2)
+        json.dump({"page": path, "renders": report, "lint_ok": lint.returncode == 0, "preflight_ok": pf.returncode == 0,
+                   "motion_lint_ok": lm.returncode == 0, "motion_runtime": vm_line, "verdict": "FAIL" if fail else "PASS"}, open(os.path.join(out, name + "-verify.json"), "w", encoding="utf-8"), indent=2)
         print(f"json -> {os.path.join(out, name + '-verify.json')}")
     print("VERDICT: FAIL - fix the items above, then run this script once more." if fail else "VERDICT: PASS - done; do not add further verification rounds.")
     return 1 if fail else 0

@@ -127,7 +127,7 @@ def build_nav(items):
         badge = f'<span class="nav-badge badge badge-sm badge-outline">{esc(it["badge"])}</span>' if it.get("badge") else ""
         if it.get("children"):
             kids = "".join(f'\n        <a class="nav-child{" active" if c == it.get("active_child") else ""}" href="#" data-i18n="{esc(c)}">{esc(c)}</a>' for c in it["children"])
-            out.append(f'    <div class="nav-group{" open" if it.get("open", True) else ""}">\n      <a class="nav-link" href="#" data-toggle-group><i data-lucide="{esc(icon)}"></i><span class="nav-title grow truncate" data-i18n="{esc(label)}">{esc(label)}</span><i data-lucide="chevron-right" class="nav-arrow size-4! transition-transform rtl:rotate-180"></i></a>\n      <div class="nav-children">{kids}\n      </div>\n    </div>')
+            out.append(f'    <div class="nav-group{" open" if it.get("open", True) else ""}">\n      <a class="nav-link" href="#" data-toggle-group role="button" aria-expanded="{"true" if it.get("open", True) else "false"}" data-motion="state"><i data-lucide="{esc(icon)}"></i><span class="nav-title grow truncate" data-i18n="{esc(label)}">{esc(label)}</span><i data-lucide="chevron-right" class="nav-arrow disclosure-chevron size-4!"></i></a>\n      <div class="nav-children">{kids}\n      </div>\n    </div>')
         else:
             active = ' active" aria-current="page' if it.get("active") else ''
             out.append(f'    <a class="nav-link{active}" href="#"><i data-lucide="{esc(icon)}"></i><span class="nav-title grow truncate" data-i18n="{esc(label)}">{esc(label)}</span>{badge}</a>')
@@ -707,10 +707,10 @@ def build_landing_faq(f):
     title = f'<h2 class="h2" data-i18n="{esc(f["title"])}">{esc(f["title"])}</h2>\n      ' if f.get("title") else ""
     note = f'<p class="text-2sm leading-relaxed text-secondary-foreground" data-i18n="{esc(f["note"])}">{esc(f["note"])}</p>' if f.get("note") else ""
     items = "".join(f'''
-      <details name="faq" class="group rounded-lg border border-border bg-card px-5 shadow-xs"{" open" if i == 0 else ""}>
+      <details name="faq" class="disclosure group rounded-lg border border-border bg-card px-5 shadow-xs" data-motion="state"{" open" if i == 0 else ""}>
         <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-sm font-medium text-mono [&::-webkit-details-marker]:hidden">
           {i18n(it.get("q", ""))}
-          <i data-lucide="chevron-down" class="size-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180"></i>
+          <i data-lucide="chevron-down" class="faq-chevron size-4 shrink-0 text-muted-foreground"></i>
         </summary>
         <p class="pb-5 text-2sm leading-relaxed text-secondary-foreground" data-i18n="{esc(it.get("a", ""))}">{esc(it.get("a", ""))}</p>
       </details>''' for i, it in enumerate(f["items"]))
@@ -1045,8 +1045,8 @@ def build_comparison(spec):
 def build_pricing_faq(f):
     if not f or not f.get("items"): return None
     items = "".join(f'''
-      <details class="faq px-5">
-        <summary>{i18n(it.get("q", ""))}<i data-lucide="chevron-down" class="faq-chevron size-4 shrink-0 text-muted-foreground transition-transform"></i></summary>
+      <details class="faq disclosure px-5" data-motion="state">
+        <summary>{i18n(it.get("q", ""))}<i data-lucide="chevron-down" class="faq-chevron size-4 shrink-0 text-muted-foreground"></i></summary>
         <p class="pb-4 pe-8 text-2sm text-secondary-foreground">{i18n(it.get("a", ""))}</p>
       </details>''' for it in f["items"])
     return f'''<section class="container-fixed pb-12" aria-labelledby="faq-heading">

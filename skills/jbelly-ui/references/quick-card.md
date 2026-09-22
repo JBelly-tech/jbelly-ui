@@ -21,8 +21,15 @@ page title `text-xl font-medium text-mono` · KPI `text-3xl font-semibold text-m
 Rhythm: cards `gap-5 lg:gap-7.5` · inside rows `gap-2.5` · card padding `p-5` · radius `--radius` (cards +4px, chips −4px).
 Shell: sidebar 280 (collapsed 80) · header 70 (60 mobile) · container `px-6 xl:px-7.5 xl:max-w-(--breakpoint-xl)`.
 
+## Motion
+Never in a class attribute. `references/motion.css` styles these class names and
+carries all twelve recipes; a page inlines it as a `jb-motion` style block.
+Every animating region declares `data-motion="feedback|state|spatial|continuity|status|position"`.
+`scripts/lint_motion.py` fails any `transition-*`, `duration-*`, `ease-*`, `delay-*` or
+`animate-*` utility, any literal duration or curve, and any entrance at first paint. See `motion.md`.
+
 ## Recipes (class strings)
-- **btn** `inline-flex items-center justify-center gap-1.5 shrink-0 whitespace-nowrap font-medium rounded-md shadow-xs h-8.5 px-3 text-2sm transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 [&_svg]:size-4`
+- **btn** `inline-flex items-center justify-center gap-1.5 shrink-0 whitespace-nowrap font-medium rounded-md shadow-xs h-8.5 px-3 text-2sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 [&_svg]:size-4`
   primary `bg-primary text-primary-foreground hover:bg-primary/90` · outline `border border-input bg-background text-secondary-foreground hover:bg-accent` · ghost `shadow-none hover:bg-accent` · icon-only `p-0 w-8.5`
 - **input** `flex w-full h-8.5 px-3 text-2sm rounded-md border border-input bg-background shadow-xs placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40` (leading icon: wrap `relative`, icon `absolute start-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground`, add `ps-9`)
 - **select** input + `appearance-none cursor-pointer pe-8` + chevron background · **textarea** input + `min-h-20 p-3 resize-y`
@@ -36,7 +43,7 @@ Shell: sidebar 280 (collapsed 80) · header 70 (60 mobile) · container `px-6 xl
 - **modal** overlay `fixed inset-0 z-50 bg-black/30` · panel `fixed top-1/2 start-1/2 -translate-x-1/2 rtl:translate-x-1/2 -translate-y-1/2 w-[calc(100%-2rem)] max-w-lg rounded-lg border bg-popover shadow-md` · header `px-5 py-3 border-b` · footer `px-5 py-3 border-t flex justify-end gap-2.5`
 - **drawer** `fixed z-50 top-5 bottom-5 end-5 w-[450px] max-w-[90%] rounded-xl border bg-card shadow-md flex flex-col`
 - **toast** `flex items-start gap-2.5 rounded-lg border bg-popover shadow-md p-3.5 text-sm w-[360px]` in `fixed bottom-5 end-5 flex flex-col gap-2.5`
-- **skeleton** `animate-pulse rounded-md bg-accent` · **empty** icon chip `size-12 rounded-full bg-muted text-muted-foreground`, title `text-sm font-semibold text-mono`, text `text-2sm text-secondary-foreground`, one button
+- **skeleton** `rounded-md bg-accent` — static; it reserves height and nothing else. The wait itself is reported by the `.pends` elapsed bar, never by a pulse or a spinner. · **empty** icon chip `size-12 rounded-full bg-muted text-muted-foreground`, title `text-sm font-semibold text-mono`, text `text-2sm text-secondary-foreground`, one button
 - **kbd** `inline-flex h-5 items-center rounded-sm border bg-muted px-1.5 font-mono text-2xs`
 - **KPI card** icon chip `size-9 rounded-lg bg-primary/10 text-primary` · delta badge light-success/destructive with trend icon · value + label; optional 40px sparkline SVG
 - **page toolbar** `flex flex-wrap items-center justify-between gap-5 pb-7.5` → title/subtitle · `flex gap-2.5` select · outline · ONE primary
@@ -54,7 +61,7 @@ one primary per view · four states per async region (skeleton/empty/error/succe
 personality chosen and written to `design/personality.md` · never `@apply group` / `peer` · render once in headless Edge before done.
 
 ## Decision tables (instead of prose)
-Animate it? — appears > 10×/session (hover, toggles, list rows): no or ≤ 100ms · 1–10×/session (open/close, tabs, toasts): 150–250ms ease-out · once (page enter, KPI count-up): ≤ 600ms, this is the one signature moment · reduced-motion: none.
+Animate it? — only if something changed and the user needs to know what, where it went or where it came from; then use the recipe for that change, never a duration you chose (`references/motion.md`). Decoration, page-enter reveals, count-ups and spinners are refusals.
 Card or no card? — data with a title and a toolbar: card · a single sentence of help: plain text in the toolbar · a list inside a card: `divide-y`, never nested cards.
 Which primary? — the one action the user came for (New order, Save, Book); Export/Filter/Import are outline; row actions ghost.
 

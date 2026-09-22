@@ -175,7 +175,7 @@ Vanilla stack
 
 ## Animation
 
-- Transitions: 150ms ease-out for colour/opacity/transform; 200–250ms for
+- Transitions: `--t-tint` for colour/opacity, `--t-pop` / `--t-panel` for
   overlays (enter faster than exit: 200 in / 150 out); 300ms sidebar collapse.
 - Enter: `opacity 0→1` + `translateY 4px→0` (menus, toasts) or `scale .98→1`
   (modals); never bounce, never slide across the screen.

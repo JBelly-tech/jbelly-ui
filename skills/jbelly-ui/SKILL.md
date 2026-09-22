@@ -158,9 +158,11 @@ this is the shape of it.
 - **Status is never colour alone.** Text or an icon accompanies every colour.
 - **Dark mode is a class** (`html.dark`), persisted, and every screen is
   checked in both modes.
-- **Motion is 150ms ease-out** on colour / opacity / transform; the sidebar
-  collapse is the one 300ms transition; a personality may add **one**
-  signature moment. `prefers-reduced-motion` is honoured by tokens.css.
+- **Motion reports a state change, and nothing else.** It is declared in
+  `references/motion.css`, never written in a class attribute and never
+  computed in JavaScript. Twelve recipes cover the whole system;
+  `scripts/lint_motion.py` refuses a thirteenth. `prefers-reduced-motion`
+  removes the travel and keeps the message. See `references/motion.md`.
 - **Anti-defaults** (the AI-generic tells — refuse them unless the personality
   chose them on purpose): blue-600 primary ·
   untouched zinc greys · `rounded-2xl shadow-lg` on everything · purple/blue
@@ -195,6 +197,7 @@ Open one, by name, only for what the quick card does not cover. Reading them all
 `build-screen.py` spec to page, `--kind app|landing|pricing` · `new_screen.py` blank shell ·
 `verify_page.py` the one verification
 call · `preflight.py` AI-tells, structure, contrast · `lint_tokens.py` raw palette colours ·
+`lint_motion.py` motion rules · `verify_motion.py` the runtime motion probe ·
 `audit_styles.py` redesign inventory · `personality_init.py` the design read ·
 `export_tokens.py` DTCG tokens · `build_dist.py` the delivery tiers.
 Windows twins: `verify-page.ps1`, `new-screen.ps1`, `lint-tokens.ps1`.
@@ -214,6 +217,7 @@ Windows twins: `verify-page.ps1`, `new-screen.ps1`, `lint-tokens.ps1`.
 | a library for charts, grids, calendars, editors, uploads, maps | `integrations.md` |
 | the pages and flows a known business type expects | `industry-playbooks.md` |
 | exact-value rules for forms, focus, motion, type, colour, copy | `interface-guidelines.md` |
+| a transition, an overlay, a loading state or anything that moves | `motion.md` |
 | to explain why a page looks generated | `anti-patterns.md` |
 | to score a review | `review-rubric.md` |
 | plain CSS or React instead of Tailwind | `stacks.md` |
@@ -232,4 +236,5 @@ the three kinds; `assets/spec.example.json`, `spec.landing.example.json` and
 - [ ] Tables: sort, filter chips, pagination text, bulk bar, hover row actions reachable by keyboard.
 - [ ] Forms: labels above, inline errors, focus to first error, dirty guard.
 - [ ] Overlays: focus trap, `Esc`, focus return, scroll lock.
+- [ ] `lint_motion.py` passes; every animating element declares `data-motion`; no Tailwind motion utility in any class attribute.
 - [ ] Icons all Lucide/inline SVG; no template assets; no emoji icons; every dependency on the vetted list.

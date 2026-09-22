@@ -109,6 +109,121 @@
   --radius-xl: calc(var(--radius) + 4px); --radius-lg: var(--radius); --radius-md: calc(var(--radius) - 2px); --radius-sm: calc(var(--radius) - 4px);
   --shadow-xs: var(--shadow-xs); --shadow-md: var(--shadow-md);
 }
+/* MOTION TOKENS START */
+:root {
+  /* the two switches — reduced motion moves these and nothing else */
+  --travel-on: 1;        /* 1 = displacement allowed. Reduced motion sets 0.   */
+  --motion-reduce: 1;    /* tempo multiplier under reduce. Reduced motion 0.7. */
+
+  /* direction — the whole RTL mechanism */
+  --flow-x: 1;           /* multiply EVERY authored inline-axis length by this */
+  --origin-inline: left; /* transform-origin has no logical keyword; this is it */
+
+  /* preset + density dials */
+  --motion-preset: 1;    /* a personality may set 0.85 .. 1.15 and nothing else */
+  --travel-density: 1;   /* a density may set 0.75 .. 1.25 and nothing else     */
+  --motion-scale: calc(var(--motion-preset) * var(--motion-reduce));
+  --motion-max: 450ms;   /* nothing in this system may resolve longer           */
+  --reduced: var(--travel-on);  /* canary the runtime probe reads off :root     */
+
+  /* base durations, named by CLASS OF CHANGE, never by component */
+  --d-0:         0ms;    /* keyboard-initiated: no animation, ever              */
+  --d-press:   100ms;    /* the control received the press                      */
+  --d-tint:    140ms;    /* paint-tier state change; also the paint-tier cap    */
+  --d-pop:     180ms;    /* tooltip / menu / popover ENTER                      */
+  --d-pop-out: 130ms;    /*                              LEAVE                  */
+  --d-menu:    220ms;    /* disclosure, selection marker, inline panel ENTER    */
+  --d-menu-out:150ms;    /*                                          LEAVE      */
+  --d-move:    260ms;    /* an object kept its identity and changed position    */
+  --d-panel:   300ms;    /* drawer, dialog, sheet, command palette ENTER        */
+  --d-panel-out:200ms;   /*                                         LEAVE       */
+  --d-heavy:   390ms;    /* destructive or irreversible; overdamped             */
+
+  /* resolved: what every recipe references */
+  --t-press:     calc(var(--d-press)     * var(--motion-scale));
+  --t-tint:      calc(var(--d-tint)      * var(--motion-scale));
+  --t-pop:       calc(var(--d-pop)       * var(--motion-scale));
+  --t-pop-out:   calc(var(--d-pop-out)   * var(--motion-scale));
+  --t-menu:      calc(var(--d-menu)      * var(--motion-scale));
+  --t-menu-out:  calc(var(--d-menu-out)  * var(--motion-scale));
+  --t-move:      calc(var(--d-move)      * var(--motion-scale));
+  --t-panel:     calc(var(--d-panel)     * var(--motion-scale));
+  --t-panel-out: calc(var(--d-panel-out) * var(--motion-scale));
+  --t-heavy:     calc(var(--d-heavy)     * var(--motion-scale));
+
+  /* not UI tempo: unscaled, exempt from the 80-450ms budget */
+  --t-grace:   250ms;    /* no wait shorter than this is reported as pending     */
+  --t-elapsed:   30s;    /* how long a wait has lasted. FINITE: it is not a loop */
+  --t-linger:     6s;    /* how long a "this just changed" mark stays on screen  */
+
+  /* easings: enter decelerates, exit accelerates, loops do not exist */
+  --ease-enter: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --ease-exit:  cubic-bezier(0.3, 0, 0.8, 0.15);
+  --ease-move:  cubic-bezier(0.2, 0, 0, 1);
+  --ease-tint:  cubic-bezier(0.2, 0, 0.38, 0.9);
+  --ease-flat:  linear;              /* elapsed time and scroll position ONLY   */
+
+  /* Springs as linear(). Critically damped and overdamped only: no curve in
+     this system has a stop above 1, because an overshoot clamps on opacity and
+     colour into a visible dead hold. Each is paired with the duration it means. */
+  --spring-ui: linear(0, 0.004 1%, 0.0229 2.5%, 0.0789 5%, 0.4656 17%, 0.6384 23.5%,
+    0.7641 30%, 0.8147 33.5%, 0.8604 37.5%, 0.8993 42%, 0.9305 47%, 0.9542 52.5%,
+    0.9712 58.5%, 0.9912 73.5%, 1);            /* zeta 1.00 — pair with --t-panel */
+  --spring-heavy: linear(0, 0.0105 1%, 0.0541 2.5%, 0.4077 10.5%, 0.6101 16.5%,
+    0.6849 19.5%, 0.7544 23%, 0.8154 27%, 0.8613 31%, 0.8995 35.5%, 0.9321 41%,
+    0.9558 47%, 0.9722 53.5%, 0.9918 70.5%, 1); /* zeta 1.31 — pair with --t-heavy */
+  --ease-elapsed: linear(0, 0.42 6%, 0.68 16%, 0.82 30%, 0.9 46%, 0.95 68%, 1);
+  --ease-elapsed-steps: steps(8, end);          /* the reduced answer for elapsed  */
+
+  /* travel: one unit, bent by density, nulled by reduce */
+  --travel-unit: calc(4px * var(--travel-density) * var(--travel-on));
+  --travel-sm:   var(--travel-unit);                    /*  4px  */
+  --travel:      calc(var(--travel-unit) * 2);          /*  8px  */
+  --travel-lg:   calc(var(--travel-unit) * 4);          /* 16px  */
+  --recoil:      calc(var(--travel-unit) * 0.75);       /*  3px  */
+  --panel-travel: calc(100% * var(--travel-on));
+  --press-depth: 0.03;  --press-scale: calc(1 - var(--press-depth) * var(--travel-on));
+  --pop-depth:   0.04;  --pop-scale:   calc(1 - var(--pop-depth)   * var(--travel-on));
+  --elapsed-cap: 0.92;  /* the pending bar stops here: it does not know when it ends */
+  --seam-range:  48px;  /* scroll distance over which a sticky seam resolves        */
+
+  /* the one surface value motion needs and the colour roles above lack */
+  --scrim: color-mix(in oklab, var(--foreground) 45%, transparent);
+}
+
+/* Direction. Both selectors on purpose: :dir() for the document, the attribute
+   for a subtree that sets dir on itself. */
+:root:dir(rtl), [dir="rtl"] { --flow-x: -1; --origin-inline: right; }
+
+/* Density changes DISTANCE only. A compact UI is not a faster UI. */
+.density-compact { --travel-density: 0.75; }
+.density-airy    { --travel-density: 1.25; }
+
+/* A personality may set --motion-preset (0.85-1.15), --ease-enter,
+   --press-depth and --pop-depth. At most three of them. Nothing else. */
+.theme-graphite  { --motion-preset: 0.85; }
+.theme-slate     { --motion-preset: 0.9; }
+.theme-clinic    { --ease-enter: var(--spring-ui); }
+.theme-editorial { --motion-preset: 1.15; }
+.theme-neo       { --motion-preset: 0.85; --press-depth: 0.05; }
+.theme-mint      { --motion-preset: 1.1;  --pop-depth: 0.06; }
+
+/* Reduced motion. This REPLACES the blanket `* { duration: 0.01ms !important }`
+   block this file used to end with. Travel goes to zero and the tempo shortens;
+   opacity, colour and position keep working, so every state is still reported.
+   The four named exceptions live in motion.css, next to the recipes they answer. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --travel-on: 0;
+    --motion-reduce: 0.7;
+    --ease-enter: var(--ease-tint);
+    --ease-exit:  var(--ease-tint);
+    --ease-elapsed: var(--ease-elapsed-steps);
+  }
+  html { scroll-behavior: auto; }
+}
+/* MOTION TOKENS END */
+
 @theme { --text-2sm: 0.8125rem; --text-2sm--line-height: 1.3; --text-2xs: 0.6875rem; --text-2xs--line-height: 1.2; }
 @layer base {
   * { border-color: var(--border); }
@@ -116,12 +231,11 @@
   body { background: var(--background); color: var(--foreground); -webkit-font-smoothing: antialiased; }
   :focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
   .scroll-thin { scrollbar-width: thin; scrollbar-color: var(--accent) transparent; }
-  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
 }
 @layer components {
   .container-fixed { @apply w-full grow px-6 xl:mx-auto xl:px-7.5 xl:max-w-(--breakpoint-xl); }
   /* buttons */
-  .btn { @apply inline-flex items-center justify-center gap-1.5 shrink-0 whitespace-nowrap font-medium rounded-md shadow-xs transition-colors cursor-pointer h-(--ctl-h) px-3 text-2sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background disabled:opacity-50 disabled:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0; }
+  .btn { @apply inline-flex items-center justify-center gap-1.5 shrink-0 whitespace-nowrap font-medium rounded-md shadow-xs cursor-pointer h-(--ctl-h) px-3 text-2sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background disabled:opacity-50 disabled:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0; }
   .btn-sm { @apply h-(--ctl-h-sm) px-2.5 text-xs gap-1.25; }
   .btn-icon { @apply p-0 w-(--ctl-h); }
   .btn-icon.btn-sm { @apply w-(--ctl-h-sm); }
@@ -130,7 +244,7 @@
   .btn-ghost { @apply shadow-none bg-transparent text-accent-foreground hover:bg-accent; }
   .btn-destructive { @apply bg-destructive text-destructive-foreground hover:bg-destructive/90; }
   /* inputs */
-  .input { @apply flex w-full rounded-md border border-input bg-background text-foreground shadow-xs placeholder:text-muted-foreground transition-colors h-(--ctl-h) px-3 text-2sm focus-visible:outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40; }
+  .input { @apply flex w-full rounded-md border border-input bg-background text-foreground shadow-xs placeholder:text-muted-foreground h-(--ctl-h) px-3 text-2sm focus-visible:outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40; }
   .input-sm { @apply h-(--ctl-h-sm) px-2.5 text-xs; }
   .select { @apply appearance-none cursor-pointer pe-8 bg-no-repeat bg-[length:14px_11px] bg-[position:right_0.6rem_center] rtl:bg-[position:left_0.6rem_center]; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%239f9fa9' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3E%3C/svg%3E"); }
   .checkbox { @apply appearance-none shrink-0 size-4 rounded-sm border border-input bg-background shadow-xs cursor-pointer checked:bg-primary checked:border-primary bg-center bg-no-repeat focus-visible:ring-2 focus-visible:ring-ring/40; }
@@ -155,7 +269,7 @@
   .table th { @apply h-11 px-4 text-start align-middle text-xs font-normal text-secondary-foreground border-b border-border whitespace-nowrap; }
   .table td { @apply px-4 align-middle border-b border-border h-(--row-h); }
   .table tbody tr:last-child td { @apply border-b-0; }
-  .table tbody tr { @apply hover:bg-muted/40 transition-colors; }
+  .table tbody tr { @apply hover:bg-muted/40; }
   .table tbody tr.selected { @apply bg-accent; }
   /* nav */
   .nav-heading { @apply px-2.5 pt-4 pb-1 text-xs font-medium uppercase text-sidebar-muted; }
@@ -165,14 +279,15 @@
   .nav-link.active svg, .nav-link:hover svg { @apply text-sidebar-primary; }
   .nav-children { @apply hidden flex-col gap-1 ms-[22px] ps-2.5 border-s border-sidebar-border; }
   .nav-group.open > .nav-children { @apply flex; }
-  .nav-group.open > .nav-link .nav-arrow { @apply rotate-90 rtl:-rotate-90; }
   .nav-child { @apply relative flex items-center gap-3.5 rounded-lg px-2.5 py-1.5 text-2sm text-sidebar-foreground hover:bg-sidebar-accent before:absolute before:-start-[15px] before:top-1/2 before:size-1.5 before:-translate-y-1/2 before:rounded-full; }
   .nav-child.active { @apply text-sidebar-primary before:bg-sidebar-primary; }
   /* menu */
   .menu { @apply min-w-44 rounded-md border border-border bg-popover text-popover-foreground shadow-md p-2 flex flex-col gap-0.5 z-50; }
   .menu-item { @apply flex items-center gap-2.5 rounded-md px-2 py-2 text-2sm text-foreground cursor-pointer hover:bg-accent [&_svg]:size-4 [&_svg]:text-muted-foreground; }
   .kbd { @apply inline-flex h-5 items-center rounded-sm border border-border bg-muted px-1.5 font-mono text-2xs text-secondary-foreground; }
-  .skeleton { @apply animate-pulse rounded-md bg-accent; }
+  /* A skeleton reserves the height a row will take. That was always its only job; the
+     pulse halved the contrast of everything inside it and reported nothing. */
+  .skeleton { @apply rounded-md bg-accent; }
 }
 
 /* ===== sidebar collapse: unlayered on purpose (must beat :root variables and utility classes) ===== */
@@ -190,13 +305,383 @@
 }
 .logo-mark { display: none; }
 </style>
+
+<!-- motion: references/motion.css, inlined. Plain CSS on purpose - it must beat
+     @layer utilities and must not pass through the Tailwind browser compiler. -->
+<style id="jb-motion">
+/* ==========================================================================
+   jbelly-ui motion. Twelve recipes. No colour, no literal tempo, no literal
+   distance: every value comes from the MOTION TOKENS region of tokens.css.
+
+   Loaded as plain CSS, AFTER Tailwind. In a single-file page it is inlined into a
+   style element with id="jb-motion", placed immediately after the closing tag of the
+   type="text/tailwindcss" block. Unlayered on purpose: it must beat @layer utilities and it
+   must not pass through the browser compiler. Nothing in this file may contain the character
+   sequence that closes a style element, comment or not: the HTML parser ends the block there
+   and the whole sheet is silently dropped. V01 is the check that catches it.
+
+   THE THREE DECLARED LAYOUT EXCEPTIONS IN THIS SYSTEM:
+   motion-exception: #sidebar — inline-size: the rail's width IS the state, and
+     no composited property expresses how much space an element occupies.
+   motion-exception: .disclosure::details-content — block-size / grid-template-rows:
+     an intrinsic panel has no portable composited equivalent.
+   motion-exception: .list-item — grid-template-rows: the gap closing after a
+     removal is the second half of the departure report.
+   ========================================================================== */
+
+/* -- R1 - PRESS ----------------------------- data-motion="feedback" -- */
+.btn, .input, .checkbox, .select, .menu-item, .nav-link, .nav-child, .seg,
+.table tbody tr, .tick {
+  transition: background-color var(--t-tint) var(--ease-tint),
+              border-color     var(--t-tint) var(--ease-tint),
+              color            var(--t-tint) var(--ease-tint);
+}
+.btn {
+  transition: scale            var(--t-press) var(--ease-exit),
+              background-color var(--t-tint)  var(--ease-tint),
+              border-color     var(--t-tint)  var(--ease-tint),
+              color            var(--t-tint)  var(--ease-tint);
+}
+.btn:active { scale: var(--press-scale); }
+/* seen 100+ times a day: no motion at all. */
+[data-frequency="constant"] { transition-duration: var(--d-0); }
+/* the ring is instant: a transitioned focus ring lags the keyboard, which reads
+   as input latency. This rule is why M03 fails any transition on :focus-visible. */
+:focus-visible { transition-property: background-color, border-color, color; }
+
+/* -- R2 - MENU FROM ITS TRIGGER -------------- data-motion="spatial" -- */
+/* Preferred form for new markup: popover, zero JavaScript, enter AND exit. */
+.menu[popover] {
+  margin: 0; opacity: 0; scale: var(--pop-scale);
+  translate: 0 calc(-1 * var(--travel-sm));
+  transform-origin: top var(--origin-inline);
+  transition: opacity   var(--t-pop-out) var(--ease-exit),
+              scale     var(--t-pop-out) var(--ease-exit),
+              translate var(--t-pop-out) var(--ease-exit),
+              overlay   var(--t-pop-out) allow-discrete,
+              display   var(--t-pop-out) allow-discrete;
+}
+.menu[popover]:popover-open {
+  opacity: 1; scale: 1; translate: 0 0;
+  transition-duration: var(--t-pop);
+  transition-timing-function: var(--ease-enter);
+}
+/* MUST come after the open rule: equal specificity, source order decides. */
+@starting-style {
+  .menu[popover]:popover-open {
+    opacity: 0; scale: var(--pop-scale); translate: 0 calc(-1 * var(--travel-sm));
+  }
+}
+/* Shell-compatible form: the page's own JS flips data-open instead of .hidden.
+   Not the top layer, so the exit animates in every engine, not just Chromium. */
+.menu[data-menu] {
+  display: none; opacity: 0; scale: var(--pop-scale);
+  translate: 0 calc(-1 * var(--travel-sm));
+  transform-origin: top var(--origin-inline);
+  transition: opacity   var(--t-pop-out) var(--ease-exit),
+              scale     var(--t-pop-out) var(--ease-exit),
+              translate var(--t-pop-out) var(--ease-exit),
+              display   var(--t-pop-out) allow-discrete;
+}
+.menu[data-menu][data-open] {
+  display: flex; opacity: 1; scale: 1; translate: 0 0;
+  transition-duration: var(--t-pop);
+  transition-timing-function: var(--ease-enter);
+}
+@starting-style {
+  .menu[data-menu][data-open] {
+    opacity: 0; scale: var(--pop-scale); translate: 0 calc(-1 * var(--travel-sm));
+  }
+}
+@supports (anchor-name: --a) {          /* upgrade only; static placement below */
+  [data-anchor] { anchor-name: --jb-anchor; }
+  .menu[data-anchored] {
+    position: fixed; position-anchor: --jb-anchor;
+    position-area: block-end span-inline-start;    /* logical: RTL-correct free */
+    position-try-fallbacks: flip-block, flip-inline;
+    margin-block-start: var(--travel-sm);
+  }
+}
+
+/* -- R3 - PANEL + SCRIM ------ data-motion="spatial" | "continuity" --- */
+.panel {                                   /* closed state = the exit style */
+  display: none; opacity: 0;
+  translate: calc(var(--flow-x) * var(--panel-travel)) 0;
+  transition: opacity   var(--t-panel-out) var(--ease-exit),
+              translate var(--t-panel-out) var(--ease-exit),
+              display   var(--t-panel-out) allow-discrete;
+}
+.panel[data-open] {
+  display: flex; opacity: 1; translate: 0 0;
+  transition-duration: var(--t-panel);
+  transition-timing-function: var(--spring-ui);
+}
+@starting-style {
+  .panel[data-open] {
+    opacity: 0; translate: calc(var(--flow-x) * var(--panel-travel)) 0;
+  }
+}
+/* A centred overlay belongs to the viewport, not to a trigger: it scales, it
+   does not travel. The one legal transform-origin: center in the system. */
+.panel-centre { translate: 0 0; scale: var(--pop-scale); transform-origin: center;
+  transition: opacity var(--t-panel-out) var(--ease-exit),
+              scale   var(--t-panel-out) var(--ease-exit),
+              display var(--t-panel-out) allow-discrete; }
+.panel-centre[data-open] { scale: 1; }
+@starting-style { .panel-centre[data-open] { opacity: 0; scale: var(--pop-scale); } }
+/* Destructive or irreversible: heavier, slower, overdamped. Same tokens. */
+.panel-heavy[data-open] {
+  transition-duration: var(--t-heavy);
+  transition-timing-function: var(--spring-heavy);
+}
+/* The scrim is the SAME event: same two tokens, no exceptions, ever. */
+.scrim {
+  display: none; opacity: 0; background: var(--scrim);
+  transition: opacity var(--t-panel-out) var(--ease-exit),
+              display var(--t-panel-out) allow-discrete;
+}
+.scrim[data-open] {
+  display: block; opacity: 1;
+  transition-duration: var(--t-panel);
+  transition-timing-function: var(--ease-enter);
+}
+@starting-style { .scrim[data-open] { opacity: 0; } }
+.panel-heavy[data-open] ~ .scrim[data-open] { transition-duration: var(--t-heavy); }
+
+/* -- R4 - DISCLOSURE -------------------------- data-motion="state" --- */
+/* motion-exception: .disclosure::details-content */
+.disclosure-chevron {
+  rotate: 0deg;
+  transition: rotate var(--t-menu) var(--ease-move);
+}
+[dir="rtl"] .disclosure-chevron { rotate: 180deg; }   /* a directional glyph mirrors */
+.disclosure[open] > summary .disclosure-chevron,
+[aria-expanded="true"] .disclosure-chevron { rotate: calc(90deg * var(--flow-x)); }
+@supports selector(::details-content) {
+  .disclosure::details-content {
+    block-size: 0; overflow: clip;
+    transition: block-size        var(--t-menu) var(--ease-move),
+                content-visibility var(--t-menu) allow-discrete;
+  }
+  .disclosure[open]::details-content { block-size: auto; }
+  @supports (interpolate-size: allow-keywords) { :root { interpolate-size: allow-keywords; } }
+  @supports not (interpolate-size: allow-keywords) {   /* portable, no measurement */
+    .disclosure::details-content {
+      block-size: auto; display: grid; grid-template-rows: 0fr;
+      transition: grid-template-rows  var(--t-menu) var(--ease-move),
+                  content-visibility  var(--t-menu) allow-discrete;
+    }
+    .disclosure[open]::details-content { grid-template-rows: 1fr; }
+    .disclosure::details-content > * { min-block-size: 0; overflow: clip; }
+  }
+}
+
+/* -- R5 - SELECTION MARKER -------------------- data-motion="state" --- */
+/* The group MUST be equal columns: the marker's position is then arithmetic,
+   so no measurement and no JavaScript are needed. */
+.marker-group {
+  --mark-i: 0; --mark-n: 2;
+  position: relative; display: grid;
+  grid-auto-flow: column; grid-auto-columns: 1fr;
+}
+.marker-group:has(> :nth-child(2) :checked) { --mark-i: 1; }
+.marker-group:has(> :nth-child(3) :checked) { --mark-i: 2; }
+.marker-group:has(> :nth-child(4) :checked) { --mark-i: 3; }
+.marker {
+  position: absolute; inset-block-end: 0; inset-inline-start: 0;
+  inline-size: calc(100% / var(--mark-n)); block-size: 2px;
+  background: var(--primary);
+  translate: calc(var(--flow-x) * var(--mark-i) * 100%) 0;
+  transition: translate var(--t-menu) var(--spring-ui);
+}
+.marker-fill { inset-block: 0; block-size: auto; border-radius: var(--radius-md);
+  background: var(--card); z-index: 0; }   /* segmented control variant */
+
+/* -- R6 - ARRIVAL AND DEPARTURE --------------- data-motion="state" --- */
+/* Gated on [data-ready], which one line of script sets after load. Rows that
+   were in the server markup therefore render with no entrance: the page
+   arriving is not a state change. */
+html[data-ready] .arrives {
+  opacity: 1; translate: 0 0;
+  transition: opacity   var(--t-menu) var(--ease-enter),
+              translate var(--t-menu) var(--ease-enter);
+}
+@starting-style {
+  html[data-ready] .arrives { opacity: 0; translate: 0 calc(-1 * var(--travel)); }
+}
+.arrives[data-new] {          /* the non-motion half: a mark that outlives it */
+  box-shadow: inset calc(2px * var(--flow-x)) 0 0 0 var(--primary);
+}
+.departs[data-leaving] {
+  opacity: 0;
+  translate: calc(var(--flow-x) * var(--travel)) 0;
+  pointer-events: none;       /* legal ONLY while leaving, never as a gate */
+  transition: opacity   var(--t-menu-out) var(--ease-exit),
+              translate var(--t-menu-out) var(--ease-exit);
+}
+/* motion-exception: .list-item */
+.list-item { display: grid; grid-template-rows: 1fr;
+  transition: grid-template-rows var(--t-menu-out) var(--ease-exit); }
+.list-item > * { min-block-size: 0; overflow: clip; }
+.list-item[data-leaving] { grid-template-rows: 0fr; }
+
+/* -- R7 - SIDEBAR COLLAPSE --------------- data-motion="continuity" -- */
+/* motion-exception: #sidebar */
+#sidebar { transition: inline-size var(--t-panel) var(--ease-move); }
+#sidebar .nav-title, #sidebar .nav-badge {
+  transition: opacity var(--t-menu-out) var(--ease-exit);
+}
+/* One subject: the content pane follows the rail through layout, it does not
+   run an animation of its own. */
+.shell-main, .shell-header { transition: none; }
+
+/* -- R8 - REVISED IN PLACE -------------------- data-motion="state" --- */
+.revises { position: relative; }
+.revises::before {
+  content: ""; position: absolute; inset-block: 0; inset-inline-start: 0;
+  inline-size: 2px; background: var(--muted-foreground); opacity: 0;
+  transition: opacity var(--t-tint) var(--ease-enter);
+  pointer-events: none;
+}
+.revises[data-changed]::before      { opacity: 1; }
+.revises[data-changed="up"]::before   { background: var(--success); }
+.revises[data-changed="down"]::before { background: var(--destructive); }
+
+/* -- R9 - REFUSAL ----------------------------- data-motion="state" --- */
+.refuses[data-refused] { animation: jb-recoil var(--t-heavy) var(--spring-heavy) both; }
+@keyframes jb-recoil {
+  0%   { translate: 0 0; }
+  30%  { translate: calc(var(--recoil) * -1 * var(--flow-x)) 0; }
+  100% { translate: 0 0; }
+}
+
+/* -- R10 - PENDING --------------------------- data-motion="status" --- */
+/* The answer to the spinner and the shimmer. Finite, decelerating, stops at
+   92% because it does not know when the wait ends. `infinite` appears nowhere
+   in this system. */
+.pends { position: relative; }
+.pends::after {
+  content: ""; position: absolute; inset-block-start: 0; inset-inline-start: 0;
+  inline-size: 100%; block-size: 2px; background: var(--primary);
+  transform-origin: var(--origin-inline) center;
+  scale: 0 1; opacity: 0; pointer-events: none;
+}
+.pends[aria-busy="true"]::after {
+  opacity: 1;
+  animation: jb-elapsed var(--t-elapsed) var(--ease-elapsed) var(--t-grace) both;
+}
+@keyframes jb-elapsed { from { scale: 0 1; } to { scale: var(--elapsed-cap) 1; } }
+/* The skeleton goes back to being a static box that reserves height, which was
+   always its only job. It has no animation at all. */
+
+/* -- R11 - POSITION ------------------------ data-motion="position" --- */
+/* Resting truth OUTSIDE the guard: the seam is present and correct. */
+.app-seam { position: relative; }
+.app-seam::after {
+  content: ""; position: absolute; inset-inline: 0; inset-block-end: 0;
+  block-size: 1px; background: var(--border); opacity: 1;
+}
+.read-progress { display: none; }
+@supports (animation-timeline: scroll()) {
+  .app-seam::after {
+    animation: jb-seam var(--ease-flat) both;      /* shorthand FIRST: it resets */
+    animation-timeline: scroll(root block);        /* animation-timeline         */
+    animation-range: 0 var(--seam-range);
+  }
+  @keyframes jb-seam { from { opacity: 0; } to { opacity: 1; } }
+  .read-progress {
+    display: block; position: fixed; inset-block-start: 0; inset-inline: 0;
+    block-size: 2px; background: var(--primary); z-index: 60;
+    transform-origin: var(--origin-inline) center;
+    animation: jb-progress var(--ease-flat) both;
+    animation-timeline: scroll(root block);
+  }
+  @keyframes jb-progress { from { scale: 0 1; } to { scale: 1 1; } }
+}
+
+/* -- R12 - IDENTITY ----------------------- data-motion="continuity" -- */
+@supports (view-transition-name: none) {
+  /* the page did not change; only the named objects did. Without this line you
+     get the UA's undifferentiated 0.25s whole-document cross-fade. */
+  ::view-transition-old(root), ::view-transition-new(root) {
+    animation: none; mix-blend-mode: normal;
+  }
+  ::view-transition-group(*) {
+    animation-duration: var(--t-move);
+    animation-timing-function: var(--spring-ui);
+  }
+  /* members MOVE, they do not dissolve into each other. mix-blend-mode is reset
+     because the UA default is plus-lighter, which reads as a glow. */
+  ::view-transition-old(*), ::view-transition-new(*) {
+    animation: none; mix-blend-mode: normal; block-size: 100%;
+  }
+  :root:active-view-transition [data-vt-suppress] { visibility: hidden; }
+}
+
+/* == REDUCED MOTION: the four named exceptions ============================
+   The two token switches in tokens.css do everything else. These four are the
+   cases where the POSITION is the state, so nulling the travel would delete
+   the information instead of the motion. */
+@media (prefers-reduced-motion: reduce) {
+  /* the marker must still be under the selected tab: remove the travel, keep
+     the position, by removing the transition rather than the translate */
+  .marker { transition-property: none; }
+  /* layout is not reached by --travel-on, and a whole-shell reflow is the most
+     vestibular motion an admin page can produce: delete it, do not shorten it */
+  #sidebar, .disclosure::details-content, .list-item {
+    transition-property: opacity;
+  }
+  /* a scroll timeline has no duration to shorten. Detach it and rest at the
+     true state - which is why the resting styles live outside the guard. */
+  .read-progress { animation-timeline: none; display: none; }
+  .app-seam::after { animation-timeline: none; opacity: 1; }
+  /* the group carries the geometry (vestibular); the pair carries the identity
+     claim (pure opacity, safe). Collapse one, keep the other. */
+  /* 1ms, never 0.01ms: some engines round a sub-millisecond duration to zero and then never fire
+     transitionend, which breaks anything awaiting it. The literal is the point, so it is the one
+     tempo in the system written outside the token region. */
+  ::view-transition-group(*) { animation-duration: 1ms; }  /* motion-lint-ignore M01 */
+  ::view-transition-old(*), ::view-transition-new(*) {
+    animation-duration: var(--t-menu-out);
+  }
+}
+
+/* ===== app-shell page rules =============================================
+   What this page's own structure needs. Every value is still a token. */
+
+/* The mobile scrim belongs to the mobile sidebar and to nothing else: above the
+   breakpoint the rail is permanent, so there is nothing for a scrim to cover. */
+@media (width >= 64rem) { #overlay[data-open] { display: none; } }
+
+/* R5 on a tablist. The chips already carry aria-selected, which is the attribute
+   assistive technology reads, so the marker reads it too rather than a second
+   source of truth. Equal columns keep the position arithmetic. */
+.marker-group[role="tablist"] { --mark-n: 5; }
+.marker-group[role="tablist"]:has(> :nth-child(2)[aria-selected="true"]) { --mark-i: 1; }
+.marker-group[role="tablist"]:has(> :nth-child(3)[aria-selected="true"]) { --mark-i: 2; }
+.marker-group[role="tablist"]:has(> :nth-child(4)[aria-selected="true"]) { --mark-i: 3; }
+.marker-group[role="tablist"]:has(> :nth-child(5)[aria-selected="true"]) { --mark-i: 4; }
+.marker-group[role="tablist"] .marker {
+  inset-block: 4px; inset-inline-start: 4px; block-size: auto;
+  inline-size: calc((100% - 8px) / var(--mark-n));
+}
+
+/* .app-seam promotes a STATIC host to position: relative so its pseudo-element has
+   something to anchor to. This header is already fixed, and motion.css is unlayered, so the
+   page has to say so after it. Any host that is already positioned needs this one line. */
+header.app-seam { position: fixed; }
+
+/* The sort direction is an end state, not motion: it is true for as long as the
+   column is sorted, so it is declared, not animated. */
+th[aria-sort="descending"] .sort-chevron { rotate: 180deg; }
+</style>
 </head>
 <body class="h-full flex text-2sm">
-<a href="#content" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:start-2 focus:z-50 btn btn-primary btn-sm">Skip to content</a>
+<a href="#content" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:start-2 focus:z-50 btn btn-primary btn-sm" data-motion="feedback">Skip to content</a>
 
 <!-- ===== Sidebar ===== -->
-<div id="overlay" class="fixed inset-0 z-30 bg-black/30 hidden lg:hidden"></div>
-<aside id="sidebar" class="fixed inset-y-0 start-0 z-40 hidden lg:flex flex-col w-(--sidebar-width) bg-sidebar text-sidebar-foreground border-e border-sidebar-border transition-[width] duration-300 ease-in-out">
+<div id="overlay" class="scrim fixed inset-0 z-30" data-motion="spatial"></div>
+<aside id="sidebar" class="fixed inset-y-0 start-0 z-40 hidden lg:flex flex-col w-(--sidebar-width) bg-sidebar text-sidebar-foreground border-e border-sidebar-border" data-motion="continuity">
   <div class="flex items-center justify-between h-(--header-height) px-6 shrink-0 relative">
     <a href="#" class="logo-full flex items-center gap-2.5 font-semibold text-mono text-sidebar-foreground">
       <span class="inline-flex size-7 items-center justify-center rounded-md bg-primary text-primary-foreground font-bold text-xs">N</span>
@@ -211,7 +696,7 @@
     <a class="nav-link" href="#"><i data-lucide="users"></i><span class="nav-title grow truncate" data-i18n="Customers">Customers</span><span class="nav-badge badge badge-sm badge-outline">128</span></a>
     <a class="nav-link" href="#"><i data-lucide="shopping-cart"></i><span class="nav-title grow truncate" data-i18n="Orders">Orders</span></a>
     <div class="nav-group open">
-      <a class="nav-link" href="#" data-toggle-group><i data-lucide="package"></i><span class="nav-title grow truncate" data-i18n="Products">Products</span><i data-lucide="chevron-right" class="nav-arrow size-4! transition-transform rtl:rotate-180"></i></a>
+      <a class="nav-link" href="#" data-toggle-group role="button" aria-expanded="true" data-motion="state"><i data-lucide="package"></i><span class="nav-title grow truncate" data-i18n="Products">Products</span><i data-lucide="chevron-right" class="nav-arrow disclosure-chevron size-4!"></i></a>
       <div class="nav-children">
         <a class="nav-child" href="#" data-i18n="Catalogue">Catalogue</a>
         <a class="nav-child" href="#" data-i18n="Collections">Collections</a>
@@ -226,7 +711,7 @@
   </nav>
 <!-- @endregion nav -->
 <div class="p-3 border-t border-sidebar-border relative">
-    <div id="side-user-menu" class="menu absolute bottom-full start-3 end-3 mb-1 hidden" role="menu">
+    <div id="side-user-menu" class="menu absolute bottom-full start-3 end-3 mb-1" data-menu data-motion="spatial" role="menu">
       <a class="menu-item" href="#"><i data-lucide="user"></i><span data-i18n="Profile">Profile</span></a>
       <a class="menu-item" href="#"><i data-lucide="settings"></i><span data-i18n="Settings">Settings</span></a>
       <a class="menu-item" href="#"><i data-lucide="keyboard"></i>Shortcuts<span class="ms-auto kbd">?</span></a>
@@ -242,9 +727,9 @@
 </aside>
 
 <!-- ===== Wrapper ===== -->
-<div class="flex flex-col grow min-w-0 lg:ps-(--sidebar-width) pt-(--header-height) transition-[padding] duration-300">
-  <header class="fixed top-0 end-0 start-0 lg:start-(--sidebar-width) z-30 h-(--header-height) flex items-stretch bg-background border-b border-border transition-[inset] duration-300">
-    <div class="container-fixed flex items-center justify-between gap-4">
+<div class="flex flex-col grow min-w-0 lg:ps-(--sidebar-width) pt-(--header-height)">
+  <header class="fixed top-0 end-0 start-0 lg:start-(--sidebar-width) z-30 h-(--header-height) flex items-stretch bg-background app-seam" data-motion="position">
+    <div class="container-fixed flex items-center justify-between gap-4" data-motion="feedback">
       <div class="flex items-center gap-3">
         <button id="hamburger" class="btn btn-ghost btn-icon lg:hidden" aria-label="Open menu"><i data-lucide="menu"></i></button>
         <nav class="hidden md:flex items-center gap-1.5 text-xs text-secondary-foreground" aria-label="Breadcrumb">
@@ -255,7 +740,7 @@
         <button id="open-search" class="btn btn-outline btn-sm hidden md:inline-flex gap-2 text-muted-foreground w-52 justify-start"><i data-lucide="search"></i><span class="grow text-start">Search…</span><span class="kbd">⌘K</span></button>
         <div class="relative">
           <button id="notif-btn" class="btn btn-ghost btn-icon relative" aria-label="Notifications" aria-haspopup="menu" aria-expanded="false"><i data-lucide="bell"></i><span id="notif-dot" class="absolute top-2 end-2 size-2 rounded-full bg-destructive ring-2 ring-background"></span></button>
-          <div id="notif-menu" class="menu absolute end-0 top-full mt-1 w-80 hidden" role="menu">
+          <div id="notif-menu" class="menu absolute end-0 top-full mt-1 w-80" data-menu data-motion="spatial" role="menu">
             <div class="flex items-center justify-between px-2.5 py-1.5"><span class="text-sm font-semibold" data-i18n="Notifications">Notifications</span><button id="notif-read" class="text-2xs text-primary-accent hover:underline" data-i18n="Mark all read">Mark all read</button></div>
             <div class="my-1 h-px bg-border"></div>
             <a class="menu-item items-start" href="#"><span class="mt-0.5 inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-success/10 text-success"><i data-lucide="check" class="size-3.5!"></i></span><span class="flex flex-col gap-0.5 min-w-0"><span class="text-2sm text-foreground">Order #1042 delivered</span><span class="text-2xs text-muted-foreground">Sara Khalil · 5 min ago</span></span></a>
@@ -271,7 +756,7 @@
           <button id="user-btn" class="flex items-center gap-2 rounded-full ms-1" aria-haspopup="menu" aria-expanded="false">
             <span class="inline-flex size-9 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold text-2xs uppercase ring-1 ring-border">LA</span>
           </button>
-          <div id="user-menu" class="menu absolute end-0 top-full mt-2 w-60 hidden" role="menu">
+          <div id="user-menu" class="menu absolute end-0 top-full mt-2 w-60" data-menu data-motion="spatial" role="menu">
             <div class="px-2 py-2 flex flex-col"><span class="text-sm font-medium text-mono">Lina Ahmad</span><span class="text-xs text-muted-foreground">lina@acme.app</span></div>
             <div class="my-1 h-px bg-border"></div>
             <a class="menu-item" href="#"><i data-lucide="user"></i>Profile</a>
@@ -284,7 +769,7 @@
     </div>
   </header>
 
-  <main id="content" class="grow pt-5 pb-10">
+  <main id="content" class="grow pt-5 pb-10" data-motion="feedback">
     <div class="container-fixed">
       <!-- @region toolbar -->
 <!-- toolbar -->
@@ -307,19 +792,19 @@
         <div class="grid sm:grid-cols-2 xl:grid-cols-4 gap-(--page-gap)" id="kpis">
           <div class="card p-(--card-p) gap-6 justify-between relative overflow-hidden">
             <div class="flex items-center justify-between"><span class="inline-flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary"><i data-lucide="users" class="size-5"></i></span><span class="badge badge-sm badge-light-success"><i data-lucide="trending-up" class="size-3"></i>12%</span></div>
-            <div class="flex flex-col gap-1"><span class="text-3xl font-semibold text-mono tabular-nums font-display" data-count="1284">0</span><span class="text-sm text-secondary-foreground" data-i18n="Active customers">Active customers</span></div><div class="h-10 -mx-1 -mb-2 apex-spark" data-spark="62,64,61,66,70,69,74,78,77,82,85,89"></div>
+            <div class="flex flex-col gap-1"><span class="text-3xl font-semibold text-mono tabular-nums font-display revises" data-motion="state">1,284</span><span class="text-sm text-secondary-foreground" data-i18n="Active customers">Active customers</span></div><div class="h-10 -mx-1 -mb-2 apex-spark" data-spark="62,64,61,66,70,69,74,78,77,82,85,89"></div>
           </div>
           <div class="card p-(--card-p) gap-6 justify-between overflow-hidden">
             <div class="flex items-center justify-between"><span class="inline-flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary"><i data-lucide="shopping-bag" class="size-5"></i></span><span class="badge badge-sm badge-light-success"><i data-lucide="trending-up" class="size-3"></i>4%</span></div>
-            <div class="flex flex-col gap-1"><span class="text-3xl font-semibold text-mono tabular-nums font-display" data-count="312">0</span><span class="text-sm text-secondary-foreground" data-i18n="Orders">Orders</span></div><div class="h-10 -mx-1 -mb-2 apex-spark" data-spark="18,22,19,24,26,25,29,31,30,33,35,38"></div>
+            <div class="flex flex-col gap-1"><span class="text-3xl font-semibold text-mono tabular-nums font-display revises" data-motion="state">312</span><span class="text-sm text-secondary-foreground" data-i18n="Orders">Orders</span></div><div class="h-10 -mx-1 -mb-2 apex-spark" data-spark="18,22,19,24,26,25,29,31,30,33,35,38"></div>
           </div>
           <div class="card p-(--card-p) gap-6 justify-between overflow-hidden">
             <div class="flex items-center justify-between"><span class="inline-flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary"><i data-lucide="truck" class="size-5"></i></span><span class="badge badge-sm badge-light-destructive"><i data-lucide="trending-down" class="size-3"></i>2%</span></div>
-            <div class="flex flex-col gap-1"><span class="text-3xl font-semibold text-mono tabular-nums font-display"><span data-count="78">0</span>%</span><span class="text-sm text-secondary-foreground" data-i18n="Fulfilment rate">Fulfilment rate</span></div><div class="h-10 -mx-1 -mb-2 apex-spark" data-spark="80,79,81,80,78,77,79,78,76,77,78,78"></div>
+            <div class="flex flex-col gap-1"><span class="text-3xl font-semibold text-mono tabular-nums font-display"><span class="revises" data-motion="state">78</span>%</span><span class="text-sm text-secondary-foreground" data-i18n="Fulfilment rate">Fulfilment rate</span></div><div class="h-10 -mx-1 -mb-2 apex-spark" data-spark="80,79,81,80,78,77,79,78,76,77,78,78"></div>
           </div>
           <div class="card p-(--card-p) gap-6 justify-between overflow-hidden">
             <div class="flex items-center justify-between"><span class="inline-flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary"><i data-lucide="wallet" class="size-5"></i></span><span class="badge badge-sm badge-light-success"><i data-lucide="trending-up" class="size-3"></i>9%</span></div>
-            <div class="flex flex-col gap-1"><span class="text-3xl font-semibold text-mono tabular-nums font-display">$<span data-count="18400">0</span></span><span class="text-sm text-secondary-foreground" data-i18n="Revenue">Revenue</span></div><div class="h-10 -mx-1 -mb-2 apex-spark" data-spark="9,10,10,11,12,12,13,13,14,15,15,16"></div>
+            <div class="flex flex-col gap-1"><span class="text-3xl font-semibold text-mono tabular-nums font-display">$<span class="revises" data-motion="state">18,400</span></span><span class="text-sm text-secondary-foreground" data-i18n="Revenue">Revenue</span></div><div class="h-10 -mx-1 -mb-2 apex-spark" data-spark="9,10,10,11,12,12,13,13,14,15,15,16"></div>
           </div>
         </div>
 
@@ -337,15 +822,15 @@
             </div>
           </div>
           <div class="card h-full">
-            <div class="card-header"><h3 class="card-title" data-i18n="Highlights">Highlights</h3><select class="input select input-sm w-28"><option data-i18n="Month">Month</option><option data-i18n="Quarter">Quarter</option></select></div>
+            <div class="card-header"><h3 class="card-title" data-i18n="Highlights">Highlights</h3><select id="ctl-period" class="input select input-sm w-28" aria-label="Highlights period"><option value="month" data-i18n="Month">Month</option><option value="quarter" data-i18n="Quarter">Quarter</option></select></div>
             <div class="card-content flex flex-col gap-4">
-              <div class="flex flex-col gap-1"><span class="text-2sm text-secondary-foreground" data-i18n="Orders completed">Orders completed</span><div class="flex items-end gap-2"><span class="text-2xl font-semibold text-mono tabular-nums font-display">214</span><span class="badge badge-sm badge-light-success mb-1"><i data-lucide="trending-up" class="size-3"></i>18%</span></div></div>
+              <div class="flex flex-col gap-1"><span class="text-2sm text-secondary-foreground" data-i18n="Orders completed">Orders completed</span><div class="flex items-end gap-2"><span id="hl-total" class="text-2xl font-semibold text-mono tabular-nums font-display">214</span><span id="hl-delta" class="badge badge-sm badge-light-success mb-1"><i data-lucide="trending-up" class="size-3"></i><span data-hl="delta">18%</span></span></div></div>
               <div id="chart-programmes" class="h-44 -my-1 overflow-hidden"></div>
               <div class="flex flex-col gap-2.5 text-2sm">
-                <div class="flex justify-between"><span class="flex items-center gap-2"><span class="size-2 rounded-full bg-primary"></span><span data-i18n="Online store">Online store</span></span><span class="text-mono font-medium tabular-nums">98</span></div>
-                <div class="flex justify-between"><span class="flex items-center gap-2"><span class="size-2 rounded-full bg-info"></span><span data-i18n="Marketplace">Marketplace</span></span><span class="text-mono font-medium tabular-nums">58</span></div>
-                <div class="flex justify-between"><span class="flex items-center gap-2"><span class="size-2 rounded-full bg-success"></span><span data-i18n="Wholesale">Wholesale</span></span><span class="text-mono font-medium tabular-nums">36</span></div>
-                <div class="flex justify-between"><span class="flex items-center gap-2"><span class="size-2 rounded-full bg-warning"></span><span data-i18n="In-store">In-store</span></span><span class="text-mono font-medium tabular-nums">22</span></div>
+                <div class="flex justify-between"><span class="flex items-center gap-2"><span class="size-2 rounded-full bg-primary"></span><span data-i18n="Online store">Online store</span></span><span class="text-mono font-medium tabular-nums" data-hl="primary">98</span></div>
+                <div class="flex justify-between"><span class="flex items-center gap-2"><span class="size-2 rounded-full bg-info"></span><span data-i18n="Marketplace">Marketplace</span></span><span class="text-mono font-medium tabular-nums" data-hl="info">58</span></div>
+                <div class="flex justify-between"><span class="flex items-center gap-2"><span class="size-2 rounded-full bg-success"></span><span data-i18n="Wholesale">Wholesale</span></span><span class="text-mono font-medium tabular-nums" data-hl="success">36</span></div>
+                <div class="flex justify-between"><span class="flex items-center gap-2"><span class="size-2 rounded-full bg-warning"></span><span data-i18n="In-store">In-store</span></span><span class="text-mono font-medium tabular-nums" data-hl="warning">22</span></div>
               </div>
             </div>
             <div class="card-footer justify-center"><a href="#" class="text-primary-accent hover:underline underline-offset-4 text-2sm font-medium" data-toast="Opening the full report" data-i18n="View report">View report</a></div>
@@ -358,16 +843,17 @@
         <div class="grid lg:grid-cols-3 gap-(--page-gap) items-stretch">
           <div class="card h-full lg:col-span-2 min-w-0">
             <div class="card-header" id="table-toolbar">
-              <div class="flex items-center gap-2.5"><h3 class="card-title" data-i18n="Recent orders">Recent orders</h3><span class="badge badge-sm badge-outline">24</span></div>
+              <div class="flex items-center gap-2.5"><h3 class="card-title" data-i18n="Recent orders">Recent orders</h3><span class="badge badge-sm badge-outline">24</span><span id="row-count" role="status" class="text-2sm text-secondary-foreground"></span></div>
               <div class="flex items-center gap-2.5 flex-wrap">
                 <div class="relative"><i data-lucide="search" class="absolute start-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground"></i><input class="input input-sm ps-8 w-48" placeholder="Search customers" data-i18n-placeholder="Search customers"></div>
-                <select class="input select input-sm w-32"><option data-i18n="All status">All status</option><option data-i18n="Confirmed">Confirmed</option><option data-i18n="Pending">Pending</option></select>
-                <div class="inline-flex items-center gap-1 rounded-lg bg-muted p-1" role="tablist" aria-label="Demo data state">
-                  <button class="h-6 px-2.5 rounded-md text-xs bg-background text-mono shadow-xs font-medium" data-state="data" role="tab" aria-selected="true" data-i18n="Data">Data</button>
-                  <button class="h-6 px-2.5 rounded-md text-xs text-secondary-foreground hover:text-foreground" data-state="loading" role="tab" aria-selected="false" data-i18n="Loading">Loading</button>
-                  <button class="h-6 px-2.5 rounded-md text-xs text-secondary-foreground hover:text-foreground" data-state="empty" role="tab" aria-selected="false" data-i18n="Empty">Empty</button>
-                  <button class="h-6 px-2.5 rounded-md text-xs text-secondary-foreground hover:text-foreground" data-state="error" role="tab" aria-selected="false" data-i18n="Error">Error</button>
-                  <button class="h-6 px-2.5 rounded-md text-xs text-secondary-foreground hover:text-foreground" data-state="success" role="tab" aria-selected="false" data-i18n="Success">Success</button>
+                <select id="status-filter" class="input select input-sm w-32"><option data-i18n="All status">All status</option><option data-i18n="Confirmed">Confirmed</option><option data-i18n="Pending">Pending</option></select>
+                <div class="marker-group items-center rounded-lg bg-muted p-1" role="tablist" aria-label="Demo data state" data-motion="state">
+                  <button class="h-6 px-2.5 rounded-md text-xs relative z-1 text-mono font-medium" data-state="data" role="tab" aria-selected="true" data-i18n="Data">Data</button>
+                  <button class="h-6 px-2.5 rounded-md text-xs relative z-1 text-secondary-foreground hover:text-foreground" data-state="loading" role="tab" aria-selected="false" data-i18n="Loading">Loading</button>
+                  <button class="h-6 px-2.5 rounded-md text-xs relative z-1 text-secondary-foreground hover:text-foreground" data-state="empty" role="tab" aria-selected="false" data-i18n="Empty">Empty</button>
+                  <button class="h-6 px-2.5 rounded-md text-xs relative z-1 text-secondary-foreground hover:text-foreground" data-state="error" role="tab" aria-selected="false" data-i18n="Error">Error</button>
+                  <button class="h-6 px-2.5 rounded-md text-xs relative z-1 text-secondary-foreground hover:text-foreground" data-state="success" role="tab" aria-selected="false" data-i18n="Success">Success</button>
+                  <span class="marker marker-fill shadow-xs" aria-hidden="true"></span>
                 </div>
               </div>
             </div>
@@ -375,10 +861,10 @@
               <span class="text-2sm font-medium text-mono"><span id="sel-count">0</span> selected</span>
               <div class="flex items-center gap-2.5"><button class="btn btn-ghost btn-sm"><i data-lucide="mail"></i>Send reminder</button><button class="btn btn-ghost btn-sm"><i data-lucide="clock"></i>Reschedule</button><button class="btn btn-outline btn-sm text-destructive border-destructive/40 hover:bg-destructive/10"><i data-lucide="trash-2"></i>Cancel</button></div>
             </div>
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto pends" data-motion="status">
               <table class="table" id="appt-table">
-                <thead><tr><th class="w-[52px] text-center"><input type="checkbox" class="checkbox" id="check-all" aria-label="Select all"></th><th class="min-w-56" aria-sort="none"><button type="button" class="inline-flex items-center gap-1 cursor-pointer select-none" data-sort="name" data-i18n="Customer">Customer <i data-lucide="chevrons-up-down" class="size-3.5 text-muted-foreground"></i></button></th><th data-i18n="Item">Item</th><th data-i18n="Status">Status</th><th class="hidden lg:table-cell" data-i18n="Time">Time</th><th class="w-[60px]"></th></tr></thead>
-                <tbody id="tbody"></tbody>
+                <thead><tr><th class="w-[52px] text-center"><input type="checkbox" class="checkbox" id="check-all" aria-label="Select all"></th><th class="min-w-56" aria-sort="none"><button type="button" class="inline-flex items-center gap-1 cursor-pointer select-none" data-sort="name" data-i18n="Customer">Customer <i data-lucide="chevrons-up-down" class="sort-chevron size-3.5 text-muted-foreground"></i></button></th><th data-i18n="Item">Item</th><th data-i18n="Status">Status</th><th class="hidden lg:table-cell" data-i18n="Time">Time</th><th class="w-[60px]"></th></tr></thead>
+                <tbody id="tbody" data-motion="continuity"></tbody>
               </table>
             </div>
             <div class="card-footer flex-wrap justify-between gap-2.5 text-2sm text-secondary-foreground">
@@ -415,8 +901,8 @@
 </div>
 
 <!-- ===== Drawer ===== -->
-<div id="drawer-overlay" class="fixed inset-0 z-50 bg-black/30 backdrop-blur-[2px] hidden"></div>
-<aside id="drawer" class="fixed z-50 top-5 bottom-5 end-5 w-[450px] max-w-[90%] rounded-xl border border-border bg-card shadow-md flex flex-col hidden" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
+<div id="drawer-overlay" class="scrim fixed inset-0 z-50 backdrop-blur-[2px]" data-motion="spatial"></div>
+<aside id="drawer" class="panel fixed z-50 top-5 bottom-5 end-5 w-[450px] max-w-[90%] rounded-xl border border-border bg-card shadow-md flex-col" data-motion="spatial" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
   <div class="flex items-center justify-between px-5 py-2.5 border-b border-border"><span id="drawer-title" class="text-sm font-semibold text-mono">Order</span><button class="btn btn-ghost btn-icon btn-sm" data-close-drawer aria-label="Close"><i data-lucide="x"></i></button></div>
   <div class="grow overflow-y-auto scroll-thin p-5 flex flex-col gap-5">
     <div class="flex items-center gap-3"><span class="inline-flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold text-sm" id="drawer-initials">SK</span><div class="flex flex-col"><span class="text-base font-semibold text-mono" id="drawer-name">Sara Khalil</span><span class="text-2sm text-secondary-foreground" id="drawer-plan">Online store · week 6</span></div></div>
@@ -430,8 +916,8 @@
 </aside>
 
 <!-- ===== Command palette ===== -->
-<div id="palette-overlay" class="fixed inset-0 z-50 bg-black/30 backdrop-blur-[2px] hidden"></div>
-<div id="palette" class="fixed z-50 top-[15%] start-1/2 -translate-x-1/2 rtl:translate-x-1/2 w-[calc(100%-2rem)] max-w-[600px] rounded-lg border border-border bg-popover text-popover-foreground shadow-md hidden flex-col" role="dialog" aria-modal="true" aria-label="Search">
+<div id="palette-overlay" class="scrim fixed inset-0 z-50 backdrop-blur-[2px]" data-motion="spatial"></div>
+<div id="palette" class="panel panel-centre fixed z-50 top-[15%] inset-x-0 mx-auto w-[calc(100%-2rem)] max-w-[600px] rounded-lg border border-border bg-popover text-popover-foreground shadow-md flex-col" data-motion="spatial" role="dialog" aria-modal="true" aria-label="Search">
   <div class="flex items-center gap-2 px-4 border-b border-border"><i data-lucide="search" class="size-4 text-muted-foreground"></i><input id="palette-input" class="input h-12 border-0 shadow-none focus-visible:ring-0 px-1 text-sm" placeholder="Search customers, orders, actions…"><span class="kbd">Esc</span></div>
   <div class="p-2 max-h-80 overflow-y-auto scroll-thin" id="palette-list">
     <div class="px-2 py-1.5 text-xs font-medium uppercase text-muted-foreground">Actions</div>
@@ -447,10 +933,10 @@
 </div>
 
 <!-- ===== Toasts ===== -->
-<div id="toasts" aria-live="polite" aria-relevant="additions" class="fixed bottom-5 end-5 z-50 flex flex-col gap-2.5 w-[360px] max-w-[calc(100%-2.5rem)]"></div>
+<div id="toasts" aria-live="polite" aria-relevant="additions" data-motion="state" class="fixed bottom-5 end-5 z-50 flex flex-col gap-2.5 w-[360px] max-w-[calc(100%-2.5rem)]"></div>
 
 <!-- ===== Demo controls (not part of the shell) ===== -->
-<details class="fixed bottom-5 end-5 z-20 rounded-lg border border-border bg-popover shadow-md text-2sm w-64 open:pb-3">
+<details class="disclosure fixed bottom-5 end-5 z-20 rounded-lg border border-border bg-popover shadow-md text-2sm w-64 open:pb-3" data-motion="state">
   <summary class="cursor-pointer select-none px-3 py-2 font-medium text-mono flex items-center gap-2"><i data-lucide="sliders-horizontal" class="size-4 text-muted-foreground"></i>Demo controls</summary>
   <div class="px-3 flex flex-col gap-2.5">
     <label class="flex flex-col gap-1"><span class="text-xs text-muted-foreground">Personality</span>
@@ -460,6 +946,108 @@
     <div class="flex items-center gap-2"><button id="ctl-rtl" class="btn btn-outline btn-sm grow" aria-label="Toggle language and direction">AR / EN</button><button id="ctl-dark" class="btn btn-outline btn-sm grow">Dark</button><button id="ctl-sidebar" class="btn btn-outline btn-sm grow" title="Dark sidebar on a light page">Side</button></div>
   </div>
 </details>
+
+<!-- motion: assets/motion.js, inlined. The one file allowed to hand the engine a delta. -->
+<script id="jb-motion">
+/* jbelly-ui identity module. No dependencies. Optional: a page without it is
+   correct, just not animated on re-sort and re-filter.
+   Contract: an object that can appear in more than one place or order carries
+   data-vt-key, whose value is a STABLE domain id — never a loop index, never a
+   row number, because a position-derived key cannot survive the one change it
+   exists to survive. */
+window.JBMotion = (function () {
+  const root = document.documentElement;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  const css = n => getComputedStyle(root).getPropertyValue(n).trim();
+  const ms = (n, d) => { const v = css(n);
+    return v.endsWith('ms') ? parseFloat(v) : v.endsWith('s') ? parseFloat(v) * 1000 : d; };
+  const CAP = 24, MARGIN = 200;          // snapshot layers are not free
+  const held = new Set(); let running = null, busy = false;
+
+  function release() { for (const el of held) el.style.viewTransitionName = ''; held.clear(); }
+  addEventListener('pageshow', e => { if (e.persisted) release(); });  // bfcache restores stale names
+
+  /* Lease names only to RENDERED members near the action, capped. A duplicate
+     name rejects ViewTransition.ready and silently skips the whole transition,
+     so first claim wins and there is never a second. */
+  function lease(scope, anchor) {
+    release();
+    const seen = new Set(), vh = innerHeight, out = [];
+    for (const el of scope.querySelectorAll('[data-vt-key]')) {
+      const r = el.getBoundingClientRect();
+      if (!r.width || r.bottom < -MARGIN || r.top > vh + MARGIN) continue;
+      out.push([el, r.top + r.height / 2]);
+    }
+    if (anchor) {
+      const a = anchor.getBoundingClientRect(), mid = a.top + a.height / 2;
+      out.sort((p, q) => Math.abs(p[1] - mid) - Math.abs(q[1] - mid));
+    }
+    for (const [el] of out.slice(0, CAP)) {
+      const name = 'vt-' + el.dataset.vtKey.replace(/[^A-Za-z0-9_-]/g, '-');
+      if (seen.has(name)) continue;
+      seen.add(name); held.add(el); el.style.viewTransitionName = name;
+    }
+  }
+
+  /* reorder(): the nodes may be replaced, so the engine derives the motion from
+     the real geometry delta. An element that did not move produces no motion,
+     because there is nothing to interpolate. */
+  function reorder(scope, mutate, o = {}) {
+    if (busy) return Promise.resolve();
+    if (!document.startViewTransition || document.visibilityState === 'hidden') {
+      mutate(); return Promise.resolve();
+    }
+    busy = true;
+    if (running) running.skipTransition();
+    lease(scope, o.anchor);
+    const t = running = document.startViewTransition({
+      update: () => { mutate(); lease(scope, o.anchor); },
+      types: o.types || [],
+    });
+    return t.finished.catch(() => {}).finally(() => { release(); running = null; busy = false; });
+  }
+
+  /* reflow(): the nodes survive, so two measurements are enough — and unlike a
+     view transition the page stays fully interactive. Preferred for anything
+     the user repeats. */
+  function reflow(scope, mutate, o = {}) {
+    if (reduce.matches) { mutate(); return Promise.resolve(); }
+    const first = new Map();
+    for (const el of scope.querySelectorAll('[data-vt-key]')) {
+      const r = el.getBoundingClientRect();
+      if (r.width) first.set(el.dataset.vtKey, r);
+    }
+    mutate();                                 // layout is final immediately after
+    const duration = ms('--t-move', 260), easing = css('--spring-ui') || 'ease-out';
+    const done = [];
+    for (const el of scope.querySelectorAll('[data-vt-key]')) {
+      const a = first.get(el.dataset.vtKey); if (!a) continue;
+      for (const x of el.getAnimations()) if (x.id === 'jb-flip') x.cancel();
+      const b = el.getBoundingClientRect(); if (!b.width) continue;
+      const dx = a.left - b.left, dy = a.top - b.top;
+      if (!dx && !dy) continue;               // <- did not change, so does not move
+      // dx is REAL SCREEN COORDINATES and is already correct in RTL. Multiplying
+      // it by --flow-x here is the double-mirror bug; M07 fails it.
+      const an = el.animate(
+        [{ translate: dx + 'px ' + dy + 'px' }, { translate: '0px 0px' }],
+        { duration, easing, fill: 'none' });  // fill:'none': a forwards fill would
+      an.id = 'jb-flip'; done.push(an.finished.catch(() => {}));   // override styles forever
+    }
+    return Promise.all(done);
+  }
+
+  /* leave(): the departure report. The only timer in the system, and it waits
+     on the animation rather than guessing at it. */
+  function leave(el) {
+    el.dataset.leaving = '';
+    return Promise.allSettled(el.getAnimations().map(a => a.finished))
+      .then(() => el.remove());
+  }
+
+  addEventListener('load', () => root.setAttribute('data-ready', ''));
+  return { reorder, reflow, leave };
+})();
+</script>
 
 <script>
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -473,13 +1061,13 @@ const rows = [
 ];
 const badge = s => ({ 'Confirmed': 'badge-light-success', 'Pending': 'badge-light-warning', 'At risk': 'badge-light-destructive' }[s] || 'badge-outline');
 function renderRows() {
-  $('#tbody').innerHTML = rows.map((r, k) => `<tr class="group" data-i="${k}">
+  $('#tbody').innerHTML = rows.map((r, k) => `<tr class="group" data-i="${k}" data-vt-key="${r.i}">
     <td class="text-center"><input type="checkbox" class="checkbox row-check" aria-label="Select ${r.n}"></td>
     <td><div class="flex items-center gap-2.5"><span class="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold text-2xs">${r.i}</span><div class="flex flex-col min-w-0"><a href="#" class="text-sm font-medium text-mono hover:text-primary-accent truncate" data-open-drawer="${k}">${r.n}</a><span class="text-2sm text-secondary-foreground truncate">${r.p}</span></div></div></td>
     <td class="text-secondary-foreground whitespace-nowrap">${r.p.split(' ·')[0]}</td>
     <td><span class="badge badge-sm ${badge(r.s)}"><span class="dot"></span>${r.s}</span></td>
     <td class="hidden lg:table-cell text-secondary-foreground whitespace-nowrap">${r.t}</td>
-    <td class="text-end"><div class="flex justify-end gap-0.5 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity"><button class="btn btn-ghost btn-icon btn-sm" aria-label="Open" data-open-drawer="${k}"><i data-lucide="panel-right-open"></i></button><button class="btn btn-ghost btn-icon btn-sm" aria-label="More"><i data-lucide="ellipsis"></i></button></div></td></tr>`).join('');
+    <td class="text-end"><div class="flex justify-end gap-0.5 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100" data-reveal="hover"><button class="btn btn-ghost btn-icon btn-sm" aria-label="Open" data-open-drawer="${k}"><i data-lucide="panel-right-open"></i></button><button class="btn btn-ghost btn-icon btn-sm" aria-label="More"><i data-lucide="ellipsis"></i></button></div></td></tr>`).join('');
   lucide.createIcons();
 }
 const STATES = ['data', 'loading', 'empty', 'error', 'success'];
@@ -490,7 +1078,7 @@ const skeletonRow = () => `<tr><td class="text-center"><span class="skeleton inl
 // selection has to live on the attribute a screen reader reads, not only on the class a sighted user sees
 function syncTabs(state) {
   $$('[role=tab][data-state]').forEach(b => { const on = b.dataset.state === state;
-    b.className = on ? 'h-6 px-2.5 rounded-md text-xs bg-background text-mono shadow-xs font-medium' : 'h-6 px-2.5 rounded-md text-xs text-secondary-foreground hover:text-foreground';
+    b.className = on ? 'h-6 px-2.5 rounded-md text-xs relative z-1 text-mono font-medium' : 'h-6 px-2.5 rounded-md text-xs relative z-1 text-secondary-foreground hover:text-foreground';
     b.setAttribute('aria-selected', on); });
 }
 function renderState(state) {
@@ -500,6 +1088,9 @@ function renderState(state) {
     tb.innerHTML = panel('circle-alert', 'bg-destructive/10 text-destructive', 'alert', 'Unknown demo state', `"${escText(state)}" is not one of: ${STATES.join(', ')}.`, '');
     syncTabs(null); lucide.createIcons(); return;
   }
+  const region = tb.closest('.pends');
+  region.setAttribute('aria-busy', state === 'loading' ? 'true' : 'false');
+  $('#row-count').textContent = state === 'loading' ? 'Loading orders' : '';
   if (state === 'loading') tb.innerHTML = Array.from({ length: 5 }, skeletonRow).join('');
   else if (state === 'empty') tb.innerHTML = panel('package-x', 'bg-muted text-muted-foreground', 'status', 'No orders match', 'Try another status or clear the search.', '<button class="btn btn-outline btn-sm" data-state="data">Clear filters</button>');
   else if (state === 'error') tb.innerHTML = panel('circle-alert', 'bg-destructive/10 text-destructive', 'alert', 'Could not load orders', 'The request failed before any rows arrived. Nothing was changed.', '<button class="btn btn-outline btn-sm" data-state="data"><i data-lucide="rotate-ccw"></i>Try again</button>');
@@ -516,17 +1107,36 @@ document.addEventListener('change', e => {
   if (e.target.matches('.row-check, #check-all')) { const n = $$('.row-check:checked').length; $('#sel-count').textContent = n; $('#bulk-bar').classList.toggle('hidden', n === 0); $('#table-toolbar').classList.toggle('hidden', n > 0); }
 });
 // KPI count-up (signature moment; skipped under reduced motion)
-(function countUp() {
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  $$('[data-count]').forEach(el => { const end = +el.dataset.count; if (reduce) { el.textContent = end.toLocaleString(); return; }
-    const t0 = performance.now(); (function tick(t) { const p = Math.min(1, (t - t0) / 600), e = 1 - Math.pow(1 - p, 3); el.textContent = Math.round(end * e).toLocaleString(); if (p < 1) requestAnimationFrame(tick); })(t0); });
-})();
+// R8: the KPI reports that it changed, not that it is arriving. The true value is written
+// first and the rail that says "this one moved" is set after it, so a screen reader never
+// announces a number that was never true and a screenshot is the same every time.
+const KPI_PERIODS = {
+  'Last 7 days':   ['301', '74', '81', '4,120'],
+  'Last 30 days':  ['1,284', '312', '78', '18,400'],
+  'This quarter':  ['3,902', '944', '81', '56,700'],
+};
+let kpiPeriod = 'Last 30 days';
+function setPeriod(next) {
+  const to = KPI_PERIODS[next], from = KPI_PERIODS[kpiPeriod];
+  if (!to || next === kpiPeriod) return;
+  $$('#kpis .revises').forEach((el, i) => {
+    el.textContent = to[i];                                   // the true value, first
+    const up = parseFloat(to[i].replace(/,/g, '')) >= parseFloat(from[i].replace(/,/g, ''));
+    el.dataset.changed = up ? 'up' : 'down';                  // then the report
+    clearTimeout(el._revised);
+    el._revised = setTimeout(() => delete el.dataset.changed, 6000);
+  });
+  kpiPeriod = next;
+}
 // sidebar
 $('#sidebar-toggle').onclick = () => { html.classList.toggle('sidebar-collapsed'); $('#sidebar').classList.add('no-peek'); $('#sidebar').addEventListener('mouseleave', () => $('#sidebar').classList.remove('no-peek'), { once: true }); try { localStorage.setItem('ui.sidebar', html.classList.contains('sidebar-collapsed') ? 'collapsed' : 'open'); } catch {} };
 try { if (localStorage.getItem('ui.sidebar') === 'collapsed') html.classList.add('sidebar-collapsed'); } catch {}
 $('#hamburger').onclick = () => { $('#sidebar').classList.remove('hidden'); $('#sidebar').classList.add('flex'); $('#overlay').classList.remove('hidden'); $('#sidebar .nav-link').focus(); };
 $('#overlay').onclick = () => { $('#sidebar').classList.add('hidden'); $('#overlay').classList.add('hidden'); };
-$$('[data-toggle-group]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); a.closest('.nav-group').classList.toggle('open'); }));
+// The chevron rotates off aria-expanded, so the attribute a screen reader reads and the state a
+// sighted reader sees are written in the same statement and cannot drift apart.
+$$('[data-toggle-group]').forEach(a => a.addEventListener('click', e => { e.preventDefault();
+  const open = a.closest('.nav-group').classList.toggle('open'); a.setAttribute('aria-expanded', open); }));
 // theme
 function setDark(on) { html.classList.toggle('dark', on); try { localStorage.setItem('ui.theme', on ? 'dark' : 'light'); } catch {} }
 $('#theme-toggle').onclick = () => setDark(!html.classList.contains('dark'));
@@ -535,8 +1145,9 @@ try { if (localStorage.getItem('ui.theme') === 'dark') html.classList.add('dark'
 // user menu
 // Every hide goes through closeMenu: the bell used to hide this menu directly and leave its button
 // still reporting aria-expanded="true" to screen readers, and so did Escape.
-function closeMenu(menu, btn) { if (menu) menu.classList.add('hidden'); if (btn) btn.setAttribute('aria-expanded', 'false'); }
-function toggleMenu(menu, btn) { const open = !menu.classList.toggle('hidden'); btn.setAttribute('aria-expanded', open); return open; }
+function closeMenu(menu, btn) { if (menu) menu.removeAttribute('data-open'); if (btn) btn.setAttribute('aria-expanded', 'false'); }
+function toggleMenu(menu, btn) { const open = menu.toggleAttribute('data-open'); btn.setAttribute('aria-expanded', open); return open; }
+const isOpen = el => el.hasAttribute('data-open');
 const ub = $('#user-btn'), um = $('#user-menu');
 ub.onclick = e => { e.stopPropagation(); toggleMenu(um, ub); };
 document.addEventListener('click', () => closeMenu(um, ub));
@@ -545,29 +1156,30 @@ let lastFocus = null;
 function openDrawer(k) { const r = rows[k]; if (!r) return; lastFocus = document.activeElement;
   $('#drawer-name').textContent = r.n; $('#drawer-initials').textContent = r.i; $('#drawer-plan').textContent = r.p; $('#drawer-time').textContent = r.t;
   $('#drawer-status').innerHTML = `<span class="badge badge-sm ${badge(r.s)}"><span class="dot"></span>${r.s}</span>`;
-  $('#drawer').classList.remove('hidden'); $('#drawer-overlay').classList.remove('hidden'); document.body.style.overflow = 'hidden'; $('#note').focus(); }
-function closeDrawer() { $('#drawer').classList.add('hidden'); $('#drawer-overlay').classList.add('hidden'); document.body.style.overflow = ''; lastFocus?.focus(); }
+  $('#drawer').setAttribute('data-open', ''); $('#drawer-overlay').setAttribute('data-open', ''); document.body.style.overflow = 'hidden'; $('#note').focus(); }
+function closeDrawer() { $('#drawer').removeAttribute('data-open'); $('#drawer-overlay').removeAttribute('data-open'); document.body.style.overflow = ''; lastFocus?.focus(); }
 document.addEventListener('click', e => { const o = e.target.closest('[data-open-drawer]'); if (o) { e.preventDefault(); openDrawer(+o.dataset.openDrawer); } if (e.target.closest('[data-close-drawer]')) closeDrawer(); });
 $('#drawer-overlay').onclick = closeDrawer;
 // palette
-function openPalette() { lastFocus = document.activeElement; $('#palette').classList.remove('hidden'); $('#palette').classList.add('flex'); $('#palette-overlay').classList.remove('hidden'); $('#palette-input').value = ''; $('#palette-input').focus(); }
-function closePalette() { $('#palette').classList.add('hidden'); $('#palette').classList.remove('flex'); $('#palette-overlay').classList.add('hidden'); lastFocus?.focus(); }
+function openPalette() { lastFocus = document.activeElement; $('#palette').setAttribute('data-open', ''); $('#palette-overlay').setAttribute('data-open', ''); $('#palette-input').value = ''; $('#palette-input').focus(); }
+function closePalette() { $('#palette').removeAttribute('data-open'); $('#palette-overlay').removeAttribute('data-open'); lastFocus?.focus(); }
 $('#open-search').onclick = openPalette; $('#palette-overlay').onclick = closePalette;
 $('#palette-input').addEventListener('input', e => { const q = e.target.value.toLowerCase(); $$('#palette-list .menu-item').forEach(i => i.classList.toggle('hidden', q && !i.textContent.toLowerCase().includes(q))); });
 document.addEventListener('keydown', e => {
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); openPalette(); }
-  if (e.key === 'Escape') { if (!$('#palette').classList.contains('hidden')) closePalette(); else if (!$('#drawer').classList.contains('hidden')) closeDrawer(); else if (innerWidth < 1024 && !$('#sidebar').classList.contains('hidden')) closeMobileSidebar(); else { closeMenu(um, ub); closeMenu($('#side-user-menu'), $('#side-user-btn')); closeMenu($('#notif-menu'), $('#notif-btn')); } }
+  if (e.key === 'Escape') { if (isOpen($('#palette'))) closePalette(); else if (isOpen($('#drawer'))) closeDrawer(); else if (innerWidth < 1024 && !$('#sidebar').classList.contains('hidden')) closeMobileSidebar(); else { closeMenu(um, ub); closeMenu($('#side-user-menu'), $('#side-user-btn')); closeMenu($('#notif-menu'), $('#notif-btn')); } }
 });
 // toasts
 function toast(msg, undo) { const el = document.createElement('div');
-  el.className = 'flex items-start gap-2.5 rounded-lg border border-border bg-popover text-popover-foreground shadow-md p-3.5 text-sm';
+  el.className = 'arrives departs flex items-start gap-2.5 rounded-lg border border-border bg-popover text-popover-foreground shadow-md p-3.5 text-sm';
   el.innerHTML = `<i data-lucide="check-circle-2" class="size-4 mt-0.5 text-success shrink-0"></i><div class="grow"><div class="font-medium text-mono">${msg}</div><div class="text-2sm text-secondary-foreground">${undo ? 'You can undo this for 5 seconds.' : 'Done.'}</div></div>${undo ? '<button class="btn btn-ghost btn-sm">Undo</button>' : ''}<button class="btn btn-ghost btn-icon btn-sm" aria-label="Dismiss"><i data-lucide="x"></i></button>`;
-  $('#toasts').appendChild(el); lucide.createIcons(); let t = setTimeout(() => el.remove(), 4000);
-  el.addEventListener('mouseenter', () => clearTimeout(t)); el.addEventListener('mouseleave', () => t = setTimeout(() => el.remove(), 2000));
-  $$('button', el).forEach(b => b.onclick = () => el.remove()); while ($('#toasts').children.length > 3) $('#toasts').firstChild.remove(); }
+    const dismiss = () => (window.JBMotion ? JBMotion.leave(el) : el.remove());
+  $('#toasts').appendChild(el); lucide.createIcons(); let t = setTimeout(dismiss, 4000);
+  el.addEventListener('mouseenter', () => clearTimeout(t)); el.addEventListener('mouseleave', () => t = setTimeout(dismiss, 2000));
+  $$('button', el).forEach(b => b.onclick = dismiss); while ($('#toasts').children.length > 3) dismiss.call(null, $('#toasts').firstChild.remove()); }
 document.addEventListener('click', e => { const b = e.target.closest('[data-toast]'); if (b) toast(b.dataset.toast, b.hasAttribute('data-toast-undo')); });
 // period
-$('#period').onchange = e => $('#period-label').textContent = e.target.value;
+$('#period').onchange = e => { $('#period-label').textContent = e.target.value; setPeriod(e.target.value); };
 // demo controls
 const THEMES = ['theme-clinic', 'theme-graphite', 'theme-editorial', 'theme-neo', 'theme-slate', 'theme-mint'], DENS = ['density-compact', 'density-airy'];
 if ($('#ctl-theme')) $('#ctl-theme').onchange = e => { html.classList.remove(...THEMES); if (e.target.value) html.classList.add(e.target.value); };
@@ -609,7 +1221,7 @@ try { if (localStorage.getItem('ui.lang') === 'ar') setLang('ar'); } catch {}
 // ===== charts: ApexCharts with a token-driven theme (re-renders when theme/dark changes) =====
 const cssVar = n => getComputedStyle(html).getPropertyValue(n).trim();
 function apexBase() { return {
-  chart: { fontFamily: cssVar('--font-sans') || 'Inter, sans-serif', foreColor: cssVar('--muted-foreground'), toolbar: { show: false }, zoom: { enabled: false }, animations: { enabled: !matchMedia('(prefers-reduced-motion: reduce)').matches, speed: 600 }, background: 'transparent', parentHeightOffset: 0 },
+  chart: { fontFamily: cssVar('--font-sans') || 'Inter, sans-serif', foreColor: cssVar('--muted-foreground'), toolbar: { show: false }, zoom: { enabled: false }, animations: { enabled: false }, background: 'transparent', parentHeightOffset: 0 },
   colors: [cssVar('--primary'), cssVar('--chart-2') || cssVar('--info'), cssVar('--chart-3') || cssVar('--success'), cssVar('--chart-4') || cssVar('--warning'), cssVar('--muted-foreground')],
   grid: { borderColor: cssVar('--border'), strokeDashArray: 3, padding: { left: 8, right: 8, top: -10 }, xaxis: { lines: { show: false } } },
   stroke: { curve: 'smooth', width: 2.5, lineCap: 'round' },
@@ -621,6 +1233,36 @@ function apexBase() { return {
   states: { hover: { filter: { type: 'none' } }, active: { filter: { type: 'none' } } },
 }; }
 const charts = [];
+// The Highlights card is the one place in this demo with a period control, so it has two periods.
+// A quarter is not the month scaled: the channel mix moves, which is the point of showing a split.
+const PERIOD = {
+  month:   { total: 214, delta: '18%', up: true,  split: [98, 58, 36, 22] },
+  quarter: { total: 611, delta: '7%',  up: false, split: [246, 195, 108, 62] },
+};
+
+function renderPeriod() {
+  const sel = $('#ctl-period');
+  const p = PERIOD[sel ? sel.value : 'month'];
+  if (!p) return;
+  if ($('#hl-total')) $('#hl-total').textContent = p.total.toLocaleString(
+    html.getAttribute('lang') === 'ar' ? 'ar' : 'en');
+  const badge = $('#hl-delta');
+  if (badge) {
+    badge.classList.toggle('badge-light-success', p.up);
+    badge.classList.toggle('badge-light-destructive', !p.up);
+    const txt = badge.querySelector('[data-hl="delta"]');
+    if (txt) txt.textContent = p.delta;
+    const ico = badge.querySelector('i, svg');
+    if (ico) ico.setAttribute('data-lucide', p.up ? 'trending-up' : 'trending-down');
+  }
+  ['primary', 'info', 'success', 'warning'].forEach((role, i) => {
+    const el = $(`[data-hl="${role}"]`);
+    if (el) el.textContent = p.split[i].toLocaleString(html.getAttribute('lang') === 'ar' ? 'ar' : 'en');
+  });
+  if (window.lucide) lucide.createIcons();
+  mountCharts();
+}
+
 function mountCharts() {
   charts.splice(0).forEach(c => c.destroy());
   const base = apexBase();
@@ -634,7 +1276,8 @@ function mountCharts() {
   })));
   if ($('#chart-programmes')) charts.push(new ApexCharts($('#chart-programmes'), Object.assign({}, base, {
     chart: Object.assign({}, base.chart, { type: 'donut', height: 176 }),
-    series: [98, 58, 36, 22], labels: ['Online store', 'Marketplace', 'Wholesale', 'In-store'],
+    series: PERIOD[$('#ctl-period') ? $('#ctl-period').value : 'month'].split,
+    labels: ['Online store', 'Marketplace', 'Wholesale', 'In-store'],
     stroke: { width: 3, colors: [cssVar('--card')] },
     plotOptions: { pie: { donut: { size: '74%', labels: { show: true, name: { show: true, fontSize: '12px', color: cssVar('--muted-foreground'), offsetY: 18 }, value: { show: true, fontSize: '24px', fontWeight: 600, color: cssVar('--mono'), offsetY: -12, formatter: v => v }, total: { show: true, label: 'Orders', fontSize: '12px', color: cssVar('--muted-foreground'), formatter: w => w.globals.seriesTotals.reduce((a, b) => a + b, 0) } } } } },
   })));
@@ -661,7 +1304,8 @@ $$('#sidebar .nav-link:not([data-toggle-group]), #sidebar .nav-child').forEach(a
   closeMobileSidebar();
 }));
 $$('#sidebar .nav-link').forEach(a => { const t = a.querySelector('.nav-title'); if (t && !a.title) a.title = t.textContent.trim(); });
-$$('#sidebar .nav-group').forEach((g, i) => { g.querySelector('[data-toggle-group]').addEventListener('click', () => { try { localStorage.setItem('ui.group.' + i, g.classList.contains('open') ? '1' : '0'); } catch {} }); try { const v = localStorage.getItem('ui.group.' + i); if (v === '0') g.classList.remove('open'); if (v === '1') g.classList.add('open'); } catch {} });
+$$('#sidebar .nav-group').forEach((g, i) => { g.querySelector('[data-toggle-group]').addEventListener('click', () => { try { localStorage.setItem('ui.group.' + i, g.classList.contains('open') ? '1' : '0'); } catch {} }); try { const v = localStorage.getItem('ui.group.' + i); if (v === '0') g.classList.remove('open'); if (v === '1') g.classList.add('open'); } catch {}
+  g.querySelector('[data-toggle-group]').setAttribute('aria-expanded', g.classList.contains('open')); });
 const sub = $('#side-user-btn'), sum = $('#side-user-menu');
 if (sub && sum) { sub.onclick = e => { e.stopPropagation(); toggleMenu(sum, sub); }; document.addEventListener('click', () => closeMenu(sum, sub)); }
 window.addEventListener('resize', () => { if (innerWidth >= 1024) { $('#sidebar').classList.remove('hidden'); $('#overlay').classList.add('hidden'); } else if (!$('#overlay').classList.contains('hidden')) {} else { $('#sidebar').classList.add('hidden'); } });
@@ -674,15 +1318,38 @@ if (nb && nm) {
   document.addEventListener('click', () => closeMenu(nm, nb));
   $('#notif-read').onclick = () => { $('#notif-dot')?.remove(); closeMenu(nm, nb); toast('All notifications marked as read'); };
 }
+// R12: a re-sort replaces the row nodes, so the motion is derived from the geometry the
+// engine measures, never from a constant. aria-sort is the non-motion carrier and is written
+// inside the same mutation, so the report is identical with or without the animation.
 let sortDir = 0;
 $$('[data-sort]').forEach(b => b.addEventListener('click', () => {
-  sortDir = sortDir === 1 ? -1 : 1;
-  rows.sort((a, c) => a.n.localeCompare(c.n) * sortDir);
-  b.closest('th').setAttribute('aria-sort', sortDir === 1 ? 'ascending' : 'descending');
-  const ic = b.querySelector('svg, i'); if (ic) ic.style.transform = sortDir === 1 ? '' : 'rotate(180deg)';
-  renderRows();
+  const tb = $('#tbody');
+  const mutate = () => {
+    sortDir = sortDir === 1 ? -1 : 1;
+    rows.sort((a, c) => a.n.localeCompare(c.n) * sortDir);
+    b.closest('th').setAttribute('aria-sort', sortDir === 1 ? 'ascending' : 'descending');
+    renderRows();
+  };
+  window.JBMotion ? JBMotion.reorder(tb, mutate, { anchor: tb.querySelector('tr:focus-within') || tb.rows[0] })
+                  : mutate();
 }));
+// R12: a filter is repeatable, so it uses the measured-delta path instead - the page stays
+// interactive and a row that did not move produces no animation object at all.
+if ($('#status-filter')) $('#status-filter').onchange = e => {
+  const want = e.target.value, tb = $('#tbody');
+  const mutate = () => {
+    let shown = 0;
+    for (const tr of tb.rows) {
+      const s = tr.querySelector('.badge')?.textContent.trim() || '';
+      const on = want.startsWith('All') || s === want;
+      tr.hidden = !on; if (on) shown++;
+    }
+    $('#row-count').textContent = shown === tb.rows.length ? '' : `${shown} of ${tb.rows.length} shown`;
+  };
+  window.JBMotion ? JBMotion.reflow(tb, mutate) : mutate();
+};
 $$('#palette-list .menu-item').forEach(a => a.addEventListener('click', e => { e.preventDefault(); closePalette(); toast((a.textContent.trim().split(/\s{2,}|\n/)[0] || 'Action').slice(0, 40)); }));
+if ($('#ctl-period')) $('#ctl-period').onchange = renderPeriod;
 renderRows(); lucide.createIcons(); mountCharts();
 </script>
 </body>

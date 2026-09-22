@@ -5,7 +5,11 @@ All class strings assume `tokens.css` is loaded (so `rounded-md`, `text-2sm`,
 add one variant, add one size. Nothing else.
 
 Use them as HTML classes, or as `@apply` inside `@layer components` when a
-recipe repeats more than ~5 times. In `@apply`, omit `group` / `peer` (markers,
+recipe repeats more than ~5 times. **No recipe here carries a transition.**
+Motion is declared once in `references/motion.css`, which styles these same
+class names; `scripts/lint_motion.py` fails a `transition-*`, `duration-*`,
+`ease-*`, `delay-*` or `animate-*` in any class attribute or `@apply` string.
+See `motion.md`. In `@apply`, omit `group` / `peer` (markers,
 not utilities) and keep arbitrary variants like `[&_svg]:size-4` — those are
 fine. One unknown class fails the whole stylesheet silently (page renders
 unstyled), so render the page once after any CSS change.
@@ -21,7 +25,7 @@ Breadcrumb · Kbd · Separator · Link · Empty state
 
 ```
 base:  inline-flex items-center justify-center gap-1.5 shrink-0 whitespace-nowrap
-       font-medium rounded-md shadow-xs transition-colors cursor-pointer
+       font-medium rounded-md shadow-xs cursor-pointer
        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background
        disabled:opacity-50 disabled:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0
 
@@ -49,7 +53,7 @@ buttons with `flex items-center gap-2.5`; split/segmented with
 
 ```
 base:  flex w-full rounded-md border border-input bg-background text-foreground shadow-xs
-       placeholder:text-muted-foreground transition-colors
+       placeholder:text-muted-foreground
        focus-visible:outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40
        disabled:opacity-50 disabled:cursor-not-allowed read-only:bg-muted
        aria-invalid:border-destructive aria-invalid:ring-destructive/30
@@ -91,10 +95,10 @@ Row layout: `label.flex.items-center.gap-2.5.text-2sm.cursor-pointer`. Descripti
 ## Switch
 
 ```
-appearance-none relative shrink-0 inline-flex h-5 w-7.5 rounded-full bg-input cursor-pointer transition-colors
+appearance-none relative shrink-0 inline-flex h-5 w-7.5 rounded-full bg-input cursor-pointer
 checked:bg-primary disabled:opacity-50
 before:absolute before:top-0.5 before:start-0.5 before:size-4 before:rounded-full before:bg-background before:shadow-xs
-before:transition-transform checked:before:translate-x-2.5 rtl:checked:before:-translate-x-2.5
+checked:before:translate-x-2.5 rtl:checked:before:-translate-x-2.5
 sm: h-4 w-6 before:size-3 checked:before:translate-x-2      lg: h-6 w-10 before:size-5 checked:before:translate-x-4
 ```
 
@@ -157,7 +161,7 @@ content:   grow p-5                                (roomy: p-7.5 · dense: p-3)
 section:   border-b border-border px-5 py-5 last:border-b-0   (stacked groups inside one card — instead of nested cards)
 footer:    flex items-center border-t border-border px-5 py-4   (justify-end for actions, justify-center for “View all”)
 table variant: card + a Table directly inside (no content padding); pagination goes in the footer.
-clickable: + hover:border-ring/60 transition-colors cursor-pointer
+clickable: + hover:border-ring/60 cursor-pointer
 ```
 
 Grid of cards: `grid gap-5 lg:gap-7.5` and `items-stretch` with `h-full` on
@@ -171,7 +175,7 @@ table:  w-full border-collapse text-sm text-foreground caption-bottom
 thead:  bg-muted/50                 (omit for a cleaner look inside cards)
 th:     h-11 px-4 text-start align-middle text-xs font-normal text-secondary-foreground border-b border-border whitespace-nowrap
 td:     px-4 py-3 align-middle border-b border-border      (last row: [&_tr:last-child_td]:border-b-0 inside cards)
-row:    hover:bg-muted/40 transition-colors   selected: bg-accent
+row:    hover:bg-muted/40   selected: bg-accent
 dense:  th h-9 · td py-2 · text-2sm
 bordered: table + border border-border, td/th + border-e last:border-e-0
 sticky header: thead th sticky top-0 z-10 bg-card
@@ -268,13 +272,13 @@ toast:      alert + w-[360px] bg-popover text-popover-foreground border border-b
 
 ```
 track: relative h-1 w-full overflow-hidden rounded-full bg-secondary     (thick: h-2)
-bar:   h-full bg-primary transition-[width]    success / warning / destructive variants
+bar:   h-full bg-primary    success / warning / destructive variants
 label row above: flex justify-between text-2sm → name text-mono, value text-secondary-foreground
 ```
 
 ## Skeleton
 
-`animate-pulse rounded-md bg-accent` — text line `h-3 w-40`, avatar `size-10 rounded-full`, card `h-32`.
+`rounded-md bg-accent` — text line `h-3 w-40`, avatar `size-10 rounded-full`, card `h-32`.
 
 ## Pagination
 

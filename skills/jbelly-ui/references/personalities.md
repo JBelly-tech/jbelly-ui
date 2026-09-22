@@ -17,7 +17,7 @@ the primary colour produces "the same site in a different shirt".
 | **Shape** | `--radius` | 0 (sharp) · 0.25rem · 0.5rem · 0.75rem · 1rem (soft) |
 | **Density** | control heights, table rows, card padding | compact (ops tools) · standard · airy (consumer / clinical) |
 | **Surface** | how cards separate from the page | flat-bordered · tinted-page (white cards on tinted bg) · elevated (soft shadow, no border) · outlined-only |
-| **Motion** | how much moves and where | still · micro (150ms colour/opacity) · one signature moment (page enter, KPI count-up) |
+| **Motion** | tempo and character | `--motion-preset` 0.85–1.15 · optionally `--ease-enter`, `--press-depth`, `--pop-depth` · at most three overrides · a preset may **nominate one of the twelve recipes as its signature**, never invent a thirteenth |
 | **Signature element** | one recognisable device, used consistently | e.g. thick start-border on active nav, oversized KPI numerals, hairline grid backdrop, dotted separators, offset shadow, corner tab on cards, monospaced meta text |
 | **Data colour set** | the 3–5 series colours for charts | derived from primary + one contrasting hue, never rainbow |
 
@@ -55,7 +55,7 @@ Google Fonts (all OFL-licensed).
   --density: airy;                                       /* see density block below */
 }
 ```
-Surface: tinted-page. Motion: micro only. Signature: KPI numerals in `--font-display` at `text-4xl`, and a 3px `bg-primary` start-border on the active nav item. Data colours: teal · amber · slate-blue · sage.
+Surface: tinted-page. Motion: `--ease-enter: var(--spring-ui)`; signature R3, the drawer settles. Signature: KPI numerals in `--font-display` at `text-4xl`, and a 3px `bg-primary` start-border on the active nav item. Data colours: teal · amber · slate-blue · sage.
 
 ### 2. `theme-graphite` — dense, technical, precise (fintech, ops, dev tools)
 
@@ -75,7 +75,7 @@ Surface: tinted-page. Motion: micro only. Signature: KPI numerals in `--font-dis
 }
 .theme-graphite.dark { --background: oklch(12% 0.004 260); --muted-foreground: oklch(60% 0.014 285); --card: oklch(15% 0.004 260); --border: oklch(24% 0.005 260); }
 ```
-Surface: flat-bordered, tables everywhere, `tabular-nums` on all numbers. Motion: still. Signature: monospaced meta text (IDs, timestamps, amounts) and 1px dotted separators. Data colours: green · sky · amber · magenta (all at equal lightness).
+Surface: flat-bordered, tables everywhere, `tabular-nums` on all numbers. Motion: `--motion-preset: 0.85`; signature none, deliberately: still. Signature: monospaced meta text (IDs, timestamps, amounts) and 1px dotted separators. Data colours: green · sky · amber · magenta (all at equal lightness).
 
 ### 3. `theme-editorial` — warm, human, content-first (community, education, media)
 
@@ -96,7 +96,7 @@ Surface: flat-bordered, tables everywhere, `tabular-nums` on all numbers. Motion
   --density: standard;
 }
 ```
-Surface: elevated (no border, `shadow-md` at 6% warm black). Motion: one signature moment (content fades up on page enter). Signature: serif display headings, generous `max-w-prose` measure, hairline rules with small caps labels. Data colours: brick · olive · mustard · ink.
+Surface: elevated (no border, `shadow-md` at 6% warm black). Motion: `--motion-preset: 1.15`; signature R4, the disclosure. Signature: serif display headings, generous `max-w-prose` measure, hairline rules with small caps labels. Data colours: brick · olive · mustard · ink.
 
 ### 4. `theme-neo` — bold, energetic, opinionated (startups, creator tools, marketing)
 
@@ -118,7 +118,7 @@ Surface: elevated (no border, `shadow-md` at 6% warm black). Motion: one signatu
   --density: standard;
 }
 ```
-Surface: outlined-only with offset shadows. Motion: micro + button press `translate` 1px. Signature: offset shadow + uppercase `tracking-wide` labels. Use sparingly on data-heavy admin screens (keep tables plain). Data colours: violet · yellow · black · coral.
+Surface: outlined-only with offset shadows. Motion: `--motion-preset: 0.85; --press-depth: 0.05`; signature R1, a harder press. Signature: offset shadow + uppercase `tracking-wide` labels. Use sparingly on data-heavy admin screens (keep tables plain). Data colours: violet · yellow · black · coral.
 
 ### 5. `theme-slate` — quiet enterprise, high contrast (B2B admin, legal, government)
 
@@ -144,7 +144,7 @@ Surface: outlined-only with offset shadows. Motion: micro + button press `transl
   --sidebar-border: oklch(26% 0.03 260);
 }
 ```
-Surface: tinted-page with a dark sidebar. Motion: micro. Signature: gold active-nav marker on navy; sentence-case everything; no icons in table headers. Data colours: navy · gold · steel · teal.
+Surface: tinted-page with a dark sidebar. Motion: `--motion-preset: 0.9`; signature R5, the marker. Signature: gold active-nav marker on navy; sentence-case everything; no icons in table headers. Data colours: navy · gold · steel · teal.
 
 ### 6. `theme-mint` — light, friendly, consumer-grade (wellness, retail, apps with a public face)
 
@@ -165,7 +165,7 @@ Surface: tinted-page with a dark sidebar. Motion: micro. Signature: gold active-
   --density: airy;
 }
 ```
-Surface: elevated, pill buttons (`rounded-full` on buttons and badges only). Motion: one signature moment (KPI count-up on load). Signature: pill controls + big rounded avatar chips. Data colours: mint · coral · navy · sand.
+Surface: elevated, pill buttons (`rounded-full` on buttons and badges only). Motion: `--motion-preset: 1.1; --pop-depth: 0.06`; signature R2, the menu. Signature: pill controls + big rounded avatar chips. Data colours: mint · coral · navy · sand.
 
 ## Density block (add once to your CSS; the presets set `--density`)
 

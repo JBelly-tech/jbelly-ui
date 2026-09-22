@@ -24,6 +24,8 @@ import argparse
 import json
 import pathlib
 import sys
+try: sys.stdout.reconfigure(encoding="utf-8", errors="replace")   # a control label may be Arabic
+except Exception: pass
 
 # Anything a person can press, in the order a reader meets it.
 SELECTOR = (
@@ -50,7 +52,7 @@ WATCHER = """
 """
 
 VERDICT = """
-() => {
+  e => {
   const b = window.__jbBefore || {};
   const now = {
     href: location.href,
@@ -59,10 +61,14 @@ VERDICT = """
     scroll: window.scrollY
   };
   if (window.__jbObs) window.__jbObs.disconnect();
+  // An empty fragment is what `href="#"` leaves behind. It is not a destination, and counting it
+  // would pass the first dead link in a page and fail every one after it.
+  const bare = u => (u || '').replace(/#$/, '');
   return {
     mutated: !!window.__jbMoved,
-    navigated: now.href !== b.href,
-    focusMoved: now.focus !== b.focus,
+    navigated: bare(now.href) !== bare(b.href),
+    // Focus that landed on the control itself is what a click always does; it says nothing.
+    focusMoved: now.focus !== b.focus && document.activeElement !== e,
     animated: now.anims > (b.anims || 0),
     scrolled: now.scroll !== b.scroll
   };
@@ -181,6 +187,34 @@ def run(target: str, width: int, height: int) -> dict:
                     skipped += 1
                 continue
 
+            kind = el.evaluate("e => ({ tag: e.tagName.toLowerCase(), type: (e.type || ''), "
+                               "checked: e.checked === true, options: e.options ? e.options.length : 0 })")
+            # A radio or checkbox already in the state the click would set is defined to do nothing.
+            # That is the specification working, not a control that is dead.
+            if kind["type"] in ("radio", "checkbox") and kind["checked"]:
+                skipped += 1
+                continue
+            # A select opens a native list on click and mutates nothing. Changing it is the action.
+            if kind["tag"] == "select":
+                if kind["options"] < 2:
+                    skipped += 1
+                    continue
+                page.evaluate(WATCHER)
+                try:
+                    el.select_option(index=1 if el.evaluate("e => e.selectedIndex") == 0 else 0)
+                except Exception as exc:
+                    dead.append({**info, "why": f"could not be changed: {str(exc).splitlines()[0][:90]}"})
+                    checked += 1
+                    continue
+                page.wait_for_timeout(260)
+                v = el.evaluate(VERDICT)
+                checked += 1
+                if not any(v.values()):
+                    dead.append({**info, "why": "changing the selection changed nothing in the page"})
+                page.keyboard.press("Escape")
+                page.wait_for_timeout(90)
+                continue
+
             page.evaluate(WATCHER)
             try:
                 if reach.get("viaLabel"):
@@ -193,7 +227,7 @@ def run(target: str, width: int, height: int) -> dict:
                 checked += 1
                 continue
             page.wait_for_timeout(260)
-            v = page.evaluate(VERDICT)
+            v = el.evaluate(VERDICT)
             checked += 1
             if not any(v.values()):
                 dead.append({**info, "why": "nothing in the page changed"})

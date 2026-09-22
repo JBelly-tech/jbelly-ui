@@ -1,0 +1,336 @@
+/* ==========================================================================
+   jbelly-ui motion. Twelve recipes. No colour, no literal tempo, no literal
+   distance: every value comes from the MOTION TOKENS region of tokens.css.
+
+   Loaded as plain CSS, AFTER Tailwind. In a single-file page it is inlined into a
+   style element with id="jb-motion", placed immediately after the closing tag of the
+   type="text/tailwindcss" block. Unlayered on purpose: it must beat @layer utilities and it
+   must not pass through the browser compiler. Nothing in this file may contain the character
+   sequence that closes a style element, comment or not: the HTML parser ends the block there
+   and the whole sheet is silently dropped. V01 is the check that catches it.
+
+   THE THREE DECLARED LAYOUT EXCEPTIONS IN THIS SYSTEM:
+   motion-exception: #sidebar — inline-size: the rail's width IS the state, and
+     no composited property expresses how much space an element occupies.
+   motion-exception: .disclosure::details-content — block-size / grid-template-rows:
+     an intrinsic panel has no portable composited equivalent.
+   motion-exception: .list-item — grid-template-rows: the gap closing after a
+     removal is the second half of the departure report.
+   ========================================================================== */
+
+/* -- R1 - PRESS ----------------------------- data-motion="feedback" -- */
+.btn, .input, .checkbox, .select, .menu-item, .nav-link, .nav-child, .seg,
+.table tbody tr, .tick {
+  transition: background-color var(--t-tint) var(--ease-tint),
+              border-color     var(--t-tint) var(--ease-tint),
+              color            var(--t-tint) var(--ease-tint);
+}
+.btn {
+  transition: scale            var(--t-press) var(--ease-exit),
+              background-color var(--t-tint)  var(--ease-tint),
+              border-color     var(--t-tint)  var(--ease-tint),
+              color            var(--t-tint)  var(--ease-tint);
+}
+.btn:active { scale: var(--press-scale); }
+/* seen 100+ times a day: no motion at all. */
+[data-frequency="constant"] { transition-duration: var(--d-0); }
+/* the ring is instant: a transitioned focus ring lags the keyboard, which reads
+   as input latency. This rule is why M03 fails any transition on :focus-visible. */
+:focus-visible { transition-property: background-color, border-color, color; }
+
+/* -- R2 - MENU FROM ITS TRIGGER -------------- data-motion="spatial" -- */
+/* Preferred form for new markup: popover, zero JavaScript, enter AND exit. */
+.menu[popover] {
+  margin: 0; opacity: 0; scale: var(--pop-scale);
+  translate: 0 calc(-1 * var(--travel-sm));
+  transform-origin: top var(--origin-inline);
+  transition: opacity   var(--t-pop-out) var(--ease-exit),
+              scale     var(--t-pop-out) var(--ease-exit),
+              translate var(--t-pop-out) var(--ease-exit),
+              overlay   var(--t-pop-out) allow-discrete,
+              display   var(--t-pop-out) allow-discrete;
+}
+.menu[popover]:popover-open {
+  opacity: 1; scale: 1; translate: 0 0;
+  transition-duration: var(--t-pop);
+  transition-timing-function: var(--ease-enter);
+}
+/* MUST come after the open rule: equal specificity, source order decides. */
+@starting-style {
+  .menu[popover]:popover-open {
+    opacity: 0; scale: var(--pop-scale); translate: 0 calc(-1 * var(--travel-sm));
+  }
+}
+/* Shell-compatible form: the page's own JS flips data-open instead of .hidden.
+   Not the top layer, so the exit animates in every engine, not just Chromium. */
+.menu[data-menu] {
+  display: none; opacity: 0; scale: var(--pop-scale);
+  translate: 0 calc(-1 * var(--travel-sm));
+  transform-origin: top var(--origin-inline);
+  transition: opacity   var(--t-pop-out) var(--ease-exit),
+              scale     var(--t-pop-out) var(--ease-exit),
+              translate var(--t-pop-out) var(--ease-exit),
+              display   var(--t-pop-out) allow-discrete;
+}
+.menu[data-menu][data-open] {
+  display: flex; opacity: 1; scale: 1; translate: 0 0;
+  transition-duration: var(--t-pop);
+  transition-timing-function: var(--ease-enter);
+}
+@starting-style {
+  .menu[data-menu][data-open] {
+    opacity: 0; scale: var(--pop-scale); translate: 0 calc(-1 * var(--travel-sm));
+  }
+}
+@supports (anchor-name: --a) {          /* upgrade only; static placement below */
+  [data-anchor] { anchor-name: --jb-anchor; }
+  .menu[data-anchored] {
+    position: fixed; position-anchor: --jb-anchor;
+    position-area: block-end span-inline-start;    /* logical: RTL-correct free */
+    position-try-fallbacks: flip-block, flip-inline;
+    margin-block-start: var(--travel-sm);
+  }
+}
+
+/* -- R3 - PANEL + SCRIM ------ data-motion="spatial" | "continuity" --- */
+.panel {                                   /* closed state = the exit style */
+  display: none; opacity: 0;
+  translate: calc(var(--flow-x) * var(--panel-travel)) 0;
+  transition: opacity   var(--t-panel-out) var(--ease-exit),
+              translate var(--t-panel-out) var(--ease-exit),
+              display   var(--t-panel-out) allow-discrete;
+}
+.panel[data-open] {
+  display: flex; opacity: 1; translate: 0 0;
+  transition-duration: var(--t-panel);
+  transition-timing-function: var(--spring-ui);
+}
+@starting-style {
+  .panel[data-open] {
+    opacity: 0; translate: calc(var(--flow-x) * var(--panel-travel)) 0;
+  }
+}
+/* A centred overlay belongs to the viewport, not to a trigger: it scales, it
+   does not travel. The one legal transform-origin: center in the system. */
+.panel-centre { translate: 0 0; scale: var(--pop-scale); transform-origin: center;
+  transition: opacity var(--t-panel-out) var(--ease-exit),
+              scale   var(--t-panel-out) var(--ease-exit),
+              display var(--t-panel-out) allow-discrete; }
+.panel-centre[data-open] { scale: 1; }
+@starting-style { .panel-centre[data-open] { opacity: 0; scale: var(--pop-scale); } }
+/* Destructive or irreversible: heavier, slower, overdamped. Same tokens. */
+.panel-heavy[data-open] {
+  transition-duration: var(--t-heavy);
+  transition-timing-function: var(--spring-heavy);
+}
+/* The scrim is the SAME event: same two tokens, no exceptions, ever. */
+.scrim {
+  display: none; opacity: 0; background: var(--scrim);
+  transition: opacity var(--t-panel-out) var(--ease-exit),
+              display var(--t-panel-out) allow-discrete;
+}
+.scrim[data-open] {
+  display: block; opacity: 1;
+  transition-duration: var(--t-panel);
+  transition-timing-function: var(--ease-enter);
+}
+@starting-style { .scrim[data-open] { opacity: 0; } }
+.panel-heavy[data-open] ~ .scrim[data-open] { transition-duration: var(--t-heavy); }
+
+/* -- R4 - DISCLOSURE -------------------------- data-motion="state" --- */
+/* motion-exception: .disclosure::details-content */
+.disclosure-chevron {
+  rotate: 0deg;
+  transition: rotate var(--t-menu) var(--ease-move);
+}
+[dir="rtl"] .disclosure-chevron { rotate: 180deg; }   /* a directional glyph mirrors */
+.disclosure[open] > summary .disclosure-chevron,
+[aria-expanded="true"] .disclosure-chevron { rotate: calc(90deg * var(--flow-x)); }
+@supports selector(::details-content) {
+  .disclosure::details-content {
+    block-size: 0; overflow: clip;
+    transition: block-size        var(--t-menu) var(--ease-move),
+                content-visibility var(--t-menu) allow-discrete;
+  }
+  .disclosure[open]::details-content { block-size: auto; }
+  @supports (interpolate-size: allow-keywords) { :root { interpolate-size: allow-keywords; } }
+  @supports not (interpolate-size: allow-keywords) {   /* portable, no measurement */
+    .disclosure::details-content {
+      block-size: auto; display: grid; grid-template-rows: 0fr;
+      transition: grid-template-rows  var(--t-menu) var(--ease-move),
+                  content-visibility  var(--t-menu) allow-discrete;
+    }
+    .disclosure[open]::details-content { grid-template-rows: 1fr; }
+    .disclosure::details-content > * { min-block-size: 0; overflow: clip; }
+  }
+}
+
+/* -- R5 - SELECTION MARKER -------------------- data-motion="state" --- */
+/* The group MUST be equal columns: the marker's position is then arithmetic,
+   so no measurement and no JavaScript are needed. */
+.marker-group {
+  --mark-i: 0; --mark-n: 2;
+  position: relative; display: grid;
+  grid-auto-flow: column; grid-auto-columns: 1fr;
+}
+.marker-group:has(> :nth-child(2) :checked) { --mark-i: 1; }
+.marker-group:has(> :nth-child(3) :checked) { --mark-i: 2; }
+.marker-group:has(> :nth-child(4) :checked) { --mark-i: 3; }
+.marker {
+  position: absolute; inset-block-end: 0; inset-inline-start: 0;
+  inline-size: calc(100% / var(--mark-n)); block-size: 2px;
+  background: var(--primary);
+  translate: calc(var(--flow-x) * var(--mark-i) * 100%) 0;
+  transition: translate var(--t-menu) var(--spring-ui);
+}
+.marker-fill { inset-block: 0; block-size: auto; border-radius: var(--radius-md);
+  background: var(--card); z-index: 0; }   /* segmented control variant */
+
+/* -- R6 - ARRIVAL AND DEPARTURE --------------- data-motion="state" --- */
+/* Gated on [data-ready], which one line of script sets after load. Rows that
+   were in the server markup therefore render with no entrance: the page
+   arriving is not a state change. */
+html[data-ready] .arrives {
+  opacity: 1; translate: 0 0;
+  transition: opacity   var(--t-menu) var(--ease-enter),
+              translate var(--t-menu) var(--ease-enter);
+}
+@starting-style {
+  html[data-ready] .arrives { opacity: 0; translate: 0 calc(-1 * var(--travel)); }
+}
+.arrives[data-new] {          /* the non-motion half: a mark that outlives it */
+  box-shadow: inset calc(2px * var(--flow-x)) 0 0 0 var(--primary);
+}
+.departs[data-leaving] {
+  opacity: 0;
+  translate: calc(var(--flow-x) * var(--travel)) 0;
+  pointer-events: none;       /* legal ONLY while leaving, never as a gate */
+  transition: opacity   var(--t-menu-out) var(--ease-exit),
+              translate var(--t-menu-out) var(--ease-exit);
+}
+/* motion-exception: .list-item */
+.list-item { display: grid; grid-template-rows: 1fr;
+  transition: grid-template-rows var(--t-menu-out) var(--ease-exit); }
+.list-item > * { min-block-size: 0; overflow: clip; }
+.list-item[data-leaving] { grid-template-rows: 0fr; }
+
+/* -- R7 - SIDEBAR COLLAPSE --------------- data-motion="continuity" -- */
+/* motion-exception: #sidebar */
+#sidebar { transition: inline-size var(--t-panel) var(--ease-move); }
+#sidebar .nav-title, #sidebar .nav-badge {
+  transition: opacity var(--t-menu-out) var(--ease-exit);
+}
+/* One subject: the content pane follows the rail through layout, it does not
+   run an animation of its own. */
+.shell-main, .shell-header { transition: none; }
+
+/* -- R8 - REVISED IN PLACE -------------------- data-motion="state" --- */
+.revises { position: relative; }
+.revises::before {
+  content: ""; position: absolute; inset-block: 0; inset-inline-start: 0;
+  inline-size: 2px; background: var(--muted-foreground); opacity: 0;
+  transition: opacity var(--t-tint) var(--ease-enter);
+  pointer-events: none;
+}
+.revises[data-changed]::before      { opacity: 1; }
+.revises[data-changed="up"]::before   { background: var(--success); }
+.revises[data-changed="down"]::before { background: var(--destructive); }
+
+/* -- R9 - REFUSAL ----------------------------- data-motion="state" --- */
+.refuses[data-refused] { animation: jb-recoil var(--t-heavy) var(--spring-heavy) both; }
+@keyframes jb-recoil {
+  0%   { translate: 0 0; }
+  30%  { translate: calc(var(--recoil) * -1 * var(--flow-x)) 0; }
+  100% { translate: 0 0; }
+}
+
+/* -- R10 - PENDING --------------------------- data-motion="status" --- */
+/* The answer to the spinner and the shimmer. Finite, decelerating, stops at
+   92% because it does not know when the wait ends. `infinite` appears nowhere
+   in this system. */
+.pends { position: relative; }
+.pends::after {
+  content: ""; position: absolute; inset-block-start: 0; inset-inline-start: 0;
+  inline-size: 100%; block-size: 2px; background: var(--primary);
+  transform-origin: var(--origin-inline) center;
+  scale: 0 1; opacity: 0; pointer-events: none;
+}
+.pends[aria-busy="true"]::after {
+  opacity: 1;
+  animation: jb-elapsed var(--t-elapsed) var(--ease-elapsed) var(--t-grace) both;
+}
+@keyframes jb-elapsed { from { scale: 0 1; } to { scale: var(--elapsed-cap) 1; } }
+/* The skeleton goes back to being a static box that reserves height, which was
+   always its only job. It has no animation at all. */
+
+/* -- R11 - POSITION ------------------------ data-motion="position" --- */
+/* Resting truth OUTSIDE the guard: the seam is present and correct. */
+.app-seam { position: relative; }
+.app-seam::after {
+  content: ""; position: absolute; inset-inline: 0; inset-block-end: 0;
+  block-size: 1px; background: var(--border); opacity: 1;
+}
+.read-progress { display: none; }
+@supports (animation-timeline: scroll()) {
+  .app-seam::after {
+    animation: jb-seam var(--ease-flat) both;      /* shorthand FIRST: it resets */
+    animation-timeline: scroll(root block);        /* animation-timeline         */
+    animation-range: 0 var(--seam-range);
+  }
+  @keyframes jb-seam { from { opacity: 0; } to { opacity: 1; } }
+  .read-progress {
+    display: block; position: fixed; inset-block-start: 0; inset-inline: 0;
+    block-size: 2px; background: var(--primary); z-index: 60;
+    transform-origin: var(--origin-inline) center;
+    animation: jb-progress var(--ease-flat) both;
+    animation-timeline: scroll(root block);
+  }
+  @keyframes jb-progress { from { scale: 0 1; } to { scale: 1 1; } }
+}
+
+/* -- R12 - IDENTITY ----------------------- data-motion="continuity" -- */
+@supports (view-transition-name: none) {
+  /* the page did not change; only the named objects did. Without this line you
+     get the UA's undifferentiated 0.25s whole-document cross-fade. */
+  ::view-transition-old(root), ::view-transition-new(root) {
+    animation: none; mix-blend-mode: normal;
+  }
+  ::view-transition-group(*) {
+    animation-duration: var(--t-move);
+    animation-timing-function: var(--spring-ui);
+  }
+  /* members MOVE, they do not dissolve into each other. mix-blend-mode is reset
+     because the UA default is plus-lighter, which reads as a glow. */
+  ::view-transition-old(*), ::view-transition-new(*) {
+    animation: none; mix-blend-mode: normal; block-size: 100%;
+  }
+  :root:active-view-transition [data-vt-suppress] { visibility: hidden; }
+}
+
+/* == REDUCED MOTION: the four named exceptions ============================
+   The two token switches in tokens.css do everything else. These four are the
+   cases where the POSITION is the state, so nulling the travel would delete
+   the information instead of the motion. */
+@media (prefers-reduced-motion: reduce) {
+  /* the marker must still be under the selected tab: remove the travel, keep
+     the position, by removing the transition rather than the translate */
+  .marker { transition-property: none; }
+  /* layout is not reached by --travel-on, and a whole-shell reflow is the most
+     vestibular motion an admin page can produce: delete it, do not shorten it */
+  #sidebar, .disclosure::details-content, .list-item {
+    transition-property: opacity;
+  }
+  /* a scroll timeline has no duration to shorten. Detach it and rest at the
+     true state - which is why the resting styles live outside the guard. */
+  .read-progress { animation-timeline: none; display: none; }
+  .app-seam::after { animation-timeline: none; opacity: 1; }
+  /* the group carries the geometry (vestibular); the pair carries the identity
+     claim (pure opacity, safe). Collapse one, keep the other. */
+  /* 1ms, never 0.01ms: some engines round a sub-millisecond duration to zero and then never fire
+     transitionend, which breaks anything awaiting it. The literal is the point, so it is the one
+     tempo in the system written outside the token region. */
+  ::view-transition-group(*) { animation-duration: 1ms; }  /* motion-lint-ignore M01 */
+  ::view-transition-old(*), ::view-transition-new(*) {
+    animation-duration: var(--t-menu-out);
+  }
+}

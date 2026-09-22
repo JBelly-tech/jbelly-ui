@@ -22,7 +22,7 @@ python scripts/audit_styles.py <src-dir>         # for redesigns: inventory + de
 | 5 | Typography | ≤ 2 families, 3 weights, 13px UI / 16px card titles / 20px page title, tight tracking on titles only | 4 families, thin weights on small text, letter-spaced body | fonts audit |
 | 6 | Density | matches the user (compact for operators, airy for consumers), consistent across cards | half the page dense, half sparse | density class, row heights |
 | 7 | States | loading, empty, error, success each designed; hover and focus visible | blank areas while loading, no empty state, invisible focus | verify screenshots per `#state=` |
-| 8 | Motion | 150ms colour/opacity, 200–250ms open/close, one signature moment, reduced-motion honoured | `transition: all`, bounces, parallax on content | durations audit, tells |
+| 8 | Motion | declared in `motion.css` and nowhere else, every animating element carries `data-motion`, reduced-motion removes the travel and keeps the report; run `scripts/lint_motion.py` and `scripts/verify_motion.py` | `transition: all`, bounces, parallax on content | durations audit, tells |
 | 9 | Accessibility | contrast ≥ 4.5, labels on icon buttons, skip link, `aria-current`/`aria-sort`, keyboard closes overlays | icon-only buttons unnamed, 3:1 grey text, Esc does nothing | preflight contrast + structure |
 | 10 | Copy | sentence case, verbs on buttons, specific empty/error text | "Submit", "Elevate your workflow", lorem | filler-word tells |
 

@@ -22,9 +22,9 @@ behind the ten dimensions.
 - Destructive actions: confirm only when irreversible, otherwise Undo in a toast (4s).
 
 ## Motion
-- Animate only `transform` and `opacity`; never `transition: all`; `transform-origin` at the trigger for menus and popovers.
+- Motion is declared in `references/motion.css`, never in a class attribute: see `motion.md`. Animate only `transform` and `opacity`; never `transition: all`; `transform-origin` at the trigger for menus and popovers.
 - Durations: press feedback 100–160ms, tooltip 125–200ms, dropdown 150–250ms, modal or drawer 200–300ms in, faster out; nothing in the UI above 400ms except the one signature moment (600ms max).
-- Easing: enter = ease-out, move on screen = ease-in-out, hover = ease, progress = linear; never ease-in for entering elements.
+- Easing comes from a token, never a keyword: `--ease-enter` decelerates, `--ease-exit` accelerates, `--ease-move` for identity moves, `--ease-flat` for elapsed time and scroll. Never an accelerating curve for an entering elements.
 - Never scale in from 0; start at 0.96–0.98 with opacity. Press feedback `scale(0.97)` on `:active`.
 - No animation on keyboard-initiated actions or on anything a user sees more than ten times a session (row hover, toggles, tabs).
 - Stagger list entrances 30–80ms per item, max 8 items; exits faster than entrances.

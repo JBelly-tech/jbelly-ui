@@ -108,6 +108,121 @@
   --radius-xl: calc(var(--radius) + 4px); --radius-lg: var(--radius); --radius-md: calc(var(--radius) - 2px); --radius-sm: calc(var(--radius) - 4px);
   --shadow-xs: var(--shadow-xs); --shadow-md: var(--shadow-md);
 }
+/* MOTION TOKENS START */
+:root {
+  /* the two switches — reduced motion moves these and nothing else */
+  --travel-on: 1;        /* 1 = displacement allowed. Reduced motion sets 0.   */
+  --motion-reduce: 1;    /* tempo multiplier under reduce. Reduced motion 0.7. */
+
+  /* direction — the whole RTL mechanism */
+  --flow-x: 1;           /* multiply EVERY authored inline-axis length by this */
+  --origin-inline: left; /* transform-origin has no logical keyword; this is it */
+
+  /* preset + density dials */
+  --motion-preset: 1;    /* a personality may set 0.85 .. 1.15 and nothing else */
+  --travel-density: 1;   /* a density may set 0.75 .. 1.25 and nothing else     */
+  --motion-scale: calc(var(--motion-preset) * var(--motion-reduce));
+  --motion-max: 450ms;   /* nothing in this system may resolve longer           */
+  --reduced: var(--travel-on);  /* canary the runtime probe reads off :root     */
+
+  /* base durations, named by CLASS OF CHANGE, never by component */
+  --d-0:         0ms;    /* keyboard-initiated: no animation, ever              */
+  --d-press:   100ms;    /* the control received the press                      */
+  --d-tint:    140ms;    /* paint-tier state change; also the paint-tier cap    */
+  --d-pop:     180ms;    /* tooltip / menu / popover ENTER                      */
+  --d-pop-out: 130ms;    /*                              LEAVE                  */
+  --d-menu:    220ms;    /* disclosure, selection marker, inline panel ENTER    */
+  --d-menu-out:150ms;    /*                                          LEAVE      */
+  --d-move:    260ms;    /* an object kept its identity and changed position    */
+  --d-panel:   300ms;    /* drawer, dialog, sheet, command palette ENTER        */
+  --d-panel-out:200ms;   /*                                         LEAVE       */
+  --d-heavy:   390ms;    /* destructive or irreversible; overdamped             */
+
+  /* resolved: what every recipe references */
+  --t-press:     calc(var(--d-press)     * var(--motion-scale));
+  --t-tint:      calc(var(--d-tint)      * var(--motion-scale));
+  --t-pop:       calc(var(--d-pop)       * var(--motion-scale));
+  --t-pop-out:   calc(var(--d-pop-out)   * var(--motion-scale));
+  --t-menu:      calc(var(--d-menu)      * var(--motion-scale));
+  --t-menu-out:  calc(var(--d-menu-out)  * var(--motion-scale));
+  --t-move:      calc(var(--d-move)      * var(--motion-scale));
+  --t-panel:     calc(var(--d-panel)     * var(--motion-scale));
+  --t-panel-out: calc(var(--d-panel-out) * var(--motion-scale));
+  --t-heavy:     calc(var(--d-heavy)     * var(--motion-scale));
+
+  /* not UI tempo: unscaled, exempt from the 80-450ms budget */
+  --t-grace:   250ms;    /* no wait shorter than this is reported as pending     */
+  --t-elapsed:   30s;    /* how long a wait has lasted. FINITE: it is not a loop */
+  --t-linger:     6s;    /* how long a "this just changed" mark stays on screen  */
+
+  /* easings: enter decelerates, exit accelerates, loops do not exist */
+  --ease-enter: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --ease-exit:  cubic-bezier(0.3, 0, 0.8, 0.15);
+  --ease-move:  cubic-bezier(0.2, 0, 0, 1);
+  --ease-tint:  cubic-bezier(0.2, 0, 0.38, 0.9);
+  --ease-flat:  linear;              /* elapsed time and scroll position ONLY   */
+
+  /* Springs as linear(). Critically damped and overdamped only: no curve in
+     this system has a stop above 1, because an overshoot clamps on opacity and
+     colour into a visible dead hold. Each is paired with the duration it means. */
+  --spring-ui: linear(0, 0.004 1%, 0.0229 2.5%, 0.0789 5%, 0.4656 17%, 0.6384 23.5%,
+    0.7641 30%, 0.8147 33.5%, 0.8604 37.5%, 0.8993 42%, 0.9305 47%, 0.9542 52.5%,
+    0.9712 58.5%, 0.9912 73.5%, 1);            /* zeta 1.00 — pair with --t-panel */
+  --spring-heavy: linear(0, 0.0105 1%, 0.0541 2.5%, 0.4077 10.5%, 0.6101 16.5%,
+    0.6849 19.5%, 0.7544 23%, 0.8154 27%, 0.8613 31%, 0.8995 35.5%, 0.9321 41%,
+    0.9558 47%, 0.9722 53.5%, 0.9918 70.5%, 1); /* zeta 1.31 — pair with --t-heavy */
+  --ease-elapsed: linear(0, 0.42 6%, 0.68 16%, 0.82 30%, 0.9 46%, 0.95 68%, 1);
+  --ease-elapsed-steps: steps(8, end);          /* the reduced answer for elapsed  */
+
+  /* travel: one unit, bent by density, nulled by reduce */
+  --travel-unit: calc(4px * var(--travel-density) * var(--travel-on));
+  --travel-sm:   var(--travel-unit);                    /*  4px  */
+  --travel:      calc(var(--travel-unit) * 2);          /*  8px  */
+  --travel-lg:   calc(var(--travel-unit) * 4);          /* 16px  */
+  --recoil:      calc(var(--travel-unit) * 0.75);       /*  3px  */
+  --panel-travel: calc(100% * var(--travel-on));
+  --press-depth: 0.03;  --press-scale: calc(1 - var(--press-depth) * var(--travel-on));
+  --pop-depth:   0.04;  --pop-scale:   calc(1 - var(--pop-depth)   * var(--travel-on));
+  --elapsed-cap: 0.92;  /* the pending bar stops here: it does not know when it ends */
+  --seam-range:  48px;  /* scroll distance over which a sticky seam resolves        */
+
+  /* the one surface value motion needs and the colour roles above lack */
+  --scrim: color-mix(in oklab, var(--foreground) 45%, transparent);
+}
+
+/* Direction. Both selectors on purpose: :dir() for the document, the attribute
+   for a subtree that sets dir on itself. */
+:root:dir(rtl), [dir="rtl"] { --flow-x: -1; --origin-inline: right; }
+
+/* Density changes DISTANCE only. A compact UI is not a faster UI. */
+.density-compact { --travel-density: 0.75; }
+.density-airy    { --travel-density: 1.25; }
+
+/* A personality may set --motion-preset (0.85-1.15), --ease-enter,
+   --press-depth and --pop-depth. At most three of them. Nothing else. */
+.theme-graphite  { --motion-preset: 0.85; }
+.theme-slate     { --motion-preset: 0.9; }
+.theme-clinic    { --ease-enter: var(--spring-ui); }
+.theme-editorial { --motion-preset: 1.15; }
+.theme-neo       { --motion-preset: 0.85; --press-depth: 0.05; }
+.theme-mint      { --motion-preset: 1.1;  --pop-depth: 0.06; }
+
+/* Reduced motion. This REPLACES the blanket `* { duration: 0.01ms !important }`
+   block this file used to end with. Travel goes to zero and the tempo shortens;
+   opacity, colour and position keep working, so every state is still reported.
+   The four named exceptions live in motion.css, next to the recipes they answer. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --travel-on: 0;
+    --motion-reduce: 0.7;
+    --ease-enter: var(--ease-tint);
+    --ease-exit:  var(--ease-tint);
+    --ease-elapsed: var(--ease-elapsed-steps);
+  }
+  html { scroll-behavior: auto; }
+}
+/* MOTION TOKENS END */
+
 @theme { --text-2sm: 0.8125rem; --text-2sm--line-height: 1.3; --text-2xs: 0.6875rem; --text-2xs--line-height: 1.2; }
 @layer base {
   * { border-color: var(--border); }
@@ -115,12 +230,11 @@
   body { background: var(--background); color: var(--foreground); -webkit-font-smoothing: antialiased; }
   :focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
   .scroll-thin { scrollbar-width: thin; scrollbar-color: var(--accent) transparent; }
-  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
 }
 @layer components {
   .container-fixed { @apply w-full grow px-6 xl:mx-auto xl:px-7.5 xl:max-w-(--breakpoint-xl); }
   /* buttons */
-  .btn { @apply inline-flex items-center justify-center gap-1.5 shrink-0 whitespace-nowrap font-medium rounded-md shadow-xs transition-colors cursor-pointer h-(--ctl-h) px-3 text-2sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background disabled:opacity-50 disabled:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0; }
+  .btn { @apply inline-flex items-center justify-center gap-1.5 shrink-0 whitespace-nowrap font-medium rounded-md shadow-xs cursor-pointer h-(--ctl-h) px-3 text-2sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background disabled:opacity-50 disabled:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0; }
   .btn-sm { @apply h-(--ctl-h-sm) px-2.5 text-xs gap-1.25; }
   .btn-icon { @apply p-0 w-(--ctl-h); }
   .btn-icon.btn-sm { @apply w-(--ctl-h-sm); }
@@ -129,7 +243,7 @@
   .btn-ghost { @apply shadow-none bg-transparent text-accent-foreground hover:bg-accent; }
   .btn-destructive { @apply bg-destructive text-destructive-foreground hover:bg-destructive/90; }
   /* inputs */
-  .input { @apply flex w-full rounded-md border border-input bg-background text-foreground shadow-xs placeholder:text-muted-foreground transition-colors h-(--ctl-h) px-3 text-2sm focus-visible:outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40; }
+  .input { @apply flex w-full rounded-md border border-input bg-background text-foreground shadow-xs placeholder:text-muted-foreground h-(--ctl-h) px-3 text-2sm focus-visible:outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40; }
   .input-sm { @apply h-(--ctl-h-sm) px-2.5 text-xs; }
   .select { @apply appearance-none cursor-pointer pe-8 bg-no-repeat bg-[length:14px_11px] bg-[position:right_0.6rem_center] rtl:bg-[position:left_0.6rem_center]; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%239f9fa9' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3E%3C/svg%3E"); }
   .checkbox { @apply appearance-none shrink-0 size-4 rounded-sm border border-input bg-background shadow-xs cursor-pointer checked:bg-primary checked:border-primary bg-center bg-no-repeat focus-visible:ring-2 focus-visible:ring-ring/40; }
@@ -154,12 +268,12 @@
   .table th { @apply h-11 px-4 text-start align-middle text-xs font-normal text-secondary-foreground border-b border-border whitespace-nowrap; }
   .table td { @apply px-4 align-middle border-b border-border h-(--row-h); }
   .table tbody tr:last-child td { @apply border-b-0; }
-  .table tbody tr { @apply hover:bg-muted/40 transition-colors; }
+  .table tbody tr { @apply hover:bg-muted/40; }
   .table tbody tr.selected { @apply bg-accent; }
   /* ---- pricing page: segmented billing control, plan cards, comparison table, faq ---- */
-  .seg { @apply inline-flex h-(--ctl-h) cursor-pointer select-none items-center justify-center gap-1.5 whitespace-nowrap rounded-md px-3 text-2sm font-medium text-secondary-foreground transition-colors; }
+  .seg { @apply inline-flex h-(--ctl-h) cursor-pointer select-none items-center justify-center gap-1.5 whitespace-nowrap rounded-md px-3 text-2sm font-medium text-secondary-foreground; }
   .seg:hover { @apply text-mono; }
-  .seg-input:checked + .seg { @apply bg-background text-mono shadow-xs; }
+  .seg-input:checked + .seg { @apply text-mono; }
   .seg-input:focus-visible + .seg { @apply outline-2 outline-offset-2 outline-ring; }
   .plan { @apply relative flex flex-col rounded-xl border border-border bg-card text-card-foreground shadow-xs; }
   .plan-featured { @apply border-primary shadow-md ring-1 ring-primary; }
@@ -175,28 +289,393 @@
   .cmp td { @apply text-center text-2sm text-secondary-foreground; }
   .faq summary { @apply flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-2sm font-medium text-mono; }
   .faq summary::-webkit-details-marker { display: none; }
-  .faq[open] summary .faq-chevron { transform: rotate(180deg); }
   .faq summary:focus-visible { @apply outline-2 outline-offset-2 outline-ring; }
 }
 /* unlayered: [hidden] must beat any utility the toggled element carries */
 [hidden] { display: none !important; }
 </style>
+
+<!-- motion: references/motion.css, inlined. Plain CSS on purpose - it must beat
+     @layer utilities and must not pass through the Tailwind browser compiler. -->
+<style id="jb-motion">
+/* ==========================================================================
+   jbelly-ui motion. Twelve recipes. No colour, no literal tempo, no literal
+   distance: every value comes from the MOTION TOKENS region of tokens.css.
+
+   Loaded as plain CSS, AFTER Tailwind. In a single-file page it is inlined into a
+   style element with id="jb-motion", placed immediately after the closing tag of the
+   type="text/tailwindcss" block. Unlayered on purpose: it must beat @layer utilities and it
+   must not pass through the browser compiler. Nothing in this file may contain the character
+   sequence that closes a style element, comment or not: the HTML parser ends the block there
+   and the whole sheet is silently dropped. V01 is the check that catches it.
+
+   THE THREE DECLARED LAYOUT EXCEPTIONS IN THIS SYSTEM:
+   motion-exception: #sidebar — inline-size: the rail's width IS the state, and
+     no composited property expresses how much space an element occupies.
+   motion-exception: .disclosure::details-content — block-size / grid-template-rows:
+     an intrinsic panel has no portable composited equivalent.
+   motion-exception: .list-item — grid-template-rows: the gap closing after a
+     removal is the second half of the departure report.
+   ========================================================================== */
+
+/* -- R1 - PRESS ----------------------------- data-motion="feedback" -- */
+.btn, .input, .checkbox, .select, .menu-item, .nav-link, .nav-child, .seg,
+.table tbody tr, .tick {
+  transition: background-color var(--t-tint) var(--ease-tint),
+              border-color     var(--t-tint) var(--ease-tint),
+              color            var(--t-tint) var(--ease-tint);
+}
+.btn {
+  transition: scale            var(--t-press) var(--ease-exit),
+              background-color var(--t-tint)  var(--ease-tint),
+              border-color     var(--t-tint)  var(--ease-tint),
+              color            var(--t-tint)  var(--ease-tint);
+}
+.btn:active { scale: var(--press-scale); }
+/* seen 100+ times a day: no motion at all. */
+[data-frequency="constant"] { transition-duration: var(--d-0); }
+/* the ring is instant: a transitioned focus ring lags the keyboard, which reads
+   as input latency. This rule is why M03 fails any transition on :focus-visible. */
+:focus-visible { transition-property: background-color, border-color, color; }
+
+/* -- R2 - MENU FROM ITS TRIGGER -------------- data-motion="spatial" -- */
+/* Preferred form for new markup: popover, zero JavaScript, enter AND exit. */
+.menu[popover] {
+  margin: 0; opacity: 0; scale: var(--pop-scale);
+  translate: 0 calc(-1 * var(--travel-sm));
+  transform-origin: top var(--origin-inline);
+  transition: opacity   var(--t-pop-out) var(--ease-exit),
+              scale     var(--t-pop-out) var(--ease-exit),
+              translate var(--t-pop-out) var(--ease-exit),
+              overlay   var(--t-pop-out) allow-discrete,
+              display   var(--t-pop-out) allow-discrete;
+}
+.menu[popover]:popover-open {
+  opacity: 1; scale: 1; translate: 0 0;
+  transition-duration: var(--t-pop);
+  transition-timing-function: var(--ease-enter);
+}
+/* MUST come after the open rule: equal specificity, source order decides. */
+@starting-style {
+  .menu[popover]:popover-open {
+    opacity: 0; scale: var(--pop-scale); translate: 0 calc(-1 * var(--travel-sm));
+  }
+}
+/* Shell-compatible form: the page's own JS flips data-open instead of .hidden.
+   Not the top layer, so the exit animates in every engine, not just Chromium. */
+.menu[data-menu] {
+  display: none; opacity: 0; scale: var(--pop-scale);
+  translate: 0 calc(-1 * var(--travel-sm));
+  transform-origin: top var(--origin-inline);
+  transition: opacity   var(--t-pop-out) var(--ease-exit),
+              scale     var(--t-pop-out) var(--ease-exit),
+              translate var(--t-pop-out) var(--ease-exit),
+              display   var(--t-pop-out) allow-discrete;
+}
+.menu[data-menu][data-open] {
+  display: flex; opacity: 1; scale: 1; translate: 0 0;
+  transition-duration: var(--t-pop);
+  transition-timing-function: var(--ease-enter);
+}
+@starting-style {
+  .menu[data-menu][data-open] {
+    opacity: 0; scale: var(--pop-scale); translate: 0 calc(-1 * var(--travel-sm));
+  }
+}
+@supports (anchor-name: --a) {          /* upgrade only; static placement below */
+  [data-anchor] { anchor-name: --jb-anchor; }
+  .menu[data-anchored] {
+    position: fixed; position-anchor: --jb-anchor;
+    position-area: block-end span-inline-start;    /* logical: RTL-correct free */
+    position-try-fallbacks: flip-block, flip-inline;
+    margin-block-start: var(--travel-sm);
+  }
+}
+
+/* -- R3 - PANEL + SCRIM ------ data-motion="spatial" | "continuity" --- */
+.panel {                                   /* closed state = the exit style */
+  display: none; opacity: 0;
+  translate: calc(var(--flow-x) * var(--panel-travel)) 0;
+  transition: opacity   var(--t-panel-out) var(--ease-exit),
+              translate var(--t-panel-out) var(--ease-exit),
+              display   var(--t-panel-out) allow-discrete;
+}
+.panel[data-open] {
+  display: flex; opacity: 1; translate: 0 0;
+  transition-duration: var(--t-panel);
+  transition-timing-function: var(--spring-ui);
+}
+@starting-style {
+  .panel[data-open] {
+    opacity: 0; translate: calc(var(--flow-x) * var(--panel-travel)) 0;
+  }
+}
+/* A centred overlay belongs to the viewport, not to a trigger: it scales, it
+   does not travel. The one legal transform-origin: center in the system. */
+.panel-centre { translate: 0 0; scale: var(--pop-scale); transform-origin: center;
+  transition: opacity var(--t-panel-out) var(--ease-exit),
+              scale   var(--t-panel-out) var(--ease-exit),
+              display var(--t-panel-out) allow-discrete; }
+.panel-centre[data-open] { scale: 1; }
+@starting-style { .panel-centre[data-open] { opacity: 0; scale: var(--pop-scale); } }
+/* Destructive or irreversible: heavier, slower, overdamped. Same tokens. */
+.panel-heavy[data-open] {
+  transition-duration: var(--t-heavy);
+  transition-timing-function: var(--spring-heavy);
+}
+/* The scrim is the SAME event: same two tokens, no exceptions, ever. */
+.scrim {
+  display: none; opacity: 0; background: var(--scrim);
+  transition: opacity var(--t-panel-out) var(--ease-exit),
+              display var(--t-panel-out) allow-discrete;
+}
+.scrim[data-open] {
+  display: block; opacity: 1;
+  transition-duration: var(--t-panel);
+  transition-timing-function: var(--ease-enter);
+}
+@starting-style { .scrim[data-open] { opacity: 0; } }
+.panel-heavy[data-open] ~ .scrim[data-open] { transition-duration: var(--t-heavy); }
+
+/* -- R4 - DISCLOSURE -------------------------- data-motion="state" --- */
+/* motion-exception: .disclosure::details-content */
+.disclosure-chevron {
+  rotate: 0deg;
+  transition: rotate var(--t-menu) var(--ease-move);
+}
+[dir="rtl"] .disclosure-chevron { rotate: 180deg; }   /* a directional glyph mirrors */
+.disclosure[open] > summary .disclosure-chevron,
+[aria-expanded="true"] .disclosure-chevron { rotate: calc(90deg * var(--flow-x)); }
+@supports selector(::details-content) {
+  .disclosure::details-content {
+    block-size: 0; overflow: clip;
+    transition: block-size        var(--t-menu) var(--ease-move),
+                content-visibility var(--t-menu) allow-discrete;
+  }
+  .disclosure[open]::details-content { block-size: auto; }
+  @supports (interpolate-size: allow-keywords) { :root { interpolate-size: allow-keywords; } }
+  @supports not (interpolate-size: allow-keywords) {   /* portable, no measurement */
+    .disclosure::details-content {
+      block-size: auto; display: grid; grid-template-rows: 0fr;
+      transition: grid-template-rows  var(--t-menu) var(--ease-move),
+                  content-visibility  var(--t-menu) allow-discrete;
+    }
+    .disclosure[open]::details-content { grid-template-rows: 1fr; }
+    .disclosure::details-content > * { min-block-size: 0; overflow: clip; }
+  }
+}
+
+/* -- R5 - SELECTION MARKER -------------------- data-motion="state" --- */
+/* The group MUST be equal columns: the marker's position is then arithmetic,
+   so no measurement and no JavaScript are needed. */
+.marker-group {
+  --mark-i: 0; --mark-n: 2;
+  position: relative; display: grid;
+  grid-auto-flow: column; grid-auto-columns: 1fr;
+}
+.marker-group:has(> :nth-child(2) :checked) { --mark-i: 1; }
+.marker-group:has(> :nth-child(3) :checked) { --mark-i: 2; }
+.marker-group:has(> :nth-child(4) :checked) { --mark-i: 3; }
+.marker {
+  position: absolute; inset-block-end: 0; inset-inline-start: 0;
+  inline-size: calc(100% / var(--mark-n)); block-size: 2px;
+  background: var(--primary);
+  translate: calc(var(--flow-x) * var(--mark-i) * 100%) 0;
+  transition: translate var(--t-menu) var(--spring-ui);
+}
+.marker-fill { inset-block: 0; block-size: auto; border-radius: var(--radius-md);
+  background: var(--card); z-index: 0; }   /* segmented control variant */
+
+/* -- R6 - ARRIVAL AND DEPARTURE --------------- data-motion="state" --- */
+/* Gated on [data-ready], which one line of script sets after load. Rows that
+   were in the server markup therefore render with no entrance: the page
+   arriving is not a state change. */
+html[data-ready] .arrives {
+  opacity: 1; translate: 0 0;
+  transition: opacity   var(--t-menu) var(--ease-enter),
+              translate var(--t-menu) var(--ease-enter);
+}
+@starting-style {
+  html[data-ready] .arrives { opacity: 0; translate: 0 calc(-1 * var(--travel)); }
+}
+.arrives[data-new] {          /* the non-motion half: a mark that outlives it */
+  box-shadow: inset calc(2px * var(--flow-x)) 0 0 0 var(--primary);
+}
+.departs[data-leaving] {
+  opacity: 0;
+  translate: calc(var(--flow-x) * var(--travel)) 0;
+  pointer-events: none;       /* legal ONLY while leaving, never as a gate */
+  transition: opacity   var(--t-menu-out) var(--ease-exit),
+              translate var(--t-menu-out) var(--ease-exit);
+}
+/* motion-exception: .list-item */
+.list-item { display: grid; grid-template-rows: 1fr;
+  transition: grid-template-rows var(--t-menu-out) var(--ease-exit); }
+.list-item > * { min-block-size: 0; overflow: clip; }
+.list-item[data-leaving] { grid-template-rows: 0fr; }
+
+/* -- R7 - SIDEBAR COLLAPSE --------------- data-motion="continuity" -- */
+/* motion-exception: #sidebar */
+#sidebar { transition: inline-size var(--t-panel) var(--ease-move); }
+#sidebar .nav-title, #sidebar .nav-badge {
+  transition: opacity var(--t-menu-out) var(--ease-exit);
+}
+/* One subject: the content pane follows the rail through layout, it does not
+   run an animation of its own. */
+.shell-main, .shell-header { transition: none; }
+
+/* -- R8 - REVISED IN PLACE -------------------- data-motion="state" --- */
+.revises { position: relative; }
+.revises::before {
+  content: ""; position: absolute; inset-block: 0; inset-inline-start: 0;
+  inline-size: 2px; background: var(--muted-foreground); opacity: 0;
+  transition: opacity var(--t-tint) var(--ease-enter);
+  pointer-events: none;
+}
+.revises[data-changed]::before      { opacity: 1; }
+.revises[data-changed="up"]::before   { background: var(--success); }
+.revises[data-changed="down"]::before { background: var(--destructive); }
+
+/* -- R9 - REFUSAL ----------------------------- data-motion="state" --- */
+.refuses[data-refused] { animation: jb-recoil var(--t-heavy) var(--spring-heavy) both; }
+@keyframes jb-recoil {
+  0%   { translate: 0 0; }
+  30%  { translate: calc(var(--recoil) * -1 * var(--flow-x)) 0; }
+  100% { translate: 0 0; }
+}
+
+/* -- R10 - PENDING --------------------------- data-motion="status" --- */
+/* The answer to the spinner and the shimmer. Finite, decelerating, stops at
+   92% because it does not know when the wait ends. `infinite` appears nowhere
+   in this system. */
+.pends { position: relative; }
+.pends::after {
+  content: ""; position: absolute; inset-block-start: 0; inset-inline-start: 0;
+  inline-size: 100%; block-size: 2px; background: var(--primary);
+  transform-origin: var(--origin-inline) center;
+  scale: 0 1; opacity: 0; pointer-events: none;
+}
+.pends[aria-busy="true"]::after {
+  opacity: 1;
+  animation: jb-elapsed var(--t-elapsed) var(--ease-elapsed) var(--t-grace) both;
+}
+@keyframes jb-elapsed { from { scale: 0 1; } to { scale: var(--elapsed-cap) 1; } }
+/* The skeleton goes back to being a static box that reserves height, which was
+   always its only job. It has no animation at all. */
+
+/* -- R11 - POSITION ------------------------ data-motion="position" --- */
+/* Resting truth OUTSIDE the guard: the seam is present and correct. */
+.app-seam { position: relative; }
+.app-seam::after {
+  content: ""; position: absolute; inset-inline: 0; inset-block-end: 0;
+  block-size: 1px; background: var(--border); opacity: 1;
+}
+.read-progress { display: none; }
+@supports (animation-timeline: scroll()) {
+  .app-seam::after {
+    animation: jb-seam var(--ease-flat) both;      /* shorthand FIRST: it resets */
+    animation-timeline: scroll(root block);        /* animation-timeline         */
+    animation-range: 0 var(--seam-range);
+  }
+  @keyframes jb-seam { from { opacity: 0; } to { opacity: 1; } }
+  .read-progress {
+    display: block; position: fixed; inset-block-start: 0; inset-inline: 0;
+    block-size: 2px; background: var(--primary); z-index: 60;
+    transform-origin: var(--origin-inline) center;
+    animation: jb-progress var(--ease-flat) both;
+    animation-timeline: scroll(root block);
+  }
+  @keyframes jb-progress { from { scale: 0 1; } to { scale: 1 1; } }
+}
+
+/* -- R12 - IDENTITY ----------------------- data-motion="continuity" -- */
+@supports (view-transition-name: none) {
+  /* the page did not change; only the named objects did. Without this line you
+     get the UA's undifferentiated 0.25s whole-document cross-fade. */
+  ::view-transition-old(root), ::view-transition-new(root) {
+    animation: none; mix-blend-mode: normal;
+  }
+  ::view-transition-group(*) {
+    animation-duration: var(--t-move);
+    animation-timing-function: var(--spring-ui);
+  }
+  /* members MOVE, they do not dissolve into each other. mix-blend-mode is reset
+     because the UA default is plus-lighter, which reads as a glow. */
+  ::view-transition-old(*), ::view-transition-new(*) {
+    animation: none; mix-blend-mode: normal; block-size: 100%;
+  }
+  :root:active-view-transition [data-vt-suppress] { visibility: hidden; }
+}
+
+/* == REDUCED MOTION: the four named exceptions ============================
+   The two token switches in tokens.css do everything else. These four are the
+   cases where the POSITION is the state, so nulling the travel would delete
+   the information instead of the motion. */
+@media (prefers-reduced-motion: reduce) {
+  /* the marker must still be under the selected tab: remove the travel, keep
+     the position, by removing the transition rather than the translate */
+  .marker { transition-property: none; }
+  /* layout is not reached by --travel-on, and a whole-shell reflow is the most
+     vestibular motion an admin page can produce: delete it, do not shorten it */
+  #sidebar, .disclosure::details-content, .list-item {
+    transition-property: opacity;
+  }
+  /* a scroll timeline has no duration to shorten. Detach it and rest at the
+     true state - which is why the resting styles live outside the guard. */
+  .read-progress { animation-timeline: none; display: none; }
+  .app-seam::after { animation-timeline: none; opacity: 1; }
+  /* the group carries the geometry (vestibular); the pair carries the identity
+     claim (pure opacity, safe). Collapse one, keep the other. */
+  /* 1ms, never 0.01ms: some engines round a sub-millisecond duration to zero and then never fire
+     transitionend, which breaks anything awaiting it. The literal is the point, so it is the one
+     tempo in the system written outside the token region. */
+  ::view-transition-group(*) { animation-duration: 1ms; }  /* motion-lint-ignore M01 */
+  ::view-transition-old(*), ::view-transition-new(*) {
+    animation-duration: var(--t-menu-out);
+  }
+}
+
+/* ===== page rules =======================================================
+   What this page's own structure needs. Every value is still a token. */
+
+/* .app-seam promotes a STATIC host to position: relative so its pseudo-element has something to
+   anchor to. This header is already sticky, and motion.css is unlayered, so the page has to say
+   so after it. Any host that is already positioned needs this one line. */
+header.app-seam { position: sticky; inset-block-start: 0; }
+
+/* A chevron that points DOWN when closed turns a half-turn to point up; R4's quarter-turn is for
+   a chevron that points along the reading direction. The glyph decides the angle, the recipe
+   still decides the tempo and the curve - and the angle is an end state, so reduced motion keeps
+   it and drops only the travel between the two. */
+.disclosure summary .faq-chevron {
+  rotate: 0deg;
+  transition: rotate var(--t-menu) var(--ease-move);
+}
+.disclosure[open] summary .faq-chevron { rotate: 180deg; }
+
+/* R5 on the billing toggle. The group pads itself by 4px, so the marker starts inside that
+   padding and each column is an equal share of what is left. */
+.marker-group .marker {
+  inset-block: 4px; inset-inline-start: 4px; block-size: auto;
+  inline-size: calc((100% - 8px) / var(--mark-n));
+}
+</style>
 </head>
 <body class="min-h-full flex flex-col text-2sm">
-<a href="#content" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:start-2 focus:z-50 btn btn-primary btn-sm">Skip to content</a>
+<a href="#content" data-motion="feedback" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:start-2 focus:z-50 btn btn-primary btn-sm">Skip to content</a>
 
 <!-- @region header -->
-<header class="sticky top-0 z-40 border-b border-border bg-background">
+<header class="app-seam sticky top-0 z-40 bg-background" data-motion="position">
   <div class="container-fixed flex h-(--header-height) items-center justify-between gap-4">
-    <a href="#" class="flex shrink-0 items-center gap-2.5 font-semibold text-mono">
+    <a href="#content" class="flex shrink-0 items-center gap-2.5 font-semibold text-mono">
       <span class="inline-flex size-7 items-center justify-center rounded-md bg-primary text-xs font-bold text-primary-foreground">A</span>
       <span class="font-display">Sijil</span>
     </a>
     <nav class="hidden items-center gap-0.5 md:flex" aria-label="Main">
-      <a href="#" class="rounded-md px-2.5 py-1.5 text-2sm text-secondary-foreground hover:bg-accent hover:text-mono"><span data-i18n="Product">Product</span></a>
+      <a href="#plans-heading" class="rounded-md px-2.5 py-1.5 text-2sm text-secondary-foreground hover:bg-accent hover:text-mono"><span data-i18n="Product">Product</span></a>
       <a href="#" aria-current="page" class="rounded-md bg-accent px-2.5 py-1.5 text-2sm font-medium text-mono"><span data-i18n="Pricing">Pricing</span></a>
-      <a href="#" class="rounded-md px-2.5 py-1.5 text-2sm text-secondary-foreground hover:bg-accent hover:text-mono"><span data-i18n="Docs">Docs</span></a>
-      <a href="#" class="rounded-md px-2.5 py-1.5 text-2sm text-secondary-foreground hover:bg-accent hover:text-mono"><span data-i18n="Changelog">Changelog</span></a>
+      <a href="#compare-heading" class="rounded-md px-2.5 py-1.5 text-2sm text-secondary-foreground hover:bg-accent hover:text-mono"><span data-i18n="Docs">Docs</span></a>
+      <a href="#faq-heading" class="rounded-md px-2.5 py-1.5 text-2sm text-secondary-foreground hover:bg-accent hover:text-mono"><span data-i18n="Changelog">Changelog</span></a>
     </nav>
     <div class="flex items-center gap-1.5">
       <button id="lang-toggle" class="btn btn-ghost btn-icon" aria-label="Switch language" title="English / العربية"><i data-lucide="languages"></i></button>
@@ -215,7 +694,7 @@
 </header>
 <!-- @endregion header -->
 
-<main id="content" class="grow">
+<main id="content" data-motion="feedback" class="grow">
 
   <!-- @region pricing-intro -->
 <section class="container-fixed flex flex-col items-center gap-4 pt-10 pb-7.5 text-center md:pt-14">
@@ -223,9 +702,10 @@
     <p class="max-w-xl text-sm text-secondary-foreground"><span data-i18n="Every plan carries the whole order pipeline. What changes is how many orders, stores and people you bring to it.">Every plan carries the whole order pipeline. What changes is how many orders, stores and people you bring to it.</span></p>
     <fieldset class="mt-2 flex flex-col items-center gap-2.5">
       <legend class="sr-only" data-i18n="Billing period">Billing period</legend>
-      <div class="inline-flex items-center gap-1 rounded-lg border border-border bg-muted p-1">
-        <label class="inline-flex"><input type="radio" name="billing" value="monthly" class="seg-input sr-only" checked><span class="seg"><span data-i18n="Monthly">Monthly</span></span></label>
-        <label class="inline-flex"><input type="radio" name="billing" value="yearly" class="seg-input sr-only"><span class="seg"><span data-i18n="Yearly">Yearly</span><span class="badge badge-sm bg-primary text-primary-foreground"><span data-i18n="Save 17%">Save 17%</span></span></span></label>
+      <div class="marker-group items-center rounded-lg border border-border bg-muted p-1" data-motion="state">
+        <label class="relative z-1 inline-flex"><input type="radio" name="billing" value="monthly" class="seg-input sr-only" checked><span class="seg"><span data-i18n="Monthly">Monthly</span></span></label>
+        <label class="relative z-1 inline-flex"><input type="radio" name="billing" value="yearly" class="seg-input sr-only"><span class="seg"><span data-i18n="Yearly">Yearly</span><span class="badge badge-sm bg-primary text-primary-foreground"><span data-i18n="Save 17%">Save 17%</span></span></span></label>
+        <span class="marker marker-fill shadow-xs" aria-hidden="true"></span>
       </div>
       <p class="min-h-4 text-xs text-muted-foreground" aria-live="polite">
         <span data-when="monthly"><span data-i18n="Switch to yearly and two months come free on every plan.">Switch to yearly and two months come free on every plan.</span></span>
@@ -397,24 +877,24 @@
 <section class="container-fixed pb-12" aria-labelledby="faq-heading">
     <h2 id="faq-heading" class="pb-5 font-display text-xl font-medium text-mono"><span data-i18n="Asked before signing">Asked before signing</span></h2>
     <div class="card divide-y divide-border">
-      <details class="faq px-5">
-        <summary><span data-i18n="Can we change plan in the middle of a billing period?">Can we change plan in the middle of a billing period?</span><i data-lucide="chevron-down" class="faq-chevron size-4 shrink-0 text-muted-foreground transition-transform"></i></summary>
+      <details class="faq disclosure px-5" data-motion="state">
+        <summary><span data-i18n="Can we change plan in the middle of a billing period?">Can we change plan in the middle of a billing period?</span><i data-lucide="chevron-down" class="faq-chevron size-4 shrink-0 text-muted-foreground"></i></summary>
         <p class="pb-4 pe-8 text-2sm text-secondary-foreground"><span data-i18n="An upgrade takes effect the moment you confirm it, and we charge only the difference for the days left in the period. A downgrade takes effect on the next renewal date, so you keep what you already paid for.">An upgrade takes effect the moment you confirm it, and we charge only the difference for the days left in the period. A downgrade takes effect on the next renewal date, so you keep what you already paid for.</span></p>
       </details>
-      <details class="faq px-5">
-        <summary><span data-i18n="What counts as an order?">What counts as an order?</span><i data-lucide="chevron-down" class="faq-chevron size-4 shrink-0 text-muted-foreground transition-transform"></i></summary>
+      <details class="faq disclosure px-5" data-motion="state">
+        <summary><span data-i18n="What counts as an order?">What counts as an order?</span><i data-lucide="chevron-down" class="faq-chevron size-4 shrink-0 text-muted-foreground"></i></summary>
         <p class="pb-4 pe-8 text-2sm text-secondary-foreground"><span data-i18n="One order created in a connected store, whatever number of items it holds. Cancellations, refunds and orders made in the sandbox are not counted.">One order created in a connected store, whatever number of items it holds. Cancellations, refunds and orders made in the sandbox are not counted.</span></p>
       </details>
-      <details class="faq px-5">
-        <summary><span data-i18n="What happens if we go past the monthly order limit?">What happens if we go past the monthly order limit?</span><i data-lucide="chevron-down" class="faq-chevron size-4 shrink-0 text-muted-foreground transition-transform"></i></summary>
+      <details class="faq disclosure px-5" data-motion="state">
+        <summary><span data-i18n="What happens if we go past the monthly order limit?">What happens if we go past the monthly order limit?</span><i data-lucide="chevron-down" class="faq-chevron size-4 shrink-0 text-muted-foreground"></i></summary>
         <p class="pb-4 pe-8 text-2sm text-secondary-foreground"><span data-i18n="Orders keep syncing and nothing is blocked. We email the account owner in the same week, and if you are over the limit two months in a row we ask you to move up a plan.">Orders keep syncing and nothing is blocked. We email the account owner in the same week, and if you are over the limit two months in a row we ask you to move up a plan.</span></p>
       </details>
-      <details class="faq px-5">
-        <summary><span data-i18n="Do extra seats cost more?">Do extra seats cost more?</span><i data-lucide="chevron-down" class="faq-chevron size-4 shrink-0 text-muted-foreground transition-transform"></i></summary>
+      <details class="faq disclosure px-5" data-motion="state">
+        <summary><span data-i18n="Do extra seats cost more?">Do extra seats cost more?</span><i data-lucide="chevron-down" class="faq-chevron size-4 shrink-0 text-muted-foreground"></i></summary>
         <p class="pb-4 pe-8 text-2sm text-secondary-foreground"><span data-i18n="Starter and Growth include the seats listed in the table; each seat after that is $6 a month. Scale has no seat limit, so adding people changes nothing on the invoice.">Starter and Growth include the seats listed in the table; each seat after that is $6 a month. Scale has no seat limit, so adding people changes nothing on the invoice.</span></p>
       </details>
-      <details class="faq px-5">
-        <summary><span data-i18n="How do we cancel, and what happens to our data?">How do we cancel, and what happens to our data?</span><i data-lucide="chevron-down" class="faq-chevron size-4 shrink-0 text-muted-foreground transition-transform"></i></summary>
+      <details class="faq disclosure px-5" data-motion="state">
+        <summary><span data-i18n="How do we cancel, and what happens to our data?">How do we cancel, and what happens to our data?</span><i data-lucide="chevron-down" class="faq-chevron size-4 shrink-0 text-muted-foreground"></i></summary>
         <p class="pb-4 pe-8 text-2sm text-secondary-foreground"><span data-i18n="Cancel from Settings, Billing, with no phone call and no retention script. Exports stay available for 30 days after the last billing day, then the workspace is deleted.">Cancel from Settings, Billing, with no phone call and no retention script. Exports stay available for 30 days after the last billing day, then the workspace is deleted.</span></p>
       </details>
     </div>
@@ -451,7 +931,7 @@
 <!-- @endregion footer -->
 
 <!-- ===== Demo controls (not part of the page; build-screen.py strips them) ===== -->
-<details class="fixed bottom-5 end-5 z-20 w-64 max-w-[calc(100%-2.5rem)] rounded-lg border border-border bg-popover text-2sm shadow-md open:pb-3">
+<details class="disclosure fixed bottom-5 end-5 z-20 w-64 max-w-[calc(100%-2.5rem)] rounded-lg border border-border bg-popover text-2sm shadow-md open:pb-3" data-motion="state">
   <summary class="flex cursor-pointer items-center gap-2 px-3 py-2 font-medium text-mono select-none"><i data-lucide="sliders-horizontal" class="size-4 text-muted-foreground"></i>Demo controls</summary>
   <div class="flex flex-col gap-2.5 px-3">
     <label class="flex flex-col gap-1"><span class="text-xs text-muted-foreground">Personality</span>

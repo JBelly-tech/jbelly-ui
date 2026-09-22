@@ -130,6 +130,129 @@
   --sidebar-border: oklch(27.5% 0.006 286);
 }
 
+/* ---------- Motion ------------------------------------------------------- */
+/* The ONLY place in the system where a duration, an easing curve or a travel
+   distance may be written as a literal. Everything downstream reads a var().
+   Motion is authored in references/motion.css, never in a class attribute:
+   see references/motion.md. The sentinels below are load-bearing —
+   scripts/lint_motion.py treats this region as the one place literals are legal.
+   Contains no colour: --scrim is a color-mix of an existing role. */
+
+/* MOTION TOKENS START */
+:root {
+  /* the two switches — reduced motion moves these and nothing else */
+  --travel-on: 1;        /* 1 = displacement allowed. Reduced motion sets 0.   */
+  --motion-reduce: 1;    /* tempo multiplier under reduce. Reduced motion 0.7. */
+
+  /* direction — the whole RTL mechanism */
+  --flow-x: 1;           /* multiply EVERY authored inline-axis length by this */
+  --origin-inline: left; /* transform-origin has no logical keyword; this is it */
+
+  /* preset + density dials */
+  --motion-preset: 1;    /* a personality may set 0.85 .. 1.15 and nothing else */
+  --travel-density: 1;   /* a density may set 0.75 .. 1.25 and nothing else     */
+  --motion-scale: calc(var(--motion-preset) * var(--motion-reduce));
+  --motion-max: 450ms;   /* nothing in this system may resolve longer           */
+  --reduced: var(--travel-on);  /* canary the runtime probe reads off :root     */
+
+  /* base durations, named by CLASS OF CHANGE, never by component */
+  --d-0:         0ms;    /* keyboard-initiated: no animation, ever              */
+  --d-press:   100ms;    /* the control received the press                      */
+  --d-tint:    140ms;    /* paint-tier state change; also the paint-tier cap    */
+  --d-pop:     180ms;    /* tooltip / menu / popover ENTER                      */
+  --d-pop-out: 130ms;    /*                              LEAVE                  */
+  --d-menu:    220ms;    /* disclosure, selection marker, inline panel ENTER    */
+  --d-menu-out:150ms;    /*                                          LEAVE      */
+  --d-move:    260ms;    /* an object kept its identity and changed position    */
+  --d-panel:   300ms;    /* drawer, dialog, sheet, command palette ENTER        */
+  --d-panel-out:200ms;   /*                                         LEAVE       */
+  --d-heavy:   390ms;    /* destructive or irreversible; overdamped             */
+
+  /* resolved: what every recipe references */
+  --t-press:     calc(var(--d-press)     * var(--motion-scale));
+  --t-tint:      calc(var(--d-tint)      * var(--motion-scale));
+  --t-pop:       calc(var(--d-pop)       * var(--motion-scale));
+  --t-pop-out:   calc(var(--d-pop-out)   * var(--motion-scale));
+  --t-menu:      calc(var(--d-menu)      * var(--motion-scale));
+  --t-menu-out:  calc(var(--d-menu-out)  * var(--motion-scale));
+  --t-move:      calc(var(--d-move)      * var(--motion-scale));
+  --t-panel:     calc(var(--d-panel)     * var(--motion-scale));
+  --t-panel-out: calc(var(--d-panel-out) * var(--motion-scale));
+  --t-heavy:     calc(var(--d-heavy)     * var(--motion-scale));
+
+  /* not UI tempo: unscaled, exempt from the 80-450ms budget */
+  --t-grace:   250ms;    /* no wait shorter than this is reported as pending     */
+  --t-elapsed:   30s;    /* how long a wait has lasted. FINITE: it is not a loop */
+  --t-linger:     6s;    /* how long a "this just changed" mark stays on screen  */
+
+  /* easings: enter decelerates, exit accelerates, loops do not exist */
+  --ease-enter: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --ease-exit:  cubic-bezier(0.3, 0, 0.8, 0.15);
+  --ease-move:  cubic-bezier(0.2, 0, 0, 1);
+  --ease-tint:  cubic-bezier(0.2, 0, 0.38, 0.9);
+  --ease-flat:  linear;              /* elapsed time and scroll position ONLY   */
+
+  /* Springs as linear(). Critically damped and overdamped only: no curve in
+     this system has a stop above 1, because an overshoot clamps on opacity and
+     colour into a visible dead hold. Each is paired with the duration it means. */
+  --spring-ui: linear(0, 0.004 1%, 0.0229 2.5%, 0.0789 5%, 0.4656 17%, 0.6384 23.5%,
+    0.7641 30%, 0.8147 33.5%, 0.8604 37.5%, 0.8993 42%, 0.9305 47%, 0.9542 52.5%,
+    0.9712 58.5%, 0.9912 73.5%, 1);            /* zeta 1.00 — pair with --t-panel */
+  --spring-heavy: linear(0, 0.0105 1%, 0.0541 2.5%, 0.4077 10.5%, 0.6101 16.5%,
+    0.6849 19.5%, 0.7544 23%, 0.8154 27%, 0.8613 31%, 0.8995 35.5%, 0.9321 41%,
+    0.9558 47%, 0.9722 53.5%, 0.9918 70.5%, 1); /* zeta 1.31 — pair with --t-heavy */
+  --ease-elapsed: linear(0, 0.42 6%, 0.68 16%, 0.82 30%, 0.9 46%, 0.95 68%, 1);
+  --ease-elapsed-steps: steps(8, end);          /* the reduced answer for elapsed  */
+
+  /* travel: one unit, bent by density, nulled by reduce */
+  --travel-unit: calc(4px * var(--travel-density) * var(--travel-on));
+  --travel-sm:   var(--travel-unit);                    /*  4px  */
+  --travel:      calc(var(--travel-unit) * 2);          /*  8px  */
+  --travel-lg:   calc(var(--travel-unit) * 4);          /* 16px  */
+  --recoil:      calc(var(--travel-unit) * 0.75);       /*  3px  */
+  --panel-travel: calc(100% * var(--travel-on));
+  --press-depth: 0.03;  --press-scale: calc(1 - var(--press-depth) * var(--travel-on));
+  --pop-depth:   0.04;  --pop-scale:   calc(1 - var(--pop-depth)   * var(--travel-on));
+  --elapsed-cap: 0.92;  /* the pending bar stops here: it does not know when it ends */
+  --seam-range:  48px;  /* scroll distance over which a sticky seam resolves        */
+
+  /* the one surface value motion needs and the colour roles above lack */
+  --scrim: color-mix(in oklab, var(--foreground) 45%, transparent);
+}
+
+/* Direction. Both selectors on purpose: :dir() for the document, the attribute
+   for a subtree that sets dir on itself. */
+:root:dir(rtl), [dir="rtl"] { --flow-x: -1; --origin-inline: right; }
+
+/* Density changes DISTANCE only. A compact UI is not a faster UI. */
+.density-compact { --travel-density: 0.75; }
+.density-airy    { --travel-density: 1.25; }
+
+/* A personality may set --motion-preset (0.85-1.15), --ease-enter,
+   --press-depth and --pop-depth. At most three of them. Nothing else. */
+.theme-graphite  { --motion-preset: 0.85; }
+.theme-slate     { --motion-preset: 0.9; }
+.theme-clinic    { --ease-enter: var(--spring-ui); }
+.theme-editorial { --motion-preset: 1.15; }
+.theme-neo       { --motion-preset: 0.85; --press-depth: 0.05; }
+.theme-mint      { --motion-preset: 1.1;  --pop-depth: 0.06; }
+
+/* Reduced motion. This REPLACES the blanket `* { duration: 0.01ms !important }`
+   block this file used to end with. Travel goes to zero and the tempo shortens;
+   opacity, colour and position keep working, so every state is still reported.
+   The four named exceptions live in motion.css, next to the recipes they answer. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --travel-on: 0;
+    --motion-reduce: 0.7;
+    --ease-enter: var(--ease-tint);
+    --ease-exit:  var(--ease-tint);
+    --ease-elapsed: var(--ease-elapsed-steps);
+  }
+  html { scroll-behavior: auto; }
+}
+/* MOTION TOKENS END */
+
 /* ---------- Tailwind v4 mapping (ignored by browsers, used by Tailwind) ---- */
 
 @custom-variant dark (&:where(.dark, .dark *));
@@ -173,6 +296,7 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-border: var(--sidebar-border);
+  --color-scrim: var(--scrim);
 
   --radius-xl: calc(var(--radius) + 4px);
   --radius-lg: var(--radius);
@@ -181,6 +305,19 @@
 
   --shadow-xs: var(--shadow-xs);
   --shadow-md: var(--shadow-md);
+
+  /* Easings: mapped so the system's curves replace Tailwind's own --ease-* and
+     resolve through var(), which is how the reduced-motion override still
+     reaches them. The tempo tokens are deliberately NOT mapped — a duration in
+     a class attribute is the thing lint_motion.py refuses (see motion.md). */
+  --ease-enter: var(--ease-enter);
+  --ease-exit: var(--ease-exit);
+  --ease-move: var(--ease-move);
+  --ease-tint: var(--ease-tint);
+  --ease-flat: var(--ease-flat);
+  --ease-elapsed: var(--ease-elapsed);
+  --ease-spring-ui: var(--spring-ui);
+  --ease-spring-heavy: var(--spring-heavy);
 }
 
 @theme {
@@ -219,12 +356,4 @@
   .scroll-thin { scrollbar-width: thin; scrollbar-color: var(--accent) transparent; }
   .scroll-thin::-webkit-scrollbar { width: 5px; height: 5px; }
   .scroll-thin::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 9999px; }
-
-  @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-    }
-  }
 }

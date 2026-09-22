@@ -130,6 +130,16 @@ for _kind, _marks in MARKERS.items():
 ok &= run("new_screen.py (scaffold)", [os.path.join(SK, "scripts", "new_screen.py"), os.path.join(OUT, "blank.html"), "--theme", "theme-graphite", "--dir", "rtl", "--strip-demo-controls"])
 ok &= run("personality_init.py", [os.path.join(SK, "scripts", "personality_init.py"), "--product", "Smoke", "--kind", "dashboard", "--audience", "ops, daily, keyboard", "--vibe", "precise, calm, plain", "--preset", "theme-clinic", "--change", "density compact", "--change", "radius 0.5rem", "--out", os.path.join(OUT, "personality.md")])
 ok &= run("lint_tokens.py", [os.path.join(SK, "scripts", "lint_tokens.py"), OUT])
+# Named pages, not the whole output folder: tests/out is not cleaned between runs and holds
+# deliberately broken copies this suite writes on purpose, so scanning all of it proves nothing.
+ok &= run("lint_motion.py (the generated page)", [os.path.join(SK, "scripts", "lint_motion.py"), page])
+for _kind2 in ("app", "landing", "pricing"):
+    _p = os.path.join(OUT, _kind2 + ".html")
+    if os.path.exists(_p):
+        ok &= run(f"lint_motion.py (built {_kind2})", [os.path.join(SK, "scripts", "lint_motion.py"), _p])
+ok &= run("lint_motion.py (the system itself)", [os.path.join(SK, "scripts", "lint_motion.py"), os.path.join(SK, "references")])
+for _shellname in ("app-shell", "landing-shell", "pricing-shell"):
+    ok &= run(f"lint_motion.py ({_shellname})", [os.path.join(SK, "scripts", "lint_motion.py"), os.path.join(SK, "assets", _shellname + ".html")])
 ok &= run("preflight.py", [os.path.join(SK, "scripts", "preflight.py"), page])
 have_renderer = False
 try:
@@ -224,6 +234,52 @@ else:
     print("[" + ("OK" if _caught else "FAIL") + "] pre-flight fails a page that paints links with an unreadable role")
     if not _caught: print("    it passed a page whose links are 3.96:1 in dark mode")
     ok &= _caught
+
+# A rule that cannot fail reads as a guarantee. Four deliberately bad sources, each the smallest
+# thing that should trip its rule, and each has to fail for THAT reason -- so the rule id is
+# asserted, not only the exit code.
+_MOTION_NEGATIVES = [
+    ("transition-all",             '<button class="btn transition-all duration-300">Save</button>', "M02"),
+    ("a raw 300ms",                ".a { transition: opacity 300ms var(--ease-enter); }",            "M01"),
+    ("animate-pulse",              '<div class="skeleton animate-pulse"></div>',                    "M09"),
+    ("an ungated @starting-style", "@starting-style { .card { opacity: 0; } }",                      "M11"),
+]
+for _name, _body, _rule in _MOTION_NEGATIVES:
+    _ext = ".html" if _body.lstrip().startswith("<") else ".css"
+    _bad = os.path.join(OUT, "motion-negative-" + _rule + _ext)
+    open(_bad, "w", encoding="utf-8").write(_body + "\n")
+    _r = subprocess.run([PY, os.path.join(SK, "scripts", "lint_motion.py"), _bad],
+                        capture_output=True, text=True, encoding="utf-8", errors="replace")
+    _hit = _r.returncode == 1 and _rule in _r.stdout
+    print("[" + ("OK" if _hit else "FAIL") + f"] lint_motion.py fails {_name} with {_rule}")
+    if not _hit: print(f"    exit {_r.returncode}: " + " | ".join(_r.stdout.strip().splitlines()[:2]))
+    ok &= _hit
+    os.remove(_bad)
+
+# Scanning nothing is not a pass: a wrong path has to exit 2, never report OK.
+_empty = os.path.join(OUT, "motion-empty"); os.makedirs(_empty, exist_ok=True)
+_r = subprocess.run([PY, os.path.join(SK, "scripts", "lint_motion.py"), _empty],
+                    capture_output=True, text=True, encoding="utf-8", errors="replace")
+print("[" + ("OK" if _r.returncode == 2 else "FAIL") + "] lint_motion.py exits 2 when there was nothing to check")
+ok &= _r.returncode == 2
+
+# The runtime probe has one job source analysis cannot do: notice that the page renders correctly
+# and does not animate. Break the sheet on a copy and V01 must refuse it.
+if have_renderer:
+    _src = open(os.path.join(SK, "assets", "pricing-shell.html"), encoding="utf-8").read()
+    _dead = _src.replace('<style id="jb-motion">', '<style id="jb-motion-off">', 1)
+    if _dead == _src:
+        print("[FAIL] verify_motion regression: the shell no longer inlines a jb-motion block")
+        ok = False
+    else:
+        _tmp = os.path.join(OUT, "motion-canary.html")
+        open(_tmp, "w", encoding="utf-8").write(_dead)
+        _r = subprocess.run([PY, os.path.join(SK, "scripts", "verify_motion.py"), _tmp],
+                            capture_output=True, text=True, encoding="utf-8", errors="replace")
+        _caught = _r.returncode == 1 and "V01" in _r.stdout
+        print("[" + ("OK" if _caught else "FAIL") + "] verify_motion.py refuses a page whose motion sheet never reached the document")
+        if not _caught: print(f"    exit {_r.returncode}: " + " | ".join(_r.stdout.strip().splitlines()[-2:]))
+        ok &= _caught
 
 print("\nSMOKE:", "PASS" if ok else "FAIL")
 sys.exit(0 if ok else 1)
