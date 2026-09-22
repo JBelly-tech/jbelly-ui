@@ -42,6 +42,13 @@ jobs:
           python skills/jbelly-ui/scripts/lint_tokens.py index.html
           python skills/jbelly-ui/scripts/preflight.py index.html
           python skills/jbelly-ui/scripts/verify_page.py index.html --variants ",#dark=1"
+          python skills/jbelly-ui/scripts/check_controls.py index.html
+      - name: Every control in every shipped demo does something
+        run: |
+          for f in skills/jbelly-ui/assets/*-shell.html; do
+            echo "--- $f"
+            python skills/jbelly-ui/scripts/check_controls.py "$f"
+          done
       - name: dist/ must match the sources
         run: |
           python skills/jbelly-ui/scripts/build_dist.py

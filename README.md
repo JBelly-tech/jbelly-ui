@@ -33,9 +33,10 @@ the limits are in [`COST.md`](COST.md).
 
 **2. Quality is decided by scripts, not by opinion.** One call renders the page headlessly in
 light, dark and RTL, collects console errors, fails on horizontal overflow, runs the token lint and
-runs a pre-flight that checks WCAG contrast of the token pairs, page structure, and the tells that
-make a page read as AI-generated. Every one of those checks exits non-zero when it fails, and CI
-runs them on every push.
+runs a pre-flight that checks page structure, the tells that make a page read as AI-generated, and
+the WCAG contrast of every colour role the markup paints text with. A second call drives every
+control in the page and fails on any that does nothing. Every one of those checks exits non-zero
+when it fails, and CI runs them on every push — including against this project's own website.
 
 **3. Two products cannot ship the same page by accident.** The personality step is mandatory and
 persisted: eight dials, six presets, written to `design/personality.md` before any code, and every
@@ -134,7 +135,8 @@ Every capture on this page is taken from the shells themselves by
 | `build-screen.py` | Whole screen from a ~2 KB JSON spec, zero model tokens for markup |
 | `new_screen.py` (`new-screen.ps1`) | Scaffold copy with personality / density / RTL / dark preset |
 | `verify_page.py` (`verify-page.ps1`) | One call: render variants headlessly, console errors, token lint, pre-flight, PASS/FAIL |
-| `preflight.py` | Deterministic judgement: AI-default tells, structure checks, WCAG contrast of the token pairs |
+| `preflight.py` | Deterministic judgement: AI-default tells, structure checks, and the WCAG contrast of every colour role the markup uses as text — not only the pairs the stylesheet happens to declare |
+| `check_controls.py` | Drives every button, tab, radio, summary and same-page link in a real browser and fails on any control that changes nothing. A dead button is the commonest defect in a demo and the hardest to see in review |
 | `lint_tokens.py` (`lint-tokens.ps1`) | No raw palette colours outside `tokens.css` |
 | `audit_styles.py` | Redesign inventory: fonts, colours, radii, shadows, spacing, raw palette classes; deviation list in fix order |
 | `export_tokens.py` · `build_dist.py` | Generate `assets/tokens.json` and the two `dist/` tiers from the sources |

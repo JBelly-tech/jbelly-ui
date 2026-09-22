@@ -166,6 +166,20 @@ if len(_scores) < 8: print(f"    only {len(_scores)} heuristic(s) graded, expect
 for _l in _lost: print("    " + _l)
 if _graded == "OK": print(f"    {len(_scores)}/{len(_scores)} heuristics passed")
 ok &= _graded == "OK"
+# "Every button works" is the claim a demo lives or dies on, and it is not decidable by reading the
+# source: a handler can be attached and still do nothing. The page the generator just built is
+# driven, control by control, in a real browser.
+_cc = subprocess.run([sys.executable, os.path.join(SK, "scripts", "check_controls.py"), page],
+                     capture_output=True, text=True)
+if _cc.returncode == 2:
+    print("[SKIP] check_controls.py: no renderer (install Playwright or Chrome)")
+    print("    " + (_cc.stderr or "").strip().splitlines()[-1][:120] if _cc.stderr.strip() else "")
+else:
+    print("[" + ("OK" if _cc.returncode == 0 else "FAIL") + "] every control in the built page does something")
+    for _l in (_cc.stdout or "").strip().splitlines()[-6:]:
+        print("    " + _l)
+    ok &= _cc.returncode == 0
+
 # The reference is what people copy, so its examples have to obey its own prose. `## Link colour`
 # tells the reader every preset declares --primary-accent; for a while none of the six did, and
 # anyone copying a preset out of that file reproduced the defect the rule exists to prevent.
