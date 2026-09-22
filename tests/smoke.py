@@ -326,5 +326,47 @@ else:
         ok &= _cond
 
 
+# A state nobody declared is still a state the page can be in. Five of six personalities on this
+# project's own site painted white text on a white card in dark mode and the pre-flight said PASS,
+# because no `.theme-x.dark` rule existed and so no environment was ever built for it. The smallest
+# page that should trip the new check is one personality, a dark mode, and no block joining them.
+_bare = os.path.join(OUT, "preset-without-dark.html")
+open(_bare, "w", encoding="utf-8").write("""<!doctype html><html><head><style>
+:root { --background: oklch(100% 0 0); --foreground: oklch(14.5% 0.005 285); }
+.dark { --background: oklch(14.5% 0.005 285); --foreground: oklch(98.5% 0 0); }
+.theme-x { --background: oklch(98% 0.01 160); }
+</style></head><body><main><h1>a personality with no dark half</h1></main></body></html>""")
+_r = subprocess.run([PY, os.path.join(SK, "scripts", "preflight.py"), _bare],
+                    capture_output=True, text=True, encoding="utf-8", errors="replace")
+_caught = _r.returncode == 1 and "reachable, undeclared" in _r.stdout
+print("[" + ("OK" if _caught else "FAIL") + "] pre-flight fails a personality that has no dark half")
+if not _caught: print(f"    exit {_r.returncode}: " + " | ".join(_r.stdout.strip().splitlines()[-2:]))
+ok &= _caught
+
+# The same run must not invent the failure where the dark half IS declared, or every correct
+# personality in the system starts reporting a fault.
+_paired = os.path.join(OUT, "preset-with-dark.html")
+open(_paired, "w", encoding="utf-8").write("""<!doctype html><html><head><style>
+:root { --background: oklch(100% 0 0); --foreground: oklch(14.5% 0.005 285); }
+.dark { --background: oklch(14.5% 0.005 285); --foreground: oklch(98.5% 0 0); }
+.theme-x { --background: oklch(98% 0.01 160); }
+.theme-x.dark { --background: oklch(14% 0.01 160); }
+</style></head><body><main><h1>a personality with both halves</h1></main></body></html>""")
+_r2 = subprocess.run([PY, os.path.join(SK, "scripts", "preflight.py"), _paired],
+                     capture_output=True, text=True, encoding="utf-8", errors="replace")
+print("[" + ("OK" if _r2.returncode == 0 else "FAIL") + "] pre-flight passes a personality that has one")
+if _r2.returncode != 0: print("    " + " | ".join(_r2.stdout.strip().splitlines()[-3:]))
+ok &= _r2.returncode == 0
+
+# And a file type it cannot parse is refused rather than mis-read as CSS.
+_md = os.path.join(OUT, "not-reviewable.md")
+open(_md, "w", encoding="utf-8").write("# notes\n\n```css\n.theme-x { --background: oklch(98% 0.01 160); }\n```\n")
+_r3 = subprocess.run([PY, os.path.join(SK, "scripts", "preflight.py"), _md],
+                     capture_output=True, text=True, encoding="utf-8", errors="replace")
+print("[" + ("OK" if _r3.returncode == 2 else "FAIL") + "] pre-flight refuses a file type it cannot parse")
+if _r3.returncode != 2: print(f"    exit {_r3.returncode}")
+ok &= _r3.returncode == 2
+
+
 print("\nSMOKE:", "PASS" if ok else "FAIL")
 sys.exit(0 if ok else 1)

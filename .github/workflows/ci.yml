@@ -41,7 +41,7 @@ jobs:
         run: |
           python skills/jbelly-ui/scripts/lint_tokens.py index.html
           python skills/jbelly-ui/scripts/preflight.py index.html
-          python skills/jbelly-ui/scripts/verify_page.py index.html --variants ",#dark=1,#theme=theme-editorial,#lang=ar,#lang=ar&dark=1"
+          python skills/jbelly-ui/scripts/verify_page.py index.html --variants ",#dark=1,#theme=theme-editorial,#theme=theme-clinic&dark=1,#lang=ar,#lang=ar&dark=1"
           python skills/jbelly-ui/scripts/check_controls.py index.html
       - name: Every control in every shipped demo does something
         run: |

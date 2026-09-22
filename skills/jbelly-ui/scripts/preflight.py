@@ -223,8 +223,30 @@ def check_file(path, results):
     pairs = [("foreground", "background", 4.5), ("primary-foreground", "primary", 4.5), ("muted-foreground", "background", 4.5), ("secondary-foreground", "secondary", 4.5), ("card-foreground", "card", 4.5), ("primary-accent", "card", 4.5), ("primary-accent", "background", 4.5)]
     # and whatever the markup itself paints text with, which a fixed list cannot know
     pairs += [q for q in text_role_pairs(txt, declared) if q not in pairs]
+    # A state nobody wrote a block for is still a state the page can be in. `.dark` and
+    # `.theme-clinic` are separate blocks and one class toggle apart, so `.theme-clinic.dark` is
+    # reachable -- it is what a theme rail next to a dark toggle produces -- and until this existed
+    # it was never built and never compared. Five of six presets on this project's own site painted
+    # white text on a white card in dark mode and passed, because nothing ever asked.
+    MODE = {".dark", ".light"}
+    pair_tokens = {t for fg, bg, _ in pairs for t in (fg, bg)}
+    declared_sigs = {sig for _, sig, _ in scopes}
+    combined, seen_union = [], set()
+    modes = [(sel, sig) for sel, sig, _ in scopes if sig and sig <= MODE]
+    for msel, msig in modes:
+        for sel, sig, toks in scopes:
+            union = sig | msig
+            if not sig or sig & MODE or union in declared_sigs or union in seen_union: continue
+            if not any(t in pair_tokens for t in toks): continue   # no colour here: nothing to compare
+            seen_union.add(union)
+            env = {}
+            for _, s2, t2 in sorted(((i, s2, t2) for i, (_, s2, t2) in enumerate(scopes) if s2 <= union),
+                                    key=lambda x: (len(x[1]), x[0])):
+                env.update(t2)
+            combined.append((f"{sel}{msel} [reachable, undeclared]", union, env))
+
     envs = {}  # keyed by narrowing-set: a page repeats few distinct scopes but can repeat them often
-    for sel, sig, toks in scopes:
+    for sel, sig, toks in scopes + combined:
         if sig not in envs:
             envs[sig] = env = {}
             # Specificity decides, and source order only breaks a tie -- which is what the engine
@@ -252,7 +274,13 @@ def main():
     target = a[0]; files = []
     if not os.path.exists(target):
         print(f"preflight: target not found: {target}", file=sys.stderr); return 2
-    if os.path.isfile(target): files = [target]
+    if os.path.isfile(target):
+        # A folder scan skips these; an explicit path used to walk past the filter and get parsed
+        # anyway. On markdown that meant reading the prose between code fences as selectors, which
+        # merges every example into one scope and reports contrast failures describing nothing.
+        if os.path.splitext(target)[1] not in EXTS:
+            print(f"preflight: {target} cannot be reviewed (looking for {' '.join(EXTS)})", file=sys.stderr); return 2
+        files = [target]
     else:
         for d, dirs, fs in os.walk(target):
             dirs[:] = [x for x in dirs if x not in ("node_modules", "dist", ".git", "vendor", "__pycache__")]

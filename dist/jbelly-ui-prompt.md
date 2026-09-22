@@ -212,6 +212,7 @@ Tailwind mapping — paste this too (generated from the token file, so no role i
   --radius: 0.75rem;
   --density: airy;                                       /* see density block below */
 }
+.theme-clinic.dark { --destructive-accent: oklch(61.5% 0.22 27); --primary-accent: oklch(70% 0.13 195); --background: oklch(15% 0.012 195); --card: oklch(18% 0.012 195); --popover: oklch(18% 0.012 195); --border: oklch(28% 0.015 195); --input: oklch(28% 0.015 195); --muted: oklch(22% 0.012 195); --accent: oklch(24% 0.014 195); --primary: oklch(70% 0.13 195); --primary-foreground: oklch(12% 0.02 195); }
 ```
 - **theme-graphite** (dense, technical, precise (fintech, ops, dev tools)):
 ```css
@@ -228,7 +229,7 @@ Tailwind mapping — paste this too (generated from the token file, so no role i
   --radius: 0.25rem;
   --density: compact;
 }
-.theme-graphite.dark { --background: oklch(12% 0.004 260); --muted-foreground: oklch(60% 0.014 285); --card: oklch(15% 0.004 260); --border: oklch(24% 0.005 260); }
+.theme-graphite.dark { --destructive-accent: oklch(60.25% 0.22 27); --primary-accent: oklch(65% 0.17 150); --muted-foreground: oklch(60.0% 0.014 285); --background: oklch(12% 0.004 260); --card: oklch(15% 0.004 260); --popover: oklch(15% 0.004 260); --border: oklch(24% 0.005 260); --input: oklch(26% 0.005 260); }
 ```
 - **theme-editorial** (warm, human, content-first (community, education, media)):
 ```css
@@ -247,6 +248,7 @@ Tailwind mapping — paste this too (generated from the token file, so no role i
   --radius: 0.5rem;
   --density: standard;
 }
+.theme-editorial.dark { --destructive-accent: oklch(61.75% 0.22 27); --primary-accent: oklch(70% 0.15 35); --background: oklch(16% 0.012 60); --card: oklch(19% 0.012 60); --popover: oklch(19% 0.012 60); --foreground: oklch(95% 0.01 75); --mono: oklch(95% 0.01 75); --border: oklch(28% 0.015 60); --input: oklch(28% 0.015 60); --muted: oklch(23% 0.012 60); --accent: oklch(25% 0.014 60); --muted-foreground: oklch(65% 0.02 60); --primary: oklch(70% 0.15 35); --primary-foreground: oklch(14% 0.02 40); }
 ```
 
 ## 4. The system in one screen

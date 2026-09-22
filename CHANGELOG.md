@@ -10,6 +10,21 @@ lightness. Every pair ends up with more contrast than it had: the dark link role
 to 6.88:1. `--info`, a chroma-0.22 violet on a system that bans purple-to-blue gradients by name,
 came down with it. Hues, roles and foregrounds are unchanged, so nothing needs re-mapping.
 
+**Six personalities were broken in dark mode on the site, and the checker said PASS.** A
+personality is two blocks -- `.theme-x` for the light surfaces, `.theme-x.dark` for the dark ones --
+and the site had copied only the first. Both are a single class, so the one written later wins, and
+the preset is written after `.dark`: the preset's *light* card ended up under dark mode's white
+text. The buttons vanished, and hovering brought them back, because hover paints `--accent`, which
+was still the dark one.
+
+The pre-flight missed it for a reason worth naming: it only built states somebody had written a
+block for. `.dark` and `.theme-clinic` were declared separately and their combination never was, so
+no environment for it was ever built and nothing was ever compared -- even though it is one class
+toggle away and exactly what a theme rail next to a dark toggle produces. It now synthesises that
+state and labels it, and pointed at the site it reports 1.00:1 where it used to report nothing.
+`references/personalities.md` documented one preset's dark half and five presets' light halves
+only, so anyone copying a preset out of it reproduced the same defect; all six are now paired.
+
 **The site has an Arabic edition.** The page had been telling people the demos ship AR/EN with full
 RTL while existing only in English. The translations are markup in a `<template>` rather than
 strings in a table, so a paragraph keeps its `<strong>`, its `<code>` and its links; a template is
