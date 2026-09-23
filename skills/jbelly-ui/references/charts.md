@@ -52,6 +52,11 @@ with a real height such as `h-full min-h-60`); percentage heights inside
 ## Rules
 
 - Series ≤ 5; the 6th becomes "Other". Colours in order: primary, chart-2, chart-3, chart-4, muted.
+- **`--chart-*` are series colours, not the state fills.** `--success` and `--warning` are made to carry
+  white text, which makes them far too light to be seen as a line: on a white card they measure 2.08:1
+  and 1.44:1. A series is a graphical object the reader needs in order to read the chart, so it clears
+  3:1 against the card — which is what `--chart-3` and `--chart-4` hold, in each mode. Reach for
+  `var(--chart-N)`, never `var(--success)`, when you are drawing.
 - Never colour alone: second series dashed (`stroke.dashArray:[0,4]`) or a marker shape; heatmap prints its values.
 - Y axis starts at 0 for bars; thousands separators via `yaxis.labels.formatter`.
 - One `sr-only` `<table>` per chart with the key points, and `role="img" aria-label="<the takeaway>"` on the container.

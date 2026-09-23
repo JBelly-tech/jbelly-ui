@@ -66,8 +66,8 @@ Output complete HTML with Tailwind v4 (`<script src="https://cdn.jsdelivr.net/np
 
   /* lines + focus */
   --border: oklch(94% 0.004 286);
-  --input: oklch(92% 0.004 286);
-  --ring: oklch(71% 0.01 286);
+  --input: oklch(63.5% 0.004 286);
+  --ring: oklch(55% 0.01 286);
 
   /* sidebar roles — override in .sidebar-dark for the dark-sidebar layout */
   --sidebar: var(--card);
@@ -119,8 +119,8 @@ Output complete HTML with Tailwind v4 (`<script src="https://cdn.jsdelivr.net/np
   
 
   --border: oklch(27.5% 0.006 286);
-  --input: oklch(27.5% 0.006 286);
-  --ring: oklch(44% 0.01 286);
+  --input: oklch(55.5% 0.006 286);
+  --ring: oklch(62% 0.01 286);
 
   --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.4);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.4);
@@ -215,12 +215,12 @@ Tailwind mapping — paste this too (generated from the token file, so no role i
   --background: oklch(98.5% 0.006 190);                  /* faint teal tint */
   --card: oklch(100% 0 0);
   --border: oklch(92% 0.012 190);
-  --input: oklch(90% 0.014 190);
+  --input: oklch(62.3% 0.014 190);
   --muted: oklch(96% 0.01 190);
   --radius: 0.75rem;
   --density: airy;                                       /* see density block below */
 }
-.theme-clinic.dark { --primary-accent: oklch(70% 0.13 195); --background: oklch(15% 0.012 195); --card: oklch(18% 0.012 195); --popover: oklch(18% 0.012 195); --border: oklch(28% 0.015 195); --input: oklch(28% 0.015 195); --muted: oklch(22% 0.012 195); --accent: oklch(24% 0.014 195); --primary: oklch(70% 0.13 195); --primary-foreground: oklch(12% 0.02 195); }
+.theme-clinic.dark { --primary-accent: oklch(70% 0.13 195); --background: oklch(15% 0.012 195); --card: oklch(18% 0.012 195); --popover: oklch(18% 0.012 195); --border: oklch(28% 0.015 195); --input: oklch(55.2% 0.015 195); --muted: oklch(22% 0.012 195); --accent: oklch(24% 0.014 195); --primary: oklch(70% 0.13 195); --primary-foreground: oklch(12% 0.02 195); }
 ```
 - **theme-graphite** (dense, technical, precise (fintech, ops, dev tools)):
 ```css
@@ -237,7 +237,7 @@ Tailwind mapping — paste this too (generated from the token file, so no role i
   --radius: 0.25rem;
   --density: compact;
 }
-.theme-graphite.dark { --muted-foreground: oklch(65.5% 0.014 285); --primary: oklch(65% 0.17 150); --primary-accent: oklch(69% 0.17 150); --background: oklch(12% 0.004 260); --card: oklch(15% 0.004 260); --popover: oklch(15% 0.004 260); --border: oklch(24% 0.005 260); --input: oklch(26% 0.005 260); }
+.theme-graphite.dark { --muted-foreground: oklch(65.5% 0.014 285); --primary: oklch(65% 0.17 150); --primary-accent: oklch(69% 0.17 150); --background: oklch(12% 0.004 260); --card: oklch(15% 0.004 260); --popover: oklch(15% 0.004 260); --border: oklch(24% 0.005 260); --input: oklch(55.5% 0.005 260); }
 ```
 - **theme-editorial** (warm, human, content-first (community, education, media)):
 ```css
@@ -256,7 +256,7 @@ Tailwind mapping — paste this too (generated from the token file, so no role i
   --radius: 0.5rem;
   --density: standard;
 }
-.theme-editorial.dark { --shadow-xs: 0 1px 3px rgb(20 10 0 / 0.5); --shadow-md: 0 6px 16px -6px rgb(10 5 0 / 0.6); --primary-accent: oklch(73% 0.15 35); --background: oklch(16% 0.012 60); --card: oklch(19% 0.012 60); --popover: oklch(19% 0.012 60); --foreground: oklch(95% 0.01 75); --mono: oklch(95% 0.01 75); --border: oklch(28% 0.015 60); --input: oklch(28% 0.015 60); --muted: oklch(23% 0.012 60); --accent: oklch(25% 0.014 60); --muted-foreground: oklch(65% 0.02 60); --primary: oklch(70% 0.15 35); --primary-foreground: oklch(14% 0.02 40); }
+.theme-editorial.dark { --shadow-xs: 0 1px 3px rgb(20 10 0 / 0.5); --shadow-md: 0 6px 16px -6px rgb(10 5 0 / 0.6); --primary-accent: oklch(73% 0.15 35); --background: oklch(16% 0.012 60); --card: oklch(19% 0.012 60); --popover: oklch(19% 0.012 60); --foreground: oklch(95% 0.01 75); --mono: oklch(95% 0.01 75); --border: oklch(28% 0.015 60); --input: oklch(55.5% 0.015 60); --muted: oklch(23% 0.012 60); --accent: oklch(25% 0.014 60); --muted-foreground: oklch(65% 0.02 60); --primary: oklch(70% 0.15 35); --primary-foreground: oklch(14% 0.02 40); }
 ```
 
 ## 4. The system in one screen

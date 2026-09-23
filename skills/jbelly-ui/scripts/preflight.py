@@ -251,6 +251,14 @@ def check_file(path, results):
     pairs = [("foreground", "background", 4.5), ("primary-foreground", "primary", 4.5), ("muted-foreground", "background", 4.5), ("secondary-foreground", "secondary", 4.5), ("card-foreground", "card", 4.5), ("primary-accent", "card", 4.5), ("primary-accent", "background", 4.5)]
     # and whatever the markup itself paints text with, which a fixed list cannot know
     pairs += [q for q in text_role_pairs(txt, declared) if q not in pairs]
+    # A control's edge and its focus ring are not decoration: they are the only thing saying where
+    # the control is and which one you are on, which is why WCAG 1.4.11 and 2.4.11 ask 3:1 of them.
+    # `--input` measured 1.27:1 on the page it sits on and `--ring` 1.91:1 in dark mode. `--border`
+    # is deliberately not here: it separates cards and rows, which layout already says, and a rule
+    # that cannot tell a hairline from a control boundary would push every one of them to 3:1.
+    pairs += [(edge, surf, 3.0) for edge in ("input", "ring")
+              for surf in ("background", "card", "popover", "muted", "accent", "secondary")
+              if edge in declared and surf in declared]
     # A state nobody wrote a block for is still a state the page can be in. `.dark` and
     # `.theme-clinic` are separate blocks and one class toggle apart, so `.theme-clinic.dark` is
     # reachable -- it is what a theme rail next to a dark toggle produces -- and until this existed

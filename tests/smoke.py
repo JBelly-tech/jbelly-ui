@@ -423,5 +423,22 @@ print("[" + ("OK" if _r6.returncode == 0 else "FAIL") + "] verify_theme.py passe
 if _r6.returncode != 0: print("    " + " | ".join(_r6.stdout.strip().splitlines()[-3:]))
 ok &= _r6.returncode == 0
 
+# A control's edge and its focus ring are the only thing saying where the control is and which one
+# you are on; WCAG 1.4.11 and 2.4.11 ask 3:1 of both. Three of the four shells shipped --input at
+# 1.27:1 against the page it sits on -- a form field with no visible boundary -- and --ring at
+# 1.91:1 in dark mode. Those are the values in this fixture.
+_edge = os.path.join(OUT, "invisible-field-edge.html")
+open(_edge, "w", encoding="utf-8").write("""<!doctype html><html><head><style>
+:root { --background: oklch(100% 0 0); --foreground: oklch(14.5% 0.005 285); --card: oklch(100% 0 0);
+        --input: oklch(92% 0.004 286); --ring: oklch(71% 0.01 286); }
+</style></head><body><main><h1>a field whose edge you cannot see</h1>
+<input aria-label="Name"></main></body></html>""")
+_r7 = subprocess.run([PY, os.path.join(SK, "scripts", "preflight.py"), _edge],
+                     capture_output=True, text=True, encoding="utf-8", errors="replace")
+_caught7 = _r7.returncode == 1 and "--input on --background" in _r7.stdout and "--ring on" in _r7.stdout
+print("[" + ("OK" if _caught7 else "FAIL") + "] pre-flight fails a control boundary and a focus ring under 3:1")
+if not _caught7: print(f"    exit {_r7.returncode}: " + " | ".join(_r7.stdout.strip().splitlines()[-2:]))
+ok &= _caught7
+
 print("\nSMOKE:", "PASS" if ok else "FAIL")
 sys.exit(0 if ok else 1)

@@ -64,12 +64,12 @@ names any role that does.
   --background: oklch(98.5% 0.006 190);                  /* faint teal tint */
   --card: oklch(100% 0 0);
   --border: oklch(92% 0.012 190);
-  --input: oklch(90% 0.014 190);
+  --input: oklch(62.3% 0.014 190);
   --muted: oklch(96% 0.01 190);
   --radius: 0.75rem;
   --density: airy;                                       /* see density block below */
 }
-.theme-clinic.dark { --primary-accent: oklch(70% 0.13 195); --background: oklch(15% 0.012 195); --card: oklch(18% 0.012 195); --popover: oklch(18% 0.012 195); --border: oklch(28% 0.015 195); --input: oklch(28% 0.015 195); --muted: oklch(22% 0.012 195); --accent: oklch(24% 0.014 195); --primary: oklch(70% 0.13 195); --primary-foreground: oklch(12% 0.02 195); }
+.theme-clinic.dark { --primary-accent: oklch(70% 0.13 195); --background: oklch(15% 0.012 195); --card: oklch(18% 0.012 195); --popover: oklch(18% 0.012 195); --border: oklch(28% 0.015 195); --input: oklch(55.2% 0.015 195); --muted: oklch(22% 0.012 195); --accent: oklch(24% 0.014 195); --primary: oklch(70% 0.13 195); --primary-foreground: oklch(12% 0.02 195); }
 ```
 Surface: tinted-page. Motion: `--ease-enter: var(--spring-ui)`; signature R3, the drawer settles. Signature: KPI numerals in `--font-display` at `text-4xl`, and a 3px `bg-primary` start-border on the active nav item. Data colours: teal · amber · slate-blue · sage.
 
@@ -89,7 +89,7 @@ Surface: tinted-page. Motion: `--ease-enter: var(--spring-ui)`; signature R3, th
   --radius: 0.25rem;
   --density: compact;
 }
-.theme-graphite.dark { --muted-foreground: oklch(65.5% 0.014 285); --primary: oklch(65% 0.17 150); --primary-accent: oklch(69% 0.17 150); --background: oklch(12% 0.004 260); --card: oklch(15% 0.004 260); --popover: oklch(15% 0.004 260); --border: oklch(24% 0.005 260); --input: oklch(26% 0.005 260); }
+.theme-graphite.dark { --muted-foreground: oklch(65.5% 0.014 285); --primary: oklch(65% 0.17 150); --primary-accent: oklch(69% 0.17 150); --background: oklch(12% 0.004 260); --card: oklch(15% 0.004 260); --popover: oklch(15% 0.004 260); --border: oklch(24% 0.005 260); --input: oklch(55.5% 0.005 260); }
 ```
 Surface: flat-bordered, tables everywhere, `tabular-nums` on all numbers. Motion: `--motion-preset: 0.85`; signature none, deliberately: still. Signature: monospaced meta text (IDs, timestamps, amounts) and 1px dotted separators. Data colours: green · sky · amber · magenta (all at equal lightness).
 
@@ -111,7 +111,7 @@ Surface: flat-bordered, tables everywhere, `tabular-nums` on all numbers. Motion
   --radius: 0.5rem;
   --density: standard;
 }
-.theme-editorial.dark { --shadow-xs: 0 1px 3px rgb(20 10 0 / 0.5); --shadow-md: 0 6px 16px -6px rgb(10 5 0 / 0.6); --primary-accent: oklch(73% 0.15 35); --background: oklch(16% 0.012 60); --card: oklch(19% 0.012 60); --popover: oklch(19% 0.012 60); --foreground: oklch(95% 0.01 75); --mono: oklch(95% 0.01 75); --border: oklch(28% 0.015 60); --input: oklch(28% 0.015 60); --muted: oklch(23% 0.012 60); --accent: oklch(25% 0.014 60); --muted-foreground: oklch(65% 0.02 60); --primary: oklch(70% 0.15 35); --primary-foreground: oklch(14% 0.02 40); }
+.theme-editorial.dark { --shadow-xs: 0 1px 3px rgb(20 10 0 / 0.5); --shadow-md: 0 6px 16px -6px rgb(10 5 0 / 0.6); --primary-accent: oklch(73% 0.15 35); --background: oklch(16% 0.012 60); --card: oklch(19% 0.012 60); --popover: oklch(19% 0.012 60); --foreground: oklch(95% 0.01 75); --mono: oklch(95% 0.01 75); --border: oklch(28% 0.015 60); --input: oklch(55.5% 0.015 60); --muted: oklch(23% 0.012 60); --accent: oklch(25% 0.014 60); --muted-foreground: oklch(65% 0.02 60); --primary: oklch(70% 0.15 35); --primary-foreground: oklch(14% 0.02 40); }
 ```
 Surface: elevated (no border, `shadow-md` at 6% warm black). Motion: `--motion-preset: 1.15`; signature R4, the disclosure. Signature: serif display headings, generous `max-w-prose` measure, hairline rules with small caps labels. Data colours: brick · olive · mustard · ink.
 
@@ -161,7 +161,7 @@ Surface: outlined-only with offset shadows. Motion: `--motion-preset: 0.85; --pr
   --sidebar-primary: oklch(78% 0.12 80);                   /* gold active marker */
   --sidebar-border: oklch(26% 0.03 260);
 }
-.theme-slate.dark { --muted-foreground: oklch(65.5% 0.014 285); --primary-accent: oklch(72% 0.12 80); --background: oklch(13% 0.02 260); --card: oklch(17% 0.02 260); --popover: oklch(17% 0.02 260); --foreground: oklch(95% 0.01 250); --border: oklch(26% 0.02 260); --input: oklch(26% 0.02 260); --primary: oklch(72% 0.12 80); --primary-foreground: oklch(15% 0.03 80); --sidebar: oklch(11% 0.02 260); }
+.theme-slate.dark { --muted-foreground: oklch(65.5% 0.014 285); --primary-accent: oklch(72% 0.12 80); --background: oklch(13% 0.02 260); --card: oklch(17% 0.02 260); --popover: oklch(17% 0.02 260); --foreground: oklch(95% 0.01 250); --border: oklch(26% 0.02 260); --input: oklch(55.5% 0.02 260); --primary: oklch(72% 0.12 80); --primary-foreground: oklch(15% 0.03 80); --sidebar: oklch(11% 0.02 260); }
 ```
 Surface: tinted-page with a dark sidebar. Motion: `--motion-preset: 0.9`; signature R5, the marker. Signature: gold active-nav marker on navy; sentence-case everything; no icons in table headers. Data colours: navy · gold · steel · teal.
 
@@ -183,7 +183,7 @@ Surface: tinted-page with a dark sidebar. Motion: `--motion-preset: 0.9`; signat
   --shadow-md: 0 8px 24px -8px rgb(20 60 40 / 0.18);
   --density: airy;
 }
-.theme-mint.dark { --shadow-xs: 0 1px 2px rgb(0 20 12 / 0.5); --shadow-md: 0 8px 24px -8px rgb(0 20 12 / 0.6); --primary-accent: oklch(72% 0.15 165); --background: oklch(14% 0.01 160); --card: oklch(18% 0.012 160); --popover: oklch(18% 0.012 160); --border: oklch(27% 0.015 160); --input: oklch(27% 0.015 160); --muted: oklch(22% 0.012 160); --accent: oklch(24% 0.014 160); --primary: oklch(72% 0.15 165); }
+.theme-mint.dark { --shadow-xs: 0 1px 2px rgb(0 20 12 / 0.5); --shadow-md: 0 8px 24px -8px rgb(0 20 12 / 0.6); --primary-accent: oklch(72% 0.15 165); --background: oklch(14% 0.01 160); --card: oklch(18% 0.012 160); --popover: oklch(18% 0.012 160); --border: oklch(27% 0.015 160); --input: oklch(55.2% 0.015 160); --muted: oklch(22% 0.012 160); --accent: oklch(24% 0.014 160); --primary: oklch(72% 0.15 165); }
 ```
 Surface: elevated, pill buttons (`rounded-full` on buttons and badges only). Motion: `--motion-preset: 1.1; --pop-depth: 0.06`; signature R2, the menu. Signature: pill controls + big rounded avatar chips. Data colours: mint · coral · navy · sand.
 

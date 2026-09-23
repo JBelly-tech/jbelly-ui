@@ -15,7 +15,13 @@ behind the ten dimensions.
 
 ## Navigation and focus
 - `<a>` for navigation, `<button>` for actions; never a `div` with a click handler.
-- `:focus-visible` ring on every control (`ring-2 ring-ring ring-offset-2`); `outline-none` only with a replacement. Sticky headers must not cover the focused element: `scroll-padding-top` = header height; heading anchors get `scroll-margin-top`.
+- `:focus-visible` ring on every control (`ring-2 ring-ring ring-offset-2`); `outline-none` only with a replacement.
+- **A ring is a box-shadow, and Windows High Contrast drops box-shadow.** Probed with `forced-colors`
+  active, a page whose only focus indicator is a ring reports `box-shadow: none` and `outline: none` —
+  no indicator at all, for the readers most likely to be on the keyboard. Ship the block in the shells:
+  `@media (forced-colors: active) { …:focus-visible { outline: 3px solid CanvasText; outline-offset: 2px } }`,
+  and keep it **outside** `@layer components` so it beats the component's own `outline-none`. Add
+  `forced-color-adjust: none` only where the colour *is* the information (swatches, chart series). Sticky headers must not cover the focused element: `scroll-padding-top` = header height; heading anchors get `scroll-margin-top`.
 - Filters, tabs, sort and page live in the URL so a refresh or a shared link shows the same view.
 - One active nav item; nav fits on one line at 1024px; header 70px desktop, 60px mobile.
 - Skip link as the first focusable element when there is a nav.

@@ -2,6 +2,52 @@
 
 ## Unreleased
 
+**You could not see where a form field was, or which control had focus.** WCAG 1.4.11 asks 3:1 of
+the boundary of a user interface component and 2.4.11 asks it of the focus indicator, for the same
+reason: they are the only thing telling a reader where the control is. `--input`, a field's edge,
+measured **1.27:1** against the page it sits on. `--ring`, the focus outline, measured 2.33:1 in
+light and **1.91:1** in dark. The storefront had already fixed both locally — the second time in
+this release that the newest shell was right and the rest of the system had not caught up — and even
+its values were a shade under once measured against every surface a field can sit on rather than
+only the page. Every `--input` and `--ring` in every personality now clears 3:1; the weakest is
+3.04:1, and the focus ring takes the storefront's stronger value rather than the minimum that passes.
+
+`--border` is deliberately left where it is. It separates cards and rows — structure that layout
+already states — and the system is nearly flat on purpose. A rule that could not tell a hairline
+from a control boundary would push every one of them to 3:1 and call it an improvement.
+
+`preflight.py` checks both roles against every surface the scope declares, so this cannot come back,
+and a fixture carrying the old shipped values proves the rule can fail.
+
+**And the chart drew two of its series with the state fills.** `--success` and `--warning` are made
+to carry white text, which makes them far too light to be seen as a line: on a white card the
+success series measured **2.08:1** and the warning series **1.44:1** — a pale yellow line on white
+paper. A series is a graphical object a reader needs in order to read the chart, so `--chart-3` and
+`--chart-4` now hold values that clear 3:1 there, keeping each hue and chroma and moving only in
+lightness so the ladder that tells the series apart survives: 48, 56, 60.5, 63, 52.5 instead of 48,
+56, 72, 85, 52.5. Dark mode keeps the bright fills, which are already 8:1 and 11:1 on its card.
+
+That exposed a second thing: the donut's legend dots were painted `bg-success` and `bg-warning`
+while the donut itself drew `--chart-3` and `--chart-4`. They held the same values until now, so
+nothing showed. A legend whose colours do not match the thing it labels is not a contrast problem,
+it is a wrong legend; the dots read the series roles.
+
+**In Windows High Contrast there was no focus indicator at all.** A Tailwind `ring` is a
+`box-shadow`, and `forced-colors: active` drops `box-shadow`. Probed in a real engine with forced
+colours on, every button in every shell reported `box-shadow: none` and `outline: none` — nothing,
+for the readers most likely to be navigating by keyboard and most likely to have turned High
+Contrast on. WCAG 2.4.7 asks for an indicator. Every shipped page now carries
+`@media (forced-colors: active) { …:focus-visible { outline: 3px solid CanvasText; outline-offset: 2px } }`,
+kept deliberately **outside** `@layer components` — an unlayered author rule beats a layered one
+whatever the specificity, which is what lets it win against the component's own `outline-none`, and
+the block says so where someone might otherwise tidy it into the layer. `forced-color-adjust: none`
+goes only where the colour *is* the information — and each of those selectors was checked against a
+rendered page rather than written from memory: the storefront's tone swatches (15) and colour filter
+(12), its product art (9), the dashboard's chart canvases (6) and its legend dots (5). Two selectors
+that matched nothing anywhere were dropped. Re-probed after the change: eight controls on each of the
+five pages, none without an indicator.
+
+
 **The skill is checked on macOS, Linux and Windows now, not assumed to work there.** On Windows the
 `.ps1` twins and the agent hide the command line; on macOS and Linux the terminal *is* the
 interface, and `--help` is the first thing anyone types. `SKILL.md` said "all `--help`". Six of

@@ -68,8 +68,8 @@
 
   /* lines + focus */
   --border: oklch(94% 0.004 286);
-  --input: oklch(92% 0.004 286);
-  --ring: oklch(71% 0.01 286);
+  --input: oklch(63.5% 0.004 286);
+  --ring: oklch(55% 0.01 286);
 
   /* sidebar roles — override in .sidebar-dark for the dark-sidebar layout */
   --sidebar: var(--card);
@@ -121,8 +121,8 @@
   
 
   --border: oklch(27.5% 0.006 286);
-  --input: oklch(27.5% 0.006 286);
-  --ring: oklch(44% 0.01 286);
+  --input: oklch(55.5% 0.006 286);
+  --ring: oklch(62% 0.01 286);
 
   --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.4);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.4);
