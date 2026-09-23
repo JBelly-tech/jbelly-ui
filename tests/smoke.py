@@ -368,5 +368,60 @@ if _r3.returncode != 2: print(f"    exit {_r3.returncode}")
 ok &= _r3.returncode == 2
 
 
+# A personality is written after dark mode and is, like it, a single class, so every role it
+# declares is handed to it in BOTH modes. Five of the six shipped personalities kept a light value
+# in the dark page that way -- a 53% grey second line on a 13% ground, warm paper shadows on black.
+# The contrast pass sees that only where it happens to compare that exact pair, and never at all for
+# a role like --shadow-md, so the rule names the cause instead of waiting for a symptom.
+_leak = os.path.join(OUT, "preset-leaks-into-dark.html")
+open(_leak, "w", encoding="utf-8").write("""<!doctype html><html><head><style>
+:root { --background: oklch(100% 0 0); --foreground: oklch(14.5% 0.005 285); --shadow-md: 0 1px 2px rgb(0 0 0 / 0.05); }
+.dark { --background: oklch(14.5% 0.005 285); --foreground: oklch(98.5% 0 0); --shadow-md: 0 1px 2px rgb(0 0 0 / 0.5); }
+.theme-x { --background: oklch(97% 0.01 160); --shadow-md: 0 6px 16px rgb(60 30 10 / 0.18); }
+.theme-x.dark { --background: oklch(14% 0.01 160); }
+</style></head><body><main><h1>a personality that keeps its light shadow in the dark</h1></main></body></html>""")
+_r4 = subprocess.run([PY, os.path.join(SK, "scripts", "preflight.py"), _leak],
+                     capture_output=True, text=True, encoding="utf-8", errors="replace")
+_named = _r4.returncode == 1 and "keeps --shadow-md in .dark" in _r4.stdout
+print("[" + ("OK" if _named else "FAIL") + "] pre-flight names a role a personality keeps in dark mode")
+if not _named: print(f"    exit {_r4.returncode}: " + " | ".join(_r4.stdout.strip().splitlines()[-2:]))
+ok &= _named
+
+# preflight reads the declared roles. It cannot read what the markup does with them: `text-success`
+# names no role pair -- it paints a fill as text, and on a tint of itself that is 1.97:1. Only a
+# rendered page answers that, so verify_theme.py has to be able to fail on one.
+_fill = os.path.join(OUT, "fill-as-text.html")
+open(_fill, "w", encoding="utf-8").write("""<!doctype html><html><head><style>
+:root { --background: oklch(100% 0 0); --foreground: oklch(14.5% 0.005 285); --success: oklch(72% 0.19 150); }
+body { background: var(--background); color: var(--foreground); }
+.badge { background: color-mix(in oklab, var(--success) 15%, transparent); color: var(--success);
+         padding: 2px 8px; border-radius: 6px; font-size: 13px; }
+</style></head><body><main><h1>the fill, painted as text</h1>
+<p><span class="badge">Confirmed</span></p></main></body></html>""")
+_r5 = subprocess.run([PY, os.path.join(SK, "scripts", "verify_theme.py"), _fill],
+                     capture_output=True, text=True, encoding="utf-8", errors="replace")
+_skipped = "[SKIP]" in _r5.stdout
+_caught5 = _r5.returncode == 1 and "C01 TEXT" in _r5.stdout
+print("[" + ("SKIP" if _skipped else ("OK" if _caught5 else "FAIL")) +
+      "] verify_theme.py fails a fill painted as text on a tint of itself")
+if not _skipped and not _caught5: print(f"    exit {_r5.returncode}: " + " | ".join(_r5.stdout.strip().splitlines()[-2:]))
+ok &= _skipped or _caught5
+
+# ...and must not invent one where the page reads, or every correct page reports a fault.
+_ok_page = os.path.join(OUT, "accent-as-text.html")
+open(_ok_page, "w", encoding="utf-8").write("""<!doctype html><html><head><style>
+:root { --background: oklch(100% 0 0); --foreground: oklch(14.5% 0.005 285); --success: oklch(72% 0.19 150);
+        --success-accent: oklch(45% 0.15 150); }
+body { background: var(--background); color: var(--foreground); }
+.badge { background: color-mix(in oklab, var(--success) 15%, transparent); color: var(--success-accent);
+         padding: 2px 8px; border-radius: 6px; font-size: 13px; }
+</style></head><body><main><h1>the text value, painted as text</h1>
+<p><span class="badge">Confirmed</span></p></main></body></html>""")
+_r6 = subprocess.run([PY, os.path.join(SK, "scripts", "verify_theme.py"), _ok_page],
+                     capture_output=True, text=True, encoding="utf-8", errors="replace")
+print("[" + ("OK" if _r6.returncode == 0 else "FAIL") + "] verify_theme.py passes the same page with the text role")
+if _r6.returncode != 0: print("    " + " | ".join(_r6.stdout.strip().splitlines()[-3:]))
+ok &= _r6.returncode == 0
+
 print("\nSMOKE:", "PASS" if ok else "FAIL")
 sys.exit(0 if ok else 1)

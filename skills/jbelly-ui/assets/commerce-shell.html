@@ -11,6 +11,7 @@
 <style type="text/tailwindcss">
 /* ===== tokens.css (inlined for the single-file demo) ===== */
 :root {
+  --info-accent: oklch(48.5% 0.15 293);
   color-scheme: light;
   --radius: 0.5rem;
   --font-display: "Inter", ui-sans-serif, system-ui, "Noto Kufi Arabic", sans-serif;
@@ -21,7 +22,7 @@
   --popover: oklch(100% 0 0); --popover-foreground: oklch(14.5% 0.005 285);
   --primary: oklch(48% 0.13 255); --primary-accent: oklch(48% 0.13 255); --primary-foreground: oklch(100% 0 0);
   --secondary: oklch(96.5% 0.002 285); --secondary-foreground: oklch(21% 0.006 285);
-  --muted: oklch(96.5% 0.002 285); --muted-foreground: oklch(55% 0.014 285);
+  --muted: oklch(96.5% 0.002 285); --muted-foreground: oklch(52.5% 0.014 285);
   --accent: oklch(96.5% 0.002 285); --accent-foreground: oklch(21% 0.006 285);
   --mono: oklch(14.5% 0.005 285); --mono-foreground: oklch(100% 0 0);
   --destructive: oklch(57.5% 0.22 27); --destructive-foreground: oklch(100% 0 0); --destructive-accent: oklch(46% 0.2 27);
@@ -35,7 +36,7 @@
   --tone-strap: oklch(83% 0.03 85); --tone-page: oklch(96% 0.012 95);
   --sidebar: var(--card); --sidebar-foreground: var(--foreground); --sidebar-muted: var(--muted-foreground);
   --sidebar-accent: var(--accent); --sidebar-accent-foreground: var(--accent-foreground);
-  --sidebar-primary: var(--primary); --sidebar-border: var(--border);
+  --sidebar-primary: var(--primary-accent); --sidebar-border: var(--border);
   --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.06);
   --sidebar-width: 280px; --sidebar-default-width: 280px; --sidebar-width-collapsed: 80px; --header-height: 70px;
@@ -43,18 +44,18 @@
   --chart-2: var(--info); --chart-3: var(--success); --chart-4: var(--warning);
 }
 @media (max-width: 63.99rem) { :root { --header-height: 60px; } }
-.dark { --primary-accent: oklch(68% 0.11 255);
+.dark { --info-accent: oklch(70.5% 0.128 293); --primary-accent: oklch(68% 0.11 255);
   color-scheme: dark;
   --background: oklch(14.5% 0.005 285); --foreground: oklch(98.5% 0 0);
   --card: oklch(14.5% 0.005 285); --card-foreground: oklch(98.5% 0 0);
   --popover: oklch(14.5% 0.005 285); --popover-foreground: oklch(98.5% 0 0);
   --primary: oklch(50% 0.13 255);
   --secondary: oklch(27.5% 0.006 286); --secondary-foreground: oklch(98.5% 0 0);
-  --muted: oklch(21% 0.006 285); --muted-foreground: oklch(64% 0.014 285);
+  --muted: oklch(21% 0.006 285); --muted-foreground: oklch(65.5% 0.014 285);
   --accent: oklch(21% 0.006 285); --accent-foreground: oklch(98.5% 0 0);
   --mono: oklch(87% 0.006 286); --mono-foreground: oklch(0% 0 0);
   --warning-foreground: oklch(25% 0.06 90); --warning-accent: oklch(88% 0.12 90);
-  --success-accent: oklch(75% 0.17 150); --destructive-accent: oklch(68% 0.19 27);
+  --success-accent: oklch(75% 0.17 150); --destructive-accent: oklch(70% 0.154 27);
   --border: oklch(30% 0.006 286); --input: oklch(52% 0.008 286); --ring: oklch(62% 0.01 286);
   --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.4);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.4);
@@ -66,36 +67,36 @@
 .density-compact { --ctl-h: 30px; --ctl-h-sm: 24px; --row-h: 38px; --card-p: 1rem; --page-gap: 1rem; }
 .density-airy    { --ctl-h: 40px; --ctl-h-sm: 32px; --row-h: 56px; --card-p: 1.75rem; --page-gap: 1.75rem; }
 /* ===== personalities (from references/personalities.md) ===== */
-.theme-clinic { --primary-accent: oklch(50% 0.12 195); --font-display: "Manrope", "Noto Kufi Arabic", sans-serif; --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+.theme-clinic { --primary-accent: oklch(45% 0.12 195); --font-display: "Manrope", "Noto Kufi Arabic", sans-serif; --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --primary: oklch(50% 0.12 195); --background: oklch(98.5% 0.006 190); --card: oklch(100% 0 0);
   --border: oklch(88% 0.014 190); --input: oklch(64% 0.02 190); --muted: oklch(96% 0.01 190); --accent: oklch(95% 0.012 190); --radius: 0.75rem;
   --tone-moss: oklch(50% 0.1 178); --tone-clay: oklch(66% 0.1 78); --tone-iris: oklch(48% 0.12 250); --tone-ink: oklch(38% 0.09 210); }
 .theme-clinic.dark { --primary-accent: oklch(70% 0.13 195); --background: oklch(15% 0.012 195); --card: oklch(18% 0.012 195); --popover: oklch(18% 0.012 195); --border: oklch(30% 0.015 195); --input: oklch(52% 0.02 195); --muted: oklch(22% 0.012 195); --accent: oklch(24% 0.014 195); --primary: oklch(70% 0.13 195); --primary-foreground: oklch(12% 0.02 195); }
-.theme-graphite { --primary-accent: oklch(52.25% 0.17 150); --muted-foreground: oklch(54% 0.014 285); --font-display: "IBM Plex Sans", "Noto Kufi Arabic", sans-serif; --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, "Noto Sans Arabic", sans-serif; --font-mono: "IBM Plex Mono", monospace;
+.theme-graphite { --primary-accent: oklch(47.5% 0.17 150); --muted-foreground: oklch(54% 0.014 285); --font-display: "IBM Plex Sans", "Noto Kufi Arabic", sans-serif; --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, "Noto Sans Arabic", sans-serif; --font-mono: "IBM Plex Mono", monospace;
   --primary: oklch(65% 0.17 150); --primary-foreground: oklch(14% 0 0); --background: oklch(97% 0.002 260); --card: oklch(100% 0 0); --border: oklch(86% 0.004 260); --input: oklch(63% 0.008 260); --radius: 0.25rem;
   --tone-moss: oklch(52% 0.13 152); --tone-clay: oklch(66% 0.12 70); --tone-iris: oklch(48% 0.13 278); --tone-ink: oklch(36% 0.06 200); }
-.theme-graphite.dark { --primary-accent: oklch(65% 0.17 150); --muted-foreground: oklch(60.0% 0.014 285); --background: oklch(12% 0.004 260); --card: oklch(15% 0.004 260); --popover: oklch(15% 0.004 260); --border: oklch(28% 0.005 260); --input: oklch(52% 0.008 260); }
+.theme-graphite.dark { --muted-foreground: oklch(65.5% 0.014 285); --primary: oklch(65% 0.17 150); --primary-accent: oklch(69% 0.17 150); --background: oklch(12% 0.004 260); --card: oklch(15% 0.004 260); --popover: oklch(15% 0.004 260); --border: oklch(28% 0.005 260); --input: oklch(52% 0.008 260); }
 .theme-editorial { --primary-accent: oklch(48% 0.16 30); --font-display: "Fraunces", "Noto Kufi Arabic", Georgia, serif; --font-sans: "Source Sans 3", ui-sans-serif, system-ui, "Noto Sans Arabic", sans-serif;
   --primary: oklch(48% 0.16 30); --primary-foreground: oklch(98% 0.01 60); --background: oklch(97.5% 0.012 75); --card: oklch(99% 0.008 75);
   --foreground: oklch(22% 0.02 50); --mono: oklch(22% 0.02 50); --border: oklch(86% 0.025 70); --input: oklch(62% 0.035 65); --muted: oklch(94% 0.015 75); --accent: oklch(93% 0.018 75); --muted-foreground: oklch(50% 0.03 50);
   --tone-slate: oklch(26% 0.02 50); --tone-moss: oklch(48% 0.09 130); --tone-clay: oklch(64% 0.12 55); --tone-iris: oklch(46% 0.1 300); --tone-oxblood: oklch(40% 0.14 28); --tone-ink: oklch(36% 0.07 245);
   --radius: 0.5rem; --shadow-xs: 0 1px 3px rgb(60 30 10 / 0.08); --shadow-md: 0 6px 16px -6px rgb(60 30 10 / 0.18); }
-.theme-editorial.dark { --primary-accent: oklch(70% 0.15 35); --background: oklch(16% 0.012 60); --card: oklch(19% 0.012 60); --popover: oklch(19% 0.012 60); --foreground: oklch(95% 0.01 75); --mono: oklch(95% 0.01 75); --border: oklch(30% 0.015 60); --input: oklch(53% 0.02 60); --muted: oklch(23% 0.012 60); --accent: oklch(25% 0.014 60); --muted-foreground: oklch(65% 0.02 60); --primary: oklch(70% 0.15 35); --primary-foreground: oklch(14% 0.02 40); }
-.theme-neo { --primary-accent: oklch(55% 0.25 290); --font-display: "Space Grotesk", "Noto Kufi Arabic", sans-serif; --font-sans: "DM Sans", ui-sans-serif, system-ui, "Noto Sans Arabic", sans-serif;
+.theme-editorial.dark { --shadow-xs: 0 1px 3px rgb(20 10 0 / 0.5); --shadow-md: 0 6px 16px -6px rgb(10 5 0 / 0.6); --primary-accent: oklch(73% 0.15 35); --background: oklch(16% 0.012 60); --card: oklch(19% 0.012 60); --popover: oklch(19% 0.012 60); --foreground: oklch(95% 0.01 75); --mono: oklch(95% 0.01 75); --border: oklch(30% 0.015 60); --input: oklch(53% 0.02 60); --muted: oklch(23% 0.012 60); --accent: oklch(25% 0.014 60); --muted-foreground: oklch(65% 0.02 60); --primary: oklch(70% 0.15 35); --primary-foreground: oklch(14% 0.02 40); }
+.theme-neo { --primary-accent: oklch(51.5% 0.25 290); --font-display: "Space Grotesk", "Noto Kufi Arabic", sans-serif; --font-sans: "DM Sans", ui-sans-serif, system-ui, "Noto Sans Arabic", sans-serif;
   --tone-moss: oklch(55% 0.17 145); --tone-clay: oklch(70% 0.16 70); --tone-iris: oklch(50% 0.2 292); --tone-oxblood: oklch(42% 0.18 22); --tone-ink: oklch(38% 0.15 275);
   --primary: oklch(55% 0.25 290); --background: oklch(99% 0 0); --card: oklch(100% 0 0); --foreground: oklch(10% 0 0); --mono: oklch(10% 0 0);
   --border: oklch(10% 0 0); --input: oklch(10% 0 0); --radius: 0.25rem; --shadow-xs: 3px 3px 0 0 var(--foreground); --shadow-md: 5px 5px 0 0 var(--foreground); }
-.theme-neo.dark { --primary-accent: oklch(75% 0.2 290); --background: oklch(12% 0 0); --card: oklch(15% 0 0); --popover: oklch(15% 0 0); --foreground: oklch(98% 0 0); --mono: oklch(98% 0 0); --border: oklch(98% 0 0); --input: oklch(98% 0 0); --primary: oklch(75% 0.2 290); --primary-foreground: oklch(10% 0 0); }
+.theme-neo.dark { --shadow-xs: 3px 3px 0 0 var(--foreground); --shadow-md: 5px 5px 0 0 var(--foreground); --primary-accent: oklch(75% 0.2 290); --background: oklch(12% 0 0); --card: oklch(15% 0 0); --popover: oklch(15% 0 0); --foreground: oklch(98% 0 0); --mono: oklch(98% 0 0); --border: oklch(98% 0 0); --input: oklch(98% 0 0); --primary: oklch(75% 0.2 290); --primary-foreground: oklch(10% 0 0); }
 .theme-slate { --muted-foreground: oklch(53% 0.014 285); --font-display: "Inter", "Noto Kufi Arabic", sans-serif; --font-sans: "Inter", ui-sans-serif, system-ui, "Noto Sans Arabic", sans-serif;
   --tone-moss: oklch(50% 0.1 155); --tone-clay: oklch(66% 0.13 75); --tone-iris: oklch(46% 0.13 272); --tone-oxblood: oklch(40% 0.13 30); --tone-ink: oklch(34% 0.1 260);
   --primary: oklch(42% 0.12 260); --background: oklch(96.5% 0.004 250); --card: oklch(100% 0 0); --foreground: oklch(18% 0.02 260); --border: oklch(86% 0.012 250); --input: oklch(63% 0.018 250); --radius: 0.375rem;
   --sidebar: oklch(18% 0.03 260); --sidebar-foreground: oklch(92% 0.01 250); --sidebar-muted: oklch(65% 0.02 250); --primary-accent: oklch(46% 0.1 82); --sidebar-accent: oklch(24% 0.03 260); --sidebar-accent-foreground: oklch(100% 0 0); --sidebar-primary: oklch(78% 0.12 80); --sidebar-border: oklch(26% 0.03 260); }
-.theme-slate.dark { --primary-accent: oklch(72% 0.12 80); --muted-foreground: oklch(60.0% 0.014 285); --background: oklch(13% 0.02 260); --card: oklch(17% 0.02 260); --popover: oklch(17% 0.02 260); --foreground: oklch(95% 0.01 250); --border: oklch(30% 0.02 260); --input: oklch(52% 0.025 260); --primary: oklch(72% 0.12 80); --primary-foreground: oklch(15% 0.03 80); --sidebar: oklch(11% 0.02 260); }
-.theme-mint { --primary-accent: oklch(52.5% 0.15 165); --font-display: "Plus Jakarta Sans", "Noto Kufi Arabic", sans-serif; --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, "Noto Sans Arabic", sans-serif;
+.theme-slate.dark { --muted-foreground: oklch(65.5% 0.014 285); --primary-accent: oklch(72% 0.12 80); --background: oklch(13% 0.02 260); --card: oklch(17% 0.02 260); --popover: oklch(17% 0.02 260); --foreground: oklch(95% 0.01 250); --border: oklch(30% 0.02 260); --input: oklch(52% 0.025 260); --primary: oklch(72% 0.12 80); --primary-foreground: oklch(15% 0.03 80); --sidebar: oklch(11% 0.02 260); }
+.theme-mint { --primary-accent: oklch(45.5% 0.15 165); --font-display: "Plus Jakarta Sans", "Noto Kufi Arabic", sans-serif; --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, "Noto Sans Arabic", sans-serif;
   --tone-moss: oklch(52% 0.13 162); --tone-clay: oklch(70% 0.12 88); --tone-iris: oklch(48% 0.12 258); --tone-oxblood: oklch(42% 0.12 18); --tone-ink: oklch(36% 0.1 195);
   --primary: oklch(60% 0.15 165); --primary-foreground: oklch(14% 0 0); --background: oklch(98% 0.01 160); --card: oklch(100% 0 0); --border: oklch(88% 0.025 160); --input: oklch(64% 0.03 160); --muted: oklch(96% 0.012 160); --accent: oklch(95% 0.015 160); --radius: 1rem;
   --shadow-xs: 0 1px 2px rgb(20 60 40 / 0.06); --shadow-md: 0 8px 24px -8px rgb(20 60 40 / 0.18); }
-.theme-mint.dark { --primary-accent: oklch(72% 0.15 165); --background: oklch(14% 0.01 160); --card: oklch(18% 0.012 160); --popover: oklch(18% 0.012 160); --border: oklch(30% 0.015 160); --input: oklch(52% 0.02 160); --muted: oklch(22% 0.012 160); --accent: oklch(24% 0.014 160); --primary: oklch(72% 0.15 165); }
+.theme-mint.dark { --shadow-xs: 0 1px 2px rgb(0 20 12 / 0.5); --shadow-md: 0 8px 24px -8px rgb(0 20 12 / 0.6); --primary-accent: oklch(72% 0.15 165); --background: oklch(14% 0.01 160); --card: oklch(18% 0.012 160); --popover: oklch(18% 0.012 160); --border: oklch(30% 0.015 160); --input: oklch(52% 0.02 160); --muted: oklch(22% 0.012 160); --accent: oklch(24% 0.014 160); --primary: oklch(72% 0.15 165); }
 
 @custom-variant dark (&:where(.dark, .dark *));
 @theme inline {
@@ -114,7 +115,7 @@
   --color-tone-iris: var(--tone-iris); --color-tone-oxblood: var(--tone-oxblood); --color-tone-ink: var(--tone-ink);
   --color-warning: var(--warning); --color-warning-foreground: var(--warning-foreground); --color-warning-accent: var(--warning-accent);
   --color-tone-strap: var(--tone-strap); --color-tone-page: var(--tone-page);
-  --color-info: var(--info); --color-info-foreground: var(--info-foreground);
+  --color-info: var(--info); --color-info-accent: var(--info-accent); --color-info-foreground: var(--info-foreground);
   --color-border: var(--border); --color-input: var(--input); --color-ring: var(--ring);
   --color-sidebar: var(--sidebar); --color-sidebar-foreground: var(--sidebar-foreground); --color-sidebar-muted: var(--sidebar-muted);
   --color-sidebar-accent: var(--sidebar-accent); --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -1100,7 +1101,7 @@ header.app-seam { position: sticky; }
 <p id="live" class="sr-only" aria-live="polite"></p>
 
 <!-- ===== Demo controls (not part of the shop) ===== -->
-<details id="demo" data-motion="feedback" class="fixed bottom-16 lg:bottom-5 end-3 start-auto lg:start-5 lg:end-auto z-40 rounded-lg border border-border bg-popover shadow-md text-2sm w-auto open:w-64 lg:w-64 open:pb-3 opacity-70 hover:opacity-100 focus-within:opacity-100 open:opacity-100">
+<details id="demo" data-motion="feedback" class="fixed bottom-16 lg:bottom-5 end-3 start-auto lg:start-5 lg:end-auto z-40 rounded-lg border border-border bg-popover shadow-md text-2sm w-auto open:w-64 open:pb-3">
   <summary class="cursor-pointer select-none px-3 py-2 font-medium text-mono flex items-center gap-2"><i data-lucide="sliders-horizontal" class="size-4 text-muted-foreground"></i><span class="hidden lg:inline">Demo controls</span><span class="lg:hidden sr-only">Demo controls</span></summary>
   <div class="px-3 flex flex-col gap-2.5">
     <label class="flex flex-col gap-1"><span class="text-xs text-muted-foreground">Personality</span>
@@ -1789,7 +1790,7 @@ function filtered() {
 }
 const skelCard = () => `<div class="card overflow-hidden"><div class="aspect-[4/3] skeleton rounded-none"></div>
   <div class="p-4 flex flex-col gap-2.5"><span class="skeleton h-2.5 w-20"></span><span class="skeleton h-3.5 w-40"></span><span class="skeleton h-3 w-24"></span><span class="skeleton h-4 w-16"></span></div>
-  <div class="px-4 pb-4"><span class="skeleton block h-(--ctl-h) w-full"></span></div></div>`;
+  <div class="px-4 pb-4 flex items-center gap-2"><span class="skeleton block h-(--ctl-h) grow"></span><span class="skeleton block size-(--ctl-h) shrink-0"></span></div></div>`;
 function cardHTML(p) {
   const sel = defaultSel(p), out = p.stock === 0, liked = STATE.wish.has(p.id);
   const from = p.opts.some(o => o.v.some(x => x.d)), price = p.minPrice;
@@ -1806,7 +1807,6 @@ function cardHTML(p) {
         ${p.added <= 10 ? `<span class="badge badge-sm badge-light-primary">${esc(t('New'))}</span>` : ''}
       </div>
       <button type="button" class="absolute top-2 end-2 btn btn-ghost btn-icon bg-card/80 hover:bg-card" data-wish="${p.id}" aria-pressed="${liked}" aria-label="${esc(liked ? t('Saved') : t('Save for later'))}: ${esc(pname(p))}"><i data-lucide="heart" class="${liked ? 'fill-primary text-primary-accent' : ''}"></i></button>
-      <button type="button" class="static mt-2 mx-3 w-[calc(100%-1.5rem)] lg:absolute lg:mt-0 lg:mx-0 lg:w-auto lg:inset-x-3 lg:bottom-3 btn btn-outline bg-card/95 gap-1.5" data-quick="${p.id}"><i data-lucide="eye"></i>${esc(t('Quick view'))}</button>
     </div>
     <div class="p-(--card-p) flex flex-col gap-1.5 grow">
       <span class="text-xs text-muted-foreground">${esc(p.maker)}</span>
@@ -1816,9 +1816,10 @@ function cardHTML(p) {
         ${p.was ? `<span class="text-xs text-muted-foreground line-through tabular-nums">${moneyB(p.was)}</span>` : ''}</span>
       <span class="flex gap-0 md:gap-2 pt-1.5 -ms-2 md:ms-0" role="group" aria-label="${esc(t('Colour'))}">${p.tones.map(tn => `<button type="button" class="inline-flex size-8 md:size-6 items-center justify-center rounded-full cursor-pointer" data-tone="${p.id}|${tn}" aria-pressed="${shown === tn}" aria-label="${esc(LANG === 'ar' ? TONES[tn].ar : tn)}" title="${esc(LANG === 'ar' ? TONES[tn].ar : tn)}"><span class="size-4 rounded-full ${shown === tn ? 'border-2 border-primary' : 'border border-border'} ${TONES[tn].bg}"></span></button>`).join('')}</span>
     </div>
-    <div class="px-4 pb-4">${out
-      ? `<button type="button" class="btn btn-outline w-full" disabled>${esc(t('Out of stock'))}</button>`
-      : `<button type="button" class="btn btn-primary w-full gap-1.5" data-add="${p.id}"><i data-lucide="plus"></i>${esc(t('Add to bag'))}</button>`}</div>
+    <div class="px-4 pb-4 flex items-center gap-2">${out
+      ? `<button type="button" class="btn btn-outline grow" disabled>${esc(t('Out of stock'))}</button>`
+      : `<button type="button" class="btn btn-primary grow gap-1.5" data-add="${p.id}"><i data-lucide="plus"></i>${esc(t('Add to bag'))}</button>`}
+      <button type="button" class="btn btn-outline btn-icon shrink-0" data-quick="${p.id}" title="${esc(t('Quick view'))}" aria-label="${esc(t('Quick view'))}: ${esc(pname(p))}"><i data-lucide="eye"></i></button></div>
   </article>`;
 }
 const panel = (icon, tint, role, title, body, action) => `<div role="${role}" class="col-span-full flex flex-col items-center justify-center text-center gap-3 py-16">

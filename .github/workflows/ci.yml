@@ -36,7 +36,14 @@ jobs:
           python skills/jbelly-ui/scripts/preflight.py skills/jbelly-ui/assets/app-shell.html
           python skills/jbelly-ui/scripts/preflight.py skills/jbelly-ui/assets/landing-shell.html
           python skills/jbelly-ui/scripts/preflight.py skills/jbelly-ui/assets/pricing-shell.html
+          python skills/jbelly-ui/scripts/preflight.py skills/jbelly-ui/assets/commerce-shell.html
           python skills/jbelly-ui/scripts/preflight.py skills/jbelly-ui/references/tokens.css
+      - name: Every shipped demo reads in every personality, light and dark
+        run: |
+          for f in skills/jbelly-ui/assets/*-shell.html index.html; do
+            echo "--- $f"
+            python skills/jbelly-ui/scripts/verify_theme.py "$f"
+          done
       - name: The project's own site passes the project's own checks
         run: |
           python skills/jbelly-ui/scripts/lint_tokens.py index.html

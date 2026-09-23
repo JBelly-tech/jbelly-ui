@@ -207,7 +207,7 @@ def build_kpis(kpis):
         badge = f'<span class="badge badge-sm {"badge-light-success" if up else "badge-light-destructive"}"><i data-lucide="{"trending-up" if up else "trending-down"}" class="size-3"></i>{esc(k.get("delta",""))}</span>' if k.get("delta") else ""
         spark = f'<div class="h-10 -mx-1 -mb-2 apex-spark" data-spark="{",".join(str(v) for v in k["spark"])}"></div>' if k.get("spark") else ""
         cards.append(f'''          <div class="card p-(--card-p) gap-6 justify-between overflow-hidden">
-            <div class="flex items-center justify-between"><span class="inline-flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary"><i data-lucide="{esc(k.get("icon","activity"))}" class="size-5"></i></span>{badge}</div>
+            <div class="flex items-center justify-between"><span class="inline-flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary-accent"><i data-lucide="{esc(k.get("icon","activity"))}" class="size-5"></i></span>{badge}</div>
             <div class="flex flex-col gap-1"><span class="text-3xl font-semibold text-mono tabular-nums font-display">{esc(k.get("value",""))}</span><span class="text-sm text-secondary-foreground" data-i18n="{esc(k.get("label",""))}">{esc(k.get("label",""))}</span></div>{spark}
           </div>''')
     return f'        <!-- KPIs -->\n        <div class="grid {cols} gap-(--page-gap)" id="kpis">\n' + "\n".join(cards) + "\n        </div>"
@@ -722,10 +722,10 @@ def build_testimonial(t):
     badge = f'\n      <span class="badge badge-sm badge-outline ms-auto" data-i18n="{esc(t["badge"])}">{esc(t["badge"])}</span>' if t.get("badge") else ""
     return f'''<section class="section border-b border-border">
   <figure class="container-fixed flex max-w-3xl flex-col gap-7">
-    <i data-lucide="quote" class="size-7 text-primary"></i>
+    <i data-lucide="quote" class="size-7 text-primary-accent"></i>
     <blockquote class="font-display text-2xl lg:text-3xl font-medium leading-snug text-mono text-balance" data-i18n="{esc(t["quote"])}">{esc(t["quote"])}</blockquote>
     <figcaption class="flex flex-wrap items-center gap-x-4 gap-y-2">
-      <span class="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 font-semibold text-2xs text-primary">{esc(initials(t.get("name", "")))}</span>
+      <span class="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 font-semibold text-2xs text-primary-accent">{esc(initials(t.get("name", "")))}</span>
       <span class="flex flex-col gap-0.5 min-w-0">{who}{role}</span>{badge}
     </figcaption>
   </figure>
@@ -1048,7 +1048,7 @@ def build_plans(spec):
 
 def cmp_cell(v):
     """A cell is a word, a number, or the plain fact that a plan has the feature or has not."""
-    if v is True: return '<td><i data-lucide="check" class="mx-auto block size-4 text-primary"></i><span class="sr-only" data-i18n="Included">Included</span></td>'
+    if v is True: return '<td><i data-lucide="check" class="mx-auto block size-4 text-primary-accent"></i><span class="sr-only" data-i18n="Included">Included</span></td>'
     if v is False or v is None: return '<td><i data-lucide="minus" class="mx-auto block size-4 text-muted-foreground"></i><span class="sr-only" data-i18n="Not included">Not included</span></td>'
     if re.fullmatch(r"[\d.,%\s]+", str(v)): return f'<td dir="ltr" class="tabular-nums">{esc(v)}</td>'
     return f'<td>{i18n(v)}</td>'

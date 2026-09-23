@@ -2,6 +2,72 @@
 
 ## Unreleased
 
+**Three of the five state colours had no value for text.** The system states the rule itself --
+"a fill light enough to carry white text is too light to be read as text" -- and it is why
+`--primary-accent` and `--destructive-accent` exist. It had been applied to two roles out of five.
+So the recipes reached for the fill: `badge-light-success` was `bg-success/15 text-success`, which
+is a 72%-light green painted on a 15% tint of itself, **1.97:1**. Warning was worse. `--success-accent`,
+`--warning-accent` and `--info-accent` now exist, `--destructive-accent` is corrected (it measured
+3.78:1 light, 3.23:1 dark), and every value clears 4.9:1 on **every** surface any personality
+declares in that mode -- 16 light and 21 dark across the four shells, plus the tinted badge ground
+over each.
+
+**`text-primary` was the same mistake, and it is the one people saw.** It is the fill used as text.
+In the default palette `--primary` and `--primary-accent` hold the same value, so it looks correct;
+the moment a personality is chosen -- which this skill requires -- it stops being correct. In
+graphite it was a 65% green on white, 2.72:1, which is why active nav items and avatar initials went
+pale as soon as anyone switched personality. 32 uses across the four shells and 37 recipes across
+the references now name the text role. `--sidebar-primary` followed the fill too, and now follows
+the text value; the sidebar avatar uses the sidebar's own brand role instead of the page's, so it
+survives a dark sidebar on a light page.
+
+**A personality was leaking its light values into dark mode.** `.theme-x` and `.dark` are each a
+single class and a personality is written after dark mode, so source order hands the personality
+every role it declares -- in *both* modes. Five of six were doing it: graphite kept `--primary` and
+a 53%-grey `--muted-foreground` on a 13% ground, editorial and mint kept warm paper shadows on a
+black page. `preflight.py` has a new rule that names the role and the scope rather than waiting for
+a contrast pair to happen to cover it, and it found a broken declaration in this very change on its
+first run.
+
+**A new runtime probe, because the source cannot answer this.** `preflight.py` reads the declared
+tokens and checks the role pairs. A class like `bg-success/15 text-success` names no pair -- it
+names a fill and then paints that fill as text on a tint of itself, and whether that reads depends
+on a composite the stylesheet never states and on which personality is active. `verify_theme.py`
+drives the real engine: it sets each personality on `<html>`, walks every element that paints,
+composites the background the way the compositor does, and compares. C01 text, C02 icons, C03
+nothing painting itself invisible, C04 every personality actually reached. It is folded into
+`verify_page.py`, so it costs no extra call.
+
+Writing it taught three things about measuring a live page, all of which had produced a confident
+wrong answer first: a URL fragment is a same-document navigation, so a page that reads it once on
+load never sees the second one and every personality measures as whatever loaded first; a demo that
+remembers dark mode hands back the previous state and reads as a clean sweep; and colours sampled
+during the tint crossfade come back as an interpolated `oklab()` of the state being *left*.
+Transitions are switched off for the sweep rather than waited out.
+
+**Measured, on every page this repo ships**, before and after, with the same probe: 12,026 painted
+elements across 14 personality states each -- seven personalities, light and dark -- against the
+ground each element is actually painted on.
+
+| page | before | after |
+|------|-------:|------:|
+| `app-shell.html` | 109 | **0** |
+| `commerce-shell.html` | 63 | **0** |
+| `landing-shell.html` | 45 | **0** |
+| `pricing-shell.html` | 24 | **0** |
+| `index.html` | 0 | **0** |
+
+The site was already clean: it is plain CSS with no utility classes to get wrong, and its six
+personality dark blocks landed in the previous change. The defect was in what the skill *ships*.
+
+**Two storefront defects that were visible rather than measured.** The quick-view button was
+absolutely positioned across the bottom of every product photograph at `lg` and up -- permanently,
+because the hover gate that would normally hide it had been removed when V08 caught it (a control
+resting at opacity 0 is invisible to anyone who never hovers, and to print). It sits in the card
+footer beside "Add to bag" now. And the demo-controls panel had been faded to 70% to stop it
+covering the grid, which made every label on it 2.75:1 at rest -- a second defect standing in for a
+fix. It is opaque again, and narrow until opened, which is what the overlap needed in the first place.
+
 **The default palette stops shouting.** `--primary` was chroma 0.2 on a white page and 0.21 on
 near-black, which made it the loudest object on every screen the system produces — a template's
 accent, not a considered one. It is now deeper and much less saturated, and the dark-mode link

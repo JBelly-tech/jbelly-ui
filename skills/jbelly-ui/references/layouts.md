@@ -39,7 +39,7 @@ The default for dashboards, admin panels and SaaS apps.
     </main>
 
     <footer class="container-fixed flex flex-wrap items-center justify-between gap-2.5 py-5 text-2sm text-muted-foreground">
-      <span>© 2026 Company</span> <nav class="flex gap-4"><a class="hover:text-primary">Docs</a> …</nav>
+      <span>© 2026 Company</span> <nav class="flex gap-4"><a class="hover:text-primary-accent">Docs</a> …</nav>
     </footer>
   </div>
 </body>
@@ -82,7 +82,7 @@ or mega-menu · `grow` · search trigger (outline sm, icon + “Search” + Kbd 
 icon buttons (ghost icon-only) for notifications (with `absolute -top-0.5 -end-0.5 size-2 rounded-full bg-destructive border-2 border-background`),
 chat, apps · theme toggle · user avatar `size-9` opening a Dropdown (name + email header, links, Separator, Dark-mode Switch row, Log out as full-width outline button).
 
-Mega menu items: `flex items-center gap-1.5 h-full px-2 text-sm text-secondary-foreground border-b-2 border-transparent hover:text-primary` · active `text-mono border-primary font-medium`.
+Mega menu items: `flex items-center gap-1.5 h-full px-2 text-sm text-secondary-foreground border-b-2 border-transparent hover:text-primary-accent` · active `text-mono border-primary font-medium`.
 
 ## Collapse + mobile drawer (12 lines of JS)
 
@@ -176,7 +176,7 @@ label `text-2sm font-medium text-mono` (+ helper `text-xs text-muted-foreground`
 band:     border-b border-border bg-background   (optional cover: h-40 bg-cover rounded-none)
 inner:    container-fixed flex flex-col items-center lg:flex-row lg:items-end gap-5 py-7.5
 avatar:   size-24 rounded-full ring-4 ring-background -mt-12 (over a cover)
-name:     text-lg font-semibold text-mono   + verified icon size-4 text-primary
+name:     text-lg font-semibold text-mono   + verified icon size-4 text-primary-accent
 meta:     flex flex-wrap items-center gap-4 text-2sm text-secondary-foreground [&_svg]:size-4 [&_svg]:text-muted-foreground
 stats:    flex gap-7.5 → each: text-lg font-semibold text-mono / text-2sm text-secondary-foreground
 tabs:     line Tabs below, in the same band (border-b already provided)
@@ -217,7 +217,7 @@ automatically (`grid` + logical order).
 
 Screens in the family: sign-in, sign-up, 2FA (six `size-12 text-center text-lg font-semibold` inputs with `gap-2.5`, auto-advance),
 reset flow (enter email → check email → change password → password changed — each a card with an illustration `size-32` or icon
-`size-12 rounded-full bg-primary/10 text-primary`), welcome, account deactivated, 404 / 500
+`size-12 rounded-full bg-primary/10 text-primary-accent`), welcome, account deactivated, 404 / 500
 (`text-5xl font-semibold text-mono`, one line, primary button “Back to home”).
 
 ## Landing page (marketing)
@@ -225,12 +225,12 @@ reset flow (enter email → check email → change password → password changed
 Section order that converts, top to bottom — drop sections, do not reorder:
 
 1. **Header** — `sticky top-0 z-40 bg-background/80 backdrop-blur border-b border-border`, logo · nav links `text-sm text-secondary-foreground hover:text-mono` · outline “Sign in” + primary “Get started”.
-2. **Hero** — `py-20 lg:py-32 text-center`, background = token gradient wash + 2–3 soft blobs (`absolute rounded-full bg-primary/10 blur-3xl`), eyebrow Badge pill, `h1 text-4xl lg:text-6xl font-bold tracking-tight text-mono leading-[1.1] max-w-4xl mx-auto`, sub `text-lg lg:text-xl text-muted-foreground max-w-[600px] mx-auto`, two CTAs (primary lg + outline lg), social proof row (Avatar group + 5 `text-warning` stars + `text-sm text-muted-foreground`).
+2. **Hero** — `py-20 lg:py-32 text-center`, background = token gradient wash + 2–3 soft blobs (`absolute rounded-full bg-primary/10 blur-3xl`), eyebrow Badge pill, `h1 text-4xl lg:text-6xl font-bold tracking-tight text-mono leading-[1.1] max-w-4xl mx-auto`, sub `text-lg lg:text-xl text-muted-foreground max-w-[600px] mx-auto`, two CTAs (primary lg + outline lg), social proof row (Avatar group + 5 `text-warning-accent` stars + `text-sm text-muted-foreground`).
 3. **Trusted by** — `py-10` grey logos `opacity-60 grayscale hover:grayscale-0`, 5–7 logos, marquee on mobile.
-4. **How it works** — 3 steps `grid md:grid-cols-3 gap-7.5`, numbered `size-10 rounded-full bg-primary/10 text-primary font-semibold`.
+4. **How it works** — 3 steps `grid md:grid-cols-3 gap-7.5`, numbered `size-10 rounded-full bg-primary/10 text-primary-accent font-semibold`.
 5. **Features** — bento `grid md:grid-cols-6 gap-5` with one `md:col-span-4` hero card and `md:col-span-2` cards; each card = icon chip + title `text-lg font-semibold text-mono` + `text-secondary-foreground`.
 6. **Testimonials** — 3 cards, quote `text-sm`, author row (Avatar + name `font-medium text-mono` + role `text-xs text-muted-foreground`).
-7. **Pricing** — monthly/yearly pill Tabs (yearly shows a `light-success` “Save 20%” badge); 3 cards; popular plan `border-primary ring-1 ring-primary` with a primary Badge; price `text-4xl font-bold text-mono` + `/month text-muted-foreground`; features list with `size-4 text-success` checks; CTA full width (primary on popular, outline elsewhere).
+7. **Pricing** — monthly/yearly pill Tabs (yearly shows a `light-success` “Save 20%” badge); 3 cards; popular plan `border-primary ring-1 ring-primary` with a primary Badge; price `text-4xl font-bold text-mono` + `/month text-muted-foreground`; features list with `size-4 text-success-accent` checks; CTA full width (primary on popular, outline elsewhere).
 8. **FAQ** — `max-w-2xl mx-auto`, accordion rows `border-b border-border py-4`, question `text-sm font-medium text-mono`, chevron rotates.
 9. **CTA band** — `rounded-2xl bg-primary text-primary-foreground p-10 lg:p-16 text-center`, headline + one button (`bg-background text-foreground`).
 10. **Contact** — 2-col: text + form card.

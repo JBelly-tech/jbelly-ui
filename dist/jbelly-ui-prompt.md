@@ -9,7 +9,15 @@ Output complete HTML with Tailwind v4 (`<script src="https://cdn.jsdelivr.net/np
 ## 2. Tokens — paste this CSS first (it is the whole colour system; components use roles only)
 ```css
 :root {
-  --destructive-accent: oklch(57.5% 0.22 27);   /* --destructive as text: a fill's lightness is not a reader's */
+  /* Each state colour has TWO values. The bare role is a fill, carrying --x-foreground on top of
+     it. The -accent is that colour as text, on a page surface or on a tint of itself. They are not
+     interchangeable: a fill light enough to carry white text is too light to be read as text, and
+     --success painted as text on bg-success/15 measures 1.97:1. Every one of these clears 4.9:1 on
+     every surface the personalities declare, in this mode. */
+  --success-accent: oklch(45% 0.15 150);
+  --warning-accent: oklch(44% 0.1 75);
+  --info-accent: oklch(48.5% 0.15 293);
+  --destructive-accent: oklch(46% 0.2 27);
   color-scheme: light;
 
   /* shape + type */
@@ -40,7 +48,7 @@ Output complete HTML with Tailwind v4 (`<script src="https://cdn.jsdelivr.net/np
   --secondary: oklch(96.5% 0.002 285);
   --secondary-foreground: oklch(21% 0.006 285);
   --muted: oklch(96.5% 0.002 285);
-  --muted-foreground: oklch(55% 0.014 285);
+  --muted-foreground: oklch(52.5% 0.014 285);
   --accent: oklch(96.5% 0.002 285);
   --accent-foreground: oklch(21% 0.006 285);
   --mono: oklch(14.5% 0.005 285);
@@ -67,7 +75,7 @@ Output complete HTML with Tailwind v4 (`<script src="https://cdn.jsdelivr.net/np
   --sidebar-muted: var(--muted-foreground);
   --sidebar-accent: var(--accent);
   --sidebar-accent-foreground: var(--accent-foreground);
-  --sidebar-primary: var(--primary);
+  --sidebar-primary: var(--primary-accent);   /* the active item is read, not filled */
   --sidebar-border: var(--border);
 
   /* elevation — nearly flat by design */
@@ -84,7 +92,7 @@ Output complete HTML with Tailwind v4 (`<script src="https://cdn.jsdelivr.net/np
   :root { --header-height: 60px; }
 }
 
-.dark { --destructive-accent: oklch(60.25% 0.22 27); --primary-accent: oklch(68% 0.11 255);
+.dark { --success-accent: oklch(75% 0.17 150); --warning-accent: oklch(88% 0.12 90); --info-accent: oklch(70.5% 0.128 293); --destructive-accent: oklch(70% 0.154 27); --primary-accent: oklch(68% 0.11 255);
   color-scheme: dark;
 
   --background: oklch(14.5% 0.005 285);
@@ -100,7 +108,7 @@ Output complete HTML with Tailwind v4 (`<script src="https://cdn.jsdelivr.net/np
   --secondary: oklch(27.5% 0.006 286);
   --secondary-foreground: oklch(98.5% 0 0);
   --muted: oklch(21% 0.006 285);
-  --muted-foreground: oklch(64% 0.014 285);
+  --muted-foreground: oklch(65.5% 0.014 285);
   --accent: oklch(21% 0.006 285);
   --accent-foreground: oklch(98.5% 0 0);
   --mono: oklch(87% 0.006 286);
@@ -108,7 +116,7 @@ Output complete HTML with Tailwind v4 (`<script src="https://cdn.jsdelivr.net/np
 
   --destructive: oklch(57.5% 0.22 27);
   --destructive-foreground: oklch(100% 0 0);
-  --warning-foreground: oklch(92% 0.12 90);   /* light amber text on tinted warning fills in dark mode */
+  
 
   --border: oklch(27.5% 0.006 286);
   --input: oklch(27.5% 0.006 286);
@@ -143,11 +151,11 @@ Tailwind mapping — paste this too (generated from the token file, so no role i
   --color-mono-foreground: var(--mono-foreground);
   --color-destructive: var(--destructive); --color-destructive-accent: var(--destructive-accent);
   --color-destructive-foreground: var(--destructive-foreground);
-  --color-success: var(--success);
+  --color-success: var(--success); --color-success-accent: var(--success-accent);
   --color-success-foreground: var(--success-foreground);
-  --color-warning: var(--warning);
+  --color-warning: var(--warning); --color-warning-accent: var(--warning-accent);
   --color-warning-foreground: var(--warning-foreground);
-  --color-info: var(--info);
+  --color-info: var(--info); --color-info-accent: var(--info-accent);
   --color-info-foreground: var(--info-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
@@ -201,7 +209,7 @@ Tailwind mapping — paste this too (generated from the token file, so no role i
   --font-display: "Manrope", var(--font-sans);          /* geometric, soft */
   --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
   --primary: oklch(50% 0.12 195);                        /* deep teal, 4.6:1 with white */
-  --primary-accent: oklch(50% 0.12 195);               /* links: 5.16:1 */
+  --primary-accent: oklch(45% 0.12 195);               /* links: 5.16:1 */
   --primary-foreground: oklch(100% 0 0);
   --accent-strong: oklch(72% 0.17 60);                   /* one warm highlight: amber-peach */
   --background: oklch(98.5% 0.006 190);                  /* faint teal tint */
@@ -212,7 +220,7 @@ Tailwind mapping — paste this too (generated from the token file, so no role i
   --radius: 0.75rem;
   --density: airy;                                       /* see density block below */
 }
-.theme-clinic.dark { --destructive-accent: oklch(61.5% 0.22 27); --primary-accent: oklch(70% 0.13 195); --background: oklch(15% 0.012 195); --card: oklch(18% 0.012 195); --popover: oklch(18% 0.012 195); --border: oklch(28% 0.015 195); --input: oklch(28% 0.015 195); --muted: oklch(22% 0.012 195); --accent: oklch(24% 0.014 195); --primary: oklch(70% 0.13 195); --primary-foreground: oklch(12% 0.02 195); }
+.theme-clinic.dark { --primary-accent: oklch(70% 0.13 195); --background: oklch(15% 0.012 195); --card: oklch(18% 0.012 195); --popover: oklch(18% 0.012 195); --border: oklch(28% 0.015 195); --input: oklch(28% 0.015 195); --muted: oklch(22% 0.012 195); --accent: oklch(24% 0.014 195); --primary: oklch(70% 0.13 195); --primary-foreground: oklch(12% 0.02 195); }
 ```
 - **theme-graphite** (dense, technical, precise (fintech, ops, dev tools)):
 ```css
@@ -221,7 +229,7 @@ Tailwind mapping — paste this too (generated from the token file, so no role i
   --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
   --primary: oklch(65% 0.17 150);                        /* signal green */
-  --primary-accent: oklch(52.25% 0.17 150);            /* links: 4.52:1 */
+  --primary-accent: oklch(47.5% 0.17 150);            /* links: 4.52:1 */
   --primary-foreground: oklch(14% 0 0);
   --background: oklch(97% 0.002 260); --muted-foreground: oklch(54% 0.014 285);
   --card: oklch(100% 0 0);
@@ -229,7 +237,7 @@ Tailwind mapping — paste this too (generated from the token file, so no role i
   --radius: 0.25rem;
   --density: compact;
 }
-.theme-graphite.dark { --destructive-accent: oklch(60.25% 0.22 27); --primary-accent: oklch(65% 0.17 150); --muted-foreground: oklch(60.0% 0.014 285); --background: oklch(12% 0.004 260); --card: oklch(15% 0.004 260); --popover: oklch(15% 0.004 260); --border: oklch(24% 0.005 260); --input: oklch(26% 0.005 260); }
+.theme-graphite.dark { --muted-foreground: oklch(65.5% 0.014 285); --primary: oklch(65% 0.17 150); --primary-accent: oklch(69% 0.17 150); --background: oklch(12% 0.004 260); --card: oklch(15% 0.004 260); --popover: oklch(15% 0.004 260); --border: oklch(24% 0.005 260); --input: oklch(26% 0.005 260); }
 ```
 - **theme-editorial** (warm, human, content-first (community, education, media)):
 ```css
@@ -248,7 +256,7 @@ Tailwind mapping — paste this too (generated from the token file, so no role i
   --radius: 0.5rem;
   --density: standard;
 }
-.theme-editorial.dark { --destructive-accent: oklch(61.75% 0.22 27); --primary-accent: oklch(70% 0.15 35); --background: oklch(16% 0.012 60); --card: oklch(19% 0.012 60); --popover: oklch(19% 0.012 60); --foreground: oklch(95% 0.01 75); --mono: oklch(95% 0.01 75); --border: oklch(28% 0.015 60); --input: oklch(28% 0.015 60); --muted: oklch(23% 0.012 60); --accent: oklch(25% 0.014 60); --muted-foreground: oklch(65% 0.02 60); --primary: oklch(70% 0.15 35); --primary-foreground: oklch(14% 0.02 40); }
+.theme-editorial.dark { --shadow-xs: 0 1px 3px rgb(20 10 0 / 0.5); --shadow-md: 0 6px 16px -6px rgb(10 5 0 / 0.6); --primary-accent: oklch(73% 0.15 35); --background: oklch(16% 0.012 60); --card: oklch(19% 0.012 60); --popover: oklch(19% 0.012 60); --foreground: oklch(95% 0.01 75); --mono: oklch(95% 0.01 75); --border: oklch(28% 0.015 60); --input: oklch(28% 0.015 60); --muted: oklch(23% 0.012 60); --accent: oklch(25% 0.014 60); --muted-foreground: oklch(65% 0.02 60); --primary: oklch(70% 0.15 35); --primary-foreground: oklch(14% 0.02 40); }
 ```
 
 ## 4. The system in one screen
@@ -258,6 +266,8 @@ Tailwind mapping — paste this too (generated from the token file, so no role i
 `border-input` fields · `ring-ring` focus · states `success` `warning` `info` `destructive` (always with text/icon).
 
 `text-primary-accent` is the brand colour **as text** (links, emphasised labels). `bg-primary` with `text-primary-foreground` is the brand colour as a fill. They are different values on purpose: a fill light enough to carry white text is too light to be read as text.
+
+The same split applies to every state colour, and this is the one that gets typed wrong: `text-success-accent` `text-warning-accent` `text-info-accent` `text-destructive-accent` are the **text** values; `bg-success` + `text-success-foreground` is the fill. Never paint `text-success` — that is the fill, and on a tint of itself it measures 1.97:1. `text-primary` is the same mistake: it only looks right in the default palette, where the two values happen to coincide.
 
 Controls: sm `h-7 px-2.5 text-xs` · md `h-8.5 px-3 text-2sm` · lg `h-10 px-4 text-sm`; all `rounded-md`.
 Type: **Inter** (display + text, house default; Arabic companion Noto Sans Arabic) · body 13px `text-2sm` · labels `text-xs` · card title `text-base font-semibold tracking-tight text-mono` ·
@@ -271,18 +281,18 @@ Shell: sidebar 280 (collapsed 80) · header 70 (60 mobile) · container `px-6 xl
 - **input** `flex w-full h-8.5 px-3 text-2sm rounded-md border border-input bg-background shadow-xs placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40` (leading icon: wrap `relative`, icon `absolute start-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground`, add `ps-9`)
 - **select** input + `appearance-none cursor-pointer pe-8` + chevron background · **textarea** input + `min-h-20 p-3 resize-y`
 - **checkbox** `appearance-none size-4 rounded-sm border border-input bg-background checked:bg-primary checked:border-primary` · **switch** `h-5 w-7.5 rounded-full bg-input checked:bg-primary` + thumb `before:`
-- **badge** `inline-flex items-center gap-1.5 h-6 px-[0.45rem] rounded-md text-xs font-medium` · light-success `bg-success/15 text-success` · light-warning `bg-warning/20 text-warning-foreground` · light-destructive `bg-destructive/10 text-destructive` · outline `border border-border bg-muted text-secondary-foreground` · sm `h-5 text-2xs rounded-sm` · dot `size-1.5 rounded-full bg-current opacity-75`
-- **avatar** `size-9 rounded-full` image, or initials `inline-flex items-center justify-center bg-primary/10 text-primary font-semibold text-2xs`
+- **badge** `inline-flex items-center gap-1.5 h-6 px-[0.45rem] rounded-md text-xs font-medium` · light-success `bg-success/15 text-success-accent` · light-warning `bg-warning/20 text-warning-accent` · light-destructive `bg-destructive/10 text-destructive-accent` · outline `border border-border bg-muted text-secondary-foreground` · sm `h-5 text-2xs rounded-sm` · dot `size-1.5 rounded-full bg-current opacity-75`
+- **avatar** `size-9 rounded-full` image, or initials `inline-flex items-center justify-center bg-primary/10 text-primary-accent font-semibold text-2xs`
 - **card** `flex flex-col rounded-xl border border-border bg-card shadow-xs` · header `flex min-h-14 items-center justify-between gap-2.5 border-b border-border px-5` · content `grow p-5` · footer `flex items-center border-t border-border px-5 py-4`
 - **table** `w-full text-sm` · th `h-11 px-4 text-start text-xs font-normal text-secondary-foreground border-b` · td `px-4 h-11.5 border-b border-border` · row `hover:bg-muted/40` · check col `w-[52px] text-center` · actions `text-end opacity-0 group-hover:opacity-100 group-focus-within:opacity-100`
-- **tabs (line)** nav `flex gap-6 border-b border-border` · tab `-mb-px pb-3 text-sm text-secondary-foreground border-b-2 border-transparent` · active `text-primary border-primary font-medium` · **pill** nav `inline-flex gap-1 rounded-lg bg-muted p-1`, active `bg-background text-mono shadow-xs`
+- **tabs (line)** nav `flex gap-6 border-b border-border` · tab `-mb-px pb-3 text-sm text-secondary-foreground border-b-2 border-transparent` · active `text-primary-accent border-primary font-medium` · **pill** nav `inline-flex gap-1 rounded-lg bg-muted p-1`, active `bg-background text-mono shadow-xs`
 - **menu** `min-w-44 rounded-md border border-border bg-popover shadow-md p-2 flex flex-col gap-0.5` · item `flex items-center gap-2.5 rounded-md px-2 py-2 text-2sm hover:bg-accent [&_svg]:size-4 [&_svg]:text-muted-foreground`
 - **modal** overlay `fixed inset-0 z-50 bg-black/30` · panel `fixed top-1/2 start-1/2 -translate-x-1/2 rtl:translate-x-1/2 -translate-y-1/2 w-[calc(100%-2rem)] max-w-lg rounded-lg border bg-popover shadow-md` · header `px-5 py-3 border-b` · footer `px-5 py-3 border-t flex justify-end gap-2.5`
 - **drawer** `fixed z-50 top-5 bottom-5 end-5 w-[450px] max-w-[90%] rounded-xl border bg-card shadow-md flex flex-col`
 - **toast** `flex items-start gap-2.5 rounded-lg border bg-popover shadow-md p-3.5 text-sm w-[360px]` in `fixed bottom-5 end-5 flex flex-col gap-2.5`
 - **skeleton** `rounded-md bg-accent` — static; it reserves height and nothing else. The wait itself is reported by the `.pends` elapsed bar, never by a pulse or a spinner. · **empty** icon chip `size-12 rounded-full bg-muted text-muted-foreground`, title `text-sm font-semibold text-mono`, text `text-2sm text-secondary-foreground`, one button
 - **kbd** `inline-flex h-5 items-center rounded-sm border bg-muted px-1.5 font-mono text-2xs`
-- **KPI card** icon chip `size-9 rounded-lg bg-primary/10 text-primary` · delta badge light-success/destructive with trend icon · value + label; optional 40px sparkline SVG
+- **KPI card** icon chip `size-9 rounded-lg bg-primary/10 text-primary-accent` · delta badge light-success/destructive with trend icon · value + label; optional 40px sparkline SVG
 - **page toolbar** `flex flex-wrap items-center justify-between gap-5 pb-7.5` → title/subtitle · `flex gap-2.5` select · outline · ONE primary
 - **grid** page `grid gap-5 lg:gap-7.5` · row `grid lg:grid-cols-3 … items-stretch`, wide card `lg:col-span-2`, every card `h-full`
 

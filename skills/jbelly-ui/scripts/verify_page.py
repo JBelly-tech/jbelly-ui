@@ -150,6 +150,15 @@ def main():
     for l in vm.stdout.splitlines():
         if l.startswith("[FAIL]") or l.startswith("[WARN]"): print("    " + l)
     fail |= vm.returncode != 0
+    # The token pairs are checked from source; what the markup does with them is not. A class like
+    # `bg-success/15 text-success` names no pair, so only a rendered page can say whether it reads --
+    # and the answer changes with every personality, which is why this runs all of them.
+    vt = subprocess.run([sys.executable, os.path.join(os.path.dirname(__file__), "verify_theme.py"), path], capture_output=True, text=True, encoding="utf-8", errors="replace")
+    vt_line = (vt.stdout.strip().splitlines() or ["no output"])[-1]
+    print(f"[{'OK' if vt.returncode == 0 else 'FAIL'}] colour runtime: {vt_line}")
+    for l in vt.stdout.splitlines():
+        if l.startswith("[FAIL]") or l.startswith("       "): print("    " + l)
+    fail |= vt.returncode != 0
     pf = subprocess.run([sys.executable, os.path.join(os.path.dirname(__file__), "preflight.py"), path], capture_output=True, text=True, encoding="utf-8", errors="replace")
     pf_lines = [l for l in pf.stdout.splitlines() if l.startswith("[FAIL]") or l.startswith("[WARN]")]
     print(f"[{'OK' if pf.returncode == 0 else 'FAIL'}] pre-flight: {pf.stdout.strip().splitlines()[-1] if pf.stdout.strip() else 'no output'}")
@@ -158,7 +167,8 @@ def main():
     if "--json" in a:
         import json
         json.dump({"page": path, "renders": report, "lint_ok": lint.returncode == 0, "preflight_ok": pf.returncode == 0,
-                   "motion_lint_ok": lm.returncode == 0, "motion_runtime": vm_line, "verdict": "FAIL" if fail else "PASS"}, open(os.path.join(out, name + "-verify.json"), "w", encoding="utf-8"), indent=2)
+                   "motion_lint_ok": lm.returncode == 0, "motion_runtime": vm_line, "colour_runtime": vt_line,
+                   "verdict": "FAIL" if fail else "PASS"}, open(os.path.join(out, name + "-verify.json"), "w", encoding="utf-8"), indent=2)
         print(f"json -> {os.path.join(out, name + '-verify.json')}")
     print("VERDICT: FAIL - fix the items above, then run this script once more." if fail else "VERDICT: PASS - done; do not add further verification rounds.")
     return 1 if fail else 0

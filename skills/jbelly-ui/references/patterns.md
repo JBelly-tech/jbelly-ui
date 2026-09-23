@@ -15,7 +15,7 @@ composition is new. Numbers are the system's, keep them.
 ```html
 <div class="card h-full flex-col justify-between gap-6 p-5 relative overflow-hidden">
   <div class="flex items-center justify-between">
-    <span class="inline-flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary [&_svg]:size-5"><!-- icon --></span>
+    <span class="inline-flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary-accent [&_svg]:size-5"><!-- icon --></span>
     <span class="badge light-success sm"><svg trend-up/> 12%</span>            <!-- optional delta -->
   </div>
   <div class="flex flex-col gap-1">
@@ -72,7 +72,7 @@ header:  title + “View all” link button
 content: p-0 → ul divide-y divide-border
 row:     flex items-center gap-2.5 px-5 py-3
          Avatar size-9 (or icon chip size-9 rounded-lg bg-muted)
-         flex flex-col grow min-w-0 → title text-sm font-medium text-mono truncate hover:text-primary · sub text-2sm text-secondary-foreground truncate
+         flex flex-col grow min-w-0 → title text-sm font-medium text-mono truncate hover:text-primary-accent · sub text-2sm text-secondary-foreground truncate
          trailing: Badge light / value text-sm font-medium text-mono tabular-nums / ghost icon sm
 ```
 
@@ -107,7 +107,7 @@ section × n: card section → grid lg:grid-cols-[200px_1fr] items-center gap-2.
 footer:  justify-end → outline “Cancel” + primary “Save changes”
 ```
 
-Danger zone: separate card with `border-destructive/30`, title `text-destructive`, one sentence, destructive outline button.
+Danger zone: separate card with `border-destructive/30`, title `text-destructive-accent`, one sentence, destructive outline button.
 
 ## Datatable page
 
@@ -118,7 +118,7 @@ Toolbar (title + count + primary action) → optional KPI strip → Table card w
 ```
 card → table-layout grid: grid grid-cols-[minmax(180px,1fr)_repeat(3,minmax(140px,1fr))]
 head row:  plan cells → name text-sm font-semibold text-mono · price text-2xl font-semibold text-mono + /mo text-secondary-foreground · button (current plan: outline disabled “Current plan”; others primary sm “Upgrade”)
-rows:      py-3 border-b border-border → feature label text-2sm text-secondary-foreground · cells centred: check size-4 text-success / “—” text-muted-foreground / value text-2sm text-mono
+rows:      py-3 border-b border-border → feature label text-2sm text-secondary-foreground · cells centred: check size-4 text-success-accent / “—” text-muted-foreground / value text-2sm text-mono
 popular:   column bg-primary/5 + Badge primary sm “Popular” above the name
 ```
 
@@ -126,7 +126,7 @@ Plan cards alternative for ≤3 plans: `grid md:grid-cols-3 gap-5` using the lan
 
 ## Checkout (store-client)
 
-`grid lg:grid-cols-[1fr_380px] gap-5 lg:gap-7.5` → left: stepper (`flex items-center gap-2.5 text-2sm`, step chip `size-6 rounded-full bg-primary text-primary-foreground text-xs font-semibold`, done chip `bg-success`, line `h-px grow bg-border`) + card per step (shipping form / payment method radio-cards `grid sm:grid-cols-2 gap-2.5` with `[&:has(:checked)]:border-primary`) → right: sticky `lg:sticky lg:top-24` order-summary card (items list + totals `flex justify-between text-2sm`, total `text-base font-semibold text-mono`, primary lg w-full). Order placed: centred card with `size-16 rounded-full bg-success/10 text-success` check icon.
+`grid lg:grid-cols-[1fr_380px] gap-5 lg:gap-7.5` → left: stepper (`flex items-center gap-2.5 text-2sm`, step chip `size-6 rounded-full bg-primary text-primary-foreground text-xs font-semibold`, done chip `bg-success`, line `h-px grow bg-border`) + card per step (shipping form / payment method radio-cards `grid sm:grid-cols-2 gap-2.5` with `[&:has(:checked)]:border-primary`) → right: sticky `lg:sticky lg:top-24` order-summary card (items list + totals `flex justify-between text-2sm`, total `text-base font-semibold text-mono`, primary lg w-full). Order placed: centred card with `size-16 rounded-full bg-success/10 text-success-accent` check icon.
 
 ## Search palette (⌘K)
 
@@ -138,7 +138,7 @@ Modal `max-w-[600px]` top-aligned (`top-[15%] translate-y-0`) → Input lg with 
 grid:    grid sm:grid-cols-2 xl:grid-cols-3 gap-5 lg:gap-7.5
 person:  card p-5 flex flex-col items-center text-center gap-3 → Avatar size-20 → name text-base font-semibold text-mono · role text-2sm text-secondary-foreground → Badge light → stats row divide-x → footer buttons (outline sm “Message”, primary sm “Follow”)
 team:    card p-5 → row: icon chip size-10 + name + Badge · description text-2sm · Avatar group + “+3” · footer: rating or “View” link
-product: card overflow-hidden → image aspect-[4/3] object-cover bg-muted → p-5: name text-sm font-medium text-mono · price text-base font-semibold text-mono · rating stars text-warning size-3.5 · outline sm “Add to cart” w-full
+product: card overflow-hidden → image aspect-[4/3] object-cover bg-muted → p-5: name text-sm font-medium text-mono · price text-base font-semibold text-mono · rating stars text-warning-accent size-3.5 · outline sm “Add to cart” w-full
 ```
 
 ## Empty & error states

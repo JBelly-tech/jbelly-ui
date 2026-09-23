@@ -69,8 +69,8 @@ from `python scripts/build-screen.py --example`, which prints a complete annotat
   wrong, fix the spec and rebuild: one call instead of a chain of edits. Hand-editing is only for
   genuinely bespoke markup, appended through `extra_html`.
 - **Do not build your own verification.** `verify_page.py` renders the variants, collects console
-  errors, runs the token lint and the pre-flight, and prints one verdict. No screenshot loop, no
-  second opinion, no subagents.
+  errors, runs the token lint, the pre-flight and both runtime probes -- motion and colour -- and
+  prints one verdict. No screenshot loop, no second opinion, no subagents.
 
 Why this is worth obeying: agent cost is the size of the context multiplied by the number of steps,
 so a file read early is paid for again on every later call. The generator exists to move the whole
@@ -198,6 +198,7 @@ Open one, by name, only for what the quick card does not cover. Reading them all
 `verify_page.py` the one verification
 call · `preflight.py` AI-tells, structure, contrast · `lint_tokens.py` raw palette colours ·
 `lint_motion.py` motion rules · `verify_motion.py` the runtime motion probe ·
+`verify_theme.py` the runtime colour probe: every personality, light and dark ·
 `audit_styles.py` redesign inventory · `personality_init.py` the design read ·
 `export_tokens.py` DTCG tokens · `build_dist.py` the delivery tiers.
 Windows twins: `verify-page.ps1`, `new-screen.ps1`, `lint-tokens.ps1`.

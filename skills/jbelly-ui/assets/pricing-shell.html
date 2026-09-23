@@ -10,7 +10,7 @@
 <script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
 <style type="text/tailwindcss">
 /* ===== tokens.css (inlined for the single-file demo) ===== */
-:root { --destructive-accent: oklch(57.5% 0.22 27); --primary-accent: oklch(48% 0.13 255);
+:root { --success-accent: oklch(45% 0.15 150); --warning-accent: oklch(44% 0.1 75); --info-accent: oklch(48.5% 0.15 293); --destructive-accent: oklch(46% 0.2 27); --primary-accent: oklch(48% 0.13 255);
   color-scheme: light;
   --radius: 0.5rem;
   --font-display: "Inter", ui-sans-serif, system-ui, sans-serif;
@@ -21,7 +21,7 @@
   --popover: oklch(100% 0 0); --popover-foreground: oklch(14.5% 0.005 285);
   --primary: oklch(48% 0.13 255); --primary-foreground: oklch(100% 0 0);
   --secondary: oklch(96.5% 0.002 285); --secondary-foreground: oklch(21% 0.006 285);
-  --muted: oklch(96.5% 0.002 285); --muted-foreground: oklch(55% 0.014 285);
+  --muted: oklch(96.5% 0.002 285); --muted-foreground: oklch(52.5% 0.014 285);
   --accent: oklch(96.5% 0.002 285); --accent-foreground: oklch(21% 0.006 285);
   --mono: oklch(14.5% 0.005 285); --mono-foreground: oklch(100% 0 0);
   --destructive: oklch(57.5% 0.22 27); --destructive-foreground: oklch(100% 0 0);
@@ -31,7 +31,7 @@
   --border: oklch(94% 0.004 286); --input: oklch(92% 0.004 286); --ring: oklch(71% 0.01 286);
   --sidebar: var(--card); --sidebar-foreground: var(--foreground); --sidebar-muted: var(--muted-foreground);
   --sidebar-accent: var(--accent); --sidebar-accent-foreground: var(--accent-foreground);
-  --sidebar-primary: var(--primary); --sidebar-border: var(--border);
+  --sidebar-primary: var(--primary-accent); --sidebar-border: var(--border);
   --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.06);
   --sidebar-width: 280px; --sidebar-default-width: 280px; --sidebar-width-collapsed: 80px; --header-height: 70px;
@@ -39,17 +39,16 @@
   --chart-2: var(--info); --chart-3: var(--success); --chart-4: var(--warning);
 }
 @media (max-width: 63.99rem) { :root { --header-height: 60px; } }
-.dark { --destructive-accent: oklch(60.25% 0.22 27); --primary-accent: oklch(68% 0.11 255);
+.dark { --success-accent: oklch(75% 0.17 150); --warning-accent: oklch(88% 0.12 90); --info-accent: oklch(70.5% 0.128 293); --destructive-accent: oklch(70% 0.154 27); --primary-accent: oklch(68% 0.11 255);
   color-scheme: dark;
   --background: oklch(14.5% 0.005 285); --foreground: oklch(98.5% 0 0);
   --card: oklch(14.5% 0.005 285); --card-foreground: oklch(98.5% 0 0);
   --popover: oklch(14.5% 0.005 285); --popover-foreground: oklch(98.5% 0 0);
   --primary: oklch(50% 0.13 255);
   --secondary: oklch(27.5% 0.006 286); --secondary-foreground: oklch(98.5% 0 0);
-  --muted: oklch(21% 0.006 285); --muted-foreground: oklch(64% 0.014 285);
+  --muted: oklch(21% 0.006 285); --muted-foreground: oklch(65.5% 0.014 285);
   --accent: oklch(21% 0.006 285); --accent-foreground: oklch(98.5% 0 0);
   --mono: oklch(87% 0.006 286); --mono-foreground: oklch(0% 0 0);
-  --warning-foreground: oklch(92% 0.12 90);
   --border: oklch(27.5% 0.006 286); --input: oklch(27.5% 0.006 286); --ring: oklch(44% 0.01 286);
   --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.4);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.4);
@@ -61,30 +60,30 @@
 .density-compact { --ctl-h: 30px; --ctl-h-sm: 24px; --row-h: 38px; --card-p: 1rem; --page-gap: 1rem; }
 .density-airy    { --ctl-h: 40px; --ctl-h-sm: 32px; --row-h: 56px; --card-p: 1.75rem; --page-gap: 1.75rem; }
 /* ===== personalities (from references/personalities.md) ===== */
-.theme-clinic { --destructive-accent: oklch(57.5% 0.22 27); --primary-accent: oklch(50% 0.12 195); --font-display: "Manrope", sans-serif; --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+.theme-clinic { --primary-accent: oklch(45% 0.12 195); --font-display: "Manrope", sans-serif; --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --primary: oklch(50% 0.12 195); --background: oklch(98.5% 0.006 190); --card: oklch(100% 0 0);
   --border: oklch(92% 0.012 190); --input: oklch(90% 0.014 190); --muted: oklch(96% 0.01 190); --accent: oklch(95% 0.012 190); --radius: 0.75rem; }
-.theme-clinic.dark { --destructive-accent: oklch(61.5% 0.22 27); --primary-accent: oklch(70% 0.13 195); --background: oklch(15% 0.012 195); --card: oklch(18% 0.012 195); --popover: oklch(18% 0.012 195); --border: oklch(28% 0.015 195); --input: oklch(28% 0.015 195); --muted: oklch(22% 0.012 195); --accent: oklch(24% 0.014 195); --primary: oklch(70% 0.13 195); --primary-foreground: oklch(12% 0.02 195); }
-.theme-graphite { --destructive-accent: oklch(57.25% 0.22 27); --primary-accent: oklch(52.25% 0.17 150); --muted-foreground: oklch(54% 0.014 285); --font-display: "IBM Plex Sans", sans-serif; --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif; --font-mono: "IBM Plex Mono", monospace;
+.theme-clinic.dark { --primary-accent: oklch(70% 0.13 195); --background: oklch(15% 0.012 195); --card: oklch(18% 0.012 195); --popover: oklch(18% 0.012 195); --border: oklch(28% 0.015 195); --input: oklch(28% 0.015 195); --muted: oklch(22% 0.012 195); --accent: oklch(24% 0.014 195); --primary: oklch(70% 0.13 195); --primary-foreground: oklch(12% 0.02 195); }
+.theme-graphite { --primary-accent: oklch(47.5% 0.17 150); --muted-foreground: oklch(54% 0.014 285); --font-display: "IBM Plex Sans", sans-serif; --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif; --font-mono: "IBM Plex Mono", monospace;
   --primary: oklch(65% 0.17 150); --primary-foreground: oklch(14% 0 0); --background: oklch(97% 0.002 260); --card: oklch(100% 0 0); --border: oklch(88% 0.004 260); --input: oklch(86% 0.004 260); --radius: 0.25rem; }
-.theme-graphite.dark { --destructive-accent: oklch(60.25% 0.22 27); --primary-accent: oklch(65% 0.17 150); --muted-foreground: oklch(60.0% 0.014 285); --background: oklch(12% 0.004 260); --card: oklch(15% 0.004 260); --popover: oklch(15% 0.004 260); --border: oklch(24% 0.005 260); --input: oklch(26% 0.005 260); }
-.theme-editorial { --destructive-accent: oklch(57.5% 0.22 27); --primary-accent: oklch(48% 0.16 30); --font-display: "Fraunces", Georgia, serif; --font-sans: "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
+.theme-graphite.dark { --muted-foreground: oklch(65.5% 0.014 285); --primary: oklch(65% 0.17 150); --primary-accent: oklch(69% 0.17 150); --background: oklch(12% 0.004 260); --card: oklch(15% 0.004 260); --popover: oklch(15% 0.004 260); --border: oklch(24% 0.005 260); --input: oklch(26% 0.005 260); }
+.theme-editorial { --primary-accent: oklch(48% 0.16 30); --font-display: "Fraunces", Georgia, serif; --font-sans: "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
   --primary: oklch(48% 0.16 30); --primary-foreground: oklch(98% 0.01 60); --background: oklch(97.5% 0.012 75); --card: oklch(99% 0.008 75);
   --foreground: oklch(22% 0.02 50); --mono: oklch(22% 0.02 50); --border: oklch(90% 0.02 70); --input: oklch(88% 0.02 70); --muted: oklch(94% 0.015 75); --accent: oklch(93% 0.018 75); --muted-foreground: oklch(50% 0.03 50);
   --radius: 0.5rem; --shadow-xs: 0 1px 3px rgb(60 30 10 / 0.08); --shadow-md: 0 6px 16px -6px rgb(60 30 10 / 0.18); }
-.theme-editorial.dark { --destructive-accent: oklch(61.75% 0.22 27); --primary-accent: oklch(70% 0.15 35); --background: oklch(16% 0.012 60); --card: oklch(19% 0.012 60); --popover: oklch(19% 0.012 60); --foreground: oklch(95% 0.01 75); --mono: oklch(95% 0.01 75); --border: oklch(28% 0.015 60); --input: oklch(28% 0.015 60); --muted: oklch(23% 0.012 60); --accent: oklch(25% 0.014 60); --muted-foreground: oklch(65% 0.02 60); --primary: oklch(70% 0.15 35); --primary-foreground: oklch(14% 0.02 40); }
-.theme-neo { --destructive-accent: oklch(57.5% 0.22 27); --primary-accent: oklch(55% 0.25 290); --font-display: "Space Grotesk", sans-serif; --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+.theme-editorial.dark { --shadow-xs: 0 1px 3px rgb(20 10 0 / 0.5); --shadow-md: 0 6px 16px -6px rgb(10 5 0 / 0.6); --primary-accent: oklch(73% 0.15 35); --background: oklch(16% 0.012 60); --card: oklch(19% 0.012 60); --popover: oklch(19% 0.012 60); --foreground: oklch(95% 0.01 75); --mono: oklch(95% 0.01 75); --border: oklch(28% 0.015 60); --input: oklch(28% 0.015 60); --muted: oklch(23% 0.012 60); --accent: oklch(25% 0.014 60); --muted-foreground: oklch(65% 0.02 60); --primary: oklch(70% 0.15 35); --primary-foreground: oklch(14% 0.02 40); }
+.theme-neo { --primary-accent: oklch(51.5% 0.25 290); --font-display: "Space Grotesk", sans-serif; --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
   --primary: oklch(55% 0.25 290); --background: oklch(99% 0 0); --card: oklch(100% 0 0); --foreground: oklch(10% 0 0); --mono: oklch(10% 0 0);
   --border: oklch(10% 0 0); --input: oklch(10% 0 0); --radius: 0.25rem; --shadow-xs: 3px 3px 0 0 var(--foreground); --shadow-md: 5px 5px 0 0 var(--foreground); }
-.theme-neo.dark { --destructive-accent: oklch(60.25% 0.22 27); --primary-accent: oklch(75% 0.2 290); --background: oklch(12% 0 0); --card: oklch(15% 0 0); --popover: oklch(15% 0 0); --foreground: oklch(98% 0 0); --mono: oklch(98% 0 0); --border: oklch(98% 0 0); --input: oklch(98% 0 0); --primary: oklch(75% 0.2 290); --primary-foreground: oklch(10% 0 0); }
-.theme-slate { --destructive-accent: oklch(57% 0.22 27); --primary-accent: oklch(42% 0.12 260); --muted-foreground: oklch(53% 0.014 285); --font-display: "Inter", sans-serif; --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+.theme-neo.dark { --shadow-xs: 3px 3px 0 0 var(--foreground); --shadow-md: 5px 5px 0 0 var(--foreground); --primary-accent: oklch(75% 0.2 290); --background: oklch(12% 0 0); --card: oklch(15% 0 0); --popover: oklch(15% 0 0); --foreground: oklch(98% 0 0); --mono: oklch(98% 0 0); --border: oklch(98% 0 0); --input: oklch(98% 0 0); --primary: oklch(75% 0.2 290); --primary-foreground: oklch(10% 0 0); }
+.theme-slate { --primary-accent: oklch(42% 0.12 260); --muted-foreground: oklch(53% 0.014 285); --font-display: "Inter", sans-serif; --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --primary: oklch(42% 0.12 260); --background: oklch(96.5% 0.004 250); --card: oklch(100% 0 0); --foreground: oklch(18% 0.02 260); --border: oklch(88% 0.008 250); --input: oklch(86% 0.008 250); --radius: 0.375rem;
   --sidebar: oklch(18% 0.03 260); --sidebar-foreground: oklch(92% 0.01 250); --sidebar-muted: oklch(65% 0.02 250); --sidebar-accent: oklch(24% 0.03 260); --sidebar-accent-foreground: oklch(100% 0 0); --sidebar-primary: oklch(78% 0.12 80); --sidebar-border: oklch(26% 0.03 260); }
-.theme-slate.dark { --destructive-accent: oklch(61% 0.22 27); --primary-accent: oklch(72% 0.12 80); --muted-foreground: oklch(60.0% 0.014 285); --background: oklch(13% 0.02 260); --card: oklch(17% 0.02 260); --popover: oklch(17% 0.02 260); --foreground: oklch(95% 0.01 250); --border: oklch(26% 0.02 260); --input: oklch(26% 0.02 260); --primary: oklch(72% 0.12 80); --primary-foreground: oklch(15% 0.03 80); --sidebar: oklch(11% 0.02 260); }
-.theme-mint { --destructive-accent: oklch(57.5% 0.22 27); --primary-accent: oklch(52.5% 0.15 165); --font-display: "Plus Jakarta Sans", sans-serif; --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+.theme-slate.dark { --muted-foreground: oklch(65.5% 0.014 285); --primary-accent: oklch(72% 0.12 80); --background: oklch(13% 0.02 260); --card: oklch(17% 0.02 260); --popover: oklch(17% 0.02 260); --foreground: oklch(95% 0.01 250); --border: oklch(26% 0.02 260); --input: oklch(26% 0.02 260); --primary: oklch(72% 0.12 80); --primary-foreground: oklch(15% 0.03 80); --sidebar: oklch(11% 0.02 260); }
+.theme-mint { --primary-accent: oklch(45.5% 0.15 165); --font-display: "Plus Jakarta Sans", sans-serif; --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   --primary: oklch(60% 0.15 165); --primary-foreground: oklch(14% 0 0); --background: oklch(98% 0.01 160); --card: oklch(100% 0 0); --border: oklch(93% 0.02 160); --input: oklch(90% 0.02 160); --muted: oklch(96% 0.012 160); --accent: oklch(95% 0.015 160); --radius: 1rem;
   --shadow-xs: 0 1px 2px rgb(20 60 40 / 0.06); --shadow-md: 0 8px 24px -8px rgb(20 60 40 / 0.18); }
-.theme-mint.dark { --destructive-accent: oklch(61.5% 0.22 27); --primary-accent: oklch(72% 0.15 165); --background: oklch(14% 0.01 160); --card: oklch(18% 0.012 160); --popover: oklch(18% 0.012 160); --border: oklch(27% 0.015 160); --input: oklch(27% 0.015 160); --muted: oklch(22% 0.012 160); --accent: oklch(24% 0.014 160); --primary: oklch(72% 0.15 165); }
+.theme-mint.dark { --shadow-xs: 0 1px 2px rgb(0 20 12 / 0.5); --shadow-md: 0 8px 24px -8px rgb(0 20 12 / 0.6); --primary-accent: oklch(72% 0.15 165); --background: oklch(14% 0.01 160); --card: oklch(18% 0.012 160); --popover: oklch(18% 0.012 160); --border: oklch(27% 0.015 160); --input: oklch(27% 0.015 160); --muted: oklch(22% 0.012 160); --accent: oklch(24% 0.014 160); --primary: oklch(72% 0.15 165); }
 
 @custom-variant dark (&:where(.dark, .dark *));
 @theme inline {
@@ -98,9 +97,9 @@
   --color-accent: var(--accent); --color-accent-foreground: var(--accent-foreground);
   --color-mono: var(--mono); --color-mono-foreground: var(--mono-foreground);
   --color-destructive: var(--destructive); --color-destructive-accent: var(--destructive-accent); --color-destructive-foreground: var(--destructive-foreground);
-  --color-success: var(--success); --color-success-foreground: var(--success-foreground);
-  --color-warning: var(--warning); --color-warning-foreground: var(--warning-foreground);
-  --color-info: var(--info); --color-info-foreground: var(--info-foreground);
+  --color-success: var(--success); --color-success-accent: var(--success-accent); --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning); --color-warning-accent: var(--warning-accent); --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info); --color-info-accent: var(--info-accent); --color-info-foreground: var(--info-foreground);
   --color-border: var(--border); --color-input: var(--input); --color-ring: var(--ring);
   --color-sidebar: var(--sidebar); --color-sidebar-foreground: var(--sidebar-foreground); --color-sidebar-muted: var(--sidebar-muted);
   --color-sidebar-accent: var(--sidebar-accent); --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -251,9 +250,9 @@
   /* badges */
   .badge { @apply inline-flex items-center justify-center gap-1.5 whitespace-nowrap font-medium rounded-md h-6 min-w-6 px-[0.45rem] text-xs bg-secondary text-accent-foreground; }
   .badge-sm { @apply h-5 min-w-5 px-[0.325rem] text-2xs rounded-sm gap-1; }
-  .badge-light-primary { @apply bg-primary/10 text-primary; }
-  .badge-light-success { @apply bg-success/15 text-success; }
-  .badge-light-warning { @apply bg-warning/20 text-warning-foreground; }
+  .badge-light-primary { @apply bg-primary/10 text-primary-accent; }
+  .badge-light-success { @apply bg-success/15 text-success-accent; }
+  .badge-light-warning { @apply bg-warning/20 text-warning-accent; }
   .badge-light-destructive { @apply bg-destructive/10 text-destructive-accent; }
   .badge-outline { @apply border border-border bg-muted text-secondary-foreground; }
   .dot { @apply size-1.5 rounded-full bg-current opacity-75; }
@@ -278,7 +277,7 @@
   .plan { @apply relative flex flex-col rounded-xl border border-border bg-card text-card-foreground shadow-xs; }
   .plan-featured { @apply border-primary shadow-md ring-1 ring-primary; }
   .plan-feature { @apply flex items-start gap-2.5 text-2sm text-secondary-foreground; }
-  .plan-feature i, .plan-feature svg { @apply mt-0.5 size-4 shrink-0 text-primary; }
+  .plan-feature i, .plan-feature svg { @apply mt-0.5 size-4 shrink-0 text-primary-accent; }
   .cmp { border-collapse: separate; border-spacing: 0; }
   .cmp th, .cmp td { @apply border-b border-border; }
   .cmp thead th { @apply sticky top-0 z-20 bg-card align-bottom; }
@@ -844,21 +843,21 @@ header.app-seam { position: sticky; inset-block-start: 0; }
             <tr><th scope="row"><span data-i18n="Orders a month">Orders a month</span></th><td dir="ltr" class="tabular-nums">1,500</td><td dir="ltr" class="tabular-nums">12,000</td><td dir="ltr" class="tabular-nums">60,000</td></tr>
             <tr><th scope="row"><span data-i18n="Connected stores">Connected stores</span></th><td dir="ltr" class="tabular-nums">1</td><td dir="ltr" class="tabular-nums">5</td><td dir="ltr" class="tabular-nums">25</td></tr>
             <tr><th scope="row"><span data-i18n="Order history kept">Order history kept</span></th><td><span data-i18n="12 months">12 months</span></td><td><span data-i18n="3 years">3 years</span></td><td><span data-i18n="7 years">7 years</span></td></tr>
-            <tr><th scope="row"><span data-i18n="Bulk import from CSV">Bulk import from CSV</span></th><td><i data-lucide="check" class="mx-auto block size-4 text-primary"></i><span class="sr-only" data-i18n="Included">Included</span></td><td><i data-lucide="check" class="mx-auto block size-4 text-primary"></i><span class="sr-only" data-i18n="Included">Included</span></td><td><i data-lucide="check" class="mx-auto block size-4 text-primary"></i><span class="sr-only" data-i18n="Included">Included</span></td></tr>
+            <tr><th scope="row"><span data-i18n="Bulk import from CSV">Bulk import from CSV</span></th><td><i data-lucide="check" class="mx-auto block size-4 text-primary-accent"></i><span class="sr-only" data-i18n="Included">Included</span></td><td><i data-lucide="check" class="mx-auto block size-4 text-primary-accent"></i><span class="sr-only" data-i18n="Included">Included</span></td><td><i data-lucide="check" class="mx-auto block size-4 text-primary-accent"></i><span class="sr-only" data-i18n="Included">Included</span></td></tr>
           </tbody>
           <tbody>
             <tr class="group-row"><th scope="colgroup" colspan="4"><span data-i18n="People and access">People and access</span></th></tr>
             <tr><th scope="row"><span data-i18n="Team seats">Team seats</span></th><td dir="ltr" class="tabular-nums">3</td><td dir="ltr" class="tabular-nums">12</td><td><span data-i18n="No limit">No limit</span></td></tr>
-            <tr><th scope="row"><span data-i18n="Roles and permissions">Roles and permissions</span></th><td><i data-lucide="minus" class="mx-auto block size-4 text-muted-foreground"></i><span class="sr-only" data-i18n="Not included">Not included</span></td><td><i data-lucide="check" class="mx-auto block size-4 text-primary"></i><span class="sr-only" data-i18n="Included">Included</span></td><td><i data-lucide="check" class="mx-auto block size-4 text-primary"></i><span class="sr-only" data-i18n="Included">Included</span></td></tr>
-            <tr><th scope="row"><span data-i18n="Single sign-on (SAML)">Single sign-on (SAML)</span></th><td><i data-lucide="minus" class="mx-auto block size-4 text-muted-foreground"></i><span class="sr-only" data-i18n="Not included">Not included</span></td><td><i data-lucide="minus" class="mx-auto block size-4 text-muted-foreground"></i><span class="sr-only" data-i18n="Not included">Not included</span></td><td><i data-lucide="check" class="mx-auto block size-4 text-primary"></i><span class="sr-only" data-i18n="Included">Included</span></td></tr>
+            <tr><th scope="row"><span data-i18n="Roles and permissions">Roles and permissions</span></th><td><i data-lucide="minus" class="mx-auto block size-4 text-muted-foreground"></i><span class="sr-only" data-i18n="Not included">Not included</span></td><td><i data-lucide="check" class="mx-auto block size-4 text-primary-accent"></i><span class="sr-only" data-i18n="Included">Included</span></td><td><i data-lucide="check" class="mx-auto block size-4 text-primary-accent"></i><span class="sr-only" data-i18n="Included">Included</span></td></tr>
+            <tr><th scope="row"><span data-i18n="Single sign-on (SAML)">Single sign-on (SAML)</span></th><td><i data-lucide="minus" class="mx-auto block size-4 text-muted-foreground"></i><span class="sr-only" data-i18n="Not included">Not included</span></td><td><i data-lucide="minus" class="mx-auto block size-4 text-muted-foreground"></i><span class="sr-only" data-i18n="Not included">Not included</span></td><td><i data-lucide="check" class="mx-auto block size-4 text-primary-accent"></i><span class="sr-only" data-i18n="Included">Included</span></td></tr>
             <tr><th scope="row"><span data-i18n="Audit log">Audit log</span></th><td><i data-lucide="minus" class="mx-auto block size-4 text-muted-foreground"></i><span class="sr-only" data-i18n="Not included">Not included</span></td><td><span data-i18n="30 days">30 days</span></td><td><span data-i18n="Full history">Full history</span></td></tr>
           </tbody>
           <tbody>
             <tr class="group-row"><th scope="colgroup" colspan="4"><span data-i18n="Automation and API">Automation and API</span></th></tr>
             <tr><th scope="row"><span data-i18n="Automation rules">Automation rules</span></th><td dir="ltr" class="tabular-nums">5</td><td dir="ltr" class="tabular-nums">50</td><td><span data-i18n="No limit">No limit</span></td></tr>
-            <tr><th scope="row"><span data-i18n="Outgoing webhooks">Outgoing webhooks</span></th><td><i data-lucide="minus" class="mx-auto block size-4 text-muted-foreground"></i><span class="sr-only" data-i18n="Not included">Not included</span></td><td><i data-lucide="check" class="mx-auto block size-4 text-primary"></i><span class="sr-only" data-i18n="Included">Included</span></td><td><i data-lucide="check" class="mx-auto block size-4 text-primary"></i><span class="sr-only" data-i18n="Included">Included</span></td></tr>
+            <tr><th scope="row"><span data-i18n="Outgoing webhooks">Outgoing webhooks</span></th><td><i data-lucide="minus" class="mx-auto block size-4 text-muted-foreground"></i><span class="sr-only" data-i18n="Not included">Not included</span></td><td><i data-lucide="check" class="mx-auto block size-4 text-primary-accent"></i><span class="sr-only" data-i18n="Included">Included</span></td><td><i data-lucide="check" class="mx-auto block size-4 text-primary-accent"></i><span class="sr-only" data-i18n="Included">Included</span></td></tr>
             <tr><th scope="row"><span data-i18n="API requests a minute">API requests a minute</span></th><td dir="ltr" class="tabular-nums">60</td><td dir="ltr" class="tabular-nums">600</td><td dir="ltr" class="tabular-nums">3,000</td></tr>
-            <tr><th scope="row"><span data-i18n="Sandbox environment">Sandbox environment</span></th><td><i data-lucide="minus" class="mx-auto block size-4 text-muted-foreground"></i><span class="sr-only" data-i18n="Not included">Not included</span></td><td><i data-lucide="minus" class="mx-auto block size-4 text-muted-foreground"></i><span class="sr-only" data-i18n="Not included">Not included</span></td><td><i data-lucide="check" class="mx-auto block size-4 text-primary"></i><span class="sr-only" data-i18n="Included">Included</span></td></tr>
+            <tr><th scope="row"><span data-i18n="Sandbox environment">Sandbox environment</span></th><td><i data-lucide="minus" class="mx-auto block size-4 text-muted-foreground"></i><span class="sr-only" data-i18n="Not included">Not included</span></td><td><i data-lucide="minus" class="mx-auto block size-4 text-muted-foreground"></i><span class="sr-only" data-i18n="Not included">Not included</span></td><td><i data-lucide="check" class="mx-auto block size-4 text-primary-accent"></i><span class="sr-only" data-i18n="Included">Included</span></td></tr>
           </tbody>
           <tbody>
             <tr class="group-row"><th scope="colgroup" colspan="4"><span data-i18n="Support">Support</span></th></tr>
@@ -931,7 +930,7 @@ header.app-seam { position: sticky; inset-block-start: 0; }
 <!-- @endregion footer -->
 
 <!-- ===== Demo controls (not part of the page; build-screen.py strips them) ===== -->
-<details class="disclosure fixed bottom-5 end-5 z-20 w-64 max-w-[calc(100%-2.5rem)] rounded-lg border border-border bg-popover text-2sm shadow-md open:pb-3" data-motion="state">
+<details class="disclosure fixed bottom-5 end-5 z-20 w-auto open:w-64 max-w-[calc(100%-2.5rem)] rounded-lg border border-border bg-popover text-2sm shadow-md open:pb-3" data-motion="state">
   <summary class="flex cursor-pointer items-center gap-2 px-3 py-2 font-medium text-mono select-none"><i data-lucide="sliders-horizontal" class="size-4 text-muted-foreground"></i>Demo controls</summary>
   <div class="flex flex-col gap-2.5 px-3">
     <label class="flex flex-col gap-1"><span class="text-xs text-muted-foreground">Personality</span>

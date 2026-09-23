@@ -91,7 +91,7 @@ Vanilla stack
 
 ## Calendar & dates
 
-- Calendar surfaces use `bg-card`; today `bg-primary/10 text-primary font-semibold`;
+- Calendar surfaces use `bg-card`; today `bg-primary/10 text-primary-accent font-semibold`;
   selected `bg-primary text-primary-foreground`; range fill `bg-primary/10`;
   other-month days `text-muted-foreground/60`; weekend header `text-muted-foreground`.
 - Events: `rounded-sm border-s-2 px-1.5 text-xs` with the category colour as
@@ -118,7 +118,7 @@ Vanilla stack
   with an icon chip, "Drop files or **browse**", allowed types + max size in
   `text-xs text-muted-foreground`; drag-over → `border-primary bg-primary/5`.
 - File rows: icon chip · name `text-2sm font-medium text-mono` · size `text-xs` ·
-  Progress (thin) · remove ghost icon; error rows `text-destructive` + retry.
+  Progress (thin) · remove ghost icon; error rows `text-destructive-accent` + retry.
 - Avatar/image inputs: preview `size-16 rounded-full` + outline sm "Change" +
   link "Remove"; crop dialog for avatars.
 

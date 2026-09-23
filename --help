@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>jbelly-ui — app shell</title>
+<title>Product — Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Source+Sans+3:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=DM+Sans:wght@400;500;600&family=Public+Sans:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
@@ -684,7 +684,7 @@ th[aria-sort="descending"] .sort-chevron { rotate: 180deg; }
   <div class="flex items-center justify-between h-(--header-height) px-6 shrink-0 relative">
     <a href="#" class="logo-full flex items-center gap-2.5 font-semibold text-mono text-sidebar-foreground">
       <span class="inline-flex size-7 items-center justify-center rounded-md bg-primary text-primary-foreground font-bold text-xs">N</span>
-      <span class="font-display">Bayan Ops</span>
+      <span class="font-display">Product</span>
     </a>
     <a href="#" class="logo-mark items-center justify-center mx-auto"><span class="inline-flex size-7 items-center justify-center rounded-md bg-primary text-primary-foreground font-bold text-xs">N</span></a>
     <button id="sidebar-toggle" class="btn btn-outline btn-icon btn-sm rounded-full absolute start-full top-1/2 -translate-x-1/2 rtl:translate-x-1/2 -translate-y-1/2 hidden lg:inline-flex" aria-label="Collapse sidebar"><i data-lucide="chevrons-left" class="rtl:rotate-180"></i></button>
@@ -774,7 +774,7 @@ th[aria-sort="descending"] .sort-chevron { rotate: 180deg; }
 <!-- toolbar -->
       <div class="flex flex-wrap items-center justify-between gap-5 pb-7.5">
         <div class="flex flex-col gap-1">
-          <h1 class="text-xl font-medium text-mono font-display" data-i18n="Dashboard">Dashboard</h1>
+          <h1 class="text-xl font-medium text-mono font-display">Dashboard</h1>
           <p class="text-2sm text-secondary-foreground"><span data-i18n="Business overview">Business overview</span> · <span id="period-label" data-i18n="Last 30 days">Last 30 days</span> vs previous period</p>
         </div>
         <div class="flex flex-wrap items-center gap-2.5">
@@ -895,7 +895,7 @@ th[aria-sort="descending"] .sort-chevron { rotate: 180deg; }
   </main>
 
   <footer class="container-fixed flex flex-wrap items-center justify-between gap-2.5 py-5 text-2sm text-muted-foreground">
-    <span>© 2026 Bayan Ops</span><nav class="flex gap-4"><a href="#" class="hover:text-primary-accent" data-i18n="Docs">Docs</a><a href="#" class="hover:text-primary-accent" data-i18n="Support">Support</a><a href="#" class="hover:text-primary-accent" data-i18n="Privacy">Privacy</a></nav>
+    <span>© 2026 Product</span><nav class="flex gap-4"><a href="#" class="hover:text-primary-accent" data-i18n="Docs">Docs</a><a href="#" class="hover:text-primary-accent" data-i18n="Support">Support</a><a href="#" class="hover:text-primary-accent" data-i18n="Privacy">Privacy</a></nav>
   </footer>
 </div>
 

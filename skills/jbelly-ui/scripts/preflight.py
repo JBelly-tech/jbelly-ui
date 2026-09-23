@@ -219,6 +219,34 @@ def check_file(path, results):
     if icon_only: results.append(("FAIL", "structure", f"{path}:{where(icon_only[0].start())}", f"{len(icon_only)} icon-only button(s) without aria-label"))
     # contrast on tokens (css or html with <style>)
     scopes = token_scopes(txt)
+
+    # A personality is written after dark mode and is, like it, a single class -- so source order
+    # hands the personality every role it declares, in BOTH modes. A role it sets for its light
+    # surfaces is therefore what dark mode paints too, unless `.theme-x.dark` sets it back. Five of
+    # the six shipped personalities were doing this: a 53% grey second line on a 13% ground, a light
+    # green fill behind white text, warm paper shadows on a black page. The contrast pass sees the
+    # result only where it happens to compare that exact pair, and never sees it at all for a role
+    # like --shadow-md. This names the cause instead.
+    themed = [(i, sel, sig, toks) for i, (sel, sig, toks) in enumerate(scopes)
+              if len(sig) == 1 and next(iter(sig)).startswith(".theme-")]
+    for mi, (msel, msig, mtoks) in enumerate(scopes):
+        if not msig or not msig <= {".dark", ".light"}:
+            continue
+        for ti, sel, sig, toks in themed:
+            if ti < mi:
+                continue                    # written first, so the mode still wins: nothing leaks
+            union = sig | msig
+            taken = set()
+            for _, g, t in scopes:
+                if g == union: taken |= set(t)
+            leak = sorted((set(toks) & set(mtoks)) - taken)
+            if leak:
+                shown = ", ".join("--" + t for t in leak[:4]) + ("..." if len(leak) > 4 else "")
+                results.append(("FAIL", "tokens", path,
+                                f"{sel} keeps {shown} in {msel}: it is one class, declared after {msel}, so "
+                                f"{sel}{msel} must declare {'them' if len(leak) > 1 else 'it'} "
+                                f"or the light value paints the dark page"))
+
     declared = {t.lstrip("-") for _, _, toks in scopes for t in toks}
     pairs = [("foreground", "background", 4.5), ("primary-foreground", "primary", 4.5), ("muted-foreground", "background", 4.5), ("secondary-foreground", "secondary", 4.5), ("card-foreground", "card", 4.5), ("primary-accent", "card", 4.5), ("primary-accent", "background", 4.5)]
     # and whatever the markup itself paints text with, which a fixed list cannot know

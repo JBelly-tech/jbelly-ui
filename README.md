@@ -140,6 +140,7 @@ Every capture on this page is taken from the shells themselves by
 | `new_screen.py` (`new-screen.ps1`) | Scaffold copy with personality / density / RTL / dark preset |
 | `verify_page.py` (`verify-page.ps1`) | One call: render variants headlessly, console errors, token lint, pre-flight, PASS/FAIL |
 | `preflight.py` | Deterministic judgement: AI-default tells, structure checks, and the WCAG contrast of every colour role the markup uses as text — not only the pairs the stylesheet happens to declare |
+| `verify_theme.py` | Sets each personality on the document, light and dark, and measures every element that paints text against the background the compositor actually gives it. A class like `bg-success/15 text-success` names no role pair, so the source cannot answer it, and the answer changes with the personality |
 | `check_controls.py` | Drives every button, tab, radio, summary and same-page link in a real browser and fails on any control that changes nothing. A dead button is the commonest defect in a demo and the hardest to see in review |
 | `lint_tokens.py` (`lint-tokens.ps1`) | No raw palette colours outside `tokens.css` |
 | `audit_styles.py` | Redesign inventory: fonts, colours, radii, shadows, spacing, raw palette classes; deviation list in fix order |

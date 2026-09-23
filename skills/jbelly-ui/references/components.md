@@ -41,7 +41,7 @@ ghost:        shadow-none bg-transparent text-accent-foreground hover:bg-accent
 dim:          shadow-none bg-transparent text-muted-foreground hover:text-foreground
 mono:         bg-mono text-mono-foreground hover:bg-mono/90
 destructive:  bg-destructive text-destructive-foreground hover:bg-destructive/90
-link:         shadow-none h-auto p-0 text-primary hover:underline
+link:         shadow-none h-auto p-0 text-primary-accent hover:underline
 ```
 
 Hierarchy per view: one `primary`, actions of equal weight `outline`,
@@ -108,8 +108,8 @@ sm: h-4 w-6 before:size-3 checked:before:translate-x-2      lg: h-6 w-10 before:
 label:   text-2sm font-medium text-mono                 (inline after a checkbox: font-normal text-foreground)
 field:   flex flex-col gap-1.5
 helper:  text-xs text-muted-foreground
-error:   text-xs text-destructive   (+ aria-invalid on the control)
-required mark: <span class="text-destructive">*</span>
+error:   text-xs text-destructive-accent   (+ aria-invalid on the control)
+required mark: <span class="text-destructive-accent">*</span>
 form:    flex flex-col gap-5      grid forms: grid gap-5 lg:grid-cols-2
 ```
 
@@ -126,9 +126,9 @@ success:      bg-success text-success-foreground
 warning:      bg-warning text-warning-foreground
 info:         bg-info text-info-foreground
 destructive:  bg-destructive text-destructive-foreground
-light-*:      bg-primary/10 text-primary   (same for success / warning / info / destructive)
+light-*:      bg-primary/10 text-primary-accent   (same for success / warning / info / destructive)
 outline:      border border-border bg-muted text-secondary-foreground
-outline-*:    border border-primary/30 bg-primary/5 text-primary
+outline-*:    border border-primary/30 bg-primary/5 text-primary-accent
 pill:         + rounded-full
 dot (inside): <span class="size-1.5 rounded-full bg-current opacity-75"></span>
 ```
@@ -141,7 +141,7 @@ and nav badges. A count badge on an icon button: `absolute -top-1 -end-1 size-4 
 ```
 wrapper:   relative flex shrink-0 size-10           sizes: 6 · 7 · 8 · 9 · 10 · 12 · 16 · 20
 image:     size-full rounded-full object-cover
-initials:  size-full rounded-full inline-flex items-center justify-center bg-primary/10 text-primary font-semibold text-2xs uppercase
+initials:  size-full rounded-full inline-flex items-center justify-center bg-primary/10 text-primary-accent font-semibold text-2xs uppercase
 status:    absolute -end-0.5 -bottom-0.5 size-2.5 rounded-full border-2 border-background bg-success   (offline: bg-muted-foreground)
 group:     flex -space-x-2 rtl:space-x-reverse  ·  each child: ring-1 ring-background hover:z-10 relative
 +N chip:   same as initials, bg-secondary text-secondary-foreground
@@ -187,7 +187,7 @@ actions column: td text-end · ghost icon button · w-[60px]
 Cell patterns:
 
 - **Entity**: `flex items-center gap-2.5` → avatar `size-9` → `flex flex-col` with
-  name `text-sm font-medium text-mono hover:text-primary` and sub `text-2sm text-secondary-foreground`.
+  name `text-sm font-medium text-mono hover:text-primary-accent` and sub `text-2sm text-secondary-foreground`.
 - **Status**: light badge + dot, e.g. `light-success` “Active”.
 - **Numeric**: `text-end tabular-nums`.
 - **Date**: `text-secondary-foreground whitespace-nowrap`.
@@ -199,13 +199,13 @@ Footer (in card footer): `flex flex-wrap items-center justify-between gap-2.5 te
 
 ```
 line (default):  nav: flex items-center gap-6 border-b border-border overflow-x-auto
-                 tab: -mb-px pb-3 text-sm text-secondary-foreground border-b-2 border-transparent whitespace-nowrap hover:text-primary
-                      active: text-primary border-primary font-medium
+                 tab: -mb-px pb-3 text-sm text-secondary-foreground border-b-2 border-transparent whitespace-nowrap hover:text-primary-accent
+                      active: text-primary-accent border-primary font-medium
                  with icon: inline-flex items-center gap-1.5 [&_svg]:size-4
 pill:            nav: inline-flex items-center gap-1 rounded-lg bg-muted p-1
                  tab: h-7 px-3 rounded-md text-2sm text-secondary-foreground hover:text-foreground
                       active: bg-background text-mono shadow-xs font-medium
-vertical:        nav: flex flex-col gap-1 · tab: rounded-md px-2.5 py-2 text-2sm hover:bg-accent · active: bg-accent text-primary font-medium
+vertical:        nav: flex flex-col gap-1 · tab: rounded-md px-2.5 py-2 text-2sm hover:bg-accent · active: bg-accent text-primary-accent font-medium
 ```
 
 ## Dropdown menu
@@ -213,7 +213,7 @@ vertical:        nav: flex flex-col gap-1 · tab: rounded-md px-2.5 py-2 text-2s
 ```
 panel:     min-w-44 max-w-64 rounded-md border border-border bg-popover text-popover-foreground shadow-md p-2 flex flex-col gap-0.5 z-50
 item:      flex items-center gap-2.5 rounded-md px-2 py-2 text-2sm text-foreground cursor-pointer hover:bg-accent
-           [&_svg]:size-4 [&_svg]:text-muted-foreground   destructive item: text-destructive hover:bg-destructive/10
+           [&_svg]:size-4 [&_svg]:text-muted-foreground   destructive item: text-destructive-accent hover:bg-destructive/10
 heading:   px-2 py-1.5 text-xs text-muted-foreground
 separator: my-1 h-px bg-border
 shortcut:  ms-auto text-xs text-muted-foreground   (or a Kbd)
@@ -255,8 +255,8 @@ footer:  grid grid-cols-2 gap-2.5 p-5 border-t border-border   (two equal outlin
 
 ```
 alert:      flex w-full items-start gap-2.5 rounded-lg p-3.5 text-sm bg-muted text-foreground
-            primary: bg-primary/10 text-primary · success: bg-success/10 text-success · warning: bg-warning/15 text-warning-foreground
-            destructive: bg-destructive/10 text-destructive · outline: border border-border bg-transparent
+            primary: bg-primary/10 text-primary-accent · success: bg-success/10 text-success-accent · warning: bg-warning/15 text-warning-foreground
+            destructive: bg-destructive/10 text-destructive-accent · outline: border border-border bg-transparent
 icon:       size-4 mt-0.5 shrink-0
 title:      font-semibold   · text below in text-2sm opacity-90
 dismiss:    ms-auto ghost icon button sm
@@ -294,7 +294,7 @@ ellipsis: size-7 inline-flex items-center justify-center text-muted-foreground
 
 ## Breadcrumb
 
-`flex items-center gap-1.5 text-xs text-secondary-foreground` · link `hover:text-primary` · separator `size-3.5 text-muted-foreground rtl:rotate-180` · current `text-mono`.
+`flex items-center gap-1.5 text-xs text-secondary-foreground` · link `hover:text-primary-accent` · separator `size-3.5 text-muted-foreground rtl:rotate-180` · current `text-mono`.
 
 ## Kbd
 
@@ -307,7 +307,7 @@ ellipsis: size-7 inline-flex items-center justify-center text-muted-foreground
 
 ## Link
 
-`text-primary hover:underline underline-offset-4` · in body text `font-medium`.
+`text-primary-accent hover:underline underline-offset-4` · in body text `font-medium`.
 
 ## Empty state
 
