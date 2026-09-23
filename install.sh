@@ -21,7 +21,8 @@ case "$agent" in
   *) echo "unknown agent: $agent (claude-code|cursor|copilot|codex|windsurf|gemini-cli|custom <dir>)"; exit 1 ;;
 esac
 [ -n "$g" ] || { echo "custom needs a destination folder"; exit 1; }
-dest="$g"; [ "$mode" = "--project" ] && dest="$(pwd)/$l"
+dest="$g"
+if [ "$mode" = "--project" ]; then dest="$(pwd)/$l"; fi
 mkdir -p "$dest"; rm -rf "$dest/jbelly-ui"; cp -R "$src" "$dest/jbelly-ui"
 echo "installed jbelly-ui -> $dest/jbelly-ui"
 echo "next: ask your agent for any UI (e.g. 'add a dashboard page'); the skill triggers on UI work."

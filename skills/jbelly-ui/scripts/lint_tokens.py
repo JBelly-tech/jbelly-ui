@@ -46,6 +46,8 @@ def die(msg):
 
 def main():
     argv = sys.argv[1:]
+    if "--help" in sys.argv[1:] or "-h" in sys.argv[1:]:
+        print(__doc__.strip()); return 0
     quiet = False; excl = set(); targets = []; i = 0
     while i < len(argv):
         a = argv[i]

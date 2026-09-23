@@ -14,6 +14,8 @@ def block(css, selector):
     return dict(re.findall(r"--([\w-]+)\s*:\s*([^;]+);", m.group(1))) if m else {}
 
 def main():
+    if "--help" in sys.argv[1:] or "-h" in sys.argv[1:]:
+        print(__doc__.strip()); return 0
     src = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, "references", "tokens.css")
     out = sys.argv[2] if len(sys.argv) > 2 else os.path.join(ROOT, "assets", "tokens.json")
     css = open(src, encoding="utf-8").read()
@@ -36,7 +38,11 @@ def main():
         elif re.match(r"oklch\(|#|var\(", v):
             tokens["color"][k] = {"$type": "color", "$value": v, "$extensions": {"modes": {"dark": dark.get(k, v)}}}
     os.makedirs(os.path.dirname(out), exist_ok=True)
-    json.dump(tokens, open(out, "w", encoding="utf-8"), indent=2)
+    # An explicit newline, or the same command produces LF on Linux and CRLF on Windows, and the
+    # "generated files match their sources" check cannot pass on a Windows machine.
+    with open(out, "w", encoding="utf-8", newline="\n") as fh:
+        json.dump(tokens, fh, indent=2)
+        fh.write("\n")
     print(f"wrote {out}: {len(tokens['color'])} colours, {len(tokens['radius'])} radii, {len(tokens['font'])} fonts, {len(tokens['shadow'])} shadows, {len(tokens['layout'])} layout")
 
 if __name__ == "__main__":

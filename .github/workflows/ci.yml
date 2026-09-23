@@ -69,3 +69,66 @@ jobs:
           name: smoke-screenshots
           path: tests/out/**
           if-no-files-found: ignore
+
+  # The skill is installed by hand as often as by npx, and on macOS and Linux the terminal is the
+  # interface -- there are no .ps1 twins there. "Python 3.9+, standard library only" and "all --help"
+  # are claims in the docs; this is what makes them true rather than remembered. Python 3.9 is the
+  # floor the compatibility table promises, so that is what runs here.
+  portable:
+    name: scripts on ${{ matrix.os }}, python ${{ matrix.python }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: macos-latest, python: "3.12" }
+          - { os: macos-latest, python: "3.9" }
+          - { os: windows-latest, python: "3.12" }
+          - { os: ubuntu-latest, python: "3.9" }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Every script says what it does, and does nothing else
+        shell: bash
+        run: |
+          for f in skills/jbelly-ui/scripts/*.py scripts/*.py; do
+            python "$f" --help > /dev/null || { echo "no --help: $f"; exit 1; }
+          done
+          # A help screen that writes a file is not a help screen. `git diff` alone would miss it:
+          # new_screen.py takes its output path from argv[0], so `new_screen.py --help` wrote the
+          # scaffold to a file called "--help" -- untracked, and committed here by accident once.
+          test -z "$(git status --porcelain)" || { echo "--help changed the working tree:"; git status --porcelain; exit 1; }
+      - name: Token lint and pre-flight on every shipped page
+        shell: bash
+        run: |
+          python skills/jbelly-ui/scripts/lint_tokens.py skills/jbelly-ui
+          python skills/jbelly-ui/scripts/lint_tokens.py index.html
+          for f in skills/jbelly-ui/assets/*-shell.html index.html skills/jbelly-ui/references/tokens.css; do
+            python skills/jbelly-ui/scripts/preflight.py "$f" > /dev/null || { echo "pre-flight failed: $f"; exit 1; }
+          done
+      - name: A page builds from a spec, and passes the same checks
+        shell: bash
+        run: |
+          python skills/jbelly-ui/scripts/build-screen.py skills/jbelly-ui/assets/spec.example.json "$RUNNER_TEMP/page.html"
+          python skills/jbelly-ui/scripts/lint_tokens.py "$RUNNER_TEMP/page.html"
+          python skills/jbelly-ui/scripts/preflight.py "$RUNNER_TEMP/page.html" > /dev/null
+          python skills/jbelly-ui/scripts/lint_motion.py "$RUNNER_TEMP/page.html" --quiet
+      - name: The generated files are byte-identical on this platform
+        shell: bash
+        run: |
+          python skills/jbelly-ui/scripts/export_tokens.py
+          python skills/jbelly-ui/scripts/build_dist.py
+          git diff --exit-code -- dist skills/jbelly-ui/assets/tokens.json
+      - name: install.sh copies the skill
+        if: runner.os != 'Windows'
+        run: |
+          ./install.sh custom "$RUNNER_TEMP/skills"
+          test -f "$RUNNER_TEMP/skills/jbelly-ui/SKILL.md"
+      - name: install.ps1 copies the skill
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          ./install.ps1 -Agent custom -Dest "$env:RUNNER_TEMP/skills"
+          if (-not (Test-Path "$env:RUNNER_TEMP/skills/jbelly-ui/SKILL.md")) { exit 1 }

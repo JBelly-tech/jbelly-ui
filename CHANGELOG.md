@@ -2,6 +2,30 @@
 
 ## Unreleased
 
+**The skill is checked on macOS, Linux and Windows now, not assumed to work there.** On Windows the
+`.ps1` twins and the agent hide the command line; on macOS and Linux the terminal *is* the
+interface, and `--help` is the first thing anyone types. `SKILL.md` said "all `--help`". Six of
+thirteen scripts did something else with it: two answered "unknown option", `preflight.py` tried to
+review a file called `--help`, `verify_page.py` launched a browser and rendered one, `export_tokens.py`
+ignored the flag, and `new_screen.py` -- which takes its output path from the first argument --
+**wrote a 110 KB scaffold to a file named `--help`**, in the repository root, where it was committed
+by accident in the previous change. A later `export_tokens.py --help` then read that file as its
+stylesheet, which is how `assets/tokens.json` came to ship three `chart-*` roles that `tokens.css`
+has never declared. A help screen with a side effect is not a small thing.
+
+Every script now prints what it does, how to call it and what its exit codes mean, and does nothing
+else. `export_tokens.py` writes an explicit LF -- without it the same command produces LF
+on Linux and CRLF on Windows, and the "generated files match their sources" check could not pass on
+a Windows machine. `install.sh` is executable in the index (a fresh clone answered `./install.sh`
+with "permission denied") and its project-mode branch is an `if` rather than an `&&` that depends on
+how a shell reads `set -e`.
+
+A new CI job runs the whole script set on **macOS, Linux and Windows**, on **Python 3.9** as well as
+3.12 -- the floor the compatibility table promises: `--help` on every script, failing if one of them
+so much as touches the working tree; the token lint and pre-flight on every shipped page; a page
+built from a spec and put through the same checks; the generated files byte-compared; and both
+installers.
+
 **Three of the five state colours had no value for text.** The system states the rule itself --
 "a fill light enough to carry white text is too light to be read as text" -- and it is why
 `--primary-accent` and `--destructive-accent` exist. It had been applied to two roles out of five.

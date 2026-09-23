@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """Build a complete page from a small JSON spec, using one of the assets/*-shell.html files as the template (Class D).
 
 The model writes ~2 KB of JSON instead of ~150 KB of HTML. Everything the spec does not mention keeps the
@@ -1199,6 +1200,8 @@ SUMMARY = {"app": lambda sp: f"nav={len(sp.get('nav', []))} kpis={len(sp.get('kp
            "pricing": lambda sp: f"plans={len(sp.get('plans', []))} groups={len((sp.get('comparison') or {}).get('groups', []))} faq={len((sp.get('faq') or {}).get('items', []))}"}
 
 def main():
+    if "--help" in sys.argv[1:] or "-h" in sys.argv[1:]:
+        print(__doc__.strip()); return 0
     argv = sys.argv[1:]; kind = None; args = []; skip = False
     for i, a in enumerate(argv):                        # --kind overrides the spec's own "kind"
         if skip: skip = False

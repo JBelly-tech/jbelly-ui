@@ -41,11 +41,26 @@ no model dependency.
 | Token lint | `scripts/lint_tokens.py` or `scripts/lint-tokens.ps1` | `scripts/lint_tokens.py` |
 | Scaffold | `scripts/new_screen.py` or `scripts/new-screen.ps1` | `scripts/new_screen.py` |
 | Spec → page | `scripts/build-screen.py` | `scripts/build-screen.py` |
-| Verify (render + console + lint) | `scripts/verify_page.py` (Playwright, or Chrome/Edge headless) or `scripts/verify-page.ps1` (Edge) | `scripts/verify_page.py` (Playwright, or Chrome/Chromium headless) |
+| Verify (render + console + lint + both runtime probes) | `scripts/verify_page.py` (Playwright, or Chrome/Edge headless) or `scripts/verify-page.ps1` (Edge) | `scripts/verify_page.py` (Playwright, or Chrome/Chromium headless) |
+| Colour sweep across every personality | `scripts/verify_theme.py` | `scripts/verify_theme.py` |
+| Install without Node | `.\install.ps1 -Agent <agent>` | `./install.sh <agent>` |
 
 Requirements: Python 3.9+ (standard library only). For verification, either
 `pip install playwright && playwright install chromium` (best console
-capture) or any installed Chrome / Chromium / Edge.
+capture) or any installed Chrome / Chromium / Edge. Without a renderer the
+runtime probes print `[SKIP]` and return 0 — which is not a pass, and they
+say so.
+
+The `.ps1` files are Windows conveniences, not requirements: every one of
+them has a Python twin that is the same tool. On macOS and Linux the
+terminal is the interface, so **every script answers `--help`** with what it
+does, how to call it and what its exit codes mean, and does nothing else.
+
+This is checked rather than promised: CI runs the whole script set on
+**macOS, Linux and Windows**, on Python 3.9 as well as 3.12 — `--help` on
+every script (and fails if one of them writes a file while doing it), the
+token lint and pre-flight on every shipped page, a page built from a spec,
+the generated files byte-compared, and both installers.
 
 ## Stacks
 

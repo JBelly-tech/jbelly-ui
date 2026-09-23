@@ -72,6 +72,8 @@ def strip_links(md):
     return md
 
 def build():
+    if "--help" in sys.argv[1:] or "-h" in sys.argv[1:]:
+        print(__doc__.strip()); return 0
     quick = read("references/quick-card.md")
     anti = read("references/anti-patterns.md")
     pers = read("references/personalities.md")

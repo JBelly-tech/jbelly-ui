@@ -1016,6 +1016,8 @@ def die(msg):
 
 def main():
     a = sys.argv[1:]
+    if "--help" in sys.argv[1:] or "-h" in sys.argv[1:]:
+        print(__doc__.strip()); return 0
     targets = [x for x in a if not x.startswith("--")]
     for flag in a:
         if flag.startswith("--") and flag not in ("--json", "--quiet"): return die(f"unknown option {flag}")

@@ -84,6 +84,8 @@ def render_binary(browser, url, png, w, h, budget_ms=20000):
 
 def main():
     a = sys.argv[1:]
+    if "--help" in sys.argv[1:] or "-h" in sys.argv[1:]:
+        print(__doc__.strip()); return 0
     if not a: print(__doc__); return 2
     path = os.path.abspath(a[0])
     if not os.path.isfile(path):

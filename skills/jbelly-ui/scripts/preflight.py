@@ -298,6 +298,8 @@ def check_file(path, results):
 
 def main():
     a = sys.argv[1:]
+    if "--help" in sys.argv[1:] or "-h" in sys.argv[1:]:
+        print(__doc__.strip()); return 0
     if not a: print(__doc__); return 2
     target = a[0]; files = []
     if not os.path.exists(target):
