@@ -2,11 +2,11 @@
 
 > **Public beta.** The system, recipes and scripts are complete and measured on a handful of briefs with one model family. What the beta tests is the claim that it works well in *every* agent and model. Try it on your own screens and report with the [issue templates](.github/ISSUE_TEMPLATE/); bad results are the most useful. Fork freely (MIT). Versions: [`CHANGELOG.md`](CHANGELOG.md).
 
-[![ci](https://github.com/mohammadJohar/jbelly-ui/actions/workflows/ci.yml/badge.svg)](https://github.com/mohammadJohar/jbelly-ui/actions/workflows/ci.yml) · MIT · Agent Skills format · Python 3.9+ tooling, no dependencies
+[![ci](https://github.com/JBelly-tech/jbelly-ui/actions/workflows/ci.yml/badge.svg)](https://github.com/JBelly-tech/jbelly-ui/actions/workflows/ci.yml) · MIT · Agent Skills format · Python 3.9+ tooling, no dependencies
 
-**Live demos:** [app shell](https://mohammadjohar.github.io/jbelly-ui/skills/jbelly-ui/assets/app-shell.html) · [storefront](https://mohammadjohar.github.io/jbelly-ui/skills/jbelly-ui/assets/commerce-shell.html) · [landing page](https://mohammadjohar.github.io/jbelly-ui/skills/jbelly-ui/assets/landing-shell.html) · [pricing page](https://mohammadjohar.github.io/jbelly-ui/skills/jbelly-ui/assets/pricing-shell.html)
+**Live demos:** [app shell](https://jbelly-tech.github.io/jbelly-ui/skills/jbelly-ui/assets/app-shell.html) · [storefront](https://jbelly-tech.github.io/jbelly-ui/skills/jbelly-ui/assets/commerce-shell.html) · [landing page](https://jbelly-tech.github.io/jbelly-ui/skills/jbelly-ui/assets/landing-shell.html) · [pricing page](https://jbelly-tech.github.io/jbelly-ui/skills/jbelly-ui/assets/pricing-shell.html)
 [Cost, measured](COST.md) · [Recorded runs](evals/records/) · [Roadmap](docs/roadmap.md)
-**This project's own site**, built from these tokens and checked by these scripts: [English](https://mohammadjohar.github.io/jbelly-ui/) · [بالعربية](https://mohammadjohar.github.io/jbelly-ui/#lang=ar)
+**This project's own site**, built from these tokens and checked by these scripts: [English](https://jbelly-tech.github.io/jbelly-ui/) · [بالعربية](https://jbelly-tech.github.io/jbelly-ui/#lang=ar)
 
 **A licence-free UI system for web products, packaged as an agent skill.**
 Dashboards, admin panels, settings and auth pages, data tables, landing
@@ -73,8 +73,8 @@ what it costs.
 **1. Agents that read skills** (Claude Code, Codex, Cursor, GitHub Copilot, Gemini CLI, Windsurf, Kiro, Roo Code, OpenCode, Amp, Goose and ~70 more):
 
 ```bash
-npx skills add mohammadJohar/jbelly-ui -a claude-code     # or -a cursor, -a codex, -a copilot, -a gemini-cli …
-npx skills add mohammadJohar/jbelly-ui -g -y              # user-wide, no prompts
+npx skills add JBelly-tech/jbelly-ui -a claude-code     # or -a cursor, -a codex, -a copilot, -a gemini-cli …
+npx skills add JBelly-tech/jbelly-ui -g -y              # user-wide, no prompts
 ```
 No Node? `./install.sh cursor` (macOS/Linux) or `.\install.ps1 -Agent cursor` (Windows) copies the skill into the agent's folder; `docs/compatibility.md` lists every path.
 
@@ -88,7 +88,7 @@ Then ask for any UI ("add a dashboard", "build the settings page", "restyle this
 
 ## Try it in 30 seconds
 
-Open the [live demo](https://mohammadjohar.github.io/jbelly-ui/skills/jbelly-ui/assets/app-shell.html) (or `skills/jbelly-ui/assets/app-shell.html` locally). The *Demo controls* panel in the corner switches personality, density, dark mode, sidebar style and AR/EN (RTL); everything in the page works: collapse, ⌘K palette, table states, drawer, sort, notifications. Or build a page from a spec:
+Open the [live demo](https://jbelly-tech.github.io/jbelly-ui/skills/jbelly-ui/assets/app-shell.html) (or `skills/jbelly-ui/assets/app-shell.html` locally). The *Demo controls* panel in the corner switches personality, density, dark mode, sidebar style and AR/EN (RTL); everything in the page works: collapse, ⌘K palette, table states, drawer, sort, notifications. Or build a page from a spec:
 
 ```bash
 python skills/jbelly-ui/scripts/build-screen.py skills/jbelly-ui/assets/spec.example.json out/dashboard.html
@@ -100,8 +100,8 @@ python skills/jbelly-ui/scripts/verify_page.py out/dashboard.html --variants ",#
 | ![](docs/showcase/demo-sidebar-dark.png) | ![](docs/showcase/demo-neo-empty.png) | ![](docs/showcase/demo-slate-rtl.png) |
 
 Three more shells ship with the skill, all self-contained and all built from the same tokens: a
-[storefront](https://mohammadjohar.github.io/jbelly-ui/skills/jbelly-ui/assets/commerce-shell.html), a [landing page](https://mohammadjohar.github.io/jbelly-ui/skills/jbelly-ui/assets/landing-shell.html) and a
-[pricing page](https://mohammadjohar.github.io/jbelly-ui/skills/jbelly-ui/assets/pricing-shell.html). The storefront is the largest — browse, filter, sort,
+[storefront](https://jbelly-tech.github.io/jbelly-ui/skills/jbelly-ui/assets/commerce-shell.html), a [landing page](https://jbelly-tech.github.io/jbelly-ui/skills/jbelly-ui/assets/landing-shell.html) and a
+[pricing page](https://jbelly-tech.github.io/jbelly-ui/skills/jbelly-ui/assets/pricing-shell.html). The storefront is the largest — browse, filter, sort,
 search, quick view, variants, a cart with promo codes and undo, and a four-step checkout that
 validates, all client-side with no server. Every control in all of them works, and each carries the
 same six presets, dark mode and RTL.

@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+**The project moved to the `JBelly-tech` organisation.** `github.com/JBelly-tech/jbelly-ui` is the
+repository now, and `https://jbelly-tech.github.io/jbelly-ui/` is the site. GitHub redirects the old
+repository URL and the old `git remote`, so clones and `npx skills add mohammadJohar/jbelly-ui` keep
+working — but it does **not** redirect a Pages site, so the old
+`mohammadjohar.github.io/jbelly-ui/` address stops resolving. Every link in the README, the
+compatibility table, CONTRIBUTING, both installers and the site itself points at the new home, and
+the install command names it: `npx skills add JBelly-tech/jbelly-ui`.
+
 **You could not see where a form field was, or which control had focus.** WCAG 1.4.11 asks 3:1 of
 the boundary of a user interface component and 2.4.11 asks it of the focus indicator, for the same
 reason: they are the only thing telling a reader where the control is. `--input`, a field's edge,

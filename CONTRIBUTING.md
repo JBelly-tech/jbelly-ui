@@ -7,7 +7,7 @@ run you share makes the next version better.
 
 ## The fastest way to help
 
-1. Install it (`npx skills add mohammadJohar/jbelly-ui` or `./install.sh` / `.\install.ps1`).
+1. Install it (`npx skills add JBelly-tech/jbelly-ui` or `./install.sh` / `.\install.ps1`).
 2. Ask your agent for a real screen from your own work.
 3. Run the two checks on the result and open an issue with the numbers:
    ```bash

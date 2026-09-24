@@ -10,15 +10,15 @@ the agent reads plus scripts the agent runs.
 
 ## Agents
 
-Install with the `skills` CLI (`npx skills add mohammadJohar/<repo>`), which places
+Install with the `skills` CLI (`npx skills add JBelly-tech/<repo>`), which places
 the folder where each agent looks for skills:
 
 | Agent | Project path | Global path | Command |
 |-------|--------------|-------------|---------|
-| Claude Code | `.claude/skills/` | `~/.claude/skills/` | `npx skills add mohammadJohar/jbelly-ui -a claude-code` |
-| Cursor | `.agents/skills/` | `~/.cursor/skills/` | `npx skills add mohammadJohar/jbelly-ui -a cursor` |
-| GitHub Copilot | `.agents/skills/` | `~/.copilot/skills/` | `npx skills add mohammadJohar/jbelly-ui -a copilot` |
-| Codex | `.agents/skills/` | `~/.codex/skills/` | `npx skills add mohammadJohar/jbelly-ui -a codex` |
+| Claude Code | `.claude/skills/` | `~/.claude/skills/` | `npx skills add JBelly-tech/jbelly-ui -a claude-code` |
+| Cursor | `.agents/skills/` | `~/.cursor/skills/` | `npx skills add JBelly-tech/jbelly-ui -a cursor` |
+| GitHub Copilot | `.agents/skills/` | `~/.copilot/skills/` | `npx skills add JBelly-tech/jbelly-ui -a copilot` |
+| Codex | `.agents/skills/` | `~/.codex/skills/` | `npx skills add JBelly-tech/jbelly-ui -a codex` |
 | Gemini CLI, Windsurf, OpenCode, Cline and ~70 more | see `npx skills add --help` | | `-a <agent>` |
 
 Add `-g` for a user-wide install and `-y` to skip prompts. Without the CLI,
