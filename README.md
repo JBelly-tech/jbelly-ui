@@ -145,6 +145,7 @@ Every capture on this page is taken from the shells themselves by
 | `lint_tokens.py` (`lint-tokens.ps1`) | No raw palette colours outside `tokens.css` |
 | `audit_styles.py` | Redesign inventory: fonts, colours, radii, shadows, spacing, raw palette classes; deviation list in fix order |
 | `export_tokens.py` · `build_dist.py` | Generate `assets/tokens.json` and the two `dist/` tiers from the sources |
+| `scripts/check_links.py` | Fetches every link the project publishes and fails on the dead ones. Two were dead here for months: a `$schema` URL that never existed, and a site button pointing at a directory GitHub Pages does not serve |
 
 **Around the skill**
 

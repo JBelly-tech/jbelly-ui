@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+**Every link the project publishes is fetched now, and two of them were dead.** A transfer breaks
+links three ways and only one is obvious: the repository URL redirects, a Pages site does not, and a
+relative link on the site was never about the owner at all. Checking all 69 by hand found two that
+had nothing to do with the move. `https://www.designtokens.org/schema`, named as the `$schema` of
+the exported token file, has never existed — the specification is at `https://tr.designtokens.org/format/`.
+And the site's "The recorded runs" button pointed at `evals/records/`, a directory GitHub Pages
+does not serve: it worked only because Jekyll turns a directory's README into its index, so adding
+`.nojekyll` in the change above broke it. It points at the tree on GitHub, where the records are
+actually browsable.
+
+`scripts/check_links.py` pulls every URL and every relative target out of every file that ships and
+fetches them. In CI, this project's own links gate the build — those are the ones a move breaks and
+the ones the repository controls. Other people's sites are fetched and reported but do not fail it:
+a site that is down this morning is not this repository's defect.
+
 **The project moved to the `JBelly-tech` organisation.** `github.com/JBelly-tech/jbelly-ui` is the
 repository now, and `https://jbelly-tech.github.io/jbelly-ui/` is the site. GitHub redirects the old
 repository URL and the old `git remote`, so clones and `npx skills add mohammadJohar/jbelly-ui` keep

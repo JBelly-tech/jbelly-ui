@@ -20,7 +20,7 @@ def main():
     out = sys.argv[2] if len(sys.argv) > 2 else os.path.join(ROOT, "assets", "tokens.json")
     css = open(src, encoding="utf-8").read()
     root, dark = block(css, ":root"), block(css, ".dark")
-    tokens = {"$schema": "https://www.designtokens.org/schema", "color": {}, "font": {}, "radius": {}, "shadow": {}, "layout": {}}
+    tokens = {"$schema": "https://tr.designtokens.org/format/", "color": {}, "font": {}, "radius": {}, "shadow": {}, "layout": {}}
     for k, v in root.items():
         v = v.strip()
         if k.startswith("font-"):
