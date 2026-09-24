@@ -25,6 +25,8 @@ Shell: sidebar 280 (collapsed 80) · header 70 (60 mobile) · container `px-6 xl
 ## Rules that decide the grade
 one primary per view · four states per async region (skeleton/empty/error/success) · `Esc` closes overlays, focus returns ·
 `Ctrl/⌘+K` opens search · logical props only (`ps/pe/ms/me/start/end`, `rtl:rotate-180` on chevrons) · dark = `html.dark`, persisted ·
+every field labelled (`<label for>` or `aria-label`), every icon button named, one `<h1>`, no skipped heading level (`check_a11y.py` inside `verify_page.py`) ·
+a failed submit shows a summary with the heading "There is a problem" and one link per error, focuses the summary, and prefixes the page title with "Error:" ·
 personality chosen and written to `design/personality.md` · never `@apply group` / `peer` · render once in headless Edge before done.
 
 ## Anti-patterns (never)

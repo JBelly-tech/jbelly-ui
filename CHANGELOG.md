@@ -2,6 +2,34 @@
 
 ## Unreleased
 
+**The accessibility defects that make up most of the real ones are now caught by a script, and
+the app demo had five of them.** WebAIM's yearly sweep of the top million home pages finds the same
+handful of failures on most of them: fields without a label, images without `alt`, links and
+buttons with nothing to announce, no `lang`, a skipped heading level. `scripts/check_a11y.py` fails
+on each (plus two `<main>`s, an aria reference to a missing id, a duplicate id, a positive
+`tabindex`, an iframe without a title, a nav without a skip link), renders the page first when
+Playwright is present so template-drawn content is judged too, and runs inside `verify_page.py`.
+On its first run the app shell had a period select, a status filter, a rows-per-page select, a
+search box and the command palette's input with no accessible name, and card titles as `h3` under
+the page's `h1`. All five controls now carry a translated `aria-label`; card titles are `h2`, styled
+by the class as before. The other shells and the site page passed. The smoke suite plants every
+defect the script names and insists it names them.
+
+**The checkout's error summary said "3 fields need attention" and focused the first field.**
+GOV.UK's tested pattern -- the most researched openly licensed form guidance there is -- differs on
+every point: always a summary, even for one error; the heading "There is a problem"; one link per
+error, worded exactly like the inline message; focus on the summary, so the reader hears every
+problem once and each link takes them to its field; a visually hidden "Error:" before each inline
+message; "Error: " prefixed to the page title while errors remain. The storefront's checkout now
+does all six, in both languages, and the rule in `interface-guidelines.md` says so. Two WCAG 2.2
+criteria joined the forms rules with it: nothing asked twice in one flow (3.3.7), no cognitive test
+in sign-in without an alternative (3.3.8).
+
+**Headings balance, paragraphs avoid orphans.** `text-wrap: balance` on `h1`-`h3` was a rule the
+demos did not follow; it is now in every shell's base layer, with `text-wrap: pretty` on running
+text as a progressive enhancement (balance is Baseline, pretty is not yet, and browsers without it
+wrap as before).
+
 **The demos did not look designed, and it was four recipes rather than taste.** Each one repeated
 itself across dozens of elements, so each fix is a line or two rather than a sweep through markup.
 

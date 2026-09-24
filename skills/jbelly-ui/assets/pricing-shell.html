@@ -246,6 +246,10 @@
   * { border-color: var(--border); }
   html { font-family: var(--font-sans); }
   body { background: var(--background); color: var(--foreground); -webkit-font-smoothing: antialiased; }
+  /* Headings balance their lines; running text avoids orphans. Both are progressive: a browser
+     without them wraps as before (text-wrap: pretty is not Baseline yet, balance is). */
+  h1, h2, h3 { text-wrap: balance; }
+  p, li, dd, figcaption { text-wrap: pretty; }
   :focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
   .scroll-thin { scrollbar-width: thin; scrollbar-color: var(--accent) transparent; }
 }

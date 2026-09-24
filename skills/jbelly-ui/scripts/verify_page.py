@@ -166,10 +166,21 @@ def main():
     print(f"[{'OK' if pf.returncode == 0 else 'FAIL'}] pre-flight: {pf.stdout.strip().splitlines()[-1] if pf.stdout.strip() else 'no output'}")
     for l in pf_lines[:6]: print("    " + l)
     fail |= pf.returncode != 0
+    # Structure a screen reader meets before colour: lang, title, one main, one h1, heading order,
+    # alt text, names on links and buttons, labels on fields. Rendered when a renderer exists, so the
+    # parts a shell draws from templates are judged too; static otherwise.
+    ay = subprocess.run([sys.executable, os.path.join(os.path.dirname(__file__), "check_a11y.py"), path] + (["--rendered"] if renderer == "playwright" else []),
+                        capture_output=True, text=True, encoding="utf-8", errors="replace")
+    ay_line = (ay.stdout.strip().splitlines() or ["no output"])[-1]
+    print(f"[{'OK' if ay.returncode == 0 else 'FAIL'}] accessibility structure: {ay_line}")
+    for l in ay.stdout.splitlines():
+        if l.startswith("[FAIL]"): print("    " + l)
+    fail |= ay.returncode != 0
     if "--json" in a:
         import json
         json.dump({"page": path, "renders": report, "lint_ok": lint.returncode == 0, "preflight_ok": pf.returncode == 0,
                    "motion_lint_ok": lm.returncode == 0, "motion_runtime": vm_line, "colour_runtime": vt_line,
+                   "a11y_ok": ay.returncode == 0, "a11y": ay_line,
                    "verdict": "FAIL" if fail else "PASS"}, open(os.path.join(out, name + "-verify.json"), "w", encoding="utf-8"), indent=2)
         print(f"json -> {os.path.join(out, name + '-verify.json')}")
     print("VERDICT: FAIL - fix the items above, then run this script once more." if fail else "VERDICT: PASS - done; do not add further verification rounds.")

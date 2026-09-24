@@ -262,6 +262,10 @@
   * { border-color: var(--border); }
   html { font-family: var(--font-sans); }
   body { background: var(--background); color: var(--foreground); -webkit-font-smoothing: antialiased; }
+  /* Headings balance their lines; running text avoids orphans. Both are progressive: a browser
+     without them wraps as before (text-wrap: pretty is not Baseline yet, balance is). */
+  h1, h2, h3 { text-wrap: balance; }
+  p, li, dd, figcaption { text-wrap: pretty; }
   :focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
   .scroll-thin { scrollbar-width: thin; scrollbar-color: var(--accent) transparent; }
 }
@@ -886,7 +890,7 @@ header.app-seam { position: sticky; }
 
     <div class="grid gap-6 lg:gap-8 grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1fr)_21rem] items-start">
       <form id="co-form" novalidate class="card min-w-0">
-        <div id="co-alert" hidden class="mx-5 mt-5 rounded-lg border border-destructive/40 bg-destructive/10 p-3.5 text-2sm text-destructive-accent" role="alert"></div>
+        <div id="co-alert" hidden tabindex="-1" class="mx-5 mt-5 rounded-lg border border-destructive/40 bg-destructive/10 p-3.5 text-2sm text-destructive-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" role="alert"></div>
 
         <!-- step 1: contact -->
         <div class="co-step card-content flex flex-col gap-5" data-step="1">
@@ -1253,6 +1257,7 @@ const bdi = v => '<bdi>' + esc(v) + '</bdi>';
 
 /* ===== translations (Arabic is the second language of the shop, not a transliteration) ===== */
 const I18N = {
+  "There is a problem": "هناك مشكلة", "Error": "خطأ",
   "Free shipping over $75 — every order leaves the bindery within 24 hours": "شحن مجاني للطلبات فوق 75 دولاراً — كل طلب يغادر المشغل خلال 24 ساعة",
   "Shop all": "كل المنتجات", "Notebooks": "دفاتر", "Pens": "أقلام", "Inks": "أحبار", "Desk": "المكتب", "Paper": "ورق",
   "Search the shop": "ابحث في المتجر", "My orders": "طلباتي", "Wishlist": "المفضلة", "Addresses": "العناوين", "Sign out": "تسجيل الخروج",
@@ -2374,7 +2379,7 @@ function validateField(inp) {
   const msg = RULES[rule](inp.value, inp), err = $('#e-' + inp.id);
   if (msg) {
     inp.setAttribute('aria-invalid', 'true'); describe(inp, 'e-' + inp.id);
-    err.innerHTML = `<i data-lucide="circle-alert" class="size-3.5 shrink-0"></i><span>${esc(t(msg))}</span>`; err.hidden = false; icons();
+    err.innerHTML = `<i data-lucide="circle-alert" class="size-3.5 shrink-0"></i><span><span class="sr-only">${esc(t('Error'))}: </span>${esc(t(msg))}</span>`; err.hidden = false; icons();
   } else {
     inp.removeAttribute('aria-invalid'); describe(inp, null);
     err.hidden = true; err.textContent = '';
@@ -2509,18 +2514,32 @@ function renderCheckout() {
   checkoutGuard();
   icons();
 }
-function showAlert(n) {
+const BASE_TITLE = document.title;
+function showAlert(bad) {
   const a = $('#co-alert');
-  if (!n) { a.hidden = true; a.textContent = ''; return; }
-  a.innerHTML = `<span class="flex items-center gap-2"><i data-lucide="circle-alert" class="size-4 shrink-0"></i>${n} ${esc(t(n === 1 ? 'field needs attention' : 'fields need attention'))}</span>`;
+  const list = Array.isArray(bad) ? bad : [];
+  if (!list.length) { a.hidden = true; a.textContent = ''; document.title = BASE_TITLE; return; }
+  const items = list.map(f => {
+    const err = $('#e-' + f.id), label = $(`label[for="${f.id}"]`);
+    const msg = err && err.textContent.replace(/^\s*\S+:\s*/, '').trim() || (label ? label.textContent.trim() : f.id);
+    return `<li><a href="#${f.id}" class="underline underline-offset-2 hover:no-underline">${esc(msg)}</a></li>`;
+  }).join('');
+  a.innerHTML = `<p class="flex items-center gap-2 font-medium"><i data-lucide="circle-alert" class="size-4 shrink-0"></i>${esc(t('There is a problem'))}</p><ul class="mt-2 ms-6 list-disc space-y-1">${items}</ul>`;
   a.hidden = false; icons();
+  document.title = `${t('Error')}: ${BASE_TITLE}`;
 }
+/* a link in the summary lands on the field, clear of the sticky header */
+document.addEventListener('click', e => {
+  const link = e.target.closest('#co-alert a[href^="#"]'); if (!link) return;
+  const f = document.getElementById(link.getAttribute('href').slice(1)); if (!f) return;
+  e.preventDefault(); f.focus({ preventScroll: true }); f.scrollIntoView({ block: 'center' });
+});
 /* The summary banner was written once per submit and never revisited, so it kept asserting a
    count that was already wrong and a problem that had already been fixed. */
 function refreshAlert() {
   if ($('#co-alert').hidden) return;
   if (STATE.step === 4 && !STATE.cart.length) return;
-  showAlert(badFields(STATE.step).length);
+  showAlert(badFields(STATE.step));
 }
 function placeOrder() {
   if (STATE.placing) return;                       /* one order per submit, whatever the click rate */
@@ -2772,7 +2791,7 @@ document.addEventListener('click', e => {
   if (el('[data-promo]')) { applyPromo($('#promo').value); return; }
   if (el('[data-checkout]')) { if (!STATE.cart.length) return; closeOverlay(true); go('checkout'); return; }
   if (el('[data-open-cart]')) { openOverlay('cart'); return; }
-  if ((b = el('[data-step-to]'))) { STATE.step = +b.dataset.stepTo; showAlert(0); renderCheckout(); stepFields(STATE.step)[0] && stepFields(STATE.step)[0].focus(); return; }
+  if ((b = el('[data-step-to]'))) { STATE.step = +b.dataset.stepTo; showAlert([]); renderCheckout(); stepFields(STATE.step)[0] && stepFields(STATE.step)[0].focus(); return; }
   if (el('[data-open-wish]')) { STATE.wishOnly = true; STATE.cat = 'all'; STATE.page = 1; closeOverlay(true); go('catalog'); renderRail(); renderChips(); renderGrid(); return; }
   if ((b = el('[data-toast]'))) { toast(t(b.dataset.toast) || b.dataset.toast); say(t(b.dataset.toast) || b.dataset.toast); if (b.closest('#account-menu')) closeAccount(true); return; }
   if ((b = el('.acc-head'))) { const a = b.closest('.acc'); a.classList.toggle('open'); b.setAttribute('aria-expanded', a.classList.contains('open')); return; }
@@ -2877,14 +2896,13 @@ $('#co-form').addEventListener('submit', e => {
   e.preventDefault();
   const bad = stepFields(STATE.step).map(f => ({ f, m: validateField(f) })).filter(x => x.m);
   if (bad.length) {
-    showAlert(bad.length);
-    /* focus without the default top-alignment scroll, then place the field clear of the sticky
-       header; the role=alert summary is announced whether or not it is still on screen */
-    bad[0].f.focus({ preventScroll: true });
-    bad[0].f.scrollIntoView({ block: 'center' });
+    showAlert(bad.map(x => x.f));
+    /* focus goes to the summary, not the first field: the reader hears every problem once, and each
+       link takes them to its field. Scrolled without the default top alignment, clear of the header. */
+    const a = $('#co-alert'); a.focus({ preventScroll: true }); a.scrollIntoView({ block: 'nearest' });
     return;
   }
-  showAlert(0);
+  showAlert([]);
   if (STATE.step < 4) { STATE.step++; renderCheckout(); $('#stepper').scrollIntoView({ block: 'nearest' }); stepFocus(); }
   else placeOrder();
 });
@@ -2895,7 +2913,7 @@ function stepFocus() {
   if (f) f.focus({ preventScroll: true });
   say(`${t('Step')} ${STATE.step} ${t('of')} ${STEPS.length} — ${LANG === 'ar' ? STEPS[STATE.step - 1].ar : STEPS[STATE.step - 1].en}`);
 }
-$('#co-back').addEventListener('click', () => { if (STATE.step > 1) { STATE.step--; showAlert(0); renderCheckout(); stepFocus(); } });
+$('#co-back').addEventListener('click', () => { if (STATE.step > 1) { STATE.step--; showAlert([]); renderCheckout(); stepFocus(); } });
 $('#news-form').addEventListener('submit', e => {
   e.preventDefault();
   const i = $('#f-news-email'), err = $('#e-news'), msg = RULES.email(i.value);

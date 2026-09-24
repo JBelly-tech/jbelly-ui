@@ -8,9 +8,10 @@ behind the ten dimensions.
 ## Forms and inputs
 - Label above the field, always visible; placeholder is an example, never the label. Error text under the field, linked with `aria-describedby`; `aria-invalid` on the control.
 - Correct `type`, `inputmode` and `autocomplete` on every input; never block paste; `spellcheck="false"` on emails, codes and usernames.
-- Validate on blur, re-validate on input after the first error. On a failed submit keep inline errors and focus a `role="alert"` summary that links to each field when there are more than two.
+- Validate on blur, re-validate on input after the first error. On a failed submit keep the inline errors and **always** show a `role="alert"` summary at the top of the form, even for one error: heading "There is a problem", one link per error worded exactly like its inline message, focus moved to the summary (`tabindex="-1"`), each link landing on its field. Prefix the inline message with a visually hidden "Error:" and the page `<title>` with "Error: " while errors remain. (GOV.UK's tested pattern; the storefront shell's checkout is the reference.)
 - Submit stays enabled until the request starts, then disabled with a spinner inside the button (width unchanged). Warn before leaving with unsaved changes.
-- Sign-in must accept password managers and paste; OTP inputs auto-advance, accept a pasted code, submit on the last digit.
+- Sign-in must accept password managers and paste; OTP inputs auto-advance, accept a pasted code, submit on the last digit. No step of signing in may depend on remembering, transcribing or solving something (a puzzle, a code typed from an image) without an alternative such as a device prompt, a magic link or paste (WCAG 2.2 3.3.8).
+- Never ask for the same information twice in one flow: what the user entered earlier is prefilled or offered as a choice ("same as shipping"), unless re-entry is essential or a security step (WCAG 2.2 3.3.7).
 - Selects with 5 options or fewer become radios or a segmented control. Dates default to today; prefill from the record or the last value.
 
 ## Navigation and focus
@@ -44,7 +45,7 @@ behind the ten dimensions.
 - Tracking by size: display `-0.02em`, titles `-0.01em`, body 0, small uppercase labels `+0.04em`. Display line-height 1.05–1.15.
 - Weights 400 / 500 / 600 (700 only for display); never 300 on text below 16px.
 - `tabular-nums` where digits align (tables, KPIs, axis ticks); proportional in running text.
-- `text-wrap: balance` on headings, `…` not `...`, curly quotes, non-breaking space between a number and its unit (`10 MB`, `⌘ K`).
+- `text-wrap: balance` on headings (Baseline), `text-wrap: pretty` on paragraphs, list items and captions (not Baseline yet; browsers without it wrap as before, so it costs nothing). Both live in the shells' base layer. `…` not `...`, curly quotes, non-breaking space between a number and its unit (`10 MB`, `⌘ K`).
 - Arabic: pair a Latin UI face with an Arabic companion at the same optical weight, line-height 1.7 for Arabic body, no tracking on Arabic, numbers stay LTR.
 
 ## Colour and contrast
@@ -75,6 +76,7 @@ behind the ten dimensions.
 - Sentence case everywhere except proper nouns; no em-dashes in UI copy.
 
 ## Accessibility
+- The defects found on most of the web's top pages every year are the cheap ones: `<html>` without `lang`, images without `alt`, links and buttons with nothing to announce, fields without a label, a missing or skipped heading level. `scripts/check_a11y.py` fails on each of them (and on two `<main>`s, an aria reference to a missing id, a duplicate id, a positive `tabindex`, an iframe without a title, a nav without a skip link); `verify_page.py` runs it on the rendered page.
 - Icon-only controls get `aria-label`; decorative icons `aria-hidden="true"`; async regions `aria-live="polite"`; count badges announce context ("3 unread").
 - Interactive chips are `<button aria-pressed>`; sortable headers carry `aria-sort`; the active nav item `aria-current="page"`.
 - Every drag or swipe interaction has a button and keyboard alternative; announce moves in a live region.

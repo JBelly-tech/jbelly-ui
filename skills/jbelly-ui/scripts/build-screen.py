@@ -147,7 +147,7 @@ def build_toolbar(spec):
           <p class="text-2sm text-secondary-foreground">{esc(spec.get("subtitle",""))}{" · " if spec.get("subtitle") else ""}<span id="period-label">{esc(periods[min(1, len(periods)-1)])}</span></p>
         </div>
         <div class="flex flex-wrap items-center gap-2.5">
-          <select id="period" class="input select w-40">{opts}</select>
+          <select id="period" class="input select w-40" aria-label="Period" data-i18n-aria-label="Period">{opts}</select>
           <button class="btn btn-outline"><i data-lucide="download"></i><span data-i18n="{esc(sec)}">{esc(sec)}</span></button>
           <button class="btn btn-primary" data-toast="{esc(prim)}" data-toast-undo><i data-lucide="plus"></i><span data-i18n="{esc(prim)}">{esc(prim)}</span></button>
         </div>
@@ -405,7 +405,7 @@ def build_app(spec, s):
     ch = spec.get("chart")
     if ch:
         ct = ch.get("title", "Trend"); old_ct = SHELL["chart_title"]
-        s = s.replace(f'data-i18n="{old_ct}">{old_ct}</h3>', f'data-i18n="{esc(ct)}">{esc(ct)}</h3>')
+        s = s.replace(f'data-i18n="{old_ct}">{old_ct}</h2>', f'data-i18n="{esc(ct)}">{esc(ct)}</h2>')
         series = [x for x in ch.get("series", []) if x.get("name")]
         if series:
             # the whole chip strip is rebuilt rather than swapped name by name: pairing the spec's names
@@ -441,7 +441,7 @@ def build_app(spec, s):
     if hl.get("items"):
         items = hl["items"]; total = sum(int(str(i.get("value", 0)).replace(",", "")) for i in items)
         ht = hl.get("title", SHELL["highlights_title"]); old_ht = SHELL["highlights_title"]
-        s = s.replace(f'data-i18n="{old_ht}">{old_ht}</h3>', f'data-i18n="{esc(ht)}">{esc(ht)}</h3>')
+        s = s.replace(f'data-i18n="{old_ht}">{old_ht}</h2>', f'data-i18n="{esc(ht)}">{esc(ht)}</h2>')
         old_tl = SHELL["highlights_total_label"]; tl = hl.get("total_label", old_tl)
         s = s.replace(f'data-i18n="{old_tl}">{old_tl}</span>', f'data-i18n="{esc(tl)}">{esc(tl)}</span>')
         s = s.replace('<span id="hl-total" class="text-2xl font-semibold text-mono tabular-nums font-display">214</span>', f'<span class="text-2xl font-semibold text-mono tabular-nums font-display">{esc(hl.get("total", total))}</span>')
@@ -465,8 +465,8 @@ def build_app(spec, s):
     tb = spec.get("table")
     if tb:
         old_tt = SHELL["table_title"]; tt = tb.get("title", old_tt)
-        s = s.replace(f'data-i18n="{old_tt}">{old_tt}</h3><span class="badge badge-sm badge-outline">24</span>',
-                      f'data-i18n="{esc(tt)}">{esc(tt)}</h3><span class="badge badge-sm badge-outline">{esc(tb.get("count", len(tb.get("rows", []))))}</span>')
+        s = s.replace(f'data-i18n="{old_tt}">{old_tt}</h2><span class="badge badge-sm badge-outline">24</span>',
+                      f'data-i18n="{esc(tt)}">{esc(tt)}</h2><span class="badge badge-sm badge-outline">{esc(tb.get("count", len(tb.get("rows", []))))}</span>')
         cols = tb.get("columns")
         if cols and len(cols) == len(SHELL["columns"]):
             for old, new in zip(SHELL["columns"], cols):

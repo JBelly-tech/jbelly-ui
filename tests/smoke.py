@@ -541,5 +541,26 @@ for _m2 in _drift:
     print("    " + _m2)
 ok &= not _drift
 
+# The accessibility structure check: every shipped page passes it, and it names each defect it
+# claims to catch when that defect is planted. A checker that passes everything proves nothing.
+_a11y = os.path.join(SK, "scripts", "check_a11y.py")
+for _pg in [os.path.join(SK, "assets", n + "-shell.html") for n in _shells] + [os.path.join(ROOT, "index.html")]:
+    ok &= run("check_a11y.py " + os.path.basename(_pg), [_a11y, _pg, "--quiet"])
+_bad = os.path.join(OUT, "a11y-bad.html")
+open(_bad, "w", encoding="utf-8").write(
+    "<!doctype html><html><head><title>t</title></head><body><nav><a href='/x'>Home</a></nav><main>"
+    "<h1>Page</h1><h3>Skipped</h3><img src='a.png'><button><i data-lucide='x'></i></button>"
+    "<input type='text' name='q'><a href='#' aria-describedby='nope'>ok</a><p id='d'></p><p id='d'></p>"
+    "<div tabindex='3'></div></main></body></html>")
+_r = subprocess.run([PY, _a11y, _bad, "--json"], capture_output=True, text=True, encoding="utf-8", errors="replace")
+_codes = sorted({f["rule"] for f in json.loads(_r.stdout)["findings"]}) if _r.stdout.strip().startswith("{") else []
+_want = ["A01", "A05", "A06", "A08", "A09", "A10", "A11", "A12", "A14"]
+print("[" + ("OK" if _r.returncode == 1 and _codes == _want else "FAIL") +
+      "] check_a11y.py names every planted defect: " + ",".join(_codes))
+ok &= _r.returncode == 1 and _codes == _want
+_r = subprocess.run([PY, _a11y, _bad, "--quiet", "--ignore", ",".join(_want)], capture_output=True, text=True, encoding="utf-8", errors="replace")
+print("[" + ("OK" if _r.returncode == 0 else "FAIL") + "] check_a11y.py --ignore silences exactly the rules named")
+ok &= _r.returncode == 0
+
 print("\nSMOKE:", "PASS" if ok else "FAIL")
 sys.exit(0 if ok else 1)
