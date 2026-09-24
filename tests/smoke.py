@@ -484,5 +484,30 @@ else:
         print("    " + _m)
     ok &= not _bad
 
+# An installed skill must not depend on anything this project hosts. That is the whole reason the
+# move to an organisation broke nothing for anyone using it: the folder people copy never calls
+# home, so the site could vanish and the skill would still work. One "see the live demo at ..." in
+# a reference file would end that quietly, and the damage would surface at the NEXT move, to
+# someone else. The demos' CDN links are a separate question and stay: they are third-party.
+_OURS = ("jbelly-tech.github.io", "mohammadjohar.github.io",
+         "github.com/JBelly-tech", "github.com/mohammadJohar")
+_calls_home = []
+for _root, _dirs, _files in os.walk(SK):
+    _dirs[:] = [d for d in _dirs if d != "__pycache__"]
+    for _n in _files:
+        _f = os.path.join(_root, _n)
+        try:
+            _t = open(_f, encoding="utf-8", errors="replace").read()
+        except OSError:
+            continue
+        for _h in _OURS:
+            if _h in _t:
+                _calls_home.append(os.path.relpath(_f, ROOT).replace("\\", "/") + " -> " + _h)
+print("[" + ("OK" if not _calls_home else "FAIL") +
+      "] the installed skill depends on nothing this project hosts")
+for _m in _calls_home:
+    print("    " + _m)
+ok &= not _calls_home
+
 print("\nSMOKE:", "PASS" if ok else "FAIL")
 sys.exit(0 if ok else 1)

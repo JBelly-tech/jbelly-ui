@@ -71,6 +71,21 @@ in `tokens.css` comments), plain CSS, or component libraries that accept
 class names. Charts assume ApexCharts (MIT); any library can be themed from
 the same variables (`references/charts.md`).
 
+## What an install depends on
+
+**Nothing we host.** The folder you copy — `skills/jbelly-ui/` — names no address
+belonging to this project: no site, no repository, no API. It is text and Python
+that reads local files. If this project moves account again, or the site goes
+away entirely, an installed copy keeps working exactly as it did. A test holds
+that: `tests/smoke.py` fails if any file in the shipped folder so much as
+mentions a host we control.
+
+The four demo pages are the one exception worth naming, and they are demos
+rather than the skill: each is a single file that pulls Tailwind, ApexCharts,
+Lucide and Google Fonts from public CDNs at runtime, so it needs a network the
+first time you open it. Pages the generator builds inherit those four `<script>`
+and `<link>` tags. Nothing else reaches the network, at build time or after.
+
 ## Licence
 
 MIT. Every dependency the skill recommends is MIT / BSD / Apache / OFL. No
