@@ -46,7 +46,7 @@ jobs:
           done
       - name: Every link this project publishes resolves
         run: python scripts/check_links.py
-      - name: ...and the ones it only points at (not a gate: other people's sites move)
+      - name: "Links out to other people's sites (reported, not a gate)"
         continue-on-error: true
         run: python scripts/check_links.py --external
       - name: The project's own site passes the project's own checks

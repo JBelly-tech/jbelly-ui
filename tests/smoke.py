@@ -455,5 +455,34 @@ print("[" + ("OK" if _caught7 else "FAIL") + "] pre-flight fails a control bound
 if not _caught7: print(f"    exit {_r7.returncode}: " + " | ".join(_r7.stdout.strip().splitlines()[-2:]))
 ok &= _caught7
 
+# A workflow that does not parse is not a failing build, it is no build: GitHub answers a YAML error
+# by running no jobs at all, so the run is red with an empty job list and no log to read. That cost
+# a push to learn, from an unquoted step name containing "gate: " -- a colon-space starts a nested
+# mapping. CI cannot catch this, because CI is the thing that did not start.
+try:
+    import yaml as _yaml
+except ImportError:
+    print("[SKIP] the workflows parse: needs pyyaml")
+else:
+    _wf = sorted(glob.glob(os.path.join(ROOT, ".github", "workflows", "*.yml")) +
+                 glob.glob(os.path.join(ROOT, ".github", "workflows", "*.yaml")))
+    _bad = []
+    for _f in _wf:
+        try:
+            _d = _yaml.safe_load(open(_f, encoding="utf-8"))
+            if not _d or not _d.get("jobs"):
+                _bad.append(os.path.basename(_f) + ": no jobs")
+            else:
+                for _j, _spec in _d["jobs"].items():
+                    if not _spec.get("steps"):
+                        _bad.append(f"{os.path.basename(_f)}: job {_j} has no steps")
+        except Exception as _e:
+            _bad.append(f"{os.path.basename(_f)}: {type(_e).__name__}: {str(_e).splitlines()[0]}")
+    print("[" + ("OK" if not _bad else "FAIL") +
+          f"] every workflow parses and has jobs with steps ({len(_wf)} file(s))")
+    for _m in _bad:
+        print("    " + _m)
+    ok &= not _bad
+
 print("\nSMOKE:", "PASS" if ok else "FAIL")
 sys.exit(0 if ok else 1)
