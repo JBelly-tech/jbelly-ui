@@ -2,6 +2,41 @@
 
 ## Unreleased
 
+**The demos did not look designed, and it was four recipes rather than taste.** Each one repeated
+itself across dozens of elements, so each fix is a line or two rather than a sweep through markup.
+
+`.meta` — the small secondary line under a CTA, a logo row, a card — was declared `font-mono`. That
+set twenty-five captions on the landing page in a typewriter face, including whole sentences:
+"Stop 214 cannot be served before 12:30. Mishwar lists it for a call at 06:15 with two slots to
+offer." Prose in mono reads as a terminal, not a product, and it was setting the tone of the page.
+Twelve of the twenty-five are figures and already say so with `tabular-nums`, which is what wants a
+monospace face, so the face follows the content: `.meta` is the page's own typeface and
+`.meta.tabular-nums` is still mono. No element had to be edited.
+
+`.eyebrow` and `.step` were mono for the same reason. The usual alternative — uppercase with wide
+tracking — is a tell this project's own pre-flight budgets against, so the design had swapped one
+costume for another. A label reads as a label from size, weight and colour; the two are already
+told apart by colour, and losing mono lets that be the thing you notice.
+
+**`--border` was 1.19:1 against the surface it sat on**, so a card was a rectangle the same colour
+as the page and the eye had to be told it was there. The storefront has shipped 88% for a while and
+reads better for it — the third time in this release that the newest shell was right and the rest
+of the system had not caught up. Every personality's border moves in lightness only, to about
+1.45:1: visible as structure, quiet enough that the system stays flat by intent. neo keeps its hard
+black and white borders, which are the personality rather than a default nobody revised.
+
+**The featured pricing card was lifted exactly 16px, at the same height as its neighbours** — so its
+top edge *and* its bottom edge were out of line by the same amount. Large enough to notice, small
+enough to look accidental. With a visible border, a primary ring and a badge already marking the
+plan, the lift earned nothing; the three cards line up. The badge itself sat across the top border
+as a sharp-cornered rectangle, so the border ran into it and stopped: it is a pill with a ring in
+the page colour now, which cuts the border the way the pattern is supposed to.
+
+**And 192px of nothing between sections.** Every section carried 96px top and bottom, so the last
+line of one and the first of the next were most of a laptop viewport apart. 72px each side keeps
+the page airy and lets the sections read as parts of one document; the landing page lost about 400px
+of height without losing a word.
+
 **Every link the project publishes is fetched now, and two of them were dead.** A transfer breaks
 links three ways and only one is obvious: the repository URL redirects, a Pages site does not, and a
 relative link on the site was never about the owner at all. Checking all 69 by hand found two that

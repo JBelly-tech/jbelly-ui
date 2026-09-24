@@ -509,5 +509,37 @@ for _m in _calls_home:
     print("    " + _m)
 ok &= not _calls_home
 
+# The four shells are one system with four products in it. A role that carries no brand -- the line
+# around a card, a field's edge, the focus ring, the radius, the grey of a second line -- has no
+# reason to differ between them, and three times in one release it did, always the same way: the
+# storefront was revised and the other three were not. Nobody sees a border at 94% next to one at
+# 88% in different files; you see it as "the demos look uneven" months later.
+# Surfaces and brand are excluded on purpose: the storefront's off-white page is a decision about
+# product photographs, and each demo is a different product with a different colour.
+_STRUCTURAL = ("border", "input", "ring", "radius", "muted-foreground")
+_shells = ["app", "commerce", "landing", "pricing"]
+
+
+def _scope(name, sel):
+    _css = open(os.path.join(SK, "assets", name + "-shell.html"), encoding="utf-8").read()
+    _m = re.search(r"(^|\n)" + re.escape(sel) + r"[^{]*\{([^{}]*)\}", _css, re.S)
+    return dict(re.findall(r"--([\w-]+)\s*:\s*([^;]+);", _m.group(2))) if _m else {}
+
+
+_drift = []
+for _sel in (":root", ".dark"):
+    _envs = {n: _scope(n, _sel) for n in _shells}
+    for _role in _STRUCTURAL:
+        _vals = {n: (_envs[n].get(_role) or "").strip() for n in _shells}
+        _seen = {v for v in _vals.values() if v}
+        if len(_seen) > 1:
+            _drift.append("%s --%s: %s" % (_sel, _role,
+                          ", ".join("%s=%s" % (n, v or "(unset)") for n, v in _vals.items())))
+print("[" + ("OK" if not _drift else "FAIL") +
+      "] the shells agree on every role that carries no brand")
+for _m2 in _drift:
+    print("    " + _m2)
+ok &= not _drift
+
 print("\nSMOKE:", "PASS" if ok else "FAIL")
 sys.exit(0 if ok else 1)
