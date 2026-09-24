@@ -725,8 +725,9 @@ html[data-ready] .arrives {
                 with sparklines, an area chart, a donut with a channel breakdown, and a data table
                 with filters and pagination.">
     </a>
-    <p class="small" data-i18n="hero-caption">The demo, as it ships. Open it and everything works — collapse the sidebar,
-    press ⌘K, sort a column, switch to Arabic. This capture is taken from that file by
+    <p class="small" data-i18n="hero-caption">The demo, as it ships — and opening it keeps whatever you picked
+    above: the personality, dark mode, the language. Everything in it works: collapse the sidebar,
+    press ⌘K, sort a column. This capture is taken from that file by
     <code>scripts/capture_showcase.py</code>, so it cannot fall behind the code.</p>
   </div>
 </section>
@@ -1026,9 +1027,9 @@ python skills/jbelly-ui/scripts/verify_page.py out.html --variants ",#dark=1,#di
   <div data-for="hero-shot" data-alt="شاشة التطبيق: شريط جانبي قابل للطيّ، وترويسة فيها بحث وإشعارات،
   وأربع بطاقات مؤشرات مع رسوم مصغّرة، ورسم مساحي، ورسم دائري بتوزيع القنوات، وجدول بيانات فيه
   مرشّحات وتنقّل بين الصفحات."></div>
-  <div data-for="hero-caption">الديمو كما يُسلَّم. افتحه وكل شيء فيه يعمل — اطوِ الشريط الجانبي، اضغط
-  ⌘K، رتّب عموداً، بدّل إلى العربية. هذه اللقطة مأخوذة من ذلك الملف نفسه بواسطة
-  <code>scripts/capture_showcase.py</code>، فلا يمكن أن تتخلّف عن الشيفرة.</div>
+  <div data-for="hero-caption">الديمو كما يُسلَّم — وفتحه يحتفظ بما اخترته في الأعلى: الهويّة،
+  والوضع الداكن، واللغة. وكل شيء فيه يعمل: اطوِ الشريط الجانبي، اضغط ⌘K، رتّب عموداً. هذه اللقطة
+  مأخوذة من ذلك الملف نفسه بواسطة <code>scripts/capture_showcase.py</code>، فلا يمكن أن تتخلّف عن الشيفرة.</div>
 
   <div data-for="theme-h2">كل لون في هذه الصفحة جاء من المهارة</div>
   <div data-for="theme-p1">الشريط في الأعلى يكتب صنفاً واحداً على هذا المستند، ولا يغيّر شيئاً غيره.
@@ -1207,6 +1208,7 @@ python skills/jbelly-ui/scripts/verify_page.py out.html --variants ",#dark=1,#di
       c.tabIndex = on ? 0 : -1;               // a radiogroup is one tab stop, not seven
     });
     try { localStorage.setItem('jb-preset', name); } catch (e) { /* private window: not fatal */ }
+    links();                                    // the way into each demo follows the rail too
   }
 
   chips.forEach(function (chip, i) {
@@ -1255,6 +1257,28 @@ python skills/jbelly-ui/scripts/verify_page.py out.html --variants ",#dark=1,#di
     var a = document.getElementById('shot'), b = document.getElementById('shop-shot');
     if (a) a.src = 'docs/showcase/default-' + ar + tone + '.png';
     if (b) b.src = 'docs/showcase/commerce-' + ar + tone + '.png';
+    links();
+  }
+
+  // ...and every way into a demo carries the state the reader is in. The still says what it is --
+  // the demo as it ships -- but the rail has just re-themed this page, and a reader who picked mint
+  // should not have to find the demo's own theme control to see mint. The shells read exactly this
+  // fragment, which is also what capture_showcase.py passes them.
+  function links() {
+    var theme = (html.className.match(/theme-[a-z]+/) || [''])[0];
+    var bits = [];
+    if (theme) bits.push('theme=' + theme);
+    if (html.classList.contains('dark')) bits.push('dark=1');
+    if (lang === 'ar') bits.push('lang=ar');
+    var frag = bits.length ? '#' + bits.join('&') : '';
+    Array.prototype.forEach.call(document.querySelectorAll('a[href*="-shell.html"]'), function (el) {
+      var href = el.getAttribute('href');
+      // "Open it in Arabic" opens the demo in the direction the reader is NOT in, and in Arabic it
+      // becomes "Open it in English". A link that names its own dir= is overriding the page on
+      // purpose; handing it the page's state would make it say one thing and do another.
+      if (href.indexOf('dir=') !== -1) return;
+      el.setAttribute('href', href.split('#')[0] + frag);
+    });
   }
 
   function label() {

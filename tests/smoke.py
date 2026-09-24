@@ -312,6 +312,18 @@ else:
         _pg.click("#lang-toggle"); _pg.wait_for_timeout(200)
         _after = _pg.evaluate("document.getElementById('main').innerHTML")
         _t2 = _pg.title()
+        # The rail re-themes this page; the still beside it is the demo as it ships and cannot
+        # follow. What can follow is the way in: every link to a demo carries the personality, the
+        # mode and the language the reader is in -- except the one whose whole job is to open the
+        # demo in the direction they are NOT in.
+        _pg.click('button[data-theme="theme-mint"]'); _pg.wait_for_timeout(200)
+        _pg.click("#dark-toggle"); _pg.wait_for_timeout(200)
+        _links = _pg.evaluate("""() => Array.from(document.querySelectorAll('a[href*="-shell.html"]'))
+              .map(a => a.getAttribute('href'))""")
+        _carry = [l for l in _links if "dir=" not in l]
+        _flip = [l for l in _links if "dir=" in l]
+        _state_ok = bool(_carry) and all("theme=theme-mint" in l and "dark=1" in l for l in _carry)
+        _flip_ok = all("theme=" not in l for l in _flip)
         _b.close()
     for _name, _cond, _why in [
         ("the language button switches the document to Arabic and RTL", _ar == ("rtl", "ar"), str(_ar)),
@@ -321,6 +333,9 @@ else:
         ("switching back restores the served markup exactly", _before == _after,
          f"{len(_before)} -> {len(_after)} characters"),
         ("switching back restores the title", _t2 == _t0, _t2),
+        ("every demo link carries the personality and the mode the reader picked", _state_ok,
+         ", ".join(_carry)),
+        ("the link that flips direction keeps its own fragment", _flip_ok, ", ".join(_flip)),
     ]:
         print("[" + ("OK" if _cond else "FAIL") + "] " + _name + ("" if _cond else "\n    " + _why))
         ok &= _cond
